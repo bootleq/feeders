@@ -10,6 +10,9 @@
     "pages:build": "pnpm next-on-pages",
     "preview": "pnpm pages:build && wrangler pages dev",
     "deploy": "pnpm pages:build && wrangler pages deploy",
+    "migrate-new": "wrangler d1 migrations create feeders",
+    "migrate-list": "wrangler d1 migrations list feeders",
+    "migrate-up": "wrangler d1 migrations apply feeders",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv env.d.ts"
   },
   "dependencies": {
