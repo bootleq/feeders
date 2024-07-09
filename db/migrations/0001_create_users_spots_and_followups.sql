@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS spots (
   created_at TEXT,
   created_by INTEGER,
   lat TEXT,
-  lon TEXT
+  lon TEXT,
+  user_id INTEGER
 );
 
 DROP TABLE IF EXISTS followups;
