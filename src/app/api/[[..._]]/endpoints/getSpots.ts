@@ -2,10 +2,14 @@ import { OpenAPIRoute } from 'chanfana';
 import { z } from 'zod';
 import { latitude, longitude, PubStateEnum } from '../types';
 import { getRequestContext } from '@cloudflare/next-on-pages';
+import { db } from '@/lib/db';
+import { spots, users } from '@/lib/schema';
 
 export const runtime = 'edge';
 
-const originExample = '23.9739, 120.9773';
+const softLimit = 300;
+
+const originExample = '24.988040038688847, 121.5210559478082';
 
 const origin = z.string().trim().transform((val, ctx) => {
   const matches = val.match(/^(-?\d+(?:\.?\d+)?)\s*,\s*(-?\d+(?:\.?\d+)?)$/);
@@ -39,13 +43,13 @@ const origin = z.string().trim().transform((val, ctx) => {
 
 const ResultItem = z.object({
   id: z.number(),
+  title: z.string(),
   desc: z.string(),
   lat: latitude,
   lon: longitude,
   state: PubStateEnum,
   created_at: z.coerce.date(),
-  created_by: z.coerce.number(),
-  user_id: z.number()
+  userId: z.string()
 });
 
 export class getSpots extends OpenAPIRoute {
@@ -70,17 +74,23 @@ export class getSpots extends OpenAPIRoute {
   async handle(c: any) {
     const data = await this.getValidatedData<typeof this.schema>()
 
-    const DB = getRequestContext().env.DB;
-
-    const { results } = await DB.prepare(
-      "SELECT * FROM spots WHERE state = ?"
-    )
-      .bind("published")
-      .all();
+    const items = await db.query.spots.findMany({
+      columns: {
+        id: true,
+        title: true,
+        lat: true,
+        lon: true,
+        desc: true,
+        state: true,
+        createdAt: true,
+        userId: true,
+      },
+      limit: softLimit + 1
+    });
 
     return c.json({
       success: true,
-      items: results.map((fd: typeof ResultItem) => ResultItem.parse(fd))
+      items: items
     })
   }
 }

@@ -18,3 +18,4 @@ openapi.get('/spots/:origin', getSpots);
 openapi.post('/spots', createSpot);
 
 export const GET = handle(app)
+export const POST = handle(app)

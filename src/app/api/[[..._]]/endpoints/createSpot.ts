@@ -3,14 +3,19 @@ import { z } from 'zod';
 import { latitude, longitude, PubStateEnum } from '../types';
 import { HTTPException } from 'hono/http-exception';
 import { getRequestContext } from '@cloudflare/next-on-pages';
+import { db } from '@/lib/db';
+import { spots } from '@/lib/schema';
+import { auth } from '@/lib/auth';
 
 const ResultItem = {
   id: z.number(),
-  state: PubStateEnum,
+  title: z.string(),
   desc: z.string(),
   lat: latitude,
   lon: longitude,
-  created_at: z.date()
+  state: PubStateEnum,
+  createdAt: z.date(),
+  authorId: z.number()
 };
 
 export class createSpot extends OpenAPIRoute {
@@ -20,6 +25,7 @@ export class createSpot extends OpenAPIRoute {
         content: {
           'application/json': {
             schema: z.object({
+              title: z.string().default('').openapi({ example: '隨機滷味' }),
               state: PubStateEnum.default('draft'),
               desc: z.string().default(''),
               lat: latitude,
@@ -31,7 +37,7 @@ export class createSpot extends OpenAPIRoute {
     },
     responses: {
       "200": {
-        description: "建立新 spot",
+        description: "建立新 spot，需要登入",
         content: {
           'application/json': {
             schema: z.object(ResultItem)
@@ -43,21 +49,31 @@ export class createSpot extends OpenAPIRoute {
 
   async handle(c: any) {
     const data = await this.getValidatedData<typeof this.schema>()
-    const { state, desc, lat, lon } = data.body;
-    const now = new Date().toISOString();
+    const { title, state, desc, lat, lon } = data.body;
+    const now = new Date();
+
+    const session = await auth();
+
+    if (!session?.userId || session?.user?.state !== 'active') {
+      throw new HTTPException(401);
+    }
 
     try {
-      const DB = getRequestContext().env.DB;
-      const { success } = await DB.prepare(
-        `INSERT INTO spots (state, desc, lat, lon, created_at)
-                VALUES (?1, ?2, ?3, ?4, ?5)`
-        )
-        .bind(state, desc, lat, lon, now)
-        .run();
+      const item = await db.insert(spots)
+        .values({
+          title,
+          state,
+          desc,
+          lat,
+          lon,
+          userId: session.userId,
+          createdAt: now
+        }).returning();
 
-      if (success) {
+      if (item) {
         return c.json({
           success: true,
+          item: item
         })
       }
     } catch (e: any) {

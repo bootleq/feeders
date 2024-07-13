@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1720875390855,
+      "tag": "20240713125630_chemical_raider",
+      "breakpoints": true
+    }
+  ]
+}
