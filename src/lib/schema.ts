@@ -1,12 +1,19 @@
 import { integer, text, real, primaryKey, sqliteTable } from "drizzle-orm/sqlite-core"
 import { sql, relations } from "drizzle-orm";
 import type { AdapterAccount } from "@auth/core/adapters"
+import { z } from 'zod';
 import { nanoid } from 'nanoid';
 
-const userStateCol = (name: string = 'state') => text(name, { enum: ["new", "active", "inactive"] }).default('new');
-const intIdCol = (name: string = 'id') =>  integer(name).notNull().primaryKey({ autoIncrement: true });
-const pubStateCol = (name: string = 'state') => text(name, { enum: ["draft", "published", "dropped"] }).default('draft');
-const createdAtCol = (name: string = 'createdAt') => integer(name, { mode: "timestamp" }).default(sql`(unixepoch())`);
+export const UserStateEnum = z.enum(['new', 'active', 'inactive'] as const);
+export const PubStateEnum = z.enum(['draft', 'published', 'dropped'] as const);
+export const SpotActionEnum = z.enum(['see', 'say', 'remove', 'down'] as const);
+export const SpotStateEnum = z.enum(['dirty', 'clean', 'tolerated'] as const);
+
+const userStateCol = (name: string = 'state') => text(name, { enum: UserStateEnum.options }).notNull().default('new');
+const incrementIdCol = (name: string = 'id') =>  integer(name).notNull().primaryKey({ autoIncrement: true });
+const pubStateCol = (name: string = 'state') => text(name, { enum: PubStateEnum.options }).notNull().default('draft');
+const timestampCol = (name: string) => integer(name, { mode: "timestamp" });
+const createdAtCol = (name: string = 'createdAt') => timestampCol(name).notNull().default(sql`(unixepoch())`);
 
 // Auth.js tables
 // Ref: https://auth-docs-git-feat-nextjs-auth-authjs.vercel.app/reference/adapter/drizzle#sqlite
@@ -19,7 +26,8 @@ export const users = sqliteTable("users", {
   emailVerified: integer("emailVerified", { mode: "timestamp_ms" }),
   state: userStateCol(),
   image: text("image"),
-  createdAt: createdAtCol()
+  createdAt: createdAtCol(),
+  lockedAt: timestampCol('lockedAt')
 })
 export const usersRelations = relations(users, ({ many }) => ({
   spots: many(spots)
@@ -71,28 +79,51 @@ export const verificationTokens = sqliteTable("verification_tokens", {
 // {{{
 
 export const profiles = sqliteTable('profiles', {
-  id: intIdCol(),
+  id: incrementIdCol(),
   desc: text('desc'),
   createdAt: createdAtCol(),
-  userId: text('user_id').references(() => users.id),
+  userId: text('userId').references(() => users.id),
 })
 
 export const spots = sqliteTable("spots", {
-  id: intIdCol(),
+  id: incrementIdCol(),
   title: text("title"),
   lat: real("lat"),
   lon: real("lon"),
   desc: text('desc'),
-  state: pubStateCol(),
+  state: pubStateCol().notNull(),
   createdAt: createdAtCol(),
-  userId: text('user_id').references(() => users.id)
-})
+  userId: text('userId').references(() => users.id)
+});
 
-export const spotsRelations = relations(spots, ({ one }) => ({
+export const spotsRelations = relations(spots, ({ one, many }) => ({
   author: one(users, {
     fields: [spots.userId],
     references: [users.id]
   }),
+  followups: many(spotFollowups)
+}));
+
+export const spotFollowups = sqliteTable("spotFollowups", {
+  id: incrementIdCol(),
+  title: text("title"),
+  action: text('action', { enum: SpotActionEnum.options }).notNull(),
+  spotState: text('spotState', { enum: SpotStateEnum.options }).notNull(),
+  desc: text('desc'),
+  feedeeCount: integer('feedeeCount'),
+  state: pubStateCol().notNull(),
+  spawnedAt: timestampCol('spawnedAt'),
+  removedAt: timestampCol('removedAt'),
+  createdAt: createdAtCol(),
+  spotId: integer('spotId').references(() => spots.id),
+  userId: text('userId').references(() => users.id)
+});
+
+export const spotFollowupsRelations = relations(spotFollowups, ({ one }) => ({
+  spot: one(spots, {
+    fields: [spotFollowups.spotId],
+    references: [spots.id]
+  })
 }));
 
 // }}}

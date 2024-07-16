@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "b99b149b-3978-4e4c-acbb-d377c23361eb",
+  "id": "5009d1c6-9f7a-4796-b82c-dc21de02afee",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "accounts": {
@@ -88,7 +88,7 @@
           "name": "createdAt",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch())"
         }
@@ -141,12 +141,12 @@
           "name": "createdAt",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch())"
         },
-        "user_id": {
-          "name": "user_id",
+        "userId": {
+          "name": "userId",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -155,12 +155,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "profiles_user_id_users_id_fk": {
-          "name": "profiles_user_id_users_id_fk",
+        "profiles_userId_users_id_fk": {
+          "name": "profiles_userId_users_id_fk",
           "tableFrom": "profiles",
           "tableTo": "users",
           "columnsFrom": [
-            "user_id"
+            "userId"
           ],
           "columnsTo": [
             "id"
@@ -216,6 +216,128 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
+    "spotFollowups": {
+      "name": "spotFollowups",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "action": {
+          "name": "action",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "spotState": {
+          "name": "spotState",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "desc": {
+          "name": "desc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "feedeeCount": {
+          "name": "feedeeCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "state": {
+          "name": "state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'draft'"
+        },
+        "spawnedAt": {
+          "name": "spawnedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "removedAt": {
+          "name": "removedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch())"
+        },
+        "spotId": {
+          "name": "spotId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "spotFollowups_spotId_spots_id_fk": {
+          "name": "spotFollowups_spotId_spots_id_fk",
+          "tableFrom": "spotFollowups",
+          "tableTo": "spots",
+          "columnsFrom": [
+            "spotId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "spotFollowups_userId_users_id_fk": {
+          "name": "spotFollowups_userId_users_id_fk",
+          "tableFrom": "spotFollowups",
+          "tableTo": "users",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "spots": {
       "name": "spots",
       "columns": {
@@ -258,7 +380,7 @@
           "name": "state",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "'draft'"
         },
@@ -266,12 +388,12 @@
           "name": "createdAt",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch())"
         },
-        "user_id": {
-          "name": "user_id",
+        "userId": {
+          "name": "userId",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -280,12 +402,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "spots_user_id_users_id_fk": {
-          "name": "spots_user_id_users_id_fk",
+        "spots_userId_users_id_fk": {
+          "name": "spots_userId_users_id_fk",
           "tableFrom": "spots",
           "tableTo": "users",
           "columnsFrom": [
-            "user_id"
+            "userId"
           ],
           "columnsTo": [
             "id"
@@ -332,9 +454,9 @@
           "name": "state",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
-          "default": "'active'"
+          "default": "'new'"
         },
         "image": {
           "name": "image",
@@ -347,9 +469,16 @@
           "name": "createdAt",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch())"
+        },
+        "lockedAt": {
+          "name": "lockedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {

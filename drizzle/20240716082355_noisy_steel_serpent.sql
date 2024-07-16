@@ -10,7 +10,7 @@ CREATE TABLE `accounts` (
 	`scope` text,
 	`id_token` text,
 	`session_state` text,
-	`createdAt` integer DEFAULT (unixepoch()),
+	`createdAt` integer DEFAULT (unixepoch()) NOT NULL,
 	PRIMARY KEY(`provider`, `providerAccountId`),
 	FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
 );
@@ -18,9 +18,9 @@ CREATE TABLE `accounts` (
 CREATE TABLE `profiles` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`desc` text,
-	`createdAt` integer DEFAULT (unixepoch()),
-	`user_id` text,
-	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
+	`createdAt` integer DEFAULT (unixepoch()) NOT NULL,
+	`userId` text,
+	FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `sessions` (
@@ -30,16 +30,33 @@ CREATE TABLE `sessions` (
 	FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
+CREATE TABLE `spotFollowups` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`title` text,
+	`action` text NOT NULL,
+	`spotState` text NOT NULL,
+	`desc` text,
+	`feedeeCount` integer,
+	`state` text DEFAULT 'draft' NOT NULL,
+	`spawnedAt` integer,
+	`removedAt` integer,
+	`createdAt` integer DEFAULT (unixepoch()) NOT NULL,
+	`spotId` integer,
+	`userId` text,
+	FOREIGN KEY (`spotId`) REFERENCES `spots`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
 CREATE TABLE `spots` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`title` text,
 	`lat` real,
 	`lon` real,
 	`desc` text,
-	`state` text DEFAULT 'draft',
-	`createdAt` integer DEFAULT (unixepoch()),
-	`user_id` text,
-	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
+	`state` text DEFAULT 'draft' NOT NULL,
+	`createdAt` integer DEFAULT (unixepoch()) NOT NULL,
+	`userId` text,
+	FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `users` (
@@ -47,9 +64,10 @@ CREATE TABLE `users` (
 	`name` text,
 	`email` text NOT NULL,
 	`emailVerified` integer,
-	`state` text DEFAULT 'active',
+	`state` text DEFAULT 'new' NOT NULL,
 	`image` text,
-	`createdAt` integer DEFAULT (unixepoch())
+	`createdAt` integer DEFAULT (unixepoch()) NOT NULL,
+	`lockedAt` integer
 );
 --> statement-breakpoint
 CREATE TABLE `verification_tokens` (

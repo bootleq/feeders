@@ -1,9 +1,13 @@
 import { OpenAPIRoute } from 'chanfana';
 import { z } from 'zod';
-import { latitude, longitude, PubStateEnum } from '../types';
+import {
+  latitude,
+  longitude,
+  GetSpotsResult
+} from '@/app/api/schema/api';
 import { getRequestContext } from '@cloudflare/next-on-pages';
 import { db } from '@/lib/db';
-import { spots, users } from '@/lib/schema';
+import { spots, users, PubStateEnum } from '@/lib/schema';
 
 export const runtime = 'edge';
 
@@ -41,17 +45,6 @@ const origin = z.string().trim().transform((val, ctx) => {
   return parsed.map(({ data }) => data);
 });
 
-const ResultItem = z.object({
-  id: z.number(),
-  title: z.string(),
-  desc: z.string(),
-  lat: latitude,
-  lon: longitude,
-  state: PubStateEnum,
-  created_at: z.coerce.date(),
-  userId: z.string()
-});
-
 export class getSpots extends OpenAPIRoute {
   schema = {
     request: {
@@ -64,7 +57,7 @@ export class getSpots extends OpenAPIRoute {
         description: "取得 spots 列表",
         content: {
           'application/json': {
-            schema: ResultItem.array(),
+            schema: GetSpotsResult.array(),
           },
         },
       }

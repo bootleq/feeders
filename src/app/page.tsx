@@ -1,4 +1,4 @@
-import { users, accounts } from '@/lib/schema';
+import { users, accounts, spots } from '@/lib/schema';
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { SignIn } from '@/components/sign-in-button';
@@ -11,6 +11,7 @@ export default async function Home() {
 
   const rUsers = await db.select().from(users);
   const rAcs = await db.select().from(accounts);
+  const rSpots = await db.select().from(spots);
 
   return (
     <main className="flex min-h-screen flex-col items-center p-4">
@@ -22,6 +23,11 @@ export default async function Home() {
         <h2 className='mt-5'>Users</h2>
         <code>
           {JSON.stringify(rUsers)}
+        </code>
+
+        <h2 className='mt-5'>Spots</h2>
+        <code>
+          {JSON.stringify(rSpots)}
         </code>
 
         <h2 className='mt-5'>Accounts</h2>

@@ -45,7 +45,6 @@ const providers = [
       return {
         id: profile.sub ?? profile.id,
         email: profile.email,
-        state: ''
       };
     },
   })

@@ -1,22 +1,15 @@
 import { OpenAPIRoute } from 'chanfana';
 import { z } from 'zod';
-import { latitude, longitude, PubStateEnum } from '../types';
+import {
+  latitude,
+  longitude,
+  CreateSpotResult
+} from '@/app/api/schema/api';
 import { HTTPException } from 'hono/http-exception';
 import { getRequestContext } from '@cloudflare/next-on-pages';
 import { db } from '@/lib/db';
-import { spots } from '@/lib/schema';
+import { spots, PubStateEnum } from '@/lib/schema';
 import { auth } from '@/lib/auth';
-
-const ResultItem = {
-  id: z.number(),
-  title: z.string(),
-  desc: z.string(),
-  lat: latitude,
-  lon: longitude,
-  state: PubStateEnum,
-  createdAt: z.date(),
-  authorId: z.number()
-};
 
 export class createSpot extends OpenAPIRoute {
   schema = {
@@ -40,7 +33,7 @@ export class createSpot extends OpenAPIRoute {
         description: "建立新 spot，需要登入",
         content: {
           'application/json': {
-            schema: z.object(ResultItem)
+            schema: CreateSpotResult
           },
         },
       }
