@@ -106,10 +106,10 @@ export const spotsRelations = relations(spots, ({ one, many }) => ({
 
 export const spotFollowups = sqliteTable("spotFollowups", {
   id: incrementIdCol(),
-  title: text("title"),
   action: text('action', { enum: SpotActionEnum.options }).notNull(),
   spotState: text('spotState', { enum: SpotStateEnum.options }).notNull(),
   desc: text('desc'),
+  material: text('material'),
   feedeeCount: integer('feedeeCount'),
   state: pubStateCol().notNull(),
   spawnedAt: timestampCol('spawnedAt'),

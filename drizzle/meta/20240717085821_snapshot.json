@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "5009d1c6-9f7a-4796-b82c-dc21de02afee",
+  "id": "134ddcf6-6189-4451-86bd-cdbd8a12422c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "accounts": {
@@ -226,13 +226,6 @@
           "notNull": true,
           "autoincrement": true
         },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "action": {
           "name": "action",
           "type": "text",
@@ -249,6 +242,13 @@
         },
         "desc": {
           "name": "desc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "material": {
+          "name": "material",
           "type": "text",
           "primaryKey": false,
           "notNull": false,

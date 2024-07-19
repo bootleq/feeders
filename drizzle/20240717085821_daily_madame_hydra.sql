@@ -32,10 +32,10 @@ CREATE TABLE `sessions` (
 --> statement-breakpoint
 CREATE TABLE `spotFollowups` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`title` text,
 	`action` text NOT NULL,
 	`spotState` text NOT NULL,
 	`desc` text,
+	`material` text,
 	`feedeeCount` integer,
 	`state` text DEFAULT 'draft' NOT NULL,
 	`spawnedAt` integer,

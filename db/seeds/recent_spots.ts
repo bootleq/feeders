@@ -4,7 +4,8 @@ import { format } from 'node:util';
 import { getLocalDB, schema, fakeAnimal, fakeText } from './utils';
 import { eq, ne, gt, gte } from "drizzle-orm";
 import { fakerZH_TW as faker } from '@faker-js/faker';
-import { subDays } from '@/lib/date-fp';
+import { addHours, subDays } from '@/lib/date-fp';
+import { MaterializedViewBuilder } from 'drizzle-orm/pg-core';
 
 const {
   users,
@@ -22,7 +23,7 @@ const geoRange = {
   lon: [121.510496, 121.52979]
 };
 
-const today = new Date();
+const today = R.tap(d => d.setHours(5), new Date());
 const backwardDays = 3;
 
 const latRestricted = () => faker.location.latitude({ max: geoRange.lat[1], min: geoRange.lat[0], precision: 9 });
@@ -52,7 +53,7 @@ async function main() {
 
       const spawnedAt = subDays(ago, today);
       const spotValues = {
-        title: `（測試）${fakeAnimal()}`,
+        title: fakeAnimal(),
         state: PubStateEnum.enum.published,
         desc: fakeText(),
         lat: latRestricted(),
@@ -66,6 +67,7 @@ async function main() {
         spotState: SpotStateEnum.enum.dirty,
         state: PubStateEnum.enum.published,
         desc: fakeText(),
+        material: '雞脖子',
         feedeeCount: 3,
         spawnedAt: spawnedAt,
       }
@@ -74,7 +76,34 @@ async function main() {
       const initialFollowup = await db.insert(spotFollowups)
         .values(
           R.mergeLeft({spotId: newSpot.id}, followupValueBase)
-        ).returning();
+        ).returning().get();
+
+      // Additional followups (removal / respawn) for 1st spot
+      if (idx === 0) {
+        const removalFollowup = await db.insert(spotFollowups)
+          .values(
+            R.mergeLeft({
+              action: SpotActionEnum.enum.remove,
+              desc: '已移除',
+              spotState: SpotStateEnum.enum.clean,
+              spawnedAt: null,
+              removedAt: addHours(2, spawnedAt),
+              spotId: newSpot.id
+            }, followupValueBase)
+          ).returning().get();
+
+        const RespawnFollowup = await db.insert(spotFollowups)
+          .values(
+            R.mergeLeft({
+              action: SpotActionEnum.enum.see,
+              desc: '又重生了',
+              material: '米腸',
+              spotState: SpotStateEnum.enum.dirty,
+              spawnedAt: addHours(4, spawnedAt!),
+              spotId: newSpot.id
+            }, followupValueBase)
+          ).returning();
+      }
 
       console.log(
         'Added spot %s at %s, %s',

@@ -1,14 +1,11 @@
 import dynamic from 'next/dynamic';
 import * as R from 'ramda';
-import { eq, desc, type InferSelectModel, type InferInsertModel } from 'drizzle-orm';
-import { spots as spotsSchema } from '@/lib/schema';
 import { db } from '@/lib/db';
-import { formatISO } from '@/lib/date-fp';
+import { recentFollowups } from '@/models/spots';
+import { subDays, formatISO } from '@/lib/date-fp';
 import { MapPinIcon } from '@heroicons/react/24/solid';
 
 export const runtime = 'edge';
-
-type SelectSpot = typeof spotsSchema.$inferSelect;
 
 const LazyMap = dynamic(() => import("@/components/Map"), {
   ssr: false,
@@ -16,55 +13,70 @@ const LazyMap = dynamic(() => import("@/components/Map"), {
 });
 
 const TW_CENTER = [23.9739, 120.9773];
+const trackDays = 5
 const fetchLimit = 200;
 
-async function getSpots() {
-  const items = await db.query.spots.findMany({
-    columns: {
-      id: true,
-      title: true,
-      lat: true,
-      lon: true,
-      desc: true,
-      state: true,
-      createdAt: true,
-      userId: true,
-    },
-    where: eq(spotsSchema.state, 'published'),
-    orderBy: [desc(spotsSchema.createdAt)],
-    limit: fetchLimit + 1
-  });
-
+async function getSpots(oldestDate: Date) {
+  const query = recentFollowups(oldestDate, fetchLimit + 1);
+  const items = await query;
   return items;
 }
 
-const spotsByDay = (spots: SelectSpot[]) => {
-  return R.groupBy(s => s.createdAt.toISOString(), spots);
+type RecentFollowupsItemProps = Awaited<ReturnType<typeof recentFollowups>>[number];
+
+function recentDateStrings(today: Date, oldestDate: Date) {
+  const days = R.range(0, trackDays);
+  return days
+    .map(d => subDays(d, today))
+    .map(formatISO({ representation: 'date' }));
 }
 
-function RecentSpots({ spots }: { spots: SelectSpot[] }) {
-  if (!spots.length) {
-    return <p>沒有發現報告</p>;
+function dateColorCls(age: number, itemSize: number) {
+  if (itemSize === 0) {
+    return 'text-opacity-50';
+  }
+  return '';
+}
+
+function RecentFollowups({ items, today, oldestDate }: {
+  items: RecentFollowupsItemProps[],
+  today: Date,
+  oldestDate: Date
+}) {
+  if (!items?.length) {
+    return <p>沒有新發現</p>;
   }
 
-  const byDate = R.pipe(
-    R.groupBy(
-      R.pipe(R.prop('createdAt'), formatISO({ representation: 'date' }))
-    ),
-    Object.entries
-  )(spots);
+  const indexByDate = R.groupBy(
+    R.pipe(
+      R.prop('createdAt'),
+      formatISO({ representation: 'date' })
+    )
+  )(items);
 
-  const list = byDate.map(([date, items]) => {
+  const list = recentDateStrings(today, oldestDate).map((date, idx) => {
+    const subItems = indexByDate[date];
+    const isEmpty = !R.has(date, indexByDate);
+
     return (
       <li key={date}>
-        <time dateTime={`${date}`}>{date}</time>
-        <ul className='flex flex-row'>
-          {items.map((i: SelectSpot) => (
-          <li key={i.id}>
-            <MapPinIcon className='fill-current' height={24} />
-          </li>
-        ))}
-        </ul>
+        <time className={`text-slate-900 ${dateColorCls(idx, subItems?.length || 0)}`} dateTime={`${date}`}>
+          {date}{idx === 0 ? '（今天）' : null}
+        </time>
+        {
+          subItems ?
+            <ul className='flex flex-row'>
+              {subItems.map((i: RecentFollowupsItemProps) => (
+                <li key={i.spotId}>
+                  <MapPinIcon className='fill-current' data-lat={i.lat} data-lon={i.lon} height={24} />
+                  {i.spotState}
+                  <p>
+                    {i.action}
+                  </p>
+                </li>
+              ))}
+            </ul> : null
+        }
       </li>
     );
   });
@@ -73,14 +85,16 @@ function RecentSpots({ spots }: { spots: SelectSpot[] }) {
 }
 
 export default async function Page() {
-  const spots = await getSpots();
+  const today = new Date();
+  const oldestDate = subDays(trackDays, today);
+  const items = await getSpots(oldestDate);
 
   return (
     <main className="flex min-h-screen flex-row items-start justify-between">
-      <div className='flex flex-col px-3 py-1'>
-        <h2>HOME</h2>
+      <div className='flex flex-col px-3 py-1 font-mono'>
+        <h2>最新動態</h2>
 
-        <RecentSpots spots={spots} />
+        <RecentFollowups items={items} today={today} oldestDate={oldestDate} />
 
       </div>
       <LazyMap preferCanvas={true} zoom={8} center={TW_CENTER}></LazyMap>
