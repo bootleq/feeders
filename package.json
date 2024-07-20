@@ -24,6 +24,7 @@
     "@auth/d1-adapter": "^1.4.1",
     "@auth/drizzle-adapter": "^1.4.1",
     "@heroicons/react": "^2.1.5",
+    "@next/bundle-analyzer": "^14.2.5",
     "chanfana": "^2.0.2",
     "date-fns": "^3.6.0",
     "drizzle-orm": "^0.32.0",

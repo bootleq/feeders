@@ -46,3 +46,12 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 - Review approved services (you can revoke permission here)
   https://myaccount.google.com/permissions
+
+
+### Build
+
+    pnpm build
+
+With Bundle Analyzer
+
+    ANALYZE=true pnpm build
