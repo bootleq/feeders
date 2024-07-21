@@ -4,6 +4,7 @@ import { db } from '@/lib/db';
 import { recentFollowups } from '@/models/spots';
 import { subDays, formatISO } from '@/lib/date-fp';
 import { MapPinIcon } from '@heroicons/react/24/solid';
+import Sidebar from '@/components/Sidebar';
 
 export const runtime = 'edge';
 
@@ -65,7 +66,7 @@ function RecentFollowups({ items, today, oldestDate }: {
         </time>
         {
           subItems ?
-            <ul className='flex flex-row'>
+            <ul className='flex flex-row flex-wrap'>
               {subItems.map((i: RecentFollowupsItemProps) => (
                 <li key={i.spotId}>
                   <MapPinIcon className='fill-current' data-lat={i.lat} data-lon={i.lon} height={24} />
@@ -91,13 +92,13 @@ export default async function Page() {
 
   return (
     <main className="flex min-h-screen flex-row items-start justify-between">
-      <div className='flex flex-col px-3 py-1 font-mono'>
-        <h2>最新動態</h2>
+      <Sidebar className=' flex flex-col px-3 py-1 font-mono z-[410]'>
+        <h2>動態</h2>
 
         <RecentFollowups items={items} today={today} oldestDate={oldestDate} />
+      </Sidebar>
 
-      </div>
-      <LazyMap preferCanvas={true} zoom={8} center={TW_CENTER}></LazyMap>
+      <LazyMap preferCanvas={true} zoom={8} center={TW_CENTER} zoomControl={false}></LazyMap>
     </main>
   );
 }

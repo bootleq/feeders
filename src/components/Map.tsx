@@ -7,7 +7,6 @@ import 'leaflet/dist/leaflet.css';
 // import "leaflet-defaulticon-compatibility";
 // import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 // import Image from "next/image";
-import styles from './Map.module.scss';
 
 type MapProps = {
   children?: React.ReactNode;
@@ -36,7 +35,7 @@ export default function Map({ children, className, width, height, ...rest }: Map
   // }, []);
 
   return (
-    <MapContainer className={styles.map} {...rest}>
+    <MapContainer className={`w-full h-[100vh] ${className || ''}`} {...rest}>
       <MapUser />
       <TileLayer
         url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
