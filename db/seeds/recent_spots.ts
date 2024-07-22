@@ -5,7 +5,7 @@ import { getLocalDB, schema, fakeAnimal, fakeText } from './utils';
 import { eq, ne, gt, gte } from "drizzle-orm";
 import { fakerZH_TW as faker } from '@faker-js/faker';
 import { addHours, subDays } from '@/lib/date-fp';
-import { MaterializedViewBuilder } from 'drizzle-orm/pg-core';
+import { queryDistrict } from '@/models/spots';
 
 const {
   users,
@@ -19,12 +19,23 @@ const {
 const db = getLocalDB();
 
 const geoRange = {
-  lat: [24.970017, 24.992608],
-  lon: [121.510496, 121.52979]
+  // 新北市小範圍
+  // lat: [24.970017, 24.992608],
+  // lon: [121.510496, 121.52979]
+  //
+  // 極點，會包括到海上
+  // https://zh.wikipedia.org/wiki/臺灣之最列表/極點位置
+  // lat: [21.7586, 25.6295],  // 北：彭佳嶼 南：七星岩
+  // lon: [119.3144, 122.1069]  // 東：棉花嶼 西：花嶼
+  //
+  // 台灣本島
+  lat: [21.896900, 25.3056],
+  lon: [120.035141, 122.007164]
 };
 
 const today = R.tap(d => d.setHours(5), new Date());
 const backwardDays = 3;
+const queryDistrictSync = false;
 
 const latRestricted = () => faker.location.latitude({ max: geoRange.lat[1], min: geoRange.lat[0], precision: 9 });
 const lonRestricted = () => faker.location.longitude({ max: geoRange.lon[1], min: geoRange.lon[0], precision: 9 });
@@ -51,20 +62,30 @@ async function main() {
     for (let idx = 0; idx < days.length; idx++) {
       const ago = days[idx];
 
+      const [lat, lon] = [latRestricted(), lonRestricted()];
+      const district = queryDistrictSync ? await queryDistrict(lat, lon) : null;
+
+      const fakeSpotState = faker.helpers.weightedArrayElement([
+        { weight: 6, value: SpotStateEnum.enum.dirty },
+        { weight: 3, value: SpotStateEnum.enum.clean },
+        { weight: 2, value: SpotStateEnum.enum.tolerated },
+      ]);
+
       const spawnedAt = subDays(ago, today);
       const spotValues = {
         title: fakeAnimal(),
         state: PubStateEnum.enum.published,
         desc: fakeText(),
-        lat: latRestricted(),
-        lon: lonRestricted(),
+        lat: lat,
+        lon: lon,
+        district: district,
         userId: author.id,
       };
       const followupValueBase = {
         userId: author.id,
         spotId: null,
         action: SpotActionEnum.enum.see,
-        spotState: SpotStateEnum.enum.dirty,
+        spotState: fakeSpotState,
         state: PubStateEnum.enum.published,
         desc: fakeText(),
         material: '雞脖子',
@@ -73,6 +94,7 @@ async function main() {
       }
 
       const newSpot = await db.insert(spots).values(spotValues).returning().get();
+
       const initialFollowup = await db.insert(spotFollowups)
         .values(
           R.mergeLeft({spotId: newSpot.id}, followupValueBase)
@@ -114,6 +136,10 @@ async function main() {
     }
 
     console.log('Done.');
+
+    if (!queryDistrictSync) {
+      console.log(chalk.red('Note district values were missing, to be filled later.'));
+    }
   });
 }
 

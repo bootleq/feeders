@@ -52,6 +52,7 @@ CREATE TABLE `spots` (
 	`title` text,
 	`lat` real,
 	`lon` real,
+	`district` text,
 	`desc` text,
 	`state` text DEFAULT 'draft' NOT NULL,
 	`createdAt` integer DEFAULT (unixepoch()) NOT NULL,

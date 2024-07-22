@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "134ddcf6-6189-4451-86bd-cdbd8a12422c",
+  "id": "fc429a97-b874-458a-9425-e1c198f9e10b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "accounts": {
@@ -365,6 +365,13 @@
         "lon": {
           "name": "lon",
           "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "district": {
+          "name": "district",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false

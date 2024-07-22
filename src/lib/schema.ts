@@ -90,6 +90,7 @@ export const spots = sqliteTable("spots", {
   title: text("title"),
   lat: real("lat"),
   lon: real("lon"),
+  district: text('district'),
   desc: text('desc'),
   state: pubStateCol().notNull(),
   createdAt: createdAtCol(),

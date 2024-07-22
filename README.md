@@ -27,9 +27,10 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
     pnpm db:migrate:drop
     pnpm db:migrate
 
-- Remove local db + drizzle meta
+- Remove local db + drizzle meta, then reset with migrations
 
     pnpm db:delete
+    pnpm db:delete && pnpm db:tables && pnpm db:migrate:gen && pnpm db:migrate
 
 - Directly execute commands in D1
 
