@@ -31,6 +31,7 @@
     "drizzle-orm": "^0.32.0",
     "fast-xml-parser": "^4.4.0",
     "hono": "^4.4.12",
+    "jotai": "^2.9.0",
     "leaflet": "^1.9.4",
     "leaflet-defaulticon-compatibility": "^0.1.2",
     "nanoid": "^5.0.7",
