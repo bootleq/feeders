@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "fc429a97-b874-458a-9425-e1c198f9e10b",
+  "id": "56835243-67ad-44b4-a7eb-b97e7b8d71a2",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "accounts": {
@@ -369,8 +369,15 @@
           "notNull": false,
           "autoincrement": false
         },
-        "district": {
-          "name": "district",
+        "city": {
+          "name": "city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "town": {
+          "name": "town",
           "type": "text",
           "primaryKey": false,
           "notNull": false,

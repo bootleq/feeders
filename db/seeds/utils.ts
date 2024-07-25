@@ -65,16 +65,35 @@ const fakeQuoteCollection = [
   '指犬、貓及其他人為飼養或管領之脊椎動物，包括經濟動物、實驗動物、寵物及其他動物',
 ];
 
+const fakeImgSrcCollection = [
+  'https://i.imgur.com/Sxfgtso.png', // 戶外墓、未紮母犬
+  'https://i.imgur.com/kdRR92J.jpeg', // 標記怪手旁的位置
+  'https://i.imgur.com/T6rKVGf.jpeg', // 雞冠
+  'https://i.imgur.com/m0SQdri.jpeg', // 小巷菜園地面
+  'https://i.imgur.com/JK8nW7X.jpeg', // 雞頭分離
+  'https://i.imgur.com/T6rKVGf.jpeg', // 雞冠
+  'https://i.imghippo.com/files/j6p1W1721814316.webp', // 戶外墓、爽吃
+  'https://iili.io/dxz6PLJ.webp', // 私人墓、兩橫排
+  'https://iili.io/dxz6sqv.webp', // 私人墓、台前
+];
+
 export const fakeQuote = () => {
   return faker.helpers.arrayElement(fakeQuoteCollection);
 }
 
-// Random quote + animal name mixed within
+// Random (quote + animal name mixed within) x 2 + imgSrc
 export const fakeText = () => {
-  const quote = fakeQuote();
-  const animal = fakeAnimal();
-  const insertAt = Math.floor(Math.random() * (quote.length + 1));
-  const result = quote.slice(0, insertAt) + animal + quote.slice(insertAt);
+  const parts = [0, 1].map(i => {
+    const quote = fakeQuote();
+    const animal = fakeAnimal();
+    const insertAt = Math.floor(Math.random() * (quote.length + 1));
+    const result = quote.slice(0, insertAt) + animal + quote.slice(insertAt);
+    return result;
+  });
 
-  return wordWord(result);
+  const imgSrc = faker.helpers.arrayElement(fakeImgSrcCollection);
+
+  return wordWord(
+    faker.helpers.shuffle([...parts, imgSrc]).join('')
+  );
 };

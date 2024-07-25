@@ -6,7 +6,15 @@ import { nanoid } from 'nanoid';
 
 export const UserStateEnum = z.enum(['new', 'active', 'inactive'] as const);
 export const PubStateEnum = z.enum(['draft', 'published', 'dropped'] as const);
-export const SpotActionEnum = z.enum(['see', 'say', 'remove', 'down'] as const);
+export const SpotActionEnum = z.enum([
+  'see',      // 看見
+  'remove',   // 移除
+  'talk',     // 溝通
+  'investig', // 調查
+  'power',    // 公權力
+  'coop',     // 互助
+  'downvote', // 扣分
+] as const);
 export const SpotStateEnum = z.enum(['dirty', 'clean', 'tolerated'] as const);
 
 const userStateCol = (name: string = 'state') => text(name, { enum: UserStateEnum.options }).notNull().default('new');
@@ -90,7 +98,8 @@ export const spots = sqliteTable("spots", {
   title: text("title"),
   lat: real("lat"),
   lon: real("lon"),
-  district: text('district'),
+  city: text('city'),
+  town: text('town'),
   desc: text('desc'),
   state: pubStateCol().notNull(),
   createdAt: createdAtCol(),

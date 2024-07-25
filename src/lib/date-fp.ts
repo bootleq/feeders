@@ -11,7 +11,10 @@ import {
   addHours,
   formatWithOptions as format,
   formatISOWithOptions as formatISO,
+  formatDistanceWithOptions as formatDistanceOriginal,
+  formatDurationWithOptions as formatDuration,
 } from 'date-fns/fp';
+
 
 // this is NOT functional style
 const formatDistanceToNow = (date: Date) => {
@@ -22,10 +25,16 @@ const formatDistanceToNow = (date: Date) => {
   return formatDistanceToNowOriginal(date, options);
 };
 
+const formatDistance = formatDistanceOriginal({
+  locale: zhTW,
+});
+
 export {
   subDays,
   addHours,
   format,
   formatISO,
   formatDistanceToNow,
+  formatDistance,
+  formatDuration,
 };

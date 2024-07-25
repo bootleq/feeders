@@ -41,7 +41,8 @@ export const recentFollowups = (oldestDate: Date, fetchLimit: number) => {
     spotTitle:   spots.title,
     lat:         spots.lat,
     lon:         spots.lon,
-    district:    spots.district,
+    city:        spots.city,
+    town:        spots.town,
     action:      spotFollowups.action,
     spotState:   spotFollowups.spotState,
     desc:        spotFollowups.desc,
@@ -87,18 +88,14 @@ export async function queryDistrict(lat: number, lon: number) {
     const body = await response.text();
     const json = xmlParser.parse(body);
 
-    const district = R.pipe(
+    return R.pipe(
       R.prop('townVillageItem'),
       R.props(['ctyName', 'townName']),
-      R.join(' ')
+      R.map(x => typeof x === 'string' ? x : null)
     )(json);
-
-    if (R.isNotEmpty(district)) {
-      return district;
-    }
   }
 
-  return null;
+  return [null, null];
 };
 
 export function spotsMissingDistrict(ids = []) {
@@ -115,8 +112,10 @@ export function spotsMissingDistrict(ids = []) {
       isNotNull(spots.lat),
       isNotNull(spots.lon),
       or(
-        isNull(spots.district),
-        eq(spots.district, ''),
+        isNull(spots.city),
+        eq(spots.city, ''),
+        isNull(spots.town),
+        eq(spots.town, ''),
       ),
     )
   );

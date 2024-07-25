@@ -30,9 +30,9 @@ export default async function Page() {
 
   return (
     <main className="flex min-h-screen flex-row items-start justify-between">
-      <Sidebar className='flex flex-col px-2 py-1 font-mono z-[410]'>
+      <Sidebar className='flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200'>
         <RecentFollowups items={items} today={today} oldestDate={oldestDate} />
-        <HandThumbDownIcon className='mt-auto fill-current size-7' height={24} />
+        <HandThumbDownIcon className='mt-auto ml-1 fill-current size-7' height={24} />
       </Sidebar>
 
       <LazyMap preferCanvas={true} zoom={8} center={TW_CENTER} zoomControl={false}></LazyMap>

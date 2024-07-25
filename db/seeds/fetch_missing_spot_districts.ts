@@ -31,11 +31,12 @@ async function main() {
 
   for (let idx = 0; idx < items.length; idx++) {
     const i = items[idx];
-    const district = await queryDistrict(i.lat!, i.lon!);
+    const [city, town] = await queryDistrict(i.lat!, i.lon!);
 
     values.push({
       id: i.id,
-      district: district
+      city: city,
+      town: town,
     });
   }
 
@@ -45,7 +46,10 @@ async function main() {
     .values(values)
     .onConflictDoUpdate({
       target: spots.id,
-      set: { district: sql.raw(`excluded.${spots.district.name}`) }
+      set: {
+        city: sql.raw(`excluded.${spots.city.name}`),
+        town: sql.raw(`excluded.${spots.town.name}`),
+      }
     });
 
   console.log('Done.');

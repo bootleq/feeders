@@ -28,14 +28,15 @@ const geoRange = {
   // lat: [21.7586, 25.6295],  // 北：彭佳嶼 南：七星岩
   // lon: [119.3144, 122.1069]  // 東：棉花嶼 西：花嶼
   //
-  // 台灣本島
+  // 台灣本島，仍會包括到海上
   lat: [21.896900, 25.3056],
   lon: [120.035141, 122.007164]
 };
 
 const today = R.tap(d => d.setHours(5), new Date());
 const backwardDays = 3;
-const queryDistrictSync = false;
+const queryDistrictSync = true;
+const queryDistrictRetryLimit = 10;
 
 const latRestricted = () => faker.location.latitude({ max: geoRange.lat[1], min: geoRange.lat[0], precision: 9 });
 const lonRestricted = () => faker.location.longitude({ max: geoRange.lon[1], min: geoRange.lon[0], precision: 9 });
@@ -62,8 +63,29 @@ async function main() {
     for (let idx = 0; idx < days.length; idx++) {
       const ago = days[idx];
 
-      const [lat, lon] = [latRestricted(), lonRestricted()];
-      const district = queryDistrictSync ? await queryDistrict(lat, lon) : null;
+      let districtRetry = 0;
+      let [lat, lon] = [latRestricted(), lonRestricted()];
+      let [city, town] = queryDistrictSync ? await queryDistrict(lat, lon) : [null, null];
+
+      while (
+        queryDistrictSync &&
+        districtRetry < queryDistrictRetryLimit &&
+        R.any(R.isNil, [city, town])
+      ) {
+        districtRetry += 1;
+        [lat, lon] = [latRestricted(), lonRestricted()];
+        [city, town] = await queryDistrict(lat, lon);
+      }
+
+      const fakeAction = faker.helpers.weightedArrayElement([
+        { weight: 6, value: SpotActionEnum.enum.see },
+        { weight: 3, value: SpotActionEnum.enum.talk },
+        { weight: 3, value: SpotActionEnum.enum.remove },
+        { weight: 2, value: SpotActionEnum.enum.investig },
+        { weight: 2, value: SpotActionEnum.enum.power },
+        { weight: 2, value: SpotActionEnum.enum.coop },
+        { weight: 1, value: SpotActionEnum.enum.downvote },
+      ]);
 
       const fakeSpotState = faker.helpers.weightedArrayElement([
         { weight: 6, value: SpotStateEnum.enum.dirty },
@@ -78,13 +100,14 @@ async function main() {
         desc: fakeText(),
         lat: lat,
         lon: lon,
-        district: district,
+        city: city,
+        town: town,
         userId: author.id,
       };
       const followupValueBase = {
         userId: author.id,
         spotId: null,
-        action: SpotActionEnum.enum.see,
+        action: fakeAction,
         spotState: fakeSpotState,
         state: PubStateEnum.enum.published,
         desc: fakeText(),
@@ -138,7 +161,7 @@ async function main() {
     console.log('Done.');
 
     if (!queryDistrictSync) {
-      console.log(chalk.red('Note district values were missing, to be filled later.'));
+      console.log(chalk.yellow('NOTE district values were missing, to be filled later.'));
     }
   });
 }
