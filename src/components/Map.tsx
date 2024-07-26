@@ -1,5 +1,7 @@
 "use client"
 
+import { usePathname, useSearchParams } from 'next/navigation';
+
 import Leaflet from 'leaflet';
 // import * as ReactLeaflet from 'react-leaflet';
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
@@ -18,11 +20,18 @@ type MapProps = {
 
 function MapUser() {
   const map = useMap();
-  console.log('map center:', map.getCenter());
   return null;
 }
 
+function parsePath(path: string) {
+}
+
 export default function Map({ children, className, width, height, ...rest }: MapProps) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  console.log('path', pathname);
+
   // useEffect(() => {
   //   (async function init() {
   //     delete Leaflet.Icon.Default.prototype._getIconUrl;

@@ -200,6 +200,12 @@ function SpotInfo() {
   );
 }
 
+function visitSpot(lat: number, lon: number) {
+  return (e: React.SyntheticEvent) => {
+    window.history.pushState(null, '', `/world/spot/${lat},${lon}`);
+  }
+}
+
 function Areas({ items }: {
   items: RecentFollowupsItemProps[],
 }) {
@@ -261,7 +267,7 @@ function Areas({ items }: {
 
           return (
             <li key={name} className={`relative rounded p-1 mx-1 grow-0 text-center ${isCurrent ? 'bg-slate-300/75' : 'bg-slate-200'}`}>
-              <div className='break-keep w-min'>
+              <div className='break-keep w-min cursor-pointer' onClick={visitSpot(lat, lon)}>
                 {name}
               </div>
               <i className='absolute font-mono -top-3 right-0 drop-shadow'>

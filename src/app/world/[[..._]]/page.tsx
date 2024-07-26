@@ -14,7 +14,7 @@ const LazyMap = dynamic(() => import("@/components/Map"), {
 });
 
 const TW_BOUNDS = [
-  [21.7, 119.1], // bottom left
+  [21.7, 118.5], // bottom left
   [25.4, 122.3]  // up right
 ];
 const TW_CENTER = [23.9739, 120.9773];

@@ -43,6 +43,7 @@ export const recentFollowups = (oldestDate: Date, fetchLimit: number) => {
     lon:         spots.lon,
     city:        spots.city,
     town:        spots.town,
+    followupId:  spotFollowups.id,
     action:      spotFollowups.action,
     spotState:   spotFollowups.spotState,
     desc:        spotFollowups.desc,
