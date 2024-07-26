@@ -200,6 +200,81 @@ function SpotInfo() {
   );
 }
 
+function Areas({ items }: {
+  items: RecentFollowupsItemProps[],
+}) {
+  const viewItem = useAtomValue(viewItemAtom);
+  let viewingAreaKey = '';
+
+  if (viewItem && viewItem.lat && viewItem.lon) {
+    viewingAreaKey = R.filter(R.isNotNil, [viewItem.city, viewItem.town]).join(' ');
+  }
+
+  type ByAreaData = {
+    [key: string]: {  // city + town
+      lat: number
+      lon: number
+      maxFollowCount: number
+      totalFollows: number  // will only pick 1 spot with max followups, but sums all followups together
+    }
+  }
+  type ByAreaValue = ByAreaData[string];
+
+  const byArea = items.reduce((m: ByAreaData, i) => {
+    const { city, town, lat, lon, followCount = 0 } = i;
+    const key = R.filter(R.isNotNil, [city, town]).join(' ');
+
+    if (!key.length || R.isNil(lat) || R.isNil(lon)) {
+      return m;
+    }
+
+    if (!m[key]) {
+      m[key] = { lat, lon, maxFollowCount: followCount, totalFollows: followCount };
+    } else {
+      if (followCount > m[key].maxFollowCount) {
+        Object.assign(m, { lat, lon, maxFollowCount: followCount });
+      }
+      m[key].totalFollows += followCount;
+    }
+
+    return m;
+  }, {} as ByAreaData);
+
+  let pickedAreas = R.pipe(
+    R.toPairs,
+    R.sortBy(([key, value]: [string, ByAreaValue]) => {
+      if (key === viewingAreaKey) {
+        return Infinity;
+      }
+      return value.totalFollows;
+    }),
+    R.reverse,
+    R.take(5),
+  )(byArea as ByAreaData) as [string, ByAreaValue][];
+
+  return (
+    <div className='mt-4 mb-2 p-1 overflow-visible'>
+      前往區域
+      <ul className='flex py-1 overflow-hidden scrollbar-thin'>
+        {pickedAreas.map(([name, { lat, lon, totalFollows }]) => {
+          const isCurrent = name === viewingAreaKey;
+
+          return (
+            <li key={name} className={`relative rounded p-1 mx-1 grow-0 text-center ${isCurrent ? 'bg-slate-300/75' : 'bg-slate-200'}`}>
+              <div className='break-keep w-min'>
+                {name}
+              </div>
+              <i className='absolute font-mono -top-3 right-0 drop-shadow'>
+                {totalFollows}
+              </i>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+};
+
 function recentDateStrings(today: Date, oldestDate: Date) {
   const days = R.range(0, 5); // FIXME: 5 is magic
   return days
@@ -263,10 +338,10 @@ function Followups({ items, today, oldestDate }: {
           subItems ?
             <ul className='flex flex-row flex-wrap p-1'>
               {subItems.map((i: RecentFollowupsItemProps) => (
-                <li key={i.spotId} className={`relative ${viewItem === i ? '-translate-y-0.5' : ''}`}>
+                <li key={i.spotId} className={`relative ${viewItem === i ? '-translate-y-[0.4rem]' : ''}`}>
                   <MapPinIcon className={`cursor-pointer ${mapPinCls(i.spotState)}`} onClick={() => setViewItem(i)} data-lat={i.lat} data-lon={i.lon} height={24} />
                   {viewItem === i &&
-                  <div className='absolute -bottom-[0.44rem] bg-yellow-400 h-1 w-full scale-x-75'></div>
+                  <div className='absolute -bottom-[0.4rem] bg-yellow-400 h-1 w-full scale-x-75'></div>
                   }
                 </li>
               ))}
@@ -277,7 +352,7 @@ function Followups({ items, today, oldestDate }: {
   });
 
   return (
-    <ul className='mt-4 mb-1'>
+    <ul className='mt-3 mb-1'>
       {list}
     </ul>
   )
@@ -300,6 +375,7 @@ export default function RecentFollowups({ items, today, oldestDate }: {
   return (
     <div className=''>
       <SpotInfo />
+      <Areas items={items} />
       <Followups items={items} today={today} oldestDate={oldestDate} />
     </div>
   );
