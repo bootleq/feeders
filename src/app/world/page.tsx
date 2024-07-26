@@ -1,3 +1,4 @@
+import * as R from 'ramda';
 import dynamic from 'next/dynamic';
 import { recentFollowups } from '@/models/spots';
 import { subDays } from '@/lib/date-fp';
@@ -12,6 +13,10 @@ const LazyMap = dynamic(() => import("@/components/Map"), {
   loading: () => <p>Loading...</p>,
 });
 
+const TW_BOUNDS = [
+  [21.7, 119.1], // bottom left
+  [25.4, 122.3]  // up right
+];
 const TW_CENTER = [23.9739, 120.9773];
 const trackDays = 5
 const fetchLimit = 200;
@@ -35,7 +40,7 @@ export default async function Page() {
         <HandThumbDownIcon className='mt-auto ml-1 fill-current size-7' height={24} />
       </Sidebar>
 
-      <LazyMap preferCanvas={true} zoom={8} center={TW_CENTER} zoomControl={false}></LazyMap>
+      <LazyMap preferCanvas={true} minZoom={8} zoom={8} center={TW_CENTER} maxBounds={TW_BOUNDS} zoomControl={false}></LazyMap>
     </main>
   );
 }
