@@ -54,6 +54,7 @@ CREATE TABLE `spots` (
 	`lon` real,
 	`city` text,
 	`town` text,
+	`geohash` text,
 	`desc` text,
 	`state` text DEFAULT 'draft' NOT NULL,
 	`createdAt` integer DEFAULT (unixepoch()) NOT NULL,
@@ -79,4 +80,5 @@ CREATE TABLE `verification_tokens` (
 	PRIMARY KEY(`identifier`, `token`)
 );
 --> statement-breakpoint
+CREATE INDEX `geohash` ON `spots` (`geohash`);--> statement-breakpoint
 CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);

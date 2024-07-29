@@ -1,63 +1,48 @@
-import { OpenAPIRoute } from 'chanfana';
+import * as R from 'ramda';
+import { ApiRoute } from './ApiRoute';
 import { z } from 'zod';
 import {
+  geohash4tw,
   latitude,
   longitude,
-  GetSpotsResult
+  GetSpotsResult,
+  GetSpotsByGeohash,
 } from '@/app/api/schema/api';
 import { getRequestContext } from '@cloudflare/next-on-pages';
 import { db } from '@/lib/db';
 import { spots, users, PubStateEnum } from '@/lib/schema';
+import { geoSpots } from '@/models/spots';
 
 export const runtime = 'edge';
 
-const softLimit = 300;
-
-const originExample = '24.988040038688847, 121.5210559478082';
-
-const origin = z.string().trim().transform((val, ctx) => {
-  const matches = val.match(/^(-?\d+(?:\.?\d+)?)\s*,\s*(-?\d+(?:\.?\d+)?)$/);
-  if (!matches) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'Invalid format'
-    });
-    return z.NEVER;
-  }
-
-  const [, lat, lon] = matches;
-  const parsed = [
-    latitude.safeParse(lat),
-    longitude.safeParse(lon)
-  ];
+const geohash = z.string().trim().transform((val, ctx) => {
+  const list = val.split(',').filter(s => s.length);
+  const parsed = list.map(v => geohash4tw.safeParse(v));
 
   parsed.forEach((r, idx) => {
-    const tail = idx === 0 ? 'lat' : 'lon';
-
     if (!r.success) {
       r.error.issues.forEach(issue => {
-        const path = [...issue.path, tail];
+        const path = [...issue.path, idx];
         ctx.addIssue({ ...issue, path });
       });
     }
   });
+  return parsed.map(({ data }) => data).filter(R.isNotNil);
+})
 
-  return parsed.map(({ data }) => data);
-});
-
-export class getSpots extends OpenAPIRoute {
+export class getSpots extends ApiRoute {
   schema = {
     request: {
       params: z.object({
-        origin: origin.describe('初始座標（緯度, 經度）').openapi({example: originExample})
+        geohash: geohash.describe('Geohash').openapi({example: 'wsqq,wsqr'})
       })
     },
     responses: {
       "200": {
-        description: "取得 spots 列表",
+        description: "取得 spots，用於顯示在地圖上特定的 geohash 範圍內",
         content: {
           'application/json': {
-            schema: GetSpotsResult.array(),
+            schema: GetSpotsByGeohash,
           },
         },
       }
@@ -66,24 +51,19 @@ export class getSpots extends OpenAPIRoute {
 
   async handle(c: any) {
     const data = await this.getValidatedData<typeof this.schema>()
+    const items = await geoSpots(data.params.geohash);
+    const grouped = R.groupBy(i => i.geohash || '', items);
 
-    const items = await db.query.spots.findMany({
-      columns: {
-        id: true,
-        title: true,
-        lat: true,
-        lon: true,
-        desc: true,
-        state: true,
-        createdAt: true,
-        userId: true,
-      },
-      limit: softLimit + 1
-    });
+    // Ensure all keys present in result
+    data.params.geohash.forEach(key => grouped[key] ||= []);
 
     return c.json({
       success: true,
-      items: items
+      items: grouped
     })
   }
 }
+
+type HandleReturnType = ReturnType<getSpots['handle']>;
+type GetSpotsResponse = Awaited<HandleReturnType>;
+export type { GetSpotsResponse };

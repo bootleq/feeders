@@ -5,6 +5,7 @@ import { getLocalDB, schema, fakeAnimal, fakeText } from './utils';
 import { eq, ne, gt, gte } from "drizzle-orm";
 import { fakerZH_TW as faker } from '@faker-js/faker';
 import { addHours, subDays } from '@/lib/date-fp';
+import geohash from 'ngeohash';
 import { queryDistrict } from '@/models/spots';
 
 const {
@@ -100,6 +101,7 @@ async function main() {
         desc: fakeText(),
         lat: lat,
         lon: lon,
+        geohash: geohash.encode(lat, lon, 4),
         city: city,
         town: town,
         userId: author.id,

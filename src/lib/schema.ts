@@ -1,4 +1,4 @@
-import { integer, text, real, primaryKey, sqliteTable } from "drizzle-orm/sqlite-core"
+import { integer, text, real, primaryKey, sqliteTable, index } from "drizzle-orm/sqlite-core"
 import { sql, relations } from "drizzle-orm";
 import type { AdapterAccount } from "@auth/core/adapters"
 import { z } from 'zod';
@@ -100,10 +100,15 @@ export const spots = sqliteTable("spots", {
   lon: real("lon"),
   city: text('city'),
   town: text('town'),
+  geohash: text('geohash'),
   desc: text('desc'),
   state: pubStateCol().notNull(),
   createdAt: createdAtCol(),
   userId: text('userId').references(() => users.id)
+}, (table) => {
+  return {
+    geohashIndex: index('geohash').on(table.geohash),
+  }
 });
 
 export const spotsRelations = relations(spots, ({ one, many }) => ({

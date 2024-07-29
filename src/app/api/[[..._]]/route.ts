@@ -14,7 +14,7 @@ const openapi = fromHono(app, {
   base: '/api'
 });
 
-openapi.get('/spots/:origin', getSpots);
+openapi.get('/spots/:geohash', getSpots);
 openapi.post('/spots', createSpot);
 
 export const GET = handle(app)

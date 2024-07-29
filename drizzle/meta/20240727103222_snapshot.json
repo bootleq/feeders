@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "56835243-67ad-44b4-a7eb-b97e7b8d71a2",
+  "id": "20145693-a12b-425a-b7cd-478971bbaa05",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "accounts": {
@@ -383,6 +383,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "geohash": {
+          "name": "geohash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "desc": {
           "name": "desc",
           "type": "text",
@@ -414,7 +421,15 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "geohash": {
+          "name": "geohash",
+          "columns": [
+            "geohash"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "spots_userId_users_id_fk": {
           "name": "spots_userId_users_id_fk",
