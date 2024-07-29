@@ -238,7 +238,7 @@ function Areas({ items }: {
       m[key] = { lat, lon, maxFollowCount: followCount, totalFollows: followCount };
     } else {
       if (followCount > m[key].maxFollowCount) {
-        Object.assign(m, { lat, lon, maxFollowCount: followCount });
+        m[key] = { ...m[key], lat, lon, maxFollowCount: followCount };
       }
       m[key].totalFollows += followCount;
     }
