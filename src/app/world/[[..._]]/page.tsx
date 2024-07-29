@@ -4,7 +4,7 @@ import { recentFollowups } from '@/models/spots';
 import { subDays } from '@/lib/date-fp';
 import Sidebar from '@/components/Sidebar';
 import RecentFollowups from './RecentFollowups';
-import { HandThumbDownIcon } from '@heroicons/react/24/solid';
+import Nav from './Nav';
 
 export const runtime = 'edge';
 
@@ -18,6 +18,7 @@ const TW_BOUNDS = [
   [25.4, 122.3]  // up right
 ];
 const TW_CENTER = [23.9739, 120.9773];
+const SAMPLE_CENTER = [24.987787927428965, 121.52125946066074];
 const trackDays = 5
 const fetchLimit = 200;
 const overwriteToday = new Date();
@@ -37,10 +38,20 @@ export default async function Page() {
     <main className="flex min-h-screen flex-row items-start justify-between">
       <Sidebar className='flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200'>
         <RecentFollowups items={items} today={today} oldestDate={oldestDate} />
-        <HandThumbDownIcon className='mt-auto ml-1 fill-current size-7' height={24} />
+        <Nav />
       </Sidebar>
 
-      <LazyMap preferCanvas={true} minZoom={8} zoom={8} center={TW_CENTER} maxBounds={TW_BOUNDS} zoomControl={false}></LazyMap>
+      <LazyMap
+        preferCanvas={true}
+        center={SAMPLE_CENTER}
+        minZoom={8}
+        zoom={18}
+        maxZoom={20}
+        maxBounds={TW_BOUNDS}
+        maxBoundsViscosity={0.5}
+        zoomControl={false}
+      >
+      </LazyMap>
     </main>
   );
 }

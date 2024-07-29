@@ -200,9 +200,9 @@ function SpotInfo() {
   );
 }
 
-function visitSpot(lat: number, lon: number) {
+function visitArea(lat: number, lon: number) {
   return (e: React.SyntheticEvent) => {
-    window.history.pushState(null, '', `/world/spot/${lat},${lon}`);
+    window.history.pushState(null, '', `/world/area/@${lat},${lon}`);
   }
 }
 
@@ -267,7 +267,7 @@ function Areas({ items }: {
 
           return (
             <li key={name} className={`relative rounded p-1 mx-1 grow-0 text-center ${isCurrent ? 'bg-slate-300/75' : 'bg-slate-200'}`}>
-              <div className='break-keep w-min cursor-pointer' onClick={visitSpot(lat, lon)}>
+              <div className='break-keep w-min cursor-pointer' onClick={visitArea(lat, lon)}>
                 {name}
               </div>
               <i className='absolute font-mono -top-3 right-0 drop-shadow'>
@@ -311,7 +311,7 @@ function Followups({ items, today, oldestDate }: {
   const [viewItem, setViewItem] = useAtom(viewItemAtom);
 
   if (!items?.length) {
-    return <p>沒有新發現</p>;
+    return <p className='p-1'>沒有新發現。</p>;
   }
 
   const indexByDate = R.groupBy(
