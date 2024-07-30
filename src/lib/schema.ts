@@ -96,8 +96,8 @@ export const profiles = sqliteTable('profiles', {
 export const spots = sqliteTable("spots", {
   id: incrementIdCol(),
   title: text("title"),
-  lat: real("lat"),
-  lon: real("lon"),
+  lat: real("lat").notNull(),
+  lon: real("lon").notNull(),
   city: text('city'),
   town: text('town'),
   geohash: text('geohash'),

@@ -104,11 +104,14 @@ export async function queryDistrict(lat: number, lon: number) {
 export const geoSpots = (geohashes: string[]) => {
   // Rank latest created followup
   const ranked = db.select({
-    id:            spotFollowups.id,
-    followCount:   sql<number>`COUNT(${spots.id}) OVER (PARTITION BY ${spots.id})`.as('followCount'),
-    latestSpawnAt: sql<number>`MAX(${spotFollowups.spawnedAt}) OVER (PARTITION BY ${spots.id})`.as('latestSpawnAt'),
-    maxFeedee:     sql<number>`MAX(${spotFollowups.feedeeCount}) OVER (PARTITION BY ${spots.id})`.as('maxFeedee'),
-    rank:          sql<number>`RANK() OVER (PARTITION BY ${spots.id} ORDER BY ${spotFollowups.createdAt} DESC, ${spotFollowups.spawnedAt} DESC)`.as('rank'),
+    id:              spotFollowups.id,
+    followCount:     sql<number>`COUNT(${spots.id}) OVER (PARTITION BY ${spots.id})`.as('followCount'),
+    followerCount:   sql<number>`COUNT(${spotFollowups.spawnedAt}) OVER (PARTITION BY ${spots.id})`.as('followerCount'),
+    respawnCount:    sql<number>`COUNT(${spotFollowups.spawnedAt}) OVER (PARTITION BY ${spots.id})`.as('respawnCount'),
+    latestSpawnAt:   sql<number>`MAX(${spotFollowups.spawnedAt}) OVER (PARTITION BY ${spots.id})`.as('latestSpawnAt'),
+    latestRemovedAt: sql<number>`MAX(${spotFollowups.removedAt}) OVER (PARTITION BY ${spots.id})`.as('latestRemovedAt'),
+    maxFeedee:       sql<number>`MAX(${spotFollowups.feedeeCount}) OVER (PARTITION BY ${spots.id})`.as('maxFeedee'),
+    rank:            sql<number>`RANK() OVER (PARTITION BY ${spots.id} ORDER BY ${spotFollowups.createdAt} DESC, ${spotFollowups.spawnedAt} DESC)`.as('rank'),
   }).from(spots)
     .innerJoin(spotFollowups, eq(spots.id, spotFollowups.spotId))
     .as('ranked')
@@ -126,13 +129,17 @@ export const geoSpots = (geohashes: string[]) => {
     createdAt: spots.createdAt,
     userId:    spots.userId,
     followerId:     spotFollowups.userId,
+    followupDesc:   spotFollowups.desc,
     action:         spotFollowups.action,
     spotState:      spotFollowups.spotState,
     material:       spotFollowups.material,
     latestFollowAt: spotFollowups.createdAt,
-    followCount:    ranked.followCount,
-    latestSpawnAt:  ranked.latestSpawnAt,
-    maxFeedee:      ranked.maxFeedee,
+    followCount:     ranked.followCount,
+    followerCount:   ranked.followerCount,
+    respawnCount:    ranked.respawnCount,
+    latestSpawnAt:   ranked.latestSpawnAt,
+    latestRemovedAt: ranked.latestRemovedAt,
+    maxFeedee:       ranked.maxFeedee,
   }).from(spotFollowups)
     .innerJoin(
       ranked, and(
@@ -156,6 +163,10 @@ export const geoSpots = (geohashes: string[]) => {
 
   return query;
 };
+
+type GeoSpotsQuery = ReturnType<typeof geoSpots>;
+export type GeoSpotsResult = Awaited<ReturnType<GeoSpotsQuery['execute']>>;
+export type GeoSpotsByGeohash = {[key: string]: GeoSpotsResult};
 
 export function spotsMissingDistrict(ids = []) {
   const idWhere = R.isNotEmpty(ids) ? inArray(spots.id, ids) : sql`1 = 1`;

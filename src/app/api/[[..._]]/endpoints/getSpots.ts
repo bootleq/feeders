@@ -1,5 +1,6 @@
 import * as R from 'ramda';
 import { ApiRoute } from './ApiRoute';
+import type { Context } from 'hono';
 import { z } from 'zod';
 import {
   geohash4tw,
@@ -49,7 +50,7 @@ export class getSpots extends ApiRoute {
     }
   }
 
-  async handle(c: any) {
+  async handle(c: Context) {
     const data = await this.getValidatedData<typeof this.schema>()
     const items = await geoSpots(data.params.geohash);
     const grouped = R.groupBy(i => i.geohash || '', items);
@@ -63,7 +64,3 @@ export class getSpots extends ApiRoute {
     })
   }
 }
-
-type HandleReturnType = ReturnType<getSpots['handle']>;
-type GetSpotsResponse = Awaited<HandleReturnType>;
-export type { GetSpotsResponse };

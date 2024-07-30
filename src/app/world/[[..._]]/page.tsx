@@ -18,7 +18,8 @@ const TW_BOUNDS = [
   [25.4, 122.3]  // up right
 ];
 const TW_CENTER = [23.9739, 120.9773];
-const SAMPLE_CENTER = [24.987787927428965, 121.52125946066074];
+// const SAMPLE_CENTER = [24.987787927428965, 121.52125946066074];
+const SAMPLE_CENTER = [24.87493294850338,121.22191410433534];
 const trackDays = 5
 const fetchLimit = 200;
 const overwriteToday = new Date();

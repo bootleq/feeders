@@ -5,9 +5,10 @@ import { useState, useEffect, useRef } from 'react';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
 import { subDays, format, formatISO, formatDistanceToNow, formatDistance } from '@/lib/date-fp';
 import { recentFollowups } from '@/models/spots';
+import ActionLabel from './ActionLabel';
+import FoodLife from './FoodLife';
 import { MapPinIcon } from '@heroicons/react/24/solid';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
-import { ArrowLongRightIcon } from '@heroicons/react/24/solid';
 
 type RecentFollowupsItemProps = Awaited<ReturnType<typeof recentFollowups>>[number];
 
@@ -16,110 +17,6 @@ const setDefaultViewItemAtom = atom(
   null,
   (get, set, update: RecentFollowupsItemProps) => set(viewItemAtom, (value) => (R.isNil(value) ? update : value))
 )
-
-function StateLabel({ spotState, children }: {
-  spotState: string,
-  children?: React.ReactNode
-}) {
-  let cls = '';
-
-  switch (spotState) {
-    case 'dirty':
-      cls = 'bg-amber-950';
-      break;
-    case 'clean':
-      cls = 'bg-green-700';
-      break;
-    case 'tolerated':
-      cls = 'bg-blue-700';
-      break;
-    default:
-      cls = 'bg-current';
-  }
-
-  return (
-    <span className={`inline-block rounded-md text-sm px-1 mr-1 text-white font-normal ${cls}`}>
-      {children}
-    </span>
-  );
-}
-
-function ActionLabel({ action, children }: {
-  action: string,
-  children?: React.ReactNode
-}) {
-  let cls = '';
-  let t: { [key: string]: string } = {
-    see: '看見',
-    remove: '移除',
-    talk: '溝通',
-    investig: '調查',
-    power: '公權力',
-    coop: '互助',
-    downvote: '扣分',
-  };
-
-  switch (action) {
-    case 'see':
-      cls = 'bg-slate-900 opacity-70';
-      break;
-    case 'talk':
-      cls = 'bg-yellow-600';
-      break;
-    case 'remove':
-      cls = 'bg-green-700';
-      break;
-    case 'investig':
-      cls = 'bg-blue-700';
-      break;
-    case 'downvote':
-      cls = 'bg-red-700';
-      break;
-    default:
-      cls = 'bg-slate-900';
-  }
-
-  return (
-    <span className={`inline-block rounded-lg px-2 text-white text-sm font-normal flex items-center ${cls}`}>
-      {t[action]}
-    </span>
-  );
-}
-
-function FoodLife({ spot, now }: {
-  spot: RecentFollowupsItemProps,
-  now: Date | null
-}) {
-  if (!now) {
-    return;
-  }
-  const { spawnedAt, removedAt, spotState } = spot;
-  const formatTime = format({}, 'H:m');
-  const spawned = spawnedAt ? formatTime(spawnedAt) : '??';
-  const removed = removedAt ? formatTime(removedAt) : '??';
-  let duration = '';
-
-  if (spawnedAt) {
-    duration = formatDistance(removedAt || now, spawnedAt);
-  }
-
-  return (
-    <div className='flex items-center flex-wrap'>
-      <StateLabel spotState={spotState}>{spotState}</StateLabel>
-      <span className='whitespace-nowrap'>
-        {spot.material}
-      </span>
-      <span className='text-sm whitespace-nowrap font-mono'>
-        （{duration.replace('大約', '').trim()}）
-      </span>
-      <div className='text-xs font-mono opacity-60 flex items-center'>
-        {spawned}
-        <ArrowLongRightIcon className='inline fill-gray-600 mx-[-9px]' width={48} height={24} />
-        {removed}
-      </div>
-    </div>
-  );
-}
 
 function SpotInfo() {
   const spot = useAtomValue(viewItemAtom);

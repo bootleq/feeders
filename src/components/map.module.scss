@@ -1,0 +1,36 @@
+.cluster-marker {
+  color: white;
+
+  &:global(.marker-cluster-small) {
+    background-color: rgba(0,0,0, .6);
+
+    > div {
+      background-color: rgba(100,100,100, .6);
+    }
+  }
+
+  &:global(.marker-cluster-medium) {
+    color: black;
+    background-color: rgba(255,255,97, .7);
+
+    > div {
+      background-color: rgba(240,194,12, .6);
+    }
+  }
+
+  &:global(.marker-cluster-large) {
+    color: black;
+    background-color: rgba(190,0,0, .6);
+
+    > div {
+      background-color: rgba(241,128,23, .7);
+    }
+  }
+}
+
+.popup {
+  :global(.leaflet-popup-content) {
+    font-size: 1rem;
+    margin: 6px 10px 9px 10px;
+  }
+}

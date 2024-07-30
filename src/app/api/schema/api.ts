@@ -6,7 +6,7 @@ export const latitude = z.coerce.number().gte(-90).lte(90).describe('緯度 (Lat
 export const longitude = z.coerce.number().gte(-180).lte(180).describe('經度 (Longitude)').openapi({example: 121.5210559478082});
 
 export const geohash4tw = geohash4.refine(
-  s => /^ws[hjmnqtw]|^we[uvy]/.test(s),
+  s => /^ws[hjkmnpqrtw]|^we[uvy]/.test(s),
   (val) => ({ message: `${val} 不在台灣地理範圍內` })
 );
 
