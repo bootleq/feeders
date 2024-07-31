@@ -8,7 +8,7 @@ interface Foodable {
   spotState: string;
   material: string | null;
   spawnedAt: Date | number | null;
-  removedAt: number;
+  removedAt: Date | number | null;
   [key: string]: any;
 }
 

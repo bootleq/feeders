@@ -18,6 +18,8 @@ const setDefaultViewItemAtom = atom(
   (get, set, update: RecentFollowupsItemProps) => set(viewItemAtom, (value) => (R.isNil(value) ? update : value))
 )
 
+const AREA_TAKES = 3;
+
 function SpotInfo() {
   const spot = useAtomValue(viewItemAtom);
   const [autoExpand, setAutoExpand] = useState(false);
@@ -152,7 +154,7 @@ function Areas({ items }: {
       return value.totalFollows;
     }),
     R.reverse,
-    R.take(5),
+    R.take(AREA_TAKES),
   )(byArea as ByAreaData) as [string, ByAreaValue][];
 
   return (
@@ -223,6 +225,7 @@ function Followups({ items, today, oldestDate }: {
     const isEmpty = !R.has(date, indexByDate);
     const shortDate = R.pipe( R.split('-'), R.tail, R.map(Number), R.join('/'))(date);
     const itemsCount = subItems?.length || 0;
+    const viewItemPinCls = '-translate-y-[0.4rem] drop-shadow-[0_0_2px_white]';
 
     return (
       <li key={date} className=''>
@@ -241,10 +244,10 @@ function Followups({ items, today, oldestDate }: {
           subItems ?
             <ul className='flex flex-row flex-wrap p-1'>
               {subItems.map((i: RecentFollowupsItemProps) => (
-                <li key={i.spotId} className={`relative ${viewItem === i ? '-translate-y-[0.4rem]' : ''}`}>
+                <li key={i.spotId} className={`relative ${viewItem === i ? viewItemPinCls : ''}`}>
                   <MapPinIcon className={`cursor-pointer ${mapPinCls(i.spotState)}`} onClick={() => setViewItem(i)} data-lat={i.lat} data-lon={i.lon} height={24} />
                   {viewItem === i &&
-                  <div className='absolute -bottom-[0.4rem] bg-yellow-400 h-1 w-full scale-x-75'></div>
+                    <div className='absolute -bottom-[0.4rem] bg-yellow-400 h-1 w-full scale-x-75'></div>
                   }
                 </li>
               ))}
@@ -271,7 +274,7 @@ export default function RecentFollowups({ items, today, oldestDate }: {
 
   useEffect(() => {
     if (items.length) {
-      setDefaultViewItem(items[0]);
+      // setDefaultViewItem(items[0]);
     }
   }, [items, setDefaultViewItem])
 

@@ -37,7 +37,7 @@ export default async function Page() {
 
   return (
     <main className="flex min-h-screen flex-row items-start justify-between">
-      <Sidebar className='flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200'>
+      <Sidebar className={`max-h-screen scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
         <RecentFollowups items={items} today={today} oldestDate={oldestDate} />
         <Nav />
       </Sidebar>
@@ -46,7 +46,7 @@ export default async function Page() {
         preferCanvas={true}
         center={SAMPLE_CENTER}
         minZoom={8}
-        zoom={18}
+        zoom={8}
         maxZoom={20}
         maxBounds={TW_BOUNDS}
         maxBoundsViscosity={0.5}

@@ -358,7 +358,7 @@ export default function Map({ children, className, width, height, ...rest }: Map
 
   return (
     <>
-      <MapContainer className={`w-full h-[100vh] ${className || ''}`} {...rest}>
+      <MapContainer className={`w-full h-[100vh] ${mapStyles.map} ${className || ''}`} {...rest}>
         <MapUser />
         <TileLayer
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'

@@ -1,3 +1,9 @@
+.map {
+  :global(.leaflet-bottom) {
+    z-index: 600;
+  }
+}
+
 .cluster-marker {
   color: white;
 
