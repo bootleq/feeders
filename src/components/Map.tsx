@@ -308,7 +308,7 @@ function Markers({ spots }: {
 
           return (
             <Marker key={s.id} position={[s.lat, s.lon]} icon={MarkerIcon}>
-              <Popup className={mapStyles.popup}>
+              <Popup className={mapStyles.popup} autoPan={false}>
                 <div className='p-1'>
                   <strong className='block mb-1'>{s.title}</strong>
 
