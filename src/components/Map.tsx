@@ -11,7 +11,9 @@ import { format, formatDistance } from '@/lib/date-fp';
 import type { GeoSpotsResult, GeoSpotsByGeohash } from '@/models/spots';
 
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
-import { worldCtrlAtom } from '@/app/world/[[..._]]/store';
+import { spotsAtom, mergeSpotsAtom, geohashesAtom } from '@/app/world/[[..._]]/store';
+import { useHydrateAtoms } from 'jotai/utils';
+
 import Spinner from '@/assets/spinner.svg';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { MapIcon } from '@heroicons/react/24/solid';
@@ -23,29 +25,14 @@ import ActionLabel from '@/app/world/[[..._]]/ActionLabel';
 import FoodLife from '@/app/world/[[..._]]/FoodLife';
 
 import Leaflet, { MarkerCluster } from 'leaflet';
-import type { LatLng } from 'leaflet';
+import { LatLng } from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents, Marker, Popup } from "react-leaflet";
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
 
 const GEOHASH_PRECISION = 4;
 const AREA_ZOOM_MAX = 12;
-
-type SpotsAtom = {
-  [key: string]: GeoSpotsResult
-}
-const spotsAtom = atom({});
-
-const mergeSpotsAtom = atom(
-  null,
-  (get, set, update: SpotsAtom) => {
-    set(spotsAtom, { ...get(spotsAtom), ...update });
-  }
-);
-
-const geohashesAtom = atom((get) => {
-  return new Set(R.keys(get(spotsAtom)));
-});
+const D1_PARAM_LIMIT = 100;
 
 type MapPropsAtom = {
   zoom?: number
@@ -92,13 +79,31 @@ const fetchSpotsAtom = atom(
   }
 );
 
-type MapProps = {
-  children?: React.ReactNode;
-  className?: string;
-  width?: string | number;
-  height?: string | number;
-  [key: string]: any;
-};
+const atRegexp = /\/@([\d.]+),([\d.]+)/g;
+
+function parsePath(pathname: string) {
+  const result: {
+    lat: number | null,
+    lon: number | null,
+    mode: string | null,
+  } = { lat: null, lon: null, mode: null };
+
+  let s = pathname.slice('/world'.length);
+
+  if (s.match(/^\/area/)) {
+    s = s.replace(/^\/area/, '');
+    result.mode = 'area';
+  } else {
+    result.mode = 'world';
+  }
+  const at = [...s.matchAll(atRegexp)];
+  if (at[0]) {
+    result.lat = Number(at[0][1]);
+    result.lon = Number(at[0][2]);
+  }
+
+  return result;
+}
 
 function updatePath(params: {
   newZoom?: number
@@ -109,13 +114,12 @@ function updatePath(params: {
   let newPath = pathname;
 
   if (newCenter) {
-    const atRegexp = /\/@([\d.]+),([\d.]+)/g;
     newPath = newPath.replaceAll(atRegexp, '');
     newPath = newPath.replace(/\/$/, '') + `/@${newCenter.lat},${newCenter.lng}`;
   }
 
   if (newZoom) {
-    if (newZoom > AREA_ZOOM_MAX) {
+    if (newZoom >= AREA_ZOOM_MAX) {
       newPath = newPath.replace(/^\/world\/(?!area\/)/, '/world/area/');
     } else {
       newPath = newPath.replace(/^\/world\/area\//, '/world/');
@@ -125,14 +129,16 @@ function updatePath(params: {
   window.history.replaceState(null, '', newPath + search);
 }
 
-function MapUser() {
+function MapUser(props: {
+  pathname: string
+}) {
   const geoSet = useAtomValue(geohashesAtom);
   const fetchSpots = useSetAtom(fetchSpotsAtom);
-  const [worldCtrl, setWorldCtrl] = useAtom(worldCtrlAtom);
   const setInfo = useSetAtom(setInfoAtom);
-  const prevMode = useRef<string | undefined>('world');
+  const prevMode = useRef<string | null>('world');
 
-  const { mode } = worldCtrl;
+  const { pathname } = props;
+  const { lat, lon, mode } = parsePath(pathname);
 
   const map = useMapEvents({
     click: () => {
@@ -142,38 +148,63 @@ function MapUser() {
     },
     zoomstart: () => {
       const zoom = map.getZoom();
-      const mode = zoom >= AREA_ZOOM_MAX ? 'area' : 'world';
-      setWorldCtrl({ mode });
-      updatePath({ newZoom: zoom });
     },
     zoomend: () => {
+      const zoom = map.getZoom();
+
       if (prevMode.current === 'area' && mode === 'world') {
         setInfo(<><MapIcon className='mr-1 fill-amber-600' height={32} />範圍過大，已暫停讀取地點</>);
       // } else if (prevMode.current === 'world' && mode === 'area') {
       //   setInfo(<><MapIcon className='mr-1 fill-amber-600' height={32} />已開始讀取地點</>);
       }
+      updatePath({ newZoom: zoom });
       prevMode.current = mode;
     },
     moveend: () => {
-      const bounds = map.getBounds();
-      const hashes = geohash.bboxes(
-        bounds.getSouth(),
-        bounds.getWest(),
-        bounds.getNorth(),
-        bounds.getEast(),
-        GEOHASH_PRECISION
-      );
+      const zoom = map.getZoom();
 
-      if (mode === 'area') {
+      if (mode === 'area' && zoom >= AREA_ZOOM_MAX) {
+        const bounds = map.getBounds();
+        const hashes = geohash.bboxes(
+          bounds.getSouth(),
+          bounds.getWest(),
+          bounds.getNorth(),
+          bounds.getEast(),
+          GEOHASH_PRECISION
+        );
+
         const newHash = new Set(hashes).difference(geoSet);
         if (newHash.size > 0) {
-          fetchSpots(Array.from(newHash));
+          fetchSpots(
+            R.take(D1_PARAM_LIMIT, Array.from(newHash))
+          );
         }
       }
 
       updatePath({ newCenter: map.getCenter() });
     },
   });
+
+  useEffect(() => {
+    if (lat && lon) {
+      const zoom = map.getZoom();
+      const center = map.getCenter();
+
+      let newZoom = zoom;
+
+      if (prevMode.current === 'world' && mode === 'area' && zoom < AREA_ZOOM_MAX) {
+        newZoom = AREA_ZOOM_MAX;
+      } else if (prevMode.current === 'area' && mode === 'world' && zoom >= AREA_ZOOM_MAX) {
+        newZoom = AREA_ZOOM_MAX - 1;
+      }
+
+      if (center.distanceTo([lat, lon]) > 500) {
+        map.setView([lat, lon], newZoom);
+      } else if (zoom !== newZoom) {
+        map.setZoom(newZoom);
+      }
+    }
+  }, [lat, lon, mode, map]);
 
   return null;
 }
@@ -344,9 +375,22 @@ function Markers({ spots }: {
   );
 };
 
-export default function Map({ children, className, width, height, ...rest }: MapProps) {
-  // const pathname = usePathname();
+type MapProps = {
+  children?: React.ReactNode;
+  className?: string;
+  width?: string | number;
+  height?: string | number;
+  [key: string]: any;
+};
+
+export default function Map({ preloadedAreas, children, className, width, height, ...rest }: MapProps) {
+  useHydrateAtoms([
+    [spotsAtom, preloadedAreas],
+  ]);
+
+  const pathname = usePathname();
   // const searchParams = useSearchParams();
+
   const areaSpots = useAtomValue(spotsAtom);
 
   let filteredSpots = R.pipe(
@@ -359,7 +403,7 @@ export default function Map({ children, className, width, height, ...rest }: Map
   return (
     <>
       <MapContainer className={`w-full h-[100vh] ${mapStyles.map} ${className || ''}`} {...rest}>
-        <MapUser />
+        <MapUser pathname={pathname} />
         <TileLayer
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
           attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"

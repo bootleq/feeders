@@ -100,7 +100,7 @@ export const spots = sqliteTable("spots", {
   lon: real("lon").notNull(),
   city: text('city'),
   town: text('town'),
-  geohash: text('geohash'),
+  geohash: text('geohash').notNull(),
   desc: text('desc'),
   state: pubStateCol().notNull(),
   createdAt: createdAtCol(),

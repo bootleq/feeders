@@ -4,7 +4,10 @@ import * as R from 'ramda';
 import { useState, useEffect, useRef } from 'react';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
 import { subDays, format, formatISO, formatDistanceToNow, formatDistance } from '@/lib/date-fp';
+import Link from 'next/link';
+
 import { recentFollowups } from '@/models/spots';
+import type { GeoSpotsResult, GeoSpotsByGeohash } from '@/models/spots';
 import ActionLabel from './ActionLabel';
 import FoodLife from './FoodLife';
 import { MapPinIcon } from '@heroicons/react/24/solid';
@@ -17,8 +20,6 @@ const setDefaultViewItemAtom = atom(
   null,
   (get, set, update: RecentFollowupsItemProps) => set(viewItemAtom, (value) => (R.isNil(value) ? update : value))
 )
-
-const AREA_TAKES = 3;
 
 function SpotInfo() {
   const spot = useAtomValue(viewItemAtom);
@@ -105,72 +106,31 @@ function visitArea(lat: number, lon: number) {
   }
 }
 
-function Areas({ items }: {
-  items: RecentFollowupsItemProps[],
+function Areas({ areas }: {
+  areas: GeoSpotsByGeohash
 }) {
-  const viewItem = useAtomValue(viewItemAtom);
-  let viewingAreaKey = '';
-
-  if (viewItem && viewItem.lat && viewItem.lon) {
-    viewingAreaKey = R.filter(R.isNotNil, [viewItem.city, viewItem.town]).join(' ');
-  }
-
-  type ByAreaData = {
-    [key: string]: {  // city + town
-      lat: number
-      lon: number
-      maxFollowCount: number
-      totalFollows: number  // will only pick 1 spot with max followups, but sums all followups together
-    }
-  }
-  type ByAreaValue = ByAreaData[string];
-
-  const byArea = items.reduce((m: ByAreaData, i) => {
-    const { city, town, lat, lon, followCount = 0 } = i;
-    const key = R.filter(R.isNotNil, [city, town]).join(' ');
-
-    if (!key.length || R.isNil(lat) || R.isNil(lon)) {
-      return m;
-    }
-
-    if (!m[key]) {
-      m[key] = { lat, lon, maxFollowCount: followCount, totalFollows: followCount };
-    } else {
-      if (followCount > m[key].maxFollowCount) {
-        m[key] = { ...m[key], lat, lon, maxFollowCount: followCount };
-      }
-      m[key].totalFollows += followCount;
-    }
-
-    return m;
-  }, {} as ByAreaData);
-
-  let pickedAreas = R.pipe(
-    R.toPairs,
-    R.sortBy(([key, value]: [string, ByAreaValue]) => {
-      if (key === viewingAreaKey) {
-        return Infinity;
-      }
-      return value.totalFollows;
-    }),
-    R.reverse,
-    R.take(AREA_TAKES),
-  )(byArea as ByAreaData) as [string, ByAreaValue][];
+  const picked: [string, GeoSpotsResult[number], number][] = R.toPairs(areas).map(([geohash, items]) => {
+    const spot = R.sortBy(R.prop('latestFollowAt'), items)[0];
+    return [geohash, spot, items.length];
+  });
 
   return (
     <div className='mt-4 mb-2 p-1 overflow-visible'>
       前往區域
       <ul className='flex py-1 overflow-hidden scrollbar-thin'>
-        {pickedAreas.map(([name, { lat, lon, totalFollows }]) => {
-          const isCurrent = name === viewingAreaKey;
-
+        {picked.map(([geohash, { lat, lon, city, town }, spotsCount]) => {
           return (
-            <li key={name} className={`relative rounded p-1 mx-1 grow-0 text-center ${isCurrent ? 'bg-slate-300/75' : 'bg-slate-200'}`}>
-              <div className='break-keep w-min cursor-pointer' onClick={visitArea(lat, lon)}>
-                {name}
-              </div>
+            <li key={geohash} className={`relative rounded p-1 mx-1 grow-0 text-center ${false ? 'bg-slate-300/75' : 'bg-slate-200'}`}>
+              <Link
+                href={`/world/area/@${lat},${lon}`}
+                onClick={visitArea(lat, lon)}
+                className='break-keep w-min cursor-pointer'
+                prefetch={false}
+              >
+                {city} {town}
+              </Link>
               <i className='absolute font-mono -top-3 right-0 drop-shadow'>
-                {totalFollows}
+                {spotsCount}
               </i>
             </li>
           );
@@ -178,7 +138,7 @@ function Areas({ items }: {
       </ul>
     </div>
   );
-};
+}
 
 function recentDateStrings(today: Date, oldestDate: Date) {
   const days = R.range(0, 5); // FIXME: 5 is magic
@@ -265,8 +225,9 @@ function Followups({ items, today, oldestDate }: {
 }
 
 
-export default function RecentFollowups({ items, today, oldestDate }: {
+export default function RecentFollowups({ items, preloadedAreas, today, oldestDate }: {
   items: RecentFollowupsItemProps[],
+  preloadedAreas: GeoSpotsByGeohash,
   today: Date,
   oldestDate: Date
 }) {
@@ -281,7 +242,7 @@ export default function RecentFollowups({ items, today, oldestDate }: {
   return (
     <div className=''>
       <SpotInfo />
-      <Areas items={items} />
+      <Areas areas={preloadedAreas} />
       <Followups items={items} today={today} oldestDate={oldestDate} />
     </div>
   );

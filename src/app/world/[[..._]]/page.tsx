@@ -1,6 +1,7 @@
 import * as R from 'ramda';
 import dynamic from 'next/dynamic';
-import { recentFollowups } from '@/models/spots';
+import { recentFollowups, geoSpots } from '@/models/spots';
+import type { RecentFollowupsResult } from '@/models/spots';
 import { subDays } from '@/lib/date-fp';
 import Sidebar from '@/components/Sidebar';
 import RecentFollowups from './RecentFollowups';
@@ -23,6 +24,7 @@ const SAMPLE_CENTER = [24.87493294850338,121.22191410433534];
 const trackDays = 5
 const fetchLimit = 200;
 const overwriteToday = new Date();
+const PRELOAD_AREA_SIZE = 3;
 
 async function getSpots(oldestDate: Date) {
   const query = recentFollowups(oldestDate, fetchLimit + 1);
@@ -30,19 +32,29 @@ async function getSpots(oldestDate: Date) {
   return items;
 }
 
+async function preloadGeoSpots(spots: RecentFollowupsResult) {
+  const hashes = R.take(PRELOAD_AREA_SIZE, spots).map(R.prop('geohash'));
+  const query = geoSpots(hashes);
+  const items = await query;
+  const grouped = R.groupBy(i => i.geohash || '', items);
+  return R.reject(R.isNil, grouped);
+}
+
 export default async function Page() {
   const today = overwriteToday || new Date();
   const oldestDate = subDays(trackDays, today);
   const items = await getSpots(oldestDate);
+  const preloadedAreas = await preloadGeoSpots(items);
 
   return (
     <main className="flex min-h-screen flex-row items-start justify-between">
       <Sidebar className={`max-h-screen scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
-        <RecentFollowups items={items} today={today} oldestDate={oldestDate} />
+        <RecentFollowups items={items} preloadedAreas={preloadedAreas} today={today} oldestDate={oldestDate} />
         <Nav />
       </Sidebar>
 
       <LazyMap
+        preloadedAreas={preloadedAreas}
         preferCanvas={true}
         center={SAMPLE_CENTER}
         minZoom={8}

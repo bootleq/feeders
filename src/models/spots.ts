@@ -45,6 +45,7 @@ export const recentFollowups = (oldestDate: Date, fetchLimit: number) => {
     lon:         spots.lon,
     city:        spots.city,
     town:        spots.town,
+    geohash:     spots.geohash,
     followupId:  spotFollowups.id,
     action:      spotFollowups.action,
     spotState:   spotFollowups.spotState,
@@ -82,6 +83,9 @@ export const recentFollowups = (oldestDate: Date, fetchLimit: number) => {
 
   return query;
 };
+
+type RecentFollowupsQuery = ReturnType<typeof recentFollowups>;
+export type RecentFollowupsResult = Awaited<ReturnType<RecentFollowupsQuery['execute']>>;
 
 export async function queryDistrict(lat: number, lon: number) {
   const url = `${districtApiURL}${lon}/${lat}`;

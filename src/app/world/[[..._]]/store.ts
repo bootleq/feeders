@@ -1,14 +1,19 @@
+import * as R from 'ramda';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
+import type { GeoSpotsResult, GeoSpotsByGeohash } from '@/models/spots';
 
-type WorldCtrlAtom = {
-  mode?: 'world' | 'area'
+export type SpotsAtom = {
+  [key: string]: GeoSpotsResult
 }
+export const spotsAtom = atom({});
 
-export const rawWorldCtrlAtom = atom<WorldCtrlAtom>({ mode: 'world' });
-
-export const worldCtrlAtom = atom(
-  (get) => get(rawWorldCtrlAtom),
-  (get, set, update: WorldCtrlAtom) => {
-    set(rawWorldCtrlAtom, { ...get(rawWorldCtrlAtom), ...update });
+export const mergeSpotsAtom = atom(
+  null,
+  (get, set, update: SpotsAtom) => {
+    set(spotsAtom, { ...get(spotsAtom), ...update });
   }
 );
+
+export const geohashesAtom = atom((get) => {
+  return new Set(R.keys(get(spotsAtom)));
+});
