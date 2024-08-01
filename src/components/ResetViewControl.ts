@@ -22,7 +22,7 @@ export type ResetViewControlOptions = {
 } & ControlOptions;
 
 const _getControl = Control.extend({
-  options: { position: "topleft", title: "Reset map view", className: '' },
+  options: { position: "bottomright", title: "Reset map view", className: '' },
 
   onAdd: function (map: Map) {
     const { title, className } = this.options;
@@ -44,6 +44,8 @@ const _getControl = Control.extend({
     DomEvent.on(link, "mousedown dblclick", DomEvent.stopPropagation)
       .on(link, "click", DomEvent.stop)
       .on(link, "click", this._resetView, this);
+
+    map.resetViewControl = this;
 
     return container;
   },

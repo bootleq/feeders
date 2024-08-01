@@ -28,6 +28,7 @@ import Leaflet, { MarkerCluster } from 'leaflet';
 import { LatLng } from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents, Marker, Popup } from "react-leaflet";
 import ResetViewControl from './ResetViewControl';
+import LocateControl from './LocateControl';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
 
@@ -146,6 +147,7 @@ function MapUser(props: {
       // map.locate();
     },
     locationfound: (location) => {
+      map.setView(location.latlng, 16);
     },
     zoomstart: () => {
       const zoom = map.getZoom();
@@ -413,6 +415,8 @@ export default function Map({ preloadedAreas, children, className, width, height
         >
         </TileLayer>
         {filteredSpots && <Markers spots={filteredSpots} />}
+
+        <LocateControl className={mapStyles['reset-view-ctrl']} />;
         <ResetViewControl className={mapStyles['reset-view-ctrl']} title='整個台灣' position='bottomright' />
       </MapContainer>
 

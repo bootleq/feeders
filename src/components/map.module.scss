@@ -45,4 +45,11 @@
   svg {
     fill: slategray;
   }
+
+  :global(.leaflet-right .leaflet-control) {
+    margin-right: 8px;
+  }
+  :global(.leaflet-bottom .leaflet-control) {
+    margin-bottom: 8px;
+  }
 }
