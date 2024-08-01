@@ -413,7 +413,7 @@ export default function Map({ preloadedAreas, children, className, width, height
         >
         </TileLayer>
         {filteredSpots && <Markers spots={filteredSpots} />}
-        <ResetViewControl title='放大到台灣整體' position='bottomright' />
+        <ResetViewControl className={mapStyles['reset-view-ctrl']} title='整個台灣' position='bottomright' />
       </MapContainer>
 
       <Notification />
