@@ -26,6 +26,7 @@
     "@auth/drizzle-adapter": "^1.4.1",
     "@heroicons/react": "^2.1.5",
     "@next/bundle-analyzer": "^14.2.5",
+    "@react-leaflet/core": "^2.1.0",
     "chanfana": "^2.0.2",
     "date-fns": "^3.6.0",
     "drizzle-orm": "^0.32.0",

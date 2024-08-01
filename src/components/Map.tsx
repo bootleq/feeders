@@ -27,6 +27,7 @@ import FoodLife from '@/app/world/[[..._]]/FoodLife';
 import Leaflet, { MarkerCluster } from 'leaflet';
 import { LatLng } from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents, Marker, Popup } from "react-leaflet";
+import ResetViewControl from './ResetViewControl';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
 
@@ -412,6 +413,7 @@ export default function Map({ preloadedAreas, children, className, width, height
         >
         </TileLayer>
         {filteredSpots && <Markers spots={filteredSpots} />}
+        <ResetViewControl title='放大到台灣整體' position='bottomright' />
       </MapContainer>
 
       <Notification />
