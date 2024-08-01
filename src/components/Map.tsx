@@ -45,13 +45,13 @@ const mapPropSnapshotAtom = atom({
   set(mapPropSnapshotAtom, { ...get(mapPropSnapshotAtom), ...update });
 });
 
+const loadingAtom = atom(false);
+
 type StatusAtom = {
-  loading?: boolean,
   info?: any,
   error?: any,
 }
 const statusAtom = atom<StatusAtom>({
-  loading: false,
   info: null,
   error: null,
 });
@@ -63,20 +63,23 @@ const fetchSpotsAtom = atom(
   (get) => get(statusAtom),
   async (get, set, geohash: string[]) => {
     const prev = get(statusAtom);
-    set(statusAtom, { ...prev, loading: true });
+    set(loadingAtom, true);
 
     try {
       const response = await fetch(`/api/spots/${geohash.sort()}`);
       const json: ItemsGeoSpotsByGeohash = await response.json();
       if (response.ok) {
-        set(statusAtom, { ...prev, loading: false, error: null });
+        set(statusAtom, { ...prev, error: null });
+        set(loadingAtom, false);
         set(mergeSpotsAtom, { ...json.items });
       } else {
         const errorNode = <><code className='font-mono mr-1'>{response.status}</code>無法取得資料</>;
-        set(statusAtom, { ...prev, loading: false, error: errorNode });
+        set(statusAtom, { ...prev, error: errorNode });
+        set(loadingAtom, false);
       }
     } catch (e) {
-      set(statusAtom, { ...prev, loading: false, error: e });
+      set(statusAtom, { ...prev, error: e });
+      set(loadingAtom, false);
     }
   }
 );
@@ -212,9 +215,34 @@ function MapUser(props: {
   return null;
 }
 
+function LoadingIndicator(params: any) {
+  const loading = useAtomValue(loadingAtom);
+  const motionProps = {
+    exit: {
+      opacity: 0,
+      transition: { duration: 1.2 },
+    },
+  };
+  const iconSize = 24;
+
+  return (
+    <LazyMotion features={domAnimation}>
+      <AnimatePresence>
+        { loading &&
+          <div className='fixed z-[900] inset-x-1/2 inset-y-1/2 -translate-x-1/2 -translate-y-1/2'>
+            <m.div {...motionProps}>
+              <Spinner className='scale-[10]' width={iconSize} height={iconSize} aria-label='讀取中' />
+            </m.div>
+          </div>
+        }
+      </AnimatePresence>
+    </LazyMotion>
+  );
+}
+
 function Notification(params: any) {
   const dismiss = useSetAtom(dismissStatusAtom);
-  const { loading, info, error } = useAtomValue(statusAtom);
+  const { info, error } = useAtomValue(statusAtom);
   const cls = [
     'flex items-center',
     'w-max h-max px-6 py-4 shadow-[10px_20px_20px_14px_rgba(0,0,0,0.5)]',
@@ -230,19 +258,13 @@ function Notification(params: any) {
     },
   };
 
-  const open = loading || error || info;
+  const open = error || info;
 
   return (
     <LazyMotion features={domAnimation}>
       <AnimatePresence>
         { open &&
           <div className='fixed z-[900] inset-x-1/2 inset-y-1/2 -translate-x-1/2 -translate-y-full w-max h-max'>
-            {loading &&
-              <m.div className={`${cls}`} {...motionProps}>
-                <Spinner className='animate-spin mr-1 min-w-max' height={24} />
-                讀取中
-              </m.div>
-            }
             {info &&
               <div className={`${cls} bg-white/50 ring-yellow my-3 py-9 px-9`}>
                 {info}
@@ -420,6 +442,7 @@ export default function Map({ preloadedAreas, children, className, width, height
         <ResetViewControl className={mapStyles['reset-view-ctrl']} title='整個台灣' position='bottomright' />
       </MapContainer>
 
+      <LoadingIndicator />
       <Notification />
     </>
   );
