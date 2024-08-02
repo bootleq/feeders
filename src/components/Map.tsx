@@ -34,7 +34,7 @@ import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
 
 const GEOHASH_PRECISION = 4;
-const AREA_ZOOM_MAX = 12;
+const AREA_ZOOM_MAX = 14;
 const D1_PARAM_LIMIT = 100;
 
 type MapPropsAtom = {
@@ -135,8 +135,8 @@ function MapUser(props: {
 }) {
   const geoSet = useAtomValue(geohashesAtom);
   const fetchSpots = useSetAtom(fetchSpotsAtom);
-  const addAlert = useSetAtom(addAlertAtom);
   const prevMode = useRef<string | null>('world');
+  const addAlert = useSetAtom(addAlertAtom);
 
   const { pathname } = props;
   const { lat, lon, mode } = parsePath(pathname);
@@ -154,13 +154,7 @@ function MapUser(props: {
     zoomend: () => {
       const zoom = map.getZoom();
 
-      if (prevMode.current === 'area' && mode === 'world') {
-        addAlert('info', <><MapIcon className='mr-1 fill-amber-600' height={32} />範圍過大，已暫停讀取地點</>);
-      // } else if (prevMode.current === 'world' && mode === 'area') {
-      //   setInfo(<><MapIcon className='mr-1 fill-amber-600' height={32} />已開始讀取地點</>);
-      }
       updatePath({ newZoom: zoom });
-      prevMode.current = mode;
     },
     moveend: () => {
       const zoom = map.getZoom();
@@ -207,6 +201,13 @@ function MapUser(props: {
       }
     }
   }, [lat, lon, mode, map]);
+
+  useEffect(() => {
+    if (prevMode.current === 'area' && mode === 'world') {
+      addAlert('info', <><MapIcon className='mr-1 fill-amber-600' height={32} />範圍過大，已暫停讀取地點</>);
+    }
+    prevMode.current = mode;
+  }, [mode, addAlert]);
 
   return null;
 }
