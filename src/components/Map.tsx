@@ -14,6 +14,7 @@ import type { GeoSpotsResult, GeoSpotsByGeohash } from '@/models/spots';
 
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
 import { spotsAtom, mergeSpotsAtom, geohashesAtom } from '@/app/world/[[...path]]/store';
+import { parsePath, updatePath, AREA_ZOOM_MAX } from '@/app/world/[[...path]]/util';
 import { useHydrateAtoms } from 'jotai/utils';
 
 import Spinner from '@/assets/spinner.svg';
@@ -25,7 +26,6 @@ import ActionLabel from '@/app/world/[[...path]]/ActionLabel';
 import FoodLife from '@/app/world/[[...path]]/FoodLife';
 
 import Leaflet, { MarkerCluster } from 'leaflet';
-import { LatLng } from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents, Marker, Popup } from "react-leaflet";
 import ResetViewControl from './ResetViewControl';
 import LocateControl from './LocateControl';
@@ -34,7 +34,6 @@ import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
 
 const GEOHASH_PRECISION = 4;
-const AREA_ZOOM_MAX = 14;
 const D1_PARAM_LIMIT = 100;
 
 type MapPropsAtom = {
@@ -79,56 +78,6 @@ const fetchSpotsAtom = atom(
     }
   }
 );
-
-const atRegexp = /\/@([\d.]+),([\d.]+)/g;
-
-function parsePath(pathname: string) {
-  const result: {
-    lat: number | null,
-    lon: number | null,
-    mode: string | null,
-  } = { lat: null, lon: null, mode: null };
-
-  let s = pathname.slice('/world'.length);
-
-  if (s.match(/^\/area/)) {
-    s = s.replace(/^\/area/, '');
-    result.mode = 'area';
-  } else {
-    result.mode = 'world';
-  }
-  const at = [...s.matchAll(atRegexp)];
-  if (at[0]) {
-    result.lat = Number(at[0][1]);
-    result.lon = Number(at[0][2]);
-  }
-
-  return result;
-}
-
-function updatePath(params: {
-  newZoom?: number
-  newCenter?: LatLng
-}) {
-  const { newCenter, newZoom } = params;
-  const { pathname, search } = window.location;
-  let newPath = pathname;
-
-  if (newCenter) {
-    newPath = newPath.replaceAll(atRegexp, '');
-    newPath = newPath.replace(/\/$/, '') + `/@${newCenter.lat},${newCenter.lng}`;
-  }
-
-  if (newZoom) {
-    if (newZoom >= AREA_ZOOM_MAX) {
-      newPath = newPath.replace(/^\/world\/(?!area\/)/, '/world/area/');
-    } else {
-      newPath = newPath.replace(/^\/world\/area\//, '/world/');
-    }
-  }
-
-  window.history.replaceState(null, '', newPath + search);
-}
 
 function MapUser(props: {
   pathname: string
