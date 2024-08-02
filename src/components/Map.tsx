@@ -31,6 +31,7 @@ import { LatLng } from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents, Marker, Popup } from "react-leaflet";
 import ResetViewControl from './ResetViewControl';
 import LocateControl from './LocateControl';
+import Alerts from './Alerts';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
 
@@ -249,9 +250,7 @@ function LoadingIndicator(params: any) {
 
 function Notification(params: any) {
   const dismiss = useSetAtom(dismissStatusAtom);
-  const dismissError = useSetAtom(dismissErrorAtom);
   const { info } = useAtomValue(statusAtom);
-  const errors = useAtomValue(errorsAtom);
   const cls = [
     'flex items-center',
     'w-max h-max px-6 py-4 shadow-[10px_20px_20px_14px_rgba(0,0,0,0.5)]',
@@ -267,7 +266,7 @@ function Notification(params: any) {
     },
   };
 
-  const open = errors.length || info;
+  const open = info;
 
   return (
     <LazyMotion features={domAnimation}>
@@ -280,16 +279,6 @@ function Notification(params: any) {
                 <XMarkIcon className='absolute right-1 top-1 ml-auto cursor-pointer fill-slate-500' onClick={() => dismiss()} height={24} />
               </div>
             }
-            {errors.map(error => {
-              const [eKey, eNode] = error;
-              return (
-                <div key={eKey} className={`${cls} bg-red ring-black my-3 py-9 px-9`}>
-                  <ExclamationCircleIcon className='mr-1 fill-white stroke-red-700 stroke-2' height={32} />
-                  錯誤：{eNode}
-                  <XMarkIcon className='absolute right-1 top-1 ml-auto cursor-pointer fill-slate-500' onClick={() => dismissError(eKey)} height={24} />
-                </div>
-              );
-            })}
           </div>
         }
       </AnimatePresence>
@@ -454,6 +443,7 @@ export default function Map({ preloadedAreas, children, className, width, height
         <ResetViewControl className={mapStyles['reset-view-ctrl']} title='整個台灣' position='bottomright' />
       </MapContainer>
 
+      <Alerts itemsAtom={errorsAtom} dismissAtom={dismissErrorAtom} />
       <LoadingIndicator />
       <Notification />
     </>
