@@ -2,11 +2,13 @@
 
 import * as R from 'ramda';
 import geohash from 'ngeohash';
+import { nanoid } from 'nanoid';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, ReactElement } from 'react';
 import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
 import mapStyles from './map.module.scss'
 import { format, formatDistance } from '@/lib/date-fp';
+import { rejectFirst } from '@/lib/utils';
 
 import type { GeoSpotsResult, GeoSpotsByGeohash } from '@/models/spots';
 
@@ -46,16 +48,21 @@ const mapPropSnapshotAtom = atom({
 });
 
 const loadingAtom = atom(false);
+type keyedAlert = [string, ReactElement];
+const errorsAtom = atom<keyedAlert[]>([]);
+const addErrorAtom = atom(
+  null,
+  (get, set, update: ReactElement) => set(errorsAtom, (errors) => [...errors, [nanoid(6), update]])
+)
 
 type StatusAtom = {
   info?: any,
-  error?: any,
 }
 const statusAtom = atom<StatusAtom>({
   info: null,
-  error: null,
 });
-const dismissStatusAtom = atom(null, (get, set) => set(statusAtom, { ...get(statusAtom), info: null, error: null }));
+const dismissStatusAtom = atom(null, (get, set) => set(statusAtom, { ...get(statusAtom), info: null }));
+const dismissErrorAtom = atom(null, (get, set, key: string) => set(errorsAtom, rejectFirst(R.eqBy(R.head, [key]))));
 const setInfoAtom = atom(null, (get, set, update) => set(statusAtom, { ...get(statusAtom), info: update }));
 
 type ItemsGeoSpotsByGeohash = { items: GeoSpotsByGeohash }
@@ -69,16 +76,16 @@ const fetchSpotsAtom = atom(
       const response = await fetch(`/api/spots/${geohash.sort()}`);
       const json: ItemsGeoSpotsByGeohash = await response.json();
       if (response.ok) {
-        set(statusAtom, { ...prev, error: null });
         set(loadingAtom, false);
         set(mergeSpotsAtom, { ...json.items });
       } else {
         const errorNode = <><code className='font-mono mr-1'>{response.status}</code>無法取得資料</>;
-        set(statusAtom, { ...prev, error: errorNode });
+        set(addErrorAtom, errorNode);
         set(loadingAtom, false);
       }
     } catch (e) {
-      set(statusAtom, { ...prev, error: e });
+      const errorNode = <span>{String(e)}</span>;
+      set(addErrorAtom, errorNode);
       set(loadingAtom, false);
     }
   }
@@ -242,7 +249,9 @@ function LoadingIndicator(params: any) {
 
 function Notification(params: any) {
   const dismiss = useSetAtom(dismissStatusAtom);
-  const { info, error } = useAtomValue(statusAtom);
+  const dismissError = useSetAtom(dismissErrorAtom);
+  const { info } = useAtomValue(statusAtom);
+  const errors = useAtomValue(errorsAtom);
   const cls = [
     'flex items-center',
     'w-max h-max px-6 py-4 shadow-[10px_20px_20px_14px_rgba(0,0,0,0.5)]',
@@ -258,26 +267,29 @@ function Notification(params: any) {
     },
   };
 
-  const open = error || info;
+  const open = errors.length || info;
 
   return (
     <LazyMotion features={domAnimation}>
       <AnimatePresence>
         { open &&
-          <div className='fixed z-[900] inset-x-1/2 inset-y-1/2 -translate-x-1/2 -translate-y-full w-max h-max'>
+          <div className='fixed z-[900] inset-x-1/2 inset-y-1/2 -translate-x-1/2 -translate-y-1/2 w-max h-max'>
             {info &&
               <div className={`${cls} bg-white/50 ring-yellow my-3 py-9 px-9`}>
                 {info}
                 <XMarkIcon className='absolute right-1 top-1 ml-auto cursor-pointer fill-slate-500' onClick={() => dismiss()} height={24} />
               </div>
             }
-            {error &&
-              <div className={`${cls} bg-red ring-black my-3 py-9 px-9`}>
-                <ExclamationCircleIcon className='mr-1 fill-white stroke-red-700 stroke-2' height={32} />
-                錯誤：{error}
-                <XMarkIcon className='absolute right-1 top-1 ml-auto cursor-pointer fill-slate-500' onClick={() => dismiss()} height={24} />
-              </div>
-            }
+            {errors.map(error => {
+              const [eKey, eNode] = error;
+              return (
+                <div key={eKey} className={`${cls} bg-red ring-black my-3 py-9 px-9`}>
+                  <ExclamationCircleIcon className='mr-1 fill-white stroke-red-700 stroke-2' height={32} />
+                  錯誤：{eNode}
+                  <XMarkIcon className='absolute right-1 top-1 ml-auto cursor-pointer fill-slate-500' onClick={() => dismissError(eKey)} height={24} />
+                </div>
+              );
+            })}
           </div>
         }
       </AnimatePresence>
