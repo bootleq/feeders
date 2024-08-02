@@ -10,8 +10,6 @@ export default async function Home() {
   const session = await auth();
 
   const rUsers = await db.select().from(users);
-  const rAcs = await db.select().from(accounts);
-  const rSpots = await db.select().from(spots);
 
   return (
     <main className="flex min-h-screen flex-col items-center p-4">
@@ -23,16 +21,6 @@ export default async function Home() {
         <h2 className='mt-5'>Users</h2>
         <code>
           {JSON.stringify(rUsers)}
-        </code>
-
-        <h2 className='mt-5'>Spots</h2>
-        <code>
-          {JSON.stringify(rSpots)}
-        </code>
-
-        <h2 className='mt-5'>Accounts</h2>
-        <code>
-          {JSON.stringify(rAcs)}
         </code>
 
         <h2 className='mt-5'>Session</h2>
