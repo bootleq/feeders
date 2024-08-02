@@ -147,6 +147,7 @@ function MapUser(props: {
     },
     locationfound: (location) => {
       map.setView(location.latlng, 16);
+      map.fire('moveend');
     },
     zoomstart: () => {
       const zoom = map.getZoom();
