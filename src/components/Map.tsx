@@ -13,7 +13,7 @@ import { rejectFirst } from '@/lib/utils';
 import type { GeoSpotsResult, GeoSpotsByGeohash } from '@/models/spots';
 
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
-import { spotsAtom, mergeSpotsAtom, geohashesAtom } from '@/app/world/[[..._]]/store';
+import { spotsAtom, mergeSpotsAtom, geohashesAtom } from '@/app/world/[[...path]]/store';
 import { useHydrateAtoms } from 'jotai/utils';
 
 import Spinner from '@/assets/spinner.svg';
@@ -21,8 +21,8 @@ import { MapIcon } from '@heroicons/react/24/solid';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
 
-import ActionLabel from '@/app/world/[[..._]]/ActionLabel';
-import FoodLife from '@/app/world/[[..._]]/FoodLife';
+import ActionLabel from '@/app/world/[[...path]]/ActionLabel';
+import FoodLife from '@/app/world/[[...path]]/FoodLife';
 
 import Leaflet, { MarkerCluster } from 'leaflet';
 import { LatLng } from 'leaflet';
