@@ -17,10 +17,8 @@ import { spotsAtom, mergeSpotsAtom, geohashesAtom } from '@/app/world/[[..._]]/s
 import { useHydrateAtoms } from 'jotai/utils';
 
 import Spinner from '@/assets/spinner.svg';
-import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { MapIcon } from '@heroicons/react/24/solid';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid';
-import { XMarkIcon } from '@heroicons/react/24/solid';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
 
 import ActionLabel from '@/app/world/[[..._]]/ActionLabel';
@@ -49,28 +47,18 @@ const mapPropSnapshotAtom = atom({
 });
 
 const loadingAtom = atom(false);
-type keyedAlert = [string, ReactElement];
-const errorsAtom = atom<keyedAlert[]>([]);
-const addErrorAtom = atom(
+type keyedAlert = [string, 'info' | 'error', ReactElement];
+const alertsAtom = atom<keyedAlert[]>([]);
+const addAlertAtom = atom(
   null,
-  (get, set, update: ReactElement) => set(errorsAtom, (errors) => [...errors, [nanoid(6), update]])
+  (get, set, type: 'info' | 'error', node: ReactElement) => set(alertsAtom, (errors) => [...errors, [nanoid(6), type, node]])
 )
-
-type StatusAtom = {
-  info?: any,
-}
-const statusAtom = atom<StatusAtom>({
-  info: null,
-});
-const dismissStatusAtom = atom(null, (get, set) => set(statusAtom, { ...get(statusAtom), info: null }));
-const dismissErrorAtom = atom(null, (get, set, key: string) => set(errorsAtom, rejectFirst(R.eqBy(R.head, [key]))));
-const setInfoAtom = atom(null, (get, set, update) => set(statusAtom, { ...get(statusAtom), info: update }));
+const dismissAlertAtom = atom(null, (get, set, key: string) => set(alertsAtom, rejectFirst(R.eqBy(R.head, [key]))));
 
 type ItemsGeoSpotsByGeohash = { items: GeoSpotsByGeohash }
 const fetchSpotsAtom = atom(
-  (get) => get(statusAtom),
+  null,
   async (get, set, geohash: string[]) => {
-    const prev = get(statusAtom);
     set(loadingAtom, true);
 
     try {
@@ -81,12 +69,12 @@ const fetchSpotsAtom = atom(
         set(mergeSpotsAtom, { ...json.items });
       } else {
         const errorNode = <><code className='font-mono mr-1'>{response.status}</code>無法取得資料</>;
-        set(addErrorAtom, errorNode);
+        set(addAlertAtom, 'error', errorNode);
         set(loadingAtom, false);
       }
     } catch (e) {
       const errorNode = <span>{String(e)}</span>;
-      set(addErrorAtom, errorNode);
+      set(addAlertAtom, 'error', errorNode);
       set(loadingAtom, false);
     }
   }
@@ -147,7 +135,7 @@ function MapUser(props: {
 }) {
   const geoSet = useAtomValue(geohashesAtom);
   const fetchSpots = useSetAtom(fetchSpotsAtom);
-  const setInfo = useSetAtom(setInfoAtom);
+  const addAlert = useSetAtom(addAlertAtom);
   const prevMode = useRef<string | null>('world');
 
   const { pathname } = props;
@@ -167,7 +155,7 @@ function MapUser(props: {
       const zoom = map.getZoom();
 
       if (prevMode.current === 'area' && mode === 'world') {
-        setInfo(<><MapIcon className='mr-1 fill-amber-600' height={32} />範圍過大，已暫停讀取地點</>);
+        addAlert('info', <><MapIcon className='mr-1 fill-amber-600' height={32} />範圍過大，已暫停讀取地點</>);
       // } else if (prevMode.current === 'world' && mode === 'area') {
       //   setInfo(<><MapIcon className='mr-1 fill-amber-600' height={32} />已開始讀取地點</>);
       }
@@ -241,44 +229,6 @@ function LoadingIndicator(params: any) {
             <m.div {...motionProps}>
               <Spinner className='scale-[10]' width={iconSize} height={iconSize} aria-label='讀取中' />
             </m.div>
-          </div>
-        }
-      </AnimatePresence>
-    </LazyMotion>
-  );
-}
-
-function Notification(params: any) {
-  const dismiss = useSetAtom(dismissStatusAtom);
-  const { info } = useAtomValue(statusAtom);
-  const cls = [
-    'flex items-center',
-    'w-max h-max px-6 py-4 shadow-[10px_20px_20px_14px_rgba(0,0,0,0.5)]',
-    'text-lg bg-pink-300/20 backdrop-blur-sm ring ring-3 ring-offset-1 ring-slate-500 rounded',
-  ].join(' ');
-
-  const motionProps = {
-    initial: { y: '-200%' },
-    animate: { y: 0 },
-    exit: {
-      opacity: 0,
-      transition: { duration: 1.2 },
-    },
-  };
-
-  const open = info;
-
-  return (
-    <LazyMotion features={domAnimation}>
-      <AnimatePresence>
-        { open &&
-          <div className='fixed z-[900] inset-x-1/2 inset-y-1/2 -translate-x-1/2 -translate-y-1/2 w-max h-max'>
-            {info &&
-              <div className={`${cls} bg-white/50 ring-yellow my-3 py-9 px-9`}>
-                {info}
-                <XMarkIcon className='absolute right-1 top-1 ml-auto cursor-pointer fill-slate-500' onClick={() => dismiss()} height={24} />
-              </div>
-            }
           </div>
         }
       </AnimatePresence>
@@ -443,9 +393,8 @@ export default function Map({ preloadedAreas, children, className, width, height
         <ResetViewControl className={mapStyles['reset-view-ctrl']} title='整個台灣' position='bottomright' />
       </MapContainer>
 
-      <Alerts itemsAtom={errorsAtom} dismissAtom={dismissErrorAtom} />
+      <Alerts itemsAtom={alertsAtom} dismissAtom={dismissAlertAtom} />
       <LoadingIndicator />
-      <Notification />
     </>
   );
 }
