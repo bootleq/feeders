@@ -24,3 +24,8 @@ let wordWordRegexp = new RegExp([
   /(?![\s\p{P}\p{Emoji_Presentation}])/u,  // not end with, also
 ].map(r => r.source).join(''), 'gu');
 export const wordWord = R.pipe(R.replace(wordWordRegexp, ' '), R.trim);
+
+export const rejectFirst = R.curry((pred, list) => {
+  const index = R.findIndex(pred, list);
+  return index === -1 ? list : [...list.slice(0, index), ...list.slice(index + 1)];
+});

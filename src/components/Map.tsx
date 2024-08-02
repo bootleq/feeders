@@ -2,38 +2,38 @@
 
 import * as R from 'ramda';
 import geohash from 'ngeohash';
+import { nanoid } from 'nanoid';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, ReactElement } from 'react';
 import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
 import mapStyles from './map.module.scss'
 import { format, formatDistance } from '@/lib/date-fp';
+import { rejectFirst } from '@/lib/utils';
 
 import type { GeoSpotsResult, GeoSpotsByGeohash } from '@/models/spots';
 
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
-import { spotsAtom, mergeSpotsAtom, geohashesAtom } from '@/app/world/[[..._]]/store';
+import { spotsAtom, mergeSpotsAtom, geohashesAtom } from '@/app/world/[[...path]]/store';
+import { parsePath, updatePath, AREA_ZOOM_MAX } from '@/app/world/[[...path]]/util';
 import { useHydrateAtoms } from 'jotai/utils';
 
 import Spinner from '@/assets/spinner.svg';
-import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { MapIcon } from '@heroicons/react/24/solid';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid';
-import { XMarkIcon } from '@heroicons/react/24/solid';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
 
-import ActionLabel from '@/app/world/[[..._]]/ActionLabel';
-import FoodLife from '@/app/world/[[..._]]/FoodLife';
+import ActionLabel from '@/app/world/[[...path]]/ActionLabel';
+import FoodLife from '@/app/world/[[...path]]/FoodLife';
 
 import Leaflet, { MarkerCluster } from 'leaflet';
-import { LatLng } from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents, Marker, Popup } from "react-leaflet";
 import ResetViewControl from './ResetViewControl';
 import LocateControl from './LocateControl';
+import Alerts from './Alerts';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
 
 const GEOHASH_PRECISION = 4;
-const AREA_ZOOM_MAX = 12;
 const D1_PARAM_LIMIT = 100;
 
 type MapPropsAtom = {
@@ -45,99 +45,47 @@ const mapPropSnapshotAtom = atom({
   set(mapPropSnapshotAtom, { ...get(mapPropSnapshotAtom), ...update });
 });
 
-type StatusAtom = {
-  loading?: boolean,
-  info?: any,
-  error?: any,
-}
-const statusAtom = atom<StatusAtom>({
-  loading: false,
-  info: null,
-  error: null,
-});
-const dismissStatusAtom = atom(null, (get, set) => set(statusAtom, { ...get(statusAtom), info: null, error: null }));
-const setInfoAtom = atom(null, (get, set, update) => set(statusAtom, { ...get(statusAtom), info: update }));
+const loadingAtom = atom(false);
+type keyedAlert = [string, 'info' | 'error', ReactElement];
+const alertsAtom = atom<keyedAlert[]>([]);
+const addAlertAtom = atom(
+  null,
+  (get, set, type: 'info' | 'error', node: ReactElement) => set(alertsAtom, (errors) => [...errors, [nanoid(6), type, node]])
+)
+const dismissAlertAtom = atom(null, (get, set, key: string) => set(alertsAtom, rejectFirst(R.eqBy(R.head, [key]))));
 
 type ItemsGeoSpotsByGeohash = { items: GeoSpotsByGeohash }
 const fetchSpotsAtom = atom(
-  (get) => get(statusAtom),
+  null,
   async (get, set, geohash: string[]) => {
-    const prev = get(statusAtom);
-    set(statusAtom, { ...prev, loading: true });
+    set(loadingAtom, true);
 
     try {
       const response = await fetch(`/api/spots/${geohash.sort()}`);
       const json: ItemsGeoSpotsByGeohash = await response.json();
       if (response.ok) {
-        set(statusAtom, { ...prev, loading: false, error: null });
+        set(loadingAtom, false);
         set(mergeSpotsAtom, { ...json.items });
       } else {
         const errorNode = <><code className='font-mono mr-1'>{response.status}</code>無法取得資料</>;
-        set(statusAtom, { ...prev, loading: false, error: errorNode });
+        set(addAlertAtom, 'error', errorNode);
+        set(loadingAtom, false);
       }
     } catch (e) {
-      set(statusAtom, { ...prev, loading: false, error: e });
+      const errorNode = <span>{String(e)}</span>;
+      set(addAlertAtom, 'error', errorNode);
+      set(loadingAtom, false);
     }
   }
 );
-
-const atRegexp = /\/@([\d.]+),([\d.]+)/g;
-
-function parsePath(pathname: string) {
-  const result: {
-    lat: number | null,
-    lon: number | null,
-    mode: string | null,
-  } = { lat: null, lon: null, mode: null };
-
-  let s = pathname.slice('/world'.length);
-
-  if (s.match(/^\/area/)) {
-    s = s.replace(/^\/area/, '');
-    result.mode = 'area';
-  } else {
-    result.mode = 'world';
-  }
-  const at = [...s.matchAll(atRegexp)];
-  if (at[0]) {
-    result.lat = Number(at[0][1]);
-    result.lon = Number(at[0][2]);
-  }
-
-  return result;
-}
-
-function updatePath(params: {
-  newZoom?: number
-  newCenter?: LatLng
-}) {
-  const { newCenter, newZoom } = params;
-  const { pathname, search } = window.location;
-  let newPath = pathname;
-
-  if (newCenter) {
-    newPath = newPath.replaceAll(atRegexp, '');
-    newPath = newPath.replace(/\/$/, '') + `/@${newCenter.lat},${newCenter.lng}`;
-  }
-
-  if (newZoom) {
-    if (newZoom >= AREA_ZOOM_MAX) {
-      newPath = newPath.replace(/^\/world\/(?!area\/)/, '/world/area/');
-    } else {
-      newPath = newPath.replace(/^\/world\/area\//, '/world/');
-    }
-  }
-
-  window.history.replaceState(null, '', newPath + search);
-}
 
 function MapUser(props: {
   pathname: string
 }) {
   const geoSet = useAtomValue(geohashesAtom);
   const fetchSpots = useSetAtom(fetchSpotsAtom);
-  const setInfo = useSetAtom(setInfoAtom);
   const prevMode = useRef<string | null>('world');
+  const addAlert = useSetAtom(addAlertAtom);
 
   const { pathname } = props;
   const { lat, lon, mode } = parsePath(pathname);
@@ -148,6 +96,7 @@ function MapUser(props: {
     },
     locationfound: (location) => {
       map.setView(location.latlng, 16);
+      map.fire('moveend');
     },
     zoomstart: () => {
       const zoom = map.getZoom();
@@ -155,13 +104,7 @@ function MapUser(props: {
     zoomend: () => {
       const zoom = map.getZoom();
 
-      if (prevMode.current === 'area' && mode === 'world') {
-        setInfo(<><MapIcon className='mr-1 fill-amber-600' height={32} />範圍過大，已暫停讀取地點</>);
-      // } else if (prevMode.current === 'world' && mode === 'area') {
-      //   setInfo(<><MapIcon className='mr-1 fill-amber-600' height={32} />已開始讀取地點</>);
-      }
       updatePath({ newZoom: zoom });
-      prevMode.current = mode;
     },
     moveend: () => {
       const zoom = map.getZoom();
@@ -209,53 +152,34 @@ function MapUser(props: {
     }
   }, [lat, lon, mode, map]);
 
+  useEffect(() => {
+    if (prevMode.current === 'area' && mode === 'world') {
+      addAlert('info', <><MapIcon className='mr-1 fill-amber-600' height={32} />範圍過大，已暫停讀取地點</>);
+    }
+    prevMode.current = mode;
+  }, [mode, addAlert]);
+
   return null;
 }
 
-function Notification(params: any) {
-  const dismiss = useSetAtom(dismissStatusAtom);
-  const { loading, info, error } = useAtomValue(statusAtom);
-  const cls = [
-    'flex items-center',
-    'w-max h-max px-6 py-4 shadow-[10px_20px_20px_14px_rgba(0,0,0,0.5)]',
-    'text-lg bg-pink-300/20 backdrop-blur-sm ring ring-3 ring-offset-1 ring-slate-500 rounded',
-  ].join(' ');
-
+function LoadingIndicator(params: any) {
+  const loading = useAtomValue(loadingAtom);
   const motionProps = {
-    initial: { y: '-200%' },
-    animate: { y: 0 },
     exit: {
       opacity: 0,
       transition: { duration: 1.2 },
     },
   };
-
-  const open = loading || error || info;
+  const iconSize = 24;
 
   return (
     <LazyMotion features={domAnimation}>
       <AnimatePresence>
-        { open &&
-          <div className='fixed z-[900] inset-x-1/2 inset-y-1/2 -translate-x-1/2 -translate-y-full w-max h-max'>
-            {loading &&
-              <m.div className={`${cls}`} {...motionProps}>
-                <Spinner className='animate-spin mr-1 min-w-max' height={24} />
-                讀取中
-              </m.div>
-            }
-            {info &&
-              <div className={`${cls} bg-white/50 ring-yellow my-3 py-9 px-9`}>
-                {info}
-                <XMarkIcon className='absolute right-1 top-1 ml-auto cursor-pointer fill-slate-500' onClick={() => dismiss()} height={24} />
-              </div>
-            }
-            {error &&
-              <div className={`${cls} bg-red ring-black my-3 py-9 px-9`}>
-                <ExclamationCircleIcon className='mr-1 fill-white stroke-red-700 stroke-2' height={32} />
-                錯誤：{error}
-                <XMarkIcon className='absolute right-1 top-1 ml-auto cursor-pointer fill-slate-500' onClick={() => dismiss()} height={24} />
-              </div>
-            }
+        { loading &&
+          <div className='fixed z-[900] inset-x-1/2 inset-y-1/2 -translate-x-1/2 -translate-y-1/2'>
+            <m.div {...motionProps}>
+              <Spinner className='scale-[10]' width={iconSize} height={iconSize} aria-label='讀取中' />
+            </m.div>
           </div>
         }
       </AnimatePresence>
@@ -420,7 +344,8 @@ export default function Map({ preloadedAreas, children, className, width, height
         <ResetViewControl className={mapStyles['reset-view-ctrl']} title='整個台灣' position='bottomright' />
       </MapContainer>
 
-      <Notification />
+      <Alerts itemsAtom={alertsAtom} dismissAtom={dismissAlertAtom} />
+      <LoadingIndicator />
     </>
   );
 }

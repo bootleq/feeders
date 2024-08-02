@@ -1,8 +1,10 @@
 import * as R from 'ramda';
 import dynamic from 'next/dynamic';
+import geohash from 'ngeohash';
 import { recentFollowups, geoSpots } from '@/models/spots';
 import type { RecentFollowupsResult } from '@/models/spots';
 import { subDays } from '@/lib/date-fp';
+import { parsePath } from './util';
 import Sidebar from '@/components/Sidebar';
 import RecentFollowups from './RecentFollowups';
 import Nav from './Nav';
@@ -32,19 +34,30 @@ async function getSpots(oldestDate: Date) {
   return items;
 }
 
-async function preloadGeoSpots(spots: RecentFollowupsResult) {
-  const hashes = R.take(PRELOAD_AREA_SIZE, spots).map(R.prop('geohash'));
+async function preloadGeoSpots(hashes: string[]) {
   const query = geoSpots(hashes);
   const items = await query;
   const grouped = R.groupBy(i => i.geohash || '', items);
   return R.reject(R.isNil, grouped);
 }
 
-export default async function Page() {
+export default async function Page({ params }: {
+  params: { path: string[] }
+}) {
+  const path = params.path || [];
   const today = overwriteToday || new Date();
   const oldestDate = subDays(trackDays, today);
+  const pathname = `/world/${path.map(s => decodeURIComponent(s)).join('/')}`
+  const { lat, lon, mode } = parsePath(pathname);
+
   const items = await getSpots(oldestDate);
-  const preloadedAreas = await preloadGeoSpots(items);
+  const hashes = R.take(PRELOAD_AREA_SIZE, items).map(R.prop('geohash'));
+
+  if (lat && lon) {
+    hashes.push(geohash.encode(lat, lon, 4))
+  }
+
+  const preloadedAreas = await preloadGeoSpots(hashes);
 
   return (
     <main className="flex min-h-screen flex-row items-start justify-between">
