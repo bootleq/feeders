@@ -24,6 +24,7 @@
     "@auth/core": "^0.34.1",
     "@auth/d1-adapter": "^1.4.1",
     "@auth/drizzle-adapter": "^1.4.1",
+    "@floating-ui/react": "^0.26.20",
     "@heroicons/react": "^2.1.5",
     "@next/bundle-analyzer": "^14.2.5",
     "@react-leaflet/core": "^2.1.0",
