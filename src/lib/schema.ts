@@ -23,6 +23,8 @@ const pubStateCol = (name: string = 'state') => text(name, { enum: PubStateEnum.
 const timestampCol = (name: string) => integer(name, { mode: "timestamp" });
 const createdAtCol = (name: string = 'createdAt') => timestampCol(name).notNull().default(sql`(unixepoch())`);
 
+type LatLngBounds = [[number, number], [number, number]];
+
 // Auth.js tables
 // Ref: https://auth-docs-git-feat-nextjs-auth-authjs.vercel.app/reference/adapter/drizzle#sqlite
 // {{{
@@ -38,7 +40,8 @@ export const users = sqliteTable("users", {
   lockedAt: timestampCol('lockedAt')
 })
 export const usersRelations = relations(users, ({ many }) => ({
-  spots: many(spots)
+  spots: many(spots),
+  areas: many(areas),
 }));
 
 export const accounts = sqliteTable('accounts', {
@@ -138,6 +141,21 @@ export const spotFollowupsRelations = relations(spotFollowups, ({ one }) => ({
   spot: one(spots, {
     fields: [spotFollowups.spotId],
     references: [spots.id]
+  })
+}));
+
+export const areas = sqliteTable("areas", {
+  id: incrementIdCol(),
+  name: text("name"),
+  bounds: text("bounds", { mode: 'json' }).notNull().$type<LatLngBounds>(),
+  createdAt: createdAtCol(),
+  userId: text('userId').references(() => users.id)
+});
+
+export const areasRelations = relations(areas, ({ one }) => ({
+  user: one(users, {
+    fields: [areas.userId],
+    references: [users.id]
   })
 }));
 

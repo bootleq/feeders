@@ -35,6 +35,10 @@ async function getSpots(oldestDate: Date) {
 }
 
 async function preloadGeoSpots(hashes: string[]) {
+  if (!hashes.length) {
+    return {};
+  }
+
   const query = geoSpots(hashes);
   const items = await query;
   const grouped = R.groupBy(i => i.geohash || '', items);

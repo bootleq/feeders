@@ -15,6 +15,15 @@ CREATE TABLE `accounts` (
 	FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
+CREATE TABLE `areas` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`name` text,
+	`bounds` text NOT NULL,
+	`createdAt` integer DEFAULT (unixepoch()) NOT NULL,
+	`userId` text,
+	FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
 CREATE TABLE `profiles` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`desc` text,
@@ -50,11 +59,11 @@ CREATE TABLE `spotFollowups` (
 CREATE TABLE `spots` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`title` text,
-	`lat` real,
-	`lon` real,
+	`lat` real NOT NULL,
+	`lon` real NOT NULL,
 	`city` text,
 	`town` text,
-	`geohash` text,
+	`geohash` text NOT NULL,
 	`desc` text,
 	`state` text DEFAULT 'draft' NOT NULL,
 	`createdAt` integer DEFAULT (unixepoch()) NOT NULL,
