@@ -1,3 +1,5 @@
+"use client"
+
 import * as React from "react";
 import {
   useFloating,
@@ -7,26 +9,29 @@ import {
   shift,
   useHover,
   useFocus,
+  // safePolygon,
   useDismiss,
   useRole,
   useInteractions,
   useMergeRefs,
   FloatingPortal
 } from "@floating-ui/react";
-import type { Placement } from "@floating-ui/react";
+import type { Placement, UseHoverProps } from "@floating-ui/react";
 
 interface TooltipOptions {
   initialOpen?: boolean;
   placement?: Placement;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  hoverProps?: UseHoverProps;
 }
 
 export function useTooltip({
   initialOpen = false,
   placement = "top",
+  hoverProps = { delay: { open: 0, close: 300 } },
   open: controlledOpen,
-  onOpenChange: setControlledOpen
+  onOpenChange: setControlledOpen,
 }: TooltipOptions = {}) {
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(initialOpen);
 
@@ -53,7 +58,8 @@ export function useTooltip({
 
   const hover = useHover(context, {
     move: false,
-    enabled: controlledOpen == null
+    enabled: controlledOpen == null,
+    ...hoverProps,
   });
   const focus = useFocus(context, {
     enabled: controlledOpen == null
@@ -105,7 +111,7 @@ export function Tooltip({
 export const TooltipTrigger = React.forwardRef<
   HTMLElement,
   React.HTMLProps<HTMLElement> & { asChild?: boolean }
->(function TooltipTrigger({ children, asChild = false, ...props }, propRef) {
+>(function TooltipTrigger({ children, asChild = true, ...props }, propRef) {
   const context = useTooltipContext();
   const childrenRef = (children as any).ref;
   const ref = useMergeRefs([context.refs.setReference, propRef, childrenRef]);

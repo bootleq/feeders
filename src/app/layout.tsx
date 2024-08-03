@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Provider } from 'jotai';
-import { auth } from '@/lib/auth';
 import { SessionProvider } from 'next-auth/react';
 import "./globals.css";
 
@@ -17,8 +16,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth();
-
   return (
     <html lang="zh-TW">
       <body className={inter.className}>

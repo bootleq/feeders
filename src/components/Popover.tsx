@@ -1,3 +1,5 @@
+"use client"
+
 import * as React from "react";
 import {
   useFloating,
@@ -128,7 +130,7 @@ interface PopoverTriggerProps {
 export const PopoverTrigger = React.forwardRef<
   HTMLElement,
   React.HTMLProps<HTMLElement> & PopoverTriggerProps
->(function PopoverTrigger({ children, asChild = false, ...props }, propRef) {
+>(function PopoverTrigger({ children, asChild = true, ...props }, propRef) {
   const context = usePopoverContext();
   const childrenRef = (children as any).ref;
   const ref = useMergeRefs([context.refs.setReference, propRef, childrenRef]);
