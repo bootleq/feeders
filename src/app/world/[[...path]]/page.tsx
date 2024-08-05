@@ -1,10 +1,11 @@
 import * as R from 'ramda';
+import { auth } from '@/lib/auth';
 import dynamic from 'next/dynamic';
 import geohash from 'ngeohash';
-import { recentFollowups, geoSpots } from '@/models/spots';
+import { recentFollowups, geoSpots, getWorldUsers } from '@/models/spots';
 import type { RecentFollowupsResult } from '@/models/spots';
 import { subDays } from '@/lib/date-fp';
-import { parsePath } from './util';
+import { parsePath, GEOHASH_PRECISION } from './util';
 import Sidebar from '@/components/Sidebar';
 import RecentFollowups from './RecentFollowups';
 import Nav from './Nav';
@@ -45,6 +46,17 @@ async function preloadGeoSpots(hashes: string[]) {
   return R.reject(R.isNil, grouped);
 }
 
+async function getUser(id: string | undefined) {
+  if (id) {
+    const users = await getWorldUsers(id);
+    if (users) {
+      return users[0];
+    }
+  }
+
+  return null;
+}
+
 export default async function Page({ params }: {
   params: { path: string[] }
 }) {
@@ -54,8 +66,16 @@ export default async function Page({ params }: {
   const pathname = `/world/${path.map(s => decodeURIComponent(s)).join('/')}`
   const { lat, lon, mode } = parsePath(pathname);
 
+  const session = await auth();
+  const user = await getUser(session?.userId);
   const items = await getSpots(oldestDate);
-  const hashes = R.take(PRELOAD_AREA_SIZE, items).map(R.prop('geohash'));
+
+  let hashes = R.take(PRELOAD_AREA_SIZE, items).map(R.prop('geohash'));
+  if (user && user.bounds) {
+    const revBounds = R.reverse(R.flatten(user.bounds));
+    const extraHashes = geohash.bboxes(revBounds[3], revBounds[2], revBounds[1], revBounds[0], GEOHASH_PRECISION);
+    hashes = R.pipe(R.concat(extraHashes), R.uniq)(hashes);
+  }
 
   if (lat && lon) {
     hashes.push(geohash.encode(lat, lon, 4))
@@ -67,7 +87,7 @@ export default async function Page({ params }: {
     <main className="flex min-h-screen flex-row items-start justify-between">
       <Sidebar className={`max-h-screen scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
         <RecentFollowups items={items} preloadedAreas={preloadedAreas} today={today} oldestDate={oldestDate} />
-        <Nav />
+        <Nav user={user} />
       </Sidebar>
 
       <LazyMap

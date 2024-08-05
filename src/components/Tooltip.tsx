@@ -29,7 +29,7 @@ interface TooltipOptions {
 export function useTooltip({
   initialOpen = false,
   placement = "top",
-  hoverProps = { delay: { open: 0, close: 300 } },
+  hoverProps = { delay: { open: 0, close: 240 } },
   open: controlledOpen,
   onOpenChange: setControlledOpen,
 }: TooltipOptions = {}) {
@@ -58,6 +58,7 @@ export function useTooltip({
 
   const hover = useHover(context, {
     move: false,
+    restMs: 100,
     enabled: controlledOpen == null,
     ...hoverProps,
   });

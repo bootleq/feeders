@@ -23,7 +23,7 @@ const pubStateCol = (name: string = 'state') => text(name, { enum: PubStateEnum.
 const timestampCol = (name: string) => integer(name, { mode: "timestamp" });
 const createdAtCol = (name: string = 'createdAt') => timestampCol(name).notNull().default(sql`(unixepoch())`);
 
-type LatLngBounds = [[number, number], [number, number]];
+export type LatLngBounds = [[number, number], [number, number]];
 
 // Auth.js tables
 // Ref: https://auth-docs-git-feat-nextjs-auth-authjs.vercel.app/reference/adapter/drizzle#sqlite

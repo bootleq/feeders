@@ -1,5 +1,5 @@
 import { createControlComponent } from "@react-leaflet/core";
-import { Control, DomUtil, DomEvent, Util, LatLngBounds } from "leaflet";
+import { Control, DomUtil, DomEvent, Util } from "leaflet";
 
 import type { Map, ControlOptions } from "leaflet";
 

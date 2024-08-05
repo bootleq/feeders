@@ -26,8 +26,19 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+@layer components {
+  .btn {
+    @apply py-1 px-2 rounded cursor-pointer focus:outline-none focus:ring disabled:cursor-not-allowed disabled:opacity-75;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .dotted-stroke {
+    stroke-dasharray: 3;
+    stroke-dashoffset: 2;
   }
 }

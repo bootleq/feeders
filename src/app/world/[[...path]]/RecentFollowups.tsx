@@ -1,15 +1,20 @@
 "use client"
 
 import * as R from 'ramda';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
 import { subDays, format, formatISO, formatDistanceToNow, formatDistance } from '@/lib/date-fp';
 import Link from 'next/link';
 
 import { recentFollowups } from '@/models/spots';
+import { userAtom, mapAtom, areaPickerAtom } from './store';
+import type { AreaPickerAtom } from './store';
 import type { GeoSpotsResult, GeoSpotsByGeohash } from '@/models/spots';
+import type { LatLngBounds } from '@/lib/schema';
 import ActionLabel from './ActionLabel';
 import FoodLife from './FoodLife';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
+import { StarIcon } from '@heroicons/react/24/outline';
 import { MapPinIcon } from '@heroicons/react/24/solid';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
 
@@ -106,9 +111,58 @@ function visitArea(lat: number, lon: number) {
   }
 }
 
+const areaItemCls = 'relative rounded p-1 mx-1 flex items-center cursor-pointer grow-0 text-center bg-slate-200';
+const menuItemCls = `p-2 w-full`;
+
+function UserArea({ area }: {
+  area: AreaPickerAtom
+}) {
+  const map = useAtomValue(mapAtom);
+  const setPicker = useSetAtom(areaPickerAtom);
+
+  const fitArea = useCallback(() => {
+    if (map && area?.bounds) {
+      map.fitBounds(area.bounds);
+    }
+  }, [area, map]);
+
+  const onEdit = useCallback(() => {
+    if (area?.id) {
+      setPicker(area);
+    } else {
+      const newArea = {
+        id: null,
+        bounds: null,
+      };
+      setPicker(newArea);
+    }
+  }, [area, setPicker]);
+
+  const canFit = R.isNotNil(area?.bounds);
+
+  return (
+    <li className={`${areaItemCls} flex-col whitespace-nowrap`} onClick={canFit ? fitArea : onEdit}>
+      <Tooltip placement='bottom'>
+        <TooltipTrigger className='flex flex-col items-center'>
+          <StarIcon className={`${canFit ? '' : 'dotted-stroke stroke-slate-500'}`} height={24} />
+          我的
+        </TooltipTrigger>
+        <TooltipContent className="p-1 px-2 rounded box-border w-max max-w-[100vw-10px] z-[1002]">
+          <div className={`flex flex-col divide-y w-full items-center justify-between lg:flex rounded bg-gradient-to-br from-stone-50 to-slate-100 ring-2 ring-offset-1 ring-slate-300`}>
+            <button className={menuItemCls} onClick={onEdit}>{canFit ? '編輯' : '新增'}</button>
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </li>
+  );
+}
+
 function Areas({ areas }: {
   areas: GeoSpotsByGeohash
 }) {
+  const user = useAtomValue(userAtom);
+  const userArea = (user?.areaId && user.bounds) ? { id: user.areaId, bounds: user.bounds } : null;
+
   const picked: [string, GeoSpotsResult[number], number][] = R.toPairs(areas).map(([geohash, items]) => {
     const spot = R.sortBy(R.prop('latestFollowAt'), items)[0];
     return [geohash, spot, items.length];
@@ -118,9 +172,11 @@ function Areas({ areas }: {
     <div className='mt-4 mb-2 p-1 overflow-visible'>
       前往區域
       <ul className='flex py-1 overflow-hidden scrollbar-thin'>
+        <UserArea area={userArea} />
+
         {picked.map(([geohash, { lat, lon, city, town }, spotsCount]) => {
           return (
-            <li key={geohash} className={`relative rounded p-1 mx-1 grow-0 text-center ${false ? 'bg-slate-300/75' : 'bg-slate-200'}`}>
+            <li key={geohash} className={areaItemCls}>
               <Link
                 href={`/world/area/@${lat},${lon}`}
                 onClick={visitArea(lat, lon)}

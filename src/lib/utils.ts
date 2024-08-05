@@ -29,3 +29,9 @@ export const rejectFirst = R.curry((pred, list) => {
   const index = R.findIndex(pred, list);
   return index === -1 ? list : [...list.slice(0, index), ...list.slice(index + 1)];
 });
+
+export const parseFormData = (formData: FormData) => {
+  const result = Object.fromEntries(formData);
+
+  return R.map(v => v === '' ? null : v)(result);
+}
