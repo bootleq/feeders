@@ -36,6 +36,7 @@ const geoRange = {
 
 const today = R.tap(d => d.setHours(5), new Date());
 const backwardDays = 3;
+const repeat = 10;
 const queryDistrictSync = true;
 const queryDistrictRetryLimit = 10;
 
@@ -160,12 +161,13 @@ async function main() {
       );
     }
 
-    console.log('Done.');
-
     if (!queryDistrictSync) {
       console.log(chalk.yellow('NOTE district values were missing, to be filled later.'));
     }
   });
 }
 
-main();
+for (let idx = 0; idx < repeat; idx++) {
+  main();
+}
+console.log('Done.');
