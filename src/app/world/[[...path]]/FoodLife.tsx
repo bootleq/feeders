@@ -30,7 +30,7 @@ export default function FoodLife({ spot, now }: {
   }
 
   return (
-    <div className='flex items-center flex-wrap'>
+    <div className='flex items-center flex-wrap my-1'>
       <StateLabel spotState={spotState}>{spotState}</StateLabel>
       <span className='whitespace-nowrap mr-1'>
         {spot.material}

@@ -67,18 +67,30 @@ function SpotInfo() {
 
   return (
     <div className='relative px-2 py-1'>
-      <strong className='mb-1 block'>
-        {spot.spotTitle}
-      </strong>
+      <Tooltip placement='bottom-end'>
+        <TooltipTrigger className='mb-1 block truncate'>
+          {spot.spotTitle}
+        </TooltipTrigger>
+        <TooltipContent className="p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1">
+          {spot.spotTitle}
+        </TooltipContent>
+      </Tooltip>
 
       <div className='flex flex-wrap justify-start items-center'>
-        <span data-user-id={spot.userId} className='mr-3 flex'>
+        <span data-user-id={spot.userId} className='mr-3 text-sm flex items-center'>
           <UserCircleIcon className='fill-current' height={24} />
           USER NAME
         </span>
         {
           R.any(R.isNotNil)(R.props(['city', 'town'], spot)) ?
-            <span className='text-sm opacity-60 mr-3'>{`${spot.city}${spot.town}`}</span>
+            <Link
+              href={`/world/area/@${spot.lat},${spot.lon}`}
+              onClick={visitArea(spot.lat, spot.lon)}
+              className='break-keep whitespace-nowrap w-min cursor-pointer text-sm opacity-60 mr-3'
+              prefetch={false}
+            >
+              {spot.city}{spot.town}
+            </Link>
             : ''
         }
 
@@ -142,7 +154,7 @@ function UserArea({ area }: {
 
   return (
     <li className={`${areaItemCls} flex-col whitespace-nowrap`} onClick={canFit ? fitArea : onEdit}>
-      <Tooltip placement='bottom'>
+      <Tooltip placement='bottom-end'>
         <TooltipTrigger className='flex flex-col items-center'>
           <StarIcon className={`${canFit ? '' : 'dotted-stroke stroke-slate-500'}`} height={24} />
           我的
@@ -174,7 +186,7 @@ function Areas({ areas }: {
       <ul className='flex py-1 overflow-hidden scrollbar-thin'>
         <UserArea area={userArea} />
 
-        {picked.map(([geohash, { lat, lon, city, town }, spotsCount]) => {
+        {picked.map(([geohash, { lat, lon, city, town }, _spotsCount]) => {
           return (
             <li key={geohash} className={areaItemCls}>
               <Link
@@ -185,9 +197,6 @@ function Areas({ areas }: {
               >
                 {city} {town}
               </Link>
-              <i className='absolute font-mono -top-3 right-0 drop-shadow'>
-                {spotsCount}
-              </i>
             </li>
           );
         })}
@@ -244,7 +253,7 @@ function Followups({ items, today, oldestDate }: {
     const viewItemPinCls = '-translate-y-[0.4rem] drop-shadow-[0_0_2px_white]';
 
     return (
-      <li key={date} className=''>
+      <li key={date} className='max-h-64 overflow-auto scrollbar-thin'>
         <time
           data-spot-count={itemsCount}
           className={`block px-2 py-1 flex items-center text-slate-900 font-mono data-[spot-count="0"]:text-opacity-50 hover:bg-gray-200`}
@@ -261,10 +270,24 @@ function Followups({ items, today, oldestDate }: {
             <ul className='flex flex-row flex-wrap p-1'>
               {subItems.map((i: RecentFollowupsItemProps) => (
                 <li key={i.spotId} className={`relative ${viewItem === i ? viewItemPinCls : ''}`}>
-                  <MapPinIcon className={`cursor-pointer ${mapPinCls(i.spotState)}`} onClick={() => setViewItem(i)} data-lat={i.lat} data-lon={i.lon} height={24} />
-                  {viewItem === i &&
-                    <div className='absolute -bottom-[0.4rem] bg-yellow-400 h-1 w-full scale-x-75'></div>
-                  }
+                  <Tooltip placement='bottom-end'>
+                    <TooltipTrigger className='break-keep w-min cursor-pointer'>
+                      <Link
+                        href={`/world/area/@${i.lat},${i.lon}`}
+                        onClick={(e) => { e.preventDefault(); setViewItem(i); } }
+                        className='break-keep w-min cursor-pointer'
+                        prefetch={false}
+                      >
+                        <MapPinIcon className={`cursor-pointer ${mapPinCls(i.spotState)}`} height={24} />
+                        {viewItem === i &&
+                          <div className='absolute -bottom-[0.4rem] bg-yellow-400 h-1 w-full scale-x-75'></div>
+                        }
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent className="p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1">
+                      {i.city} {i.town}
+                    </TooltipContent>
+                  </Tooltip>
                 </li>
               ))}
             </ul> : null
