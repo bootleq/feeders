@@ -180,7 +180,7 @@ function Followups({ items, today, oldestDate }: {
       <li key={date} className='max-h-64 overflow-auto scrollbar-thin'>
         <time
           data-spot-count={itemsCount}
-          className={`block px-2 py-1 flex items-center text-slate-900 font-mono data-[spot-count="0"]:text-opacity-50 hover:bg-gray-200`}
+          className={`px-2 py-1 flex items-center text-slate-900 font-mono data-[spot-count="0"]:text-opacity-50 hover:bg-gray-200`}
           dateTime={date}
         >
           {shortDate}
