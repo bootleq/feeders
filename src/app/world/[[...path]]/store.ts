@@ -1,6 +1,7 @@
 import * as R from 'ramda';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
-import type { GeoSpotsResult, WorldUserResult } from '@/models/spots';
+import { recentFollowups } from '@/models/spots';
+import type { GeoSpotsResult, WorldUserResult, RecentFollowupsItemProps } from '@/models/spots';
 import type { LatLngBounds } from '@/lib/schema';
 import Leaflet from 'leaflet';
 
@@ -28,3 +29,5 @@ export type AreaPickerAtom = {
   bounds: LatLngBounds | null,
 } | null;
 export const areaPickerAtom = atom<AreaPickerAtom>(null);
+
+export const viewItemAtom = atom<RecentFollowupsItemProps | null>(null);

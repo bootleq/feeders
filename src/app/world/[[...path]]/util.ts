@@ -52,3 +52,9 @@ export function updatePath(params: {
 
   window.history.replaceState(null, '', newPath + search);
 }
+
+export function visitArea(lat: number, lon: number) {
+  return () => {
+    window.history.pushState(null, '', `/world/area/@${lat},${lon}`);
+  }
+}

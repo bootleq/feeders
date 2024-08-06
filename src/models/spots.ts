@@ -87,6 +87,7 @@ export const recentFollowups = (oldestDate: Date, fetchLimit: number) => {
 };
 
 type RecentFollowupsQuery = ReturnType<typeof recentFollowups>;
+export type RecentFollowupsItemProps = Awaited<RecentFollowupsQuery>[number];
 export type RecentFollowupsResult = Awaited<ReturnType<RecentFollowupsQuery['execute']>>;
 
 export const getWorldUsers = (userId: string) => {
