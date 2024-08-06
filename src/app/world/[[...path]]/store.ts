@@ -31,3 +31,16 @@ export type AreaPickerAtom = {
 export const areaPickerAtom = atom<AreaPickerAtom>(null);
 
 export const viewItemAtom = atom<RecentFollowupsItemProps | null>(null);
+
+export const tempMarkerAtom = atom({
+  visible: false,
+  lat: 23.97565,
+  lon: 120.9738819,
+});
+
+export const mergeTempMarkerAtom = atom(
+  (get) => get(tempMarkerAtom),
+  (get, set, update: { visible?: boolean, lat?: number, lon?: number }) => {
+    set(tempMarkerAtom, { ...get(tempMarkerAtom), ...update });
+  }
+);

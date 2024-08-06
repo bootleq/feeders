@@ -4,6 +4,31 @@
   }
 }
 
+.temp-marker {
+  animation: feeders-flip-x 1.2s ease-in-out infinite, feeders-fall-in 400ms cubic-bezier(0.57, 0.4, 0.55, 1.17) 1;
+}
+
+@keyframes feeders-flip-x {
+  0% {
+    transform: scaleX(1);
+  }
+  60% {
+    transform: scaleX(1);
+  }
+  100% {
+    transform: scaleX(-1);
+  }
+}
+
+@keyframes feeders-fall-in {
+  0% {
+    transform: translateY(-90vh);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
 .cluster-marker {
   color: white;
 

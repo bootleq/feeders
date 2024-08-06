@@ -13,7 +13,15 @@ import { rejectFirst } from '@/lib/utils';
 import type { GeoSpotsResult, GeoSpotsByGeohash } from '@/models/spots';
 
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
-import { userAtom, mapAtom, spotsAtom, mergeSpotsAtom, geohashesAtom, areaPickerAtom } from '@/app/world/[[...path]]/store';
+import {
+  userAtom,
+  mapAtom,
+  spotsAtom,
+  mergeSpotsAtom,
+  geohashesAtom,
+  areaPickerAtom,
+  mergeTempMarkerAtom,
+} from '@/app/world/[[...path]]/store';
 import { parsePath, updatePath, AREA_ZOOM_MAX, GEOHASH_PRECISION } from '@/app/world/[[...path]]/util';
 import { useHydrateAtoms } from 'jotai/utils';
 import { saveUserArea } from '@/app/world/[[...path]]/save-user-area';
@@ -32,6 +40,7 @@ import FoodLife from '@/app/world/[[...path]]/FoodLife';
 
 import Leaflet, { MarkerCluster } from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents, Marker, Popup } from "react-leaflet";
+import TempMarker from './TempMarker';
 import ResetViewControl from './ResetViewControl';
 import LocateControl from './LocateControl';
 import Alerts from './Alerts';
@@ -101,6 +110,7 @@ function MapUser(props: {
   const geoSet = useAtomValue(geohashesAtom);
   const fetchSpots = useSetAtom(fetchSpotsAtom);
   const [picker, setPicker] = useAtom(areaPickerAtom);
+  const setTempMarker = useSetAtom(mergeTempMarkerAtom);
   const status = useAtomValue(statusAtom);
   const prevMode = useRef<string | null>('world');
   const prevStatus = useRef<string | null>(null);
@@ -110,8 +120,9 @@ function MapUser(props: {
   const { lat, lon, mode } = parsePath(pathname);
 
   const map = useMapEvents({
-    click: () => {
-      // map.locate();
+    click: (e: Leaflet.LeafletMouseEvent) => {
+      const point = e.latlng;
+      setTempMarker({ visible: true, lat: point.lat, lon: point.lng });
     },
     locationfound: (location) => {
       map.setView(location.latlng, 16);
@@ -474,6 +485,8 @@ export default function Map({ preloadedAreas, children, className, width, height
         >
         </TileLayer>
         {filteredSpots && <Markers spots={filteredSpots} />}
+
+        <TempMarker />
 
         <LocateControl className={mapStyles['reset-view-ctrl']} />;
         <ResetViewControl className={mapStyles['reset-view-ctrl']} title='整個台灣' position='bottomright' />
