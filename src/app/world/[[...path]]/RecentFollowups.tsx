@@ -57,7 +57,7 @@ function SpotInfo() {
     return (
       <div className='relative px-2 py-1'>
         <strong className='mb-1 block'><span className='invisible'>未選擇</span></strong>
-        <span className='mr-3 flex'>
+        <span className='mr-2 flex'>
           <UserCircleIcon className='invisible' height={24} />
         </span>
         <div className={descClass}></div>
@@ -69,7 +69,7 @@ function SpotInfo() {
     <div className='relative px-2 py-1'>
       <Tooltip placement='bottom-end'>
         <TooltipTrigger className='mb-1 block truncate'>
-          {spot.spotTitle}
+          <span>{spot.spotTitle}</span>
         </TooltipTrigger>
         <TooltipContent className="p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1">
           {spot.spotTitle}
@@ -77,7 +77,7 @@ function SpotInfo() {
       </Tooltip>
 
       <div className='flex flex-wrap justify-start items-center'>
-        <span data-user-id={spot.userId} className='mr-3 text-sm flex items-center'>
+        <span data-user-id={spot.userId} className='mr-2 text-sm flex items-center'>
           <UserCircleIcon className='fill-current' height={24} />
           USER NAME
         </span>
@@ -86,7 +86,7 @@ function SpotInfo() {
             <Link
               href={`/world/area/@${spot.lat},${spot.lon}`}
               onClick={visitArea(spot.lat, spot.lon)}
-              className='break-keep whitespace-nowrap w-min cursor-pointer text-sm opacity-60 mr-3'
+              className='break-keep whitespace-nowrap w-min cursor-pointer text-sm opacity-60 mr-2'
               prefetch={false}
             >
               {spot.city}{spot.town}
@@ -234,6 +234,32 @@ function Followups({ items, today, oldestDate }: {
 }) {
   const [viewItem, setViewItem] = useAtom(viewItemAtom);
 
+  const onKeyUp = (e: React.KeyboardEvent<HTMLLIElement>) => {
+    if (!viewItem) return;
+    if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+
+    if (e.code === 'Escape') {
+      setViewItem(null);
+      return;
+    }
+
+    if (R.includes(e.code, ['ArrowLeft', 'ArrowRight'])) {
+      e.stopPropagation();
+      e.preventDefault();
+      const i = R.indexOf(viewItem, items);
+      switch (e.code.slice('Arrow'.length)) {
+        case 'Right':
+          setViewItem(items[i === items.length ? 0 : i + 1]);
+          break;
+        case 'Left':
+          setViewItem(items[i === 0 ? items.length - 1 : i - 1]);
+          break;
+        default:
+          break;
+      }
+    }
+  };
+
   if (!items?.length) {
     return <p className='p-1'>沒有新發現。</p>;
   }
@@ -269,7 +295,7 @@ function Followups({ items, today, oldestDate }: {
           subItems ?
             <ul className='flex flex-row flex-wrap p-1'>
               {subItems.map((i: RecentFollowupsItemProps) => (
-                <li key={i.spotId} className={`relative ${viewItem === i ? viewItemPinCls : ''}`}>
+                <li key={i.spotId} className={`relative ${viewItem === i ? viewItemPinCls : ''}`} onKeyUp={onKeyUp}>
                   <Tooltip placement='bottom-end'>
                     <TooltipTrigger className='break-keep w-min cursor-pointer'>
                       <Link
