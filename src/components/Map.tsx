@@ -48,7 +48,8 @@ const setUserAreaAtom = atom(
   }
 );
 
-const loadingAtom = atom(false);
+const loadingHashesAtom = atom<string[]>([]);
+const loadingAtom = atom((get) => R.isNotEmpty(get(loadingHashesAtom)));
 type keyedAlert = [string, 'info' | 'error', ReactElement];
 const alertsAtom = atom<keyedAlert[]>([]);
 const addAlertAtom = atom(
@@ -67,23 +68,28 @@ type ItemsGeoSpotsByGeohash = { items: GeoSpotsByGeohash }
 const fetchSpotsAtom = atom(
   null,
   async (get, set, geohash: string[]) => {
-    set(loadingAtom, true);
+    const loadingHashes = get(loadingHashesAtom);
+    const staleHashes = R.difference(geohash, loadingHashes);
+
+    if (R.isEmpty(staleHashes)) {
+      return; // already loading, do nothing
+    }
+    set(loadingHashesAtom, R.union(loadingHashes, staleHashes));
 
     try {
-      const response = await fetch(`/api/spots/${geohash.sort()}`);
+      const response = await fetch(`/api/spots/${staleHashes.sort()}`);
       const json: ItemsGeoSpotsByGeohash = await response.json();
       if (response.ok) {
-        set(loadingAtom, false);
         set(mergeSpotsAtom, { ...json.items });
       } else {
         const errorNode = <><code className='font-mono mr-1'>{response.status}</code>無法取得資料</>;
         set(addAlertAtom, 'error', errorNode);
-        set(loadingAtom, false);
       }
+      set(loadingHashesAtom, R.difference(get(loadingHashesAtom), staleHashes));
     } catch (e) {
       const errorNode = <span>{String(e)}</span>;
       set(addAlertAtom, 'error', errorNode);
-      set(loadingAtom, false);
+      set(loadingHashesAtom, R.difference(get(loadingHashesAtom), staleHashes));
     }
   }
 );

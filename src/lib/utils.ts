@@ -35,3 +35,7 @@ export const parseFormData = (formData: FormData) => {
 
   return R.map(v => v === '' ? null : v)(result);
 }
+
+export const sleep = (seconds: number) => {
+  return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+};
