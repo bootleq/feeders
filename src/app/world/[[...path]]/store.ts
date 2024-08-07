@@ -30,6 +30,19 @@ export type AreaPickerAtom = {
 } | null;
 export const areaPickerAtom = atom<AreaPickerAtom>(null);
 
+export const editingFormAtom = atom<'spot' | ''>('');
+
+export const statusAtom = atom<string | null>(get => {
+  if (get(areaPickerAtom)) {
+    return 'areaPicker';
+  }
+  const form = get(editingFormAtom);
+  if (R.isNotEmpty(form)) {
+    return `${form}Form`; // e.g., spotForm
+  }
+  return null;
+});
+
 export const viewItemAtom = atom<RecentFollowupsItemProps | null>(null);
 
 export const tempMarkerAtom = atom({

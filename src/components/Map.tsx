@@ -20,6 +20,7 @@ import {
   mergeSpotsAtom,
   geohashesAtom,
   areaPickerAtom,
+  statusAtom,
   mergeTempMarkerAtom,
 } from '@/app/world/[[...path]]/store';
 import { parsePath, updatePath, AREA_ZOOM_MAX, GEOHASH_PRECISION } from '@/app/world/[[...path]]/util';
@@ -37,6 +38,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 
 import ActionLabel from '@/app/world/[[...path]]/ActionLabel';
 import FoodLife from '@/app/world/[[...path]]/FoodLife';
+import Form from '@/app/world/[[...path]]/Form';
 
 import Leaflet, { MarkerCluster } from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents, Marker, Popup } from "react-leaflet";
@@ -66,12 +68,6 @@ const addAlertAtom = atom(
   (get, set, type: 'info' | 'error', node: ReactElement) => set(alertsAtom, (errors) => [...errors, [nanoid(6), type, node]])
 )
 const dismissAlertAtom = atom(null, (get, set, key: string) => set(alertsAtom, rejectFirst(R.eqBy(R.head, [key]))));
-const statusAtom = atom<string | null>(get => {
-  if (get(areaPickerAtom)) {
-    return 'areaPicker';
-  }
-  return null;
-});
 
 type ItemsGeoSpotsByGeohash = { items: GeoSpotsByGeohash }
 const fetchSpotsAtom = atom(
@@ -287,6 +283,10 @@ function Status(params: any) {
     case 'areaPicker':
       msg = '正在編輯「我的區域」';
       control = <AreaPickerControl />;
+      break;
+    case 'spotForm':
+      msg = '正在編輯新地點';
+      control = null;
       break;
     default:
       break;
