@@ -1,0 +1,35 @@
+import * as R from 'ramda';
+
+const translations = {
+  spotAction: {
+    'see':      '看見',
+    'remove':   '移除',
+    'talk':     '溝通',
+    'investig': '調查',
+    'power':    '公權力',
+    'coop':     '互助',
+    'downvote': '扣分',
+  },
+  spotActionDesc: {
+    'see':      '親眼確認現場',
+    'remove':   '將食物移除，使其無效',
+    'talk':     '實際與餵食者對話，個案研究',
+    'investig': '蒐證追查，提供更多資訊',
+    'power':    '檢舉或回報公家單位，促成具體行動',
+    'coop':     '如果需要幫忙，或願意協助友軍，請選互助',
+    'downvote': '記錄有誤或不當使用，請選扣分回饋',
+  },
+  spotActionColor: { // NOTE: must sync with ActionLabel
+    'see':      'bg-slate-900 opacity-70',
+    'remove':   'bg-green-700',
+    'talk':     'bg-yellow-600',
+    'investig': 'bg-blue-700',
+    'power':    'bg-slate-900',
+    'coop':     'bg-red-400',
+    'downvote': 'bg-red-700',
+  },
+};
+
+export function t(scope: string, term: string) {
+  return R.pathOr(term, [scope, term], translations);
+}

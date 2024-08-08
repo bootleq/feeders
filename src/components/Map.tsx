@@ -429,7 +429,7 @@ function Markers({ spots }: {
                     <span className='text-sm mr-2 whitespace-nowrap font-mono'>
                       {latestFollowAge}
                     </span>
-                    <ActionLabel action={s.action} className='ml-auto' />
+                    <ActionLabel action={s.action} className='ml-auto flex items-center' />
                   </div>
 
                   <div className='p-1 mb-1 mx-1 bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded'>{s.followupDesc}</div>

@@ -1,45 +1,30 @@
 "use client"
 
+import { t } from '@/lib/i18n';
+
+// Same as i18n translations, just to allow tailwind parsing in compile time
+const ensureTWClassNames = {
+  spotActionColor: {
+    'see':      'bg-slate-900 opacity-70',
+    'remove':   'bg-green-700',
+    'talk':     'bg-yellow-600',
+    'investig': 'bg-blue-700',
+    'power':    'bg-slate-900',
+    'coop':     'bg-red-400',
+    'downvote': 'bg-red-700',
+  },
+};
+
 export default function ActionLabel({ action, className, children }: {
   action: string,
   className?: string,
   children?: React.ReactNode
 }) {
-  let cls = '';
-  let t: { [key: string]: string } = {
-    see: '看見',
-    remove: '移除',
-    talk: '溝通',
-    investig: '調查',
-    power: '公權力',
-    coop: '互助',
-    downvote: '扣分',
-  };
-
-  switch (action) {
-    case 'see':
-      cls = 'bg-slate-900 opacity-70';
-      break;
-    case 'talk':
-      cls = 'bg-yellow-600';
-      break;
-    case 'remove':
-      cls = 'bg-green-700';
-      break;
-    case 'investig':
-      cls = 'bg-blue-700';
-      break;
-    case 'downvote':
-      cls = 'bg-red-700';
-      break;
-    default:
-      cls = 'bg-slate-900';
-  }
+  let cls = t('spotActionColor', action);
 
   return (
-    <span className={`inline-block rounded-lg px-2 text-white text-sm font-normal flex items-center ${cls} ${className}`}>
-      {t[action]}
+    <span className={`rounded-lg px-2 text-white text-sm font-normal ${cls} ${className}`}>
+      {t('spotAction', action)}
     </span>
   );
 }
-
