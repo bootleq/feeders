@@ -6,6 +6,7 @@ import { nanoid } from 'nanoid';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState, ReactElement, useCallback } from 'react';
 import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
+import { useDebouncedCallback } from 'use-debounce';
 import mapStyles from './map.module.scss'
 import { format, formatDistance } from '@/lib/date-fp';
 import { rejectFirst } from '@/lib/utils';
@@ -115,6 +116,35 @@ function MapUser(props: {
   const { pathname } = props;
   const { lat, lon, mode } = parsePath(pathname);
 
+  const debouncedZoomEnd = useDebouncedCallback(() => {
+    const zoom = map.getZoom();
+    updatePath({ newZoom: zoom });
+  }, 800);
+
+  const debouncedMoveEnd = useDebouncedCallback(() => {
+    const zoom = map.getZoom();
+
+    if (mode === 'area' && zoom >= AREA_ZOOM_MAX) {
+      const bounds = map.getBounds();
+      const hashes = geohash.bboxes(
+        bounds.getSouth(),
+        bounds.getWest(),
+        bounds.getNorth(),
+        bounds.getEast(),
+        GEOHASH_PRECISION
+      );
+
+      const newHash = new Set(hashes).difference(geoSet);
+      if (newHash.size > 0) {
+        fetchSpots(
+          R.take(D1_PARAM_LIMIT, Array.from(newHash))
+        );
+      }
+    }
+
+    updatePath({ newCenter: map.getCenter() });
+  }, 400);
+
   const map = useMapEvents({
     click: (e: Leaflet.LeafletMouseEvent) => {
       const point = e.latlng;
@@ -127,34 +157,8 @@ function MapUser(props: {
     zoomstart: () => {
       const zoom = map.getZoom();
     },
-    zoomend: () => {
-      const zoom = map.getZoom();
-
-      updatePath({ newZoom: zoom });
-    },
-    moveend: () => {
-      const zoom = map.getZoom();
-
-      if (mode === 'area' && zoom >= AREA_ZOOM_MAX) {
-        const bounds = map.getBounds();
-        const hashes = geohash.bboxes(
-          bounds.getSouth(),
-          bounds.getWest(),
-          bounds.getNorth(),
-          bounds.getEast(),
-          GEOHASH_PRECISION
-        );
-
-        const newHash = new Set(hashes).difference(geoSet);
-        if (newHash.size > 0) {
-          fetchSpots(
-            R.take(D1_PARAM_LIMIT, Array.from(newHash))
-          );
-        }
-      }
-
-      updatePath({ newCenter: map.getCenter() });
-    },
+    zoomend: debouncedZoomEnd,
+    moveend: debouncedMoveEnd,
   });
 
   useEffect(() => {
@@ -379,7 +383,7 @@ function Markers({ spots }: {
           const latestFollowAge = formatDistance(now, s.latestFollowAt).replace('大約', '').trim();
 
           return (
-            <Marker key={s.id} position={[s.lat, s.lon]} icon={MarkerIcon}>
+            <Marker key={s.id} position={[s.lat, s.lon]} icon={MarkerIcon} autoPan={false}>
               <Popup className={mapStyles.popup} autoPan={false}>
                 <div className='p-1'>
                   <strong className='block mb-1'>{s.title}</strong>
