@@ -5,14 +5,15 @@ import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { SpotActionEnum } from '@/lib/schema';
 
-const labelCls = 'flex items-center justify-end my-1 whitespace-nowrap active:font-bold';
-const inputCls = [
+export const labelCls = 'flex items-center justify-end my-1 whitespace-nowrap active:font-bold';
+export const inputCls = [
   'ml-2 p-1 py-px flex-1',
   'rounded-md shadow-sm border-gray-300',
   'focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50',
+  '[&:user-invalid]:border-red-300 [&:user-invalid]:ring [&:user-invalid]:ring-red-200 [&:user-invalid]:ring-opacity-80',
 ].join(' ');
 
-const tooltipTrigger = (
+export const tooltipTrigger = (
   <TooltipTrigger className='flex flex-col items-center'>
     <QuestionMarkCircleIcon className='ml-1 stroke-slate-700/75 cursor-help' height={22} />
   </TooltipTrigger>

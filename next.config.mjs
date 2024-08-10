@@ -1,6 +1,7 @@
 import withBundleAnalyzer from '@next/bundle-analyzer';
 
 import { setupDevPlatform } from '@cloudflare/next-on-pages/next-dev';
+import optimizeLocales from '@react-aria/optimize-locales-plugin';
 
 // Here we use the @cloudflare/next-on-pages next-dev module to allow us to use bindings during local development
 // (when running the application with `next dev`), for more information see:
@@ -16,6 +17,12 @@ const nextConfig = {
       test: /\.svg$/,
       use: ["@svgr/webpack"],
     });
+
+    config.plugins.push(
+      optimizeLocales.webpack({
+        locales: ['zh-TW']
+      })
+    );
 
     return config;
   },

@@ -1,0 +1,72 @@
+.datepicker {
+  :global([role=group]) {
+    display: flex;
+    align-items: center;
+  }
+
+  :global(.react-aria-DateInput) {
+    display: flex;
+    align-items: center;
+  }
+
+  :global(.react-aria-DateSegment[data-type=hour]) {
+    margin-left: 12px;
+  }
+
+  :global(.react-aria-Button) {
+    margin-left: auto;
+    margin-right: 2px;
+  }
+
+}
+
+.calender {
+  padding-top: 0.25rem;
+  padding-bottom: 0.5rem;
+
+  button[disabled] {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.25rem 0.5rem 0.5rem;
+
+    button {
+      opacity: .8;
+    }
+  }
+
+  :global(.react-aria-CalendarGrid) {
+    text-align: center;
+
+    thead {
+      color: gray;
+    }
+
+    td {
+      > div {
+        padding: 3px 6px;
+        border-radius: 100%;
+      }
+
+      &[aria-selected] > div {
+        background-color: rgba(160,185,255,0.7);
+      }
+
+      &[aria-disabled] > div {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &:not([aria-disabled]) > div {
+        &:hover {
+          background-color: rgba(0,0,0,0.3);
+        }
+      }
+    }
+  }
+}
