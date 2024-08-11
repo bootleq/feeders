@@ -1,6 +1,8 @@
 import * as R from 'ramda';
 import { z } from 'zod';
 
+export const present = R.both(R.isNotNil, R.isNotEmpty);
+
 // slugify
 // Refer from @jmlweb/ramdu
 // https://jmlweb.github.io/ramdu/slugify.js.html

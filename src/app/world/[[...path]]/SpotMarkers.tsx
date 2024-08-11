@@ -1,14 +1,16 @@
 "use client"
 
+import * as R from 'ramda';
 import Leaflet, { MarkerCluster } from 'leaflet';
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, useMapEvents, Marker, Popup } from "react-leaflet";
 import MarkerClusterGroup from 'react-leaflet-cluster';
-import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
 
 import FoodLife from './FoodLife';
 import ActionLabel from './ActionLabel';
+import { present } from '@/lib/utils';
 import { format, formatDistance } from '@/lib/date-fp';
 import type { GeoSpotsResult } from '@/models/spots';
 import mapStyles from '@/components/map.module.scss';
@@ -16,6 +18,11 @@ import mapStyles from '@/components/map.module.scss';
 const googleMapURL = (lat: number, lon: number) => {
   return `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
 }
+
+const tooltipCls = [
+  'text-xs p-1 px-2 rounded box-border w-max max-w-[100vw-10px] z-[1002]',
+  'bg-gradient-to-br from-stone-50 to-slate-100 ring-2 ring-offset-1 ring-slate-300',
+].join(' ')
 
 function clusterIconFn(cluster: MarkerCluster) {
   const childCount = Number(cluster.getChildCount());
@@ -75,22 +82,38 @@ export default function SpotMarkers({ spots }: {
                   </ul>
 
                   <div className='flex items-center text-sm'>
-                    座標 <code className='text-xs mx-2'>{s.lat},{s.lon}</code>
-                    <a
-                      className='flex items-center font-sans whitespace-nowrap hover:bg-yellow-300/50'
-                      aria-label='在 Google 地圖開啟座標'
-                      href={googleMapURL(s.lat, s.lon)}
-                      target='_blank'
-                    >
-                      <span className='text-xs text-slate-700 font-bold'>G</span>
-                      <ArrowTopRightOnSquareIcon className='fill-slate-700 h-3' height={24} />
-                    </a>
+                    座標
+                    <Tooltip>
+                      <TooltipTrigger><code className='text-xs ml-2 max-w-20 truncate hover:bg-yellow-300/50'>{s.lat}</code></TooltipTrigger>
+                      <TooltipContent className={`${tooltipCls}`}>{s.lat}</TooltipContent>
+                    </Tooltip>
+                    <small className='text-xs'>,</small>
+                    <Tooltip>
+                      <TooltipTrigger><code className='text-xs ml-1 max-w-20 truncate hover:bg-yellow-300/50'>{s.lon}</code></TooltipTrigger>
+                      <TooltipContent className={`${tooltipCls}`}>{s.lon}</TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <a
+                          className='flex items-start font-sans whitespace-nowrap rounded-full hover:bg-yellow-300/50'
+                          aria-label='在 Google 地圖開啟座標'
+                          href={googleMapURL(s.lat, s.lon)}
+                          target='_blank'
+                        >
+                          <span className='text-sm text-slate-700 px-1 font-bold'>G</span>
+                        </a>
+                      </TooltipTrigger>
+                      <TooltipContent className={`${tooltipCls}`}>在 Google 地圖開啟座標</TooltipContent>
+                    </Tooltip>
                   </div>
                 </div>
 
-                <div className='h-max-60 px-1 py-1 mx-0.5 my-1 resize-y bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded'>
-                  {s.desc}
-                </div>
+                {present(s.desc) &&
+                  <div className='h-max-60 px-1 py-1 mx-0.5 my-1 resize-y bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded'>
+                    {s.desc}
+                  </div>
+                }
 
                 <div className='mt-2 px-2 text-right text-xs text-slate-500/75'>
                   建立：<span className='font-mono'>{format({}, 'y/M/d', s.createdAt)}</span> by {s.userId}
@@ -113,7 +136,9 @@ export default function SpotMarkers({ spots }: {
                     <ActionLabel action={s.action} className='ml-auto flex items-center' />
                   </div>
 
-                  <div className='p-1 mb-1 mx-1 bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded'>{s.followupDesc}</div>
+                  {present(s.followupDesc) &&
+                    <div className='p-1 mb-1 mx-1 bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded'>{s.followupDesc}</div>
+                  }
                 </div>
 
                 {s.followCount > 1 &&
