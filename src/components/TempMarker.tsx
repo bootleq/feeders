@@ -5,7 +5,7 @@ import { Marker, Popup } from 'react-leaflet';
 import type { Marker as LeafletMarker } from 'leaflet';
 import type { LatLngExpression } from 'leaflet';
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
-import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
+import { useAtom } from 'jotai';
 import { mergeTempMarkerAtom, editingFormAtom } from '@/app/world/[[...path]]/store';
 import Form from '@/app/world/[[...path]]/Form';
 import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
