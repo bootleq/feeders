@@ -20,6 +20,10 @@ export default function Status(params: any) {
       msg = '正在編輯新地點';
       control = null;
       break;
+    case 'followupForm':
+      msg = '正在新增跟進動態';
+      control = null;
+      break;
     default:
       break;
   }

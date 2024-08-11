@@ -2,14 +2,21 @@
 
 import * as R from 'ramda';
 import Leaflet, { MarkerCluster } from 'leaflet';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { useAtom } from 'jotai';
 import { MapContainer, TileLayer, useMapEvents, Marker, Popup } from "react-leaflet";
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
+import { PlusIcon } from '@heroicons/react/24/outline';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
+import { CheckIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon } from '@heroicons/react/24/outline';
+import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 import FoodLife from './FoodLife';
 import ActionLabel from './ActionLabel';
+import FollowupForm from './FollowupForm';
+import { editingFormAtom } from './store';
 import { present } from '@/lib/utils';
 import { format, formatDistance } from '@/lib/date-fp';
 import type { GeoSpotsResult } from '@/models/spots';
@@ -45,11 +52,24 @@ const MarkerIcon = new Leaflet.DivIcon({
 export default function SpotMarkers({ spots }: {
   spots: GeoSpotsResult
 }) {
+  const [editingForm, setEditingForm] = useAtom(editingFormAtom);
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
     setNow(new Date());
   }, []);
+
+  const startEdit = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditingForm('followup');
+  }, [setEditingForm]);
+
+  const cancel = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditingForm('');
+  }, [setEditingForm]);
 
   const statLiCls = 'hover:bg-yellow-300/50 pr-1';
   const statNumCls = 'font-mono px-1 align-baseline';
@@ -141,9 +161,28 @@ export default function SpotMarkers({ spots }: {
                   }
                 </div>
 
-                {s.followCount > 1 &&
-                  <div className='w-full text-center'>載入其他 {s.followCount - 1} 則動態</div>
+                {editingForm === 'followup' &&
+                  <>
+                    <hr className='w-11/12 h-px mx-auto my-5 bg-green-800 border-0 dark:bg-gray-700' />
+                    <span className='block mx-auto -mt-[1.9rem] mb-2 px-3 w-min whitespace-nowrap bg-white text-sm text-center text-green-800 font-bold'>
+                      新增動態
+                    </span>
+                    <FollowupForm spotId={s.id} geohash={s.geohash} />
+                  </>
                 }
+
+                {editingForm !== 'followup' &&
+                  <div className='w-full flex items-center mt-2'>
+                    <button className='flex items-center justify-center py-1' onClick={startEdit}>
+                      ➕ 跟進
+                    </button>
+
+                    {s.followCount > 1 &&
+                      <div className='ml-auto text-center'>載入其他 {s.followCount - 1} 則動態</div>
+                    }
+                  </div>
+                }
+
               </Popup>
             </Marker>
           );

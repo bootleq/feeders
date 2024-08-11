@@ -25,6 +25,7 @@ import {
 } from '@/lib/schema';
 
 import type { Schema as CreateSpotSchema } from '@/app/world/[[...path]]/create-spot';
+import type { Schema as CreateFollowupSchema } from '@/app/world/[[...path]]/create-followup';
 
 import { db } from '@/lib/db';
 
@@ -238,6 +239,23 @@ export async function createSpot(data: CreateSpotSchema) {
   }
 
   return result;
+}
+
+export async function createFollowup(data: CreateFollowupSchema) {
+  const followup = await db.insert(spotFollowups).values({
+    action:      data.action,
+    spotState:   data.action === 'remove' ? SpotStateEnum.enum.clean : SpotStateEnum.enum.dirty,
+    desc:        data.desc,
+    material:    data.material,
+    feedeeCount: data.feedeeCount,
+    state:       PubStateEnum.enum.published,
+    spawnedAt:   data.spawnedAt,
+    removedAt:   data.removedAt,
+    spotId:      data.spotId,
+    userId:      data.userId,
+  }).returning().get();
+
+  return followup;
 }
 
 export function spotsMissingDistrict(ids = []) {

@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 
 const translations = {
-  spotFields: {
+  spotFields: { // NOTE: also used in FollowupForm
     'spotTitle':   '地點名稱',
     'spotDesc':    '地點說明',
     'action':      '行動',
