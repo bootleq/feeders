@@ -25,6 +25,10 @@ const createdAtCol = (name: string = 'createdAt') => timestampCol(name).notNull(
 
 export type LatLngBounds = [[number, number], [number, number]];
 
+export const sqlDateMapper = (v: number) => {
+  return new Date(v * 1000);
+};
+
 // Auth.js tables
 // Ref: https://auth-docs-git-feat-nextjs-auth-authjs.vercel.app/reference/adapter/drizzle#sqlite
 // {{{
