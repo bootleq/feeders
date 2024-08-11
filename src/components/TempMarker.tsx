@@ -36,21 +36,15 @@ export default function TempMarker() {
           setMarker({ lat: pos.lat, lon: pos.lng })
         }
       },
+      popupopen() {
+        setEditingForm('spot');
+      },
+      popupclose() {
+        setEditingForm('');
+      },
     }),
-    [setMarker],
+    [setMarker, setEditingForm],
   );
-
-  const startEditSpot = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    setEditingForm('spot');
-  }, [setEditingForm]);
-
-  const cancel = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
-    setMarker({ visible: false });
-    setEditingForm('');
-  }, [setMarker, setEditingForm]);
 
   if (!visible) {
     return;
@@ -65,24 +59,7 @@ export default function TempMarker() {
       ref={markerRef}>
       <Popup minWidth={90}>
         <div className='flex flex-col items-center text-base'>
-          {editingForm === 'spot' ?
-            <Form lat={lat} lon={lon} /> :
-            '新的地點'
-          }
-
-          {editingForm !== 'spot' &&
-            <div className='flex items-center gap-x-2 mt-3 text-sm'>
-              <button className={`btn p-1 bg-slate-100 ring-1 flex items-center hover:bg-white`} onClick={startEditSpot}>
-                <PencilSquareIcon className='stroke-slate-700' height={20} />
-                編輯
-              </button>
-
-              <button className={`btn p-1 bg-slate-100 ring-1 flex items-center hover:bg-white`} onClick={cancel}>
-                <XMarkIcon className='stroke-red-700' height={20} />
-                取消
-              </button>
-            </div>
-          }
+          <Form lat={lat} lon={lon} />
         </div>
       </Popup>
     </Marker>

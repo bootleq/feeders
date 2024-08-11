@@ -90,10 +90,12 @@ export function UnscopedForm({ lat, lon }: {
   }, []);
 
   const cancel = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     e.stopPropagation();
     setErrors({});
     setEditingForm('');
-  }, [setErrors, setEditingForm]);
+    setTempMarker({ visible: false });
+  }, [setErrors, setEditingForm, setTempMarker]);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
