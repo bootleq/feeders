@@ -146,8 +146,11 @@ function MapUser(props: {
 
   const map = useMapEvents({
     click: (e: Leaflet.LeafletMouseEvent) => {
-      const point = e.latlng;
-      setTempMarker({ visible: true, lat: point.lat, lon: point.lng });
+      const anyPopup = Boolean(map.getContainer().querySelector('.leaflet-popup'));
+      if (!anyPopup) {
+        const point = e.latlng;
+        setTempMarker({ visible: true, lat: point.lat, lon: point.lng });
+      }
     },
     locationfound: (location) => {
       map.setView(location.latlng, 16);

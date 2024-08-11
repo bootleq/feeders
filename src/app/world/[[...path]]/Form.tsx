@@ -6,6 +6,7 @@ import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
 import { ScopeProvider } from 'jotai-scope'
 import { CheckIcon } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 import { SpotActionEnum } from '@/lib/schema';
 import { t } from '@/lib/i18n';
@@ -79,6 +80,7 @@ export function UnscopedForm({ lat, lon }: {
   const [sending, setSending] = useState(false);
   const [action, setAction] = useState('');
   const [now, setNow] = useState(() => new Date());
+  const [confirming, setConfirming] = useState(false);
 
   useEffect(() => {
     setNow(new Date());
@@ -99,6 +101,11 @@ export function UnscopedForm({ lat, lon }: {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!confirming) {
+      return setConfirming(true);
+    }
+
     const formData = new FormData(e.currentTarget);
 
     setSending(true);
@@ -161,14 +168,19 @@ export function UnscopedForm({ lat, lon }: {
 
       {R.isNotEmpty(errors) && <FormErrors errors={errors} />}
 
-      <div className='p-2 m-1 rounded ring-1 ring-yellow-400 bg-yellow-300/50 text-center text-balance'>
-        資料將會公開，修改會留下記錄，請避免洩漏私人資訊。
-      </div>
+      {confirming &&
+        <div className='p-2 m-1 rounded ring-4 ring-yellow-400 bg-gradient-to-br from-amber-200 to-yellow-300 text-center text-balance flex items-center'>
+          <ExclamationCircleIcon className='stroke-yellow-700 animate-pulse size-16 stroke-2' height={24} />
+          資料即將公開，修改也會留下記錄，請避免洩漏私人資訊
+        </div>
+      }
 
       <div className='flex items-center justify-center w-full gap-x-2 mt-2 mb-1 text-sm'>
         <button className='btn bg-slate-100 ring-1 flex items-center hover:bg-white' disabled={!canSave}>
           <CheckIcon className='stroke-green-700' height={20} />
-          {sending ? '處理中……' : '儲存'}
+          {sending ? '處理中……' :
+            confirming ? '確認送出' : '儲存'
+          }
         </button>
         <button className='btn bg-slate-100 ring-1 flex items-center hover:bg-white' onClick={cancel}>
           <XMarkIcon className='stroke-red-700' height={20} />
