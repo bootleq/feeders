@@ -39,7 +39,6 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 
 import ActionLabel from '@/app/world/[[...path]]/ActionLabel';
 import FoodLife from '@/app/world/[[...path]]/FoodLife';
-import Form from '@/app/world/[[...path]]/Form';
 
 import Leaflet, { MarkerCluster } from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents, Marker, Popup } from "react-leaflet";

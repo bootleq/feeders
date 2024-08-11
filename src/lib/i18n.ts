@@ -1,6 +1,17 @@
 import * as R from 'ramda';
 
 const translations = {
+  spotFields: {
+    'spotTitle':   '地點名稱',
+    'spotDesc':    '地點說明',
+    'action':      '行動',
+    'desc':        '說明',
+    'material':    '食物內容',
+    'feedeeCount': '狗群數量',
+    'spawnedAt':   '設置時間',
+    'removedAt':   '移除時間',
+  },
+
   spotAction: {
     'see':      '看見',
     'remove':   '移除',

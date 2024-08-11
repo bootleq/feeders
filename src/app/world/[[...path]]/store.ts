@@ -9,7 +9,7 @@ export const userAtom = atom<WorldUserResult | null>(null);
 export const mapAtom = atom<Leaflet.Map | null>(null);
 
 export type SpotsAtom = {
-  [key: string]: GeoSpotsResult
+  [geohash: string]: GeoSpotsResult
 }
 export const spotsAtom = atom({});
 

@@ -1,5 +1,6 @@
 "use client"
 
+import * as R from 'ramda';
 import { forwardRef } from 'react';
 import type { ZonedDateTime } from '@internationalized/date';
 import {
@@ -20,10 +21,12 @@ import {
 } from 'react-aria-components';
 import type { DatePickerProps, HeadingProps } from 'react-aria-components';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
+import { errorsAtom } from '@/components/form/store';
 import { CalendarIcon } from '@heroicons/react/24/solid';
 
 import { wordWord } from '@/lib/utils';
-import { labelCls, inputCls, tooltipTrigger } from './Inputs';
+import { t } from '@/lib/i18n';
+import { labelCls, inputCls, tooltipTrigger, useFieldError, LabelProps } from './Inputs';
 import styles from '@/components/form.module.scss'
 
 interface MyDatePickerProps extends DatePickerProps<ZonedDateTime> {
@@ -31,6 +34,8 @@ interface MyDatePickerProps extends DatePickerProps<ZonedDateTime> {
   name: string,
   tooltip?: React.ReactNode,
 }
+
+const fieldName = R.partial(t, ['spotFields']);
 
 const focusInput = (e: React.MouseEvent<HTMLLabelElement>) => {
   const picker = e.currentTarget.nextElementSibling?.querySelector('.react-aria-DateSegment') as HTMLElement;
@@ -53,6 +58,15 @@ const HeadingWithWords = forwardRef(HeadingWithWordsForForward);
 export function DateTimeField(
   { label, name, tooltip, ...props }: MyDatePickerProps
 ) {
+  const errors = useFieldError(name);
+  const invalid = errors?.length > 0;
+  const labelProps: LabelProps = {
+    className: labelCls,
+    children: label || fieldName(name),
+    onClick: focusInput,
+    ...(invalid ? { 'aria-invalid': true } : {})
+  };
+
   const picker = (
     <DatePicker
       name={name}
@@ -88,7 +102,7 @@ export function DateTimeField(
   if (tooltip) {
     return (
       <>
-        <label onClick={focusInput} className={labelCls}>{label}</label>
+        <label {...labelProps} />
         <div className='flex items-center'>
           {picker}
           <Tooltip>
@@ -104,7 +118,7 @@ export function DateTimeField(
 
   return (
     <>
-      <label onClick={focusInput} className={labelCls}>{label}</label>
+      <label {...labelProps} />
       {picker}
     </>
   );

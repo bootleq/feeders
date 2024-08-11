@@ -1,4 +1,5 @@
 import * as R from 'ramda';
+import { z } from 'zod';
 
 // slugify
 // Refer from @jmlweb/ramdu
@@ -35,6 +36,15 @@ export const parseFormData = (formData: FormData) => {
 
   return R.map(v => v === '' ? null : v)(result);
 }
+
+// (internationalized/date) ZondedDateTime => Date
+// Example: '2024-08-10T20:24:29.444+08:00[Asia/Taipei]' => Date
+export const zondedDateTimeSchema =
+  z.string()
+  .transform(v => v.replace(/\[\w+\/\w+]$/, ''))
+  .pipe(z.string().datetime({ offset: true }))
+  .pipe(z.coerce.date())
+  .nullish();
 
 export const sleep = (seconds: number) => {
   return new Promise((resolve) => setTimeout(resolve, seconds * 1000));

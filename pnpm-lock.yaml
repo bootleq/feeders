@@ -53,6 +53,9 @@ importers:
       jotai:
         specifier: ^2.9.0
         version: 2.9.2(@types/react@18.3.3)(react@18.3.1)
+      jotai-scope:
+        specifier: ^0.7.1
+        version: 0.7.1(jotai@2.9.2(@types/react@18.3.3)(react@18.3.1))(react@18.3.1)
       leaflet:
         specifier: ^1.9.4
         version: 1.9.4
@@ -4568,6 +4571,12 @@ packages:
 
   jose@5.6.3:
     resolution: {integrity: sha512-1Jh//hEEwMhNYPDDLwXHa2ePWgWiFNNUadVmguAAw2IJ6sj9mNxV5tGXJNqlMkJAybF6Lgw1mISDxTePP/187g==}
+
+  jotai-scope@0.7.1:
+    resolution: {integrity: sha512-oFz91+fHy6U5v2zwLlE4fQja38J56FoY6h4c8SJluNQGwggfSIr/gIG5rXTaDLE/9AuPfx5kWZS7HhAjlZRb1g==}
+    peerDependencies:
+      jotai: '>=2.9.2'
+      react: '>=17.0.0'
 
   jotai@2.9.2:
     resolution: {integrity: sha512-jIBXEadOHCziOuMY6HAy2KQcHipGhnsbF+twqh8Lcmcz/Yei0gdBtW5mOYdKmbQxGqkvfvXM3w/oHtJ2WNGSFg==}
@@ -11082,6 +11091,11 @@ snapshots:
   jiti@1.21.6: {}
 
   jose@5.6.3: {}
+
+  jotai-scope@0.7.1(jotai@2.9.2(@types/react@18.3.3)(react@18.3.1))(react@18.3.1):
+    dependencies:
+      jotai: 2.9.2(@types/react@18.3.3)(react@18.3.1)
+      react: 18.3.1
 
   jotai@2.9.2(@types/react@18.3.3)(react@18.3.1):
     optionalDependencies:

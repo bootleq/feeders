@@ -66,7 +66,7 @@ export default function TempMarker() {
       <Popup minWidth={90}>
         <div className='flex flex-col items-center text-base'>
           {editingForm === 'spot' ?
-            <Form /> :
+            <Form lat={lat} lon={lon} /> :
             '新的地點'
           }
 

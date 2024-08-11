@@ -20,7 +20,10 @@ import {
   spots,
   spotFollowups,
   PubStateEnum,
+  SpotStateEnum,
 } from '@/lib/schema';
+
+import type { Schema as CreateSpotSchema } from '@/app/world/[[...path]]/create-spot';
 
 import { db } from '@/lib/db';
 
@@ -193,6 +196,48 @@ export const geoSpots = (geohashes: string[]) => {
 type GeoSpotsQuery = ReturnType<typeof geoSpots>;
 export type GeoSpotsResult = Awaited<ReturnType<GeoSpotsQuery['execute']>>;
 export type GeoSpotsByGeohash = {[key: string]: GeoSpotsResult};
+
+export async function createSpot(data: CreateSpotSchema) {
+  let result: {
+    newSpot: InferSelectModel<typeof spots>,
+    followup: InferSelectModel<typeof spotFollowups>,
+  } | undefined;
+
+  // await db.transaction(async (tx) => { // NOTE: D1 doesn't support transaction
+  const newSpot = await db.insert(spots).values({
+    title:   data.spotTitle,
+    lat:     data.lat,
+    lon:     data.lon,
+    city:    data.city,
+    town:    data.town,
+    geohash: data.geohash,
+    desc:    data.spotDesc,
+    state:   PubStateEnum.enum.published,
+    userId:  data.userId,
+  }).returning().get();
+
+  const followup = await db.insert(spotFollowups).values({
+    action:      data.action,
+    spotState:   data.action === 'remove' ? SpotStateEnum.enum.clean : SpotStateEnum.enum.dirty,
+    desc:        data.desc,
+    material:    data.material,
+    feedeeCount: data.feedeeCount,
+    state:       PubStateEnum.enum.published,
+    spawnedAt:   data.spawnedAt,
+    removedAt:   data.removedAt,
+    spotId:      newSpot.id,
+    userId:      data.userId,
+  }).returning().get();
+
+  result = { newSpot, followup };
+  // });
+
+  if (!result) {
+    throw new Error("Can't insert spot and followup.")
+  }
+
+  return result;
+}
 
 export function spotsMissingDistrict(ids = []) {
   const idWhere = R.isNotEmpty(ids) ? inArray(spots.id, ids) : sql`1 = 1`;
