@@ -1,6 +1,7 @@
 import * as R from 'ramda';
 import {
   eq,
+  lte,
   gte,
   isNull,
   isNotNull,
@@ -132,10 +133,11 @@ export async function queryDistrict(lat: number, lon: number) {
   return [null, null];
 };
 
-export const geoSpots2 = (geohashes: string[]) => {
-  // Rank latest created followup
+export const geoSpotsQuery = (geohashes: string[]) => {
+  // Rank latest created followups
   const ranked = db.select({
-    id:              spotFollowups.id,
+    id:              spots.id,
+    followupId:      sql<number>`${spotFollowups.id}`.as('followupId'),
     followCount:     sql<number>`COUNT(${spots.id}) OVER (PARTITION BY ${spots.id})`.as('followCount'),
     followerCount:   sql<number>`COUNT(${spotFollowups.spawnedAt}) OVER (PARTITION BY ${spots.id})`.as('followerCount'),
     respawnCount:    sql<number>`COUNT(${spotFollowups.spawnedAt}) OVER (PARTITION BY ${spots.id})`.as('respawnCount'),
@@ -148,38 +150,46 @@ export const geoSpots2 = (geohashes: string[]) => {
     .as('ranked')
 
   const query = db.select({
-    id:        spots.id,
-    title:     spots.title,
-    lat:       spots.lat,
-    lon:       spots.lon,
-    city:      spots.city,
-    town:      spots.town,
-    geohash:   spots.geohash,
-    desc:      spots.desc,
-    state:     spots.state,
-    createdAt: spots.createdAt,
-    userId:    spots.userId,
-    followerId:     spotFollowups.userId,
-    followupDesc:   spotFollowups.desc,
-    action:         spotFollowups.action,
-    spotState:      spotFollowups.spotState,
-    material:       spotFollowups.material,
-    latestFollowAt: spotFollowups.createdAt,
-    followCount:     ranked.followCount,
-    followerCount:   ranked.followerCount,
-    respawnCount:    ranked.respawnCount,
-    latestSpawnAt:   ranked.latestSpawnAt,
-    latestRemovedAt: ranked.latestRemovedAt,
-    maxFeedee:       ranked.maxFeedee,
-  }).from(spotFollowups)
+    spot: {
+      id:        spots.id,
+      title:     spots.title,
+      lat:       spots.lat,
+      lon:       spots.lon,
+      city:      spots.city,
+      town:      spots.town,
+      geohash:   spots.geohash,
+      desc:      spots.desc,
+      state:     spots.state,
+      createdAt: spots.createdAt,
+      userId:    spots.userId,
+
+      followCount:     ranked.followCount,
+      followerCount:   ranked.followerCount,
+      respawnCount:    ranked.respawnCount,
+      latestSpawnAt:   ranked.latestSpawnAt,
+      latestRemovedAt: ranked.latestRemovedAt,
+      maxFeedee:       ranked.maxFeedee,
+    },
+
+    followup: {
+      followupId:     spotFollowups.id,
+      followerId:     spotFollowups.userId,
+      followupDesc:   spotFollowups.desc,
+      action:         spotFollowups.action,
+      spotState:      spotFollowups.spotState,
+      material:       spotFollowups.material,
+      latestFollowAt: spotFollowups.createdAt,
+    },
+  }).from(ranked)
     .innerJoin(
-      ranked, and(
-        eq(spotFollowups.id, ranked.id),
-        eq(ranked.rank, 1),
+      spots, and(
+        eq(spots.id, ranked.id),
+        lte(ranked.rank, 4),
       )
     )
     .innerJoin(
-      spots, eq(spots.id, spotFollowups.spotId)
+      spotFollowups,
+      eq(spotFollowups.id, ranked.followupId)
     )
     .where(
       and(
@@ -189,7 +199,7 @@ export const geoSpots2 = (geohashes: string[]) => {
       )
     )
     .orderBy(
-      asc(spots.geohash),
+      asc(spots.geohash), desc(spotFollowups.createdAt),
     );
 
   return query;
