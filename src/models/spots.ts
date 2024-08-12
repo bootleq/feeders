@@ -132,6 +132,69 @@ export async function queryDistrict(lat: number, lon: number) {
   return [null, null];
 };
 
+export const geoSpots2 = (geohashes: string[]) => {
+  // Rank latest created followup
+  const ranked = db.select({
+    id:              spotFollowups.id,
+    followCount:     sql<number>`COUNT(${spots.id}) OVER (PARTITION BY ${spots.id})`.as('followCount'),
+    followerCount:   sql<number>`COUNT(${spotFollowups.spawnedAt}) OVER (PARTITION BY ${spots.id})`.as('followerCount'),
+    respawnCount:    sql<number>`COUNT(${spotFollowups.spawnedAt}) OVER (PARTITION BY ${spots.id})`.as('respawnCount'),
+    latestSpawnAt:   sql<number>`MAX(${spotFollowups.spawnedAt}) OVER (PARTITION BY ${spots.id})`.mapWith(sqlDateMapper).as('latestSpawnAt'),
+    latestRemovedAt: sql<number>`MAX(${spotFollowups.removedAt}) OVER (PARTITION BY ${spots.id})`.mapWith(sqlDateMapper).as('latestRemovedAt'),
+    maxFeedee:       sql<number>`MAX(${spotFollowups.feedeeCount}) OVER (PARTITION BY ${spots.id})`.as('maxFeedee'),
+    rank:            sql<number>`RANK() OVER (PARTITION BY ${spots.id} ORDER BY ${spotFollowups.createdAt} DESC, ${spotFollowups.spawnedAt} DESC)`.as('rank'),
+  }).from(spots)
+    .innerJoin(spotFollowups, eq(spots.id, spotFollowups.spotId))
+    .as('ranked')
+
+  const query = db.select({
+    id:        spots.id,
+    title:     spots.title,
+    lat:       spots.lat,
+    lon:       spots.lon,
+    city:      spots.city,
+    town:      spots.town,
+    geohash:   spots.geohash,
+    desc:      spots.desc,
+    state:     spots.state,
+    createdAt: spots.createdAt,
+    userId:    spots.userId,
+    followerId:     spotFollowups.userId,
+    followupDesc:   spotFollowups.desc,
+    action:         spotFollowups.action,
+    spotState:      spotFollowups.spotState,
+    material:       spotFollowups.material,
+    latestFollowAt: spotFollowups.createdAt,
+    followCount:     ranked.followCount,
+    followerCount:   ranked.followerCount,
+    respawnCount:    ranked.respawnCount,
+    latestSpawnAt:   ranked.latestSpawnAt,
+    latestRemovedAt: ranked.latestRemovedAt,
+    maxFeedee:       ranked.maxFeedee,
+  }).from(spotFollowups)
+    .innerJoin(
+      ranked, and(
+        eq(spotFollowups.id, ranked.id),
+        eq(ranked.rank, 1),
+      )
+    )
+    .innerJoin(
+      spots, eq(spots.id, spotFollowups.spotId)
+    )
+    .where(
+      and(
+        inArray(spots.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped]),
+        inArray(spotFollowups.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped]),
+        inArray(spots.geohash, geohashes),
+      )
+    )
+    .orderBy(
+      asc(spots.geohash),
+    );
+
+  return query;
+};
+
 export const geoSpots = (geohashes: string[]) => {
   // Rank latest created followup
   const ranked = db.select({
