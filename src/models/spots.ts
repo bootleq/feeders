@@ -205,6 +205,52 @@ export const geoSpotsQuery = (geohashes: string[]) => {
   return query;
 };
 
+type GeoSpotsQuery = ReturnType<typeof geoSpotsQuery>;
+export type GeoSpotsResult = Awaited<ReturnType<GeoSpotsQuery['execute']>>;
+
+type GeoSpotsResultSpot = GeoSpotsResult[number]['spot'];
+type GeoSpotsResultFollowup = GeoSpotsResult[number]['followup'];
+export type GeoSpotsByGeohash = {
+  [geohash: string]: {
+    spot: GeoSpotsResultSpot,
+    followups: GeoSpotsResultFollowup[],
+  }[]
+};
+
+export const geoSpotsGrouped = async (geohashes: string[]) => {
+  const items = await geoSpotsQuery(geohashes);
+
+  const bySpot = items.reduce<Record<number, { spot: GeoSpotsResultSpot, followups: GeoSpotsResultFollowup[] }>>(
+    (acc, row) => {
+      const { spot, followup } = row;
+      const { geohash } = spot;
+
+      if (!acc[spot.id]) {
+        acc[spot.id] = { spot, followups: [] };
+      }
+      if (followup) {
+        acc[spot.id].followups.push(followup);
+      }
+      return acc;
+    },
+    {}
+  )
+
+  const byGeohash = Object.values(bySpot).reduce<GeoSpotsByGeohash>(
+    (acc, row) => {
+      const { spot, followups } = row;
+      const { geohash } = spot;
+
+      if (!acc[geohash]) acc[geohash] = [];
+      acc[geohash].push({ spot, followups });
+      return acc;
+    },
+    {}
+  );
+
+  return R.reject(R.isNil, byGeohash);
+};
+
 export const geoSpots = (geohashes: string[]) => {
   // Rank latest created followup
   const ranked = db.select({
