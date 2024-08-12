@@ -4,6 +4,7 @@ import { Hono } from 'hono';
 import { handle } from 'hono/vercel'
 
 import { getSpots } from "./endpoints/getSpots";
+import { getFollowups } from './endpoints/getFollowups';
 import { createSpot } from "./endpoints/createSpot";
 
 export const runtime = 'edge'
@@ -15,6 +16,7 @@ const openapi = fromHono(app, {
 });
 
 openapi.get('/spots/:geohash', getSpots);
+openapi.get('/followups/:spotId', getFollowups);
 openapi.post('/spots', createSpot);
 
 export const GET = handle(app)

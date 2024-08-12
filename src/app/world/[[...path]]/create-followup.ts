@@ -6,7 +6,7 @@ import geohash from 'ngeohash';
 import { auth } from '@/lib/auth';
 import { SpotActionEnum } from '@/lib/schema';
 import { parseFormData, zondedDateTimeSchema } from '@/lib/utils';
-import { createFollowup as save, geoSpots } from '@/models/spots';
+import { createFollowup as save, getFollowups } from '@/models/spots';
 import type { FieldErrors } from '@/components/form/store';
 
 const formSchema = z.object({
@@ -80,11 +80,12 @@ export async function createFollowup(formData: FormData) {
       userId: session.userId,
     });
 
-    const reloadSpots = await geoSpots([data.geohash]);
+    const reloadFollowups = await getFollowups(data.spotId);
 
     return {
       success: true,
-      reloadSpots,
+      spotId: data.spotId,
+      reloadFollowups,
     };
   } catch (e) {
     console.log('create-followup failed', e);

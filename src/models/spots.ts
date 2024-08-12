@@ -313,6 +313,30 @@ export async function createFollowup(data: CreateFollowupSchema) {
   return followup;
 }
 
+export const getFollowups = async (spotId: number) => {
+  const items = await db.select({
+    id:        spotFollowups.id,
+    userId:    spotFollowups.userId,
+    desc:      spotFollowups.desc,
+    action:    spotFollowups.action,
+    spotState: spotFollowups.spotState,
+    material:  spotFollowups.material,
+    createdAt: spotFollowups.createdAt,
+  }).from(spotFollowups)
+    .innerJoin(spots, eq(spots.id, spotFollowups.spotId))
+    .where(
+      and(
+        inArray(spots.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped]),
+        inArray(spotFollowups.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped]),
+        eq(spotFollowups.spotId, spotId),
+      )
+    ).orderBy(
+      desc(spotFollowups.createdAt),
+    );
+
+  return items;
+};
+
 export function spotsMissingDistrict(ids = []) {
   const idWhere = R.isNotEmpty(ids) ? inArray(spots.id, ids) : sql`1 = 1`;
 

@@ -21,6 +21,7 @@ import {
   areaPickerAtom,
   statusAtom,
   mergeTempMarkerAtom,
+  loadingFollowupsAtom,
 } from '@/app/world/[[...path]]/store';
 import { parsePath, updatePath, AREA_ZOOM_MAX, GEOHASH_PRECISION } from '@/app/world/[[...path]]/util';
 import { useHydrateAtoms } from 'jotai/utils';
@@ -44,7 +45,7 @@ import 'leaflet/dist/leaflet.css';
 const D1_PARAM_LIMIT = 100;
 
 const loadingHashesAtom = atom<string[]>([]);
-const loadingAtom = atom((get) => R.isNotEmpty(get(loadingHashesAtom)));
+const loadingAtom = atom((get) => R.isNotEmpty(get(loadingHashesAtom)) || get(loadingFollowupsAtom));
 
 type ItemsGeoSpotsByGeohash = { items: GeoSpotsByGeohash }
 const fetchSpotsAtom = atom(

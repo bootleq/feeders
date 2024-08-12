@@ -4,7 +4,7 @@ import * as R from 'ramda';
 import Leaflet, { MarkerCluster } from 'leaflet';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useThrottledCallback } from 'use-debounce';
-import { useAtom } from 'jotai';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { MapContainer, TileLayer, useMapEvents, Marker, Popup } from "react-leaflet";
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
@@ -17,7 +17,8 @@ import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import FoodLife from './FoodLife';
 import ActionLabel from './ActionLabel';
 import FollowupForm from './FollowupForm';
-import { editingFormAtom } from './store';
+import { editingFormAtom, spotFollowupsAtom, mergeSpotFollowupsAtom, loadingFollowupsAtom } from './store';
+import { addAlertAtom } from '@/components/store';
 import { present } from '@/lib/utils';
 import { format, formatDistance } from '@/lib/date-fp';
 import type { GeoSpotsResult, GeoSpotsResultFollowup } from '@/models/spots';
@@ -50,11 +51,37 @@ const MarkerIcon = new Leaflet.DivIcon({
   popupAnchor: [-6, -18],
 })
 
+type ItemsFollowups = { items: GeoSpotsResultFollowup[] }
+const fetchFollowupsAtom = atom(
+  null,
+  async (get, set, spotId: number) => {
+    try {
+      set(loadingFollowupsAtom, true);
+      const response = await fetch(`/api/followups/${spotId}`);
+      const json: ItemsFollowups = await response.json();
+      if (response.ok) {
+        set(mergeSpotFollowupsAtom, [spotId, json.items]);
+      } else {
+        const errorNode = <><code className='font-mono mr-1'>{response.status}</code>載入跟進資料失敗</>;
+        set(addAlertAtom, 'error', errorNode);
+      }
+      set(loadingFollowupsAtom, false);
+    } catch (e) {
+      const errorNode = <span>{String(e)}</span>;
+      set(addAlertAtom, 'error', errorNode);
+      set(loadingFollowupsAtom, false);
+    }
+  }
+);
+
 export default function SpotMarkers({ spots }: {
   spots: GeoSpotsResult[]
 }) {
   const [editingForm, setEditingForm] = useAtom(editingFormAtom);
   const [now, setNow] = useState(() => new Date());
+  const fetchFollowups = useSetAtom(fetchFollowupsAtom);
+  const postloadFollowups = useAtomValue(spotFollowupsAtom);
+  const loading = useAtomValue(loadingFollowupsAtom);
 
   useEffect(() => {
     setNow(new Date());
@@ -63,6 +90,10 @@ export default function SpotMarkers({ spots }: {
   const throttledSetNow = useThrottledCallback(() => {
     setNow(new Date());
   }, 3000, { trailing: false });
+
+  const loadFollowups = useCallback((spotId: number) => {
+    fetchFollowups(spotId);
+  }, [fetchFollowups]);
 
   const eventHandlers = useMemo(
     () => ({
@@ -89,7 +120,8 @@ export default function SpotMarkers({ spots }: {
   return (
     <MarkerClusterGroup chunkedLoading removeOutsideVisibleBounds={false} iconCreateFunction={clusterIconFn}>
       {
-        spots.map(({ spot: s, followups }) => {
+        spots.map(({ spot: s, followups: foFromProps }) => {
+          const followups = postloadFollowups[s.id] || foFromProps;
           const latestFollowup = R.reduce<GeoSpotsResultFollowup, GeoSpotsResultFollowup>(R.maxBy(R.prop('createdAt')), followups[0], followups);
           const foodable = {
             spotState: latestFollowup.spotState,
@@ -97,8 +129,6 @@ export default function SpotMarkers({ spots }: {
             spawnedAt: s.latestSpawnAt,
             removedAt: s.latestRemovedAt,
           };
-
-          const latestFollowAge = formatDistance(now, latestFollowup.createdAt).replace('大約', '').trim();
 
           return (
             <Marker key={s.id} position={[s.lat, s.lon]} icon={MarkerIcon} autoPan={false} eventHandlers={eventHandlers}>
@@ -144,7 +174,7 @@ export default function SpotMarkers({ spots }: {
                 </div>
 
                 {present(s.desc) &&
-                  <div className='h-max-60 px-1 py-1 mx-0.5 my-1 resize-y bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded'>
+                  <div className='h-max-60 px-1 py-1 mx-0.5 my-1 resize-y bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded break-anywhere'>
                     {s.desc}
                   </div>
                 }
@@ -158,24 +188,26 @@ export default function SpotMarkers({ spots }: {
                   最新動態
                 </span>
 
-                {followups.map(fo => (
-                  <div key={fo.id} className='flex flex-col justify-start items-start mb-2'>
-                    <div className='px-1 mb-1 flex flex-wrap justify-start text-sm items-center'>
-                      <span data-user-id={s.userId} className='mr-3 flex items-center'>
-                        <UserCircleIcon className='fill-current' height={24} />
-                        USER NAME
-                      </span>
-                      <span className='text-sm mr-2 whitespace-nowrap font-mono'>
-                        {latestFollowAge}
-                      </span>
-                      <ActionLabel action={fo.action} className='ml-auto flex items-center' />
-                    </div>
+                <div className='max-h-[65vh] overflow-auto scrollbar-thin'>
+                  {followups.map(fo => (
+                    <div key={fo.id} className='flex flex-col justify-start items-start mb-2'>
+                      <div className='px-1 mb-1 flex flex-wrap justify-start text-sm items-center'>
+                        <span data-user-id={s.userId} className='mr-3 flex items-center'>
+                          <UserCircleIcon className='fill-current' height={24} />
+                          USER NAME
+                        </span>
+                        <span className='text-sm mr-2 whitespace-nowrap font-mono'>
+                          {formatDistance(now, fo.createdAt).replace('大約', '').trim()}
+                        </span>
+                        <ActionLabel action={fo.action} className='ml-auto flex items-center' />
+                      </div>
 
-                    {present(fo.desc) &&
-                      <div className='p-1 mb-1 mx-1 bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded max-h-32 overflow-auto scrollbar-thin'>{fo.desc}</div>
-                    }
-                  </div>
-                ))}
+                      {present(fo.desc) &&
+                        <div className='p-1 mb-1 mx-1 break-anywhere bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded max-h-32 overflow-auto scrollbar-thin'>{fo.desc}</div>
+                      }
+                    </div>
+                  ))}
+                </div>
 
                 {editingForm === 'followup' &&
                   <>
@@ -194,7 +226,11 @@ export default function SpotMarkers({ spots }: {
                     </button>
 
                     {s.followCount > followups.length &&
-                      <div className='ml-auto text-center'>載入其他 {s.followCount - followups.length} 則動態</div>
+                      <button className='ml-auto text-center' onClick={() => loadFollowups(s.id)} disabled={loading}>
+                        {loading ? '讀取中……' :
+                          `載入其他 ${s.followCount - followups.length} 則動態`
+                        }
+                      </button>
                     }
                   </div>
                 }

@@ -1,20 +1,41 @@
 import * as R from 'ramda';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
 import { recentFollowups } from '@/models/spots';
-import type { GeoSpotsByGeohash, WorldUserResult, RecentFollowupsItemProps } from '@/models/spots';
-import type { LatLngBounds } from '@/lib/schema';
+import type {
+  WorldUserResult,
+  RecentFollowupsItemProps,
+  GeoSpotsByGeohash,
+  GeoSpotsResultFollowup
+} from '@/models/spots';
+import { spotFollowups, type LatLngBounds } from '@/lib/schema';
 import Leaflet from 'leaflet';
 
 export const userAtom = atom<WorldUserResult | null>(null);
 export const mapAtom = atom<Leaflet.Map | null>(null);
 
-export const spotsAtom = atom({});
+export const spotsAtom = atom<GeoSpotsByGeohash>({});
 export const mergeSpotsAtom = atom(
   null,
   (get, set, update: GeoSpotsByGeohash) => {
     set(spotsAtom, { ...get(spotsAtom), ...update });
   }
 );
+
+export const spotFollowupsAtom = atom<Record<number, GeoSpotsResultFollowup[]>>({});
+export const mergeSpotFollowupsAtom = atom(
+  null,
+  (get, set, update: [spotId: number, items: GeoSpotsResultFollowup[]]) => {
+    const [spotId, items] = update;
+    if (R.isEmpty(items)) return;
+
+    const o = get(spotFollowupsAtom);
+
+    if (!o) return set(spotFollowupsAtom, { [spotId]: items });
+
+    set(spotFollowupsAtom, { ...o, [spotId]: items });
+  }
+);
+export const loadingFollowupsAtom = atom(false);
 
 export const geohashesAtom = atom((get) => {
   return new Set(R.keys(get(spotsAtom)));

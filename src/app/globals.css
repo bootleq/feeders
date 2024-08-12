@@ -41,4 +41,8 @@ body {
     stroke-dasharray: 3;
     stroke-dashoffset: 2;
   }
+
+  .break-anywhere {
+    overflow-wrap: anywhere;
+  }
 }

@@ -11,7 +11,7 @@ import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { SpotActionEnum } from '@/lib/schema';
 import { t } from '@/lib/i18n';
 import { ariaDatePickerValueFix } from '@/lib/utils';
-import { editingFormAtom, mergeSpotsAtom } from '@/app/world/[[...path]]/store';
+import { editingFormAtom, mergeSpotFollowupsAtom } from '@/app/world/[[...path]]/store';
 import ActionLabel from '@/app/world/[[...path]]/ActionLabel';
 import { createFollowup } from '@/app/world/[[...path]]/create-followup';
 import { errorsAtom, metaAtom } from '@/components/form/store';
@@ -60,7 +60,7 @@ export function UnscopedForm({ spotId, geohash }: {
   geohash: string,
 }) {
   const setEditingForm = useSetAtom(editingFormAtom);
-  const reloadSpots = useSetAtom(mergeSpotsAtom);
+  const reload = useSetAtom(mergeSpotFollowupsAtom);
   const setMeta = useSetAtom(metaAtom);
   const [errors, setErrors] = useAtom(errorsAtom);
   const [sending, setSending] = useState(false);
@@ -100,7 +100,7 @@ export function UnscopedForm({ spotId, geohash }: {
 
     if (res.success) {
       setSending(false);
-      reloadSpots(res.reloadSpots);
+      reload([res.spotId, res.reloadFollowups]);
       setEditingForm('');
       return;
     }
