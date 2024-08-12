@@ -53,14 +53,10 @@ export class getSpots extends ApiRoute {
   async handle(c: Context) {
     const data = await this.getValidatedData<typeof this.schema>()
     const items = await geoSpots(data.params.geohash);
-    const grouped = R.groupBy(i => i.geohash || '', items);
-
-    // Ensure all keys present in result
-    data.params.geohash.forEach(key => grouped[key] ||= []);
 
     return c.json({
       success: true,
-      items: grouped
+      items
     })
   }
 }

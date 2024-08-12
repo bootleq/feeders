@@ -36,6 +36,8 @@ export const runtime = 'edge';
 const districtApiURL = 'https://api.nlsc.gov.tw/other/TownVillagePointQuery1/';
 const xmlParser = new XMLParser();
 
+const PRELOAD_FOLLOWUPS_SIZE = 3;
+
 export const recentFollowups = (oldestDate: Date, fetchLimit: number) => {
   // Rank latest created followup
   const ranked = db.select({
@@ -172,19 +174,19 @@ export const geoSpotsQuery = (geohashes: string[]) => {
     },
 
     followup: {
-      followupId:     spotFollowups.id,
-      followerId:     spotFollowups.userId,
-      followupDesc:   spotFollowups.desc,
-      action:         spotFollowups.action,
-      spotState:      spotFollowups.spotState,
-      material:       spotFollowups.material,
-      latestFollowAt: spotFollowups.createdAt,
+      id:        spotFollowups.id,
+      userId:    spotFollowups.userId,
+      desc:      spotFollowups.desc,
+      action:    spotFollowups.action,
+      spotState: spotFollowups.spotState,
+      material:  spotFollowups.material,
+      createdAt: spotFollowups.createdAt,
     },
   }).from(ranked)
     .innerJoin(
       spots, and(
         eq(spots.id, ranked.id),
-        lte(ranked.rank, 4),
+        lte(ranked.rank, PRELOAD_FOLLOWUPS_SIZE),
       )
     )
     .innerJoin(
@@ -206,18 +208,19 @@ export const geoSpotsQuery = (geohashes: string[]) => {
 };
 
 type GeoSpotsQuery = ReturnType<typeof geoSpotsQuery>;
-export type GeoSpotsResult = Awaited<ReturnType<GeoSpotsQuery['execute']>>;
+export type GeoSpotsQueryResult = Awaited<ReturnType<GeoSpotsQuery['execute']>>;
 
-type GeoSpotsResultSpot = GeoSpotsResult[number]['spot'];
-type GeoSpotsResultFollowup = GeoSpotsResult[number]['followup'];
+export type GeoSpotsResultSpot = GeoSpotsQueryResult[number]['spot'];
+export type GeoSpotsResultFollowup = GeoSpotsQueryResult[number]['followup'];
+export type GeoSpotsResult = {
+  spot: GeoSpotsResultSpot,
+  followups: GeoSpotsResultFollowup[],
+};
 export type GeoSpotsByGeohash = {
-  [geohash: string]: {
-    spot: GeoSpotsResultSpot,
-    followups: GeoSpotsResultFollowup[],
-  }[]
+  [geohash: string]: GeoSpotsResult[]
 };
 
-export const geoSpotsGrouped = async (geohashes: string[]) => {
+export const geoSpots = async (geohashes: string[]) => {
   const items = await geoSpotsQuery(geohashes);
 
   const bySpot = items.reduce<Record<number, { spot: GeoSpotsResultSpot, followups: GeoSpotsResultFollowup[] }>>(
@@ -250,73 +253,6 @@ export const geoSpotsGrouped = async (geohashes: string[]) => {
 
   return R.reject(R.isNil, byGeohash);
 };
-
-export const geoSpots = (geohashes: string[]) => {
-  // Rank latest created followup
-  const ranked = db.select({
-    id:              spotFollowups.id,
-    followCount:     sql<number>`COUNT(${spots.id}) OVER (PARTITION BY ${spots.id})`.as('followCount'),
-    followerCount:   sql<number>`COUNT(${spotFollowups.spawnedAt}) OVER (PARTITION BY ${spots.id})`.as('followerCount'),
-    respawnCount:    sql<number>`COUNT(${spotFollowups.spawnedAt}) OVER (PARTITION BY ${spots.id})`.as('respawnCount'),
-    latestSpawnAt:   sql<number>`MAX(${spotFollowups.spawnedAt}) OVER (PARTITION BY ${spots.id})`.mapWith(sqlDateMapper).as('latestSpawnAt'),
-    latestRemovedAt: sql<number>`MAX(${spotFollowups.removedAt}) OVER (PARTITION BY ${spots.id})`.mapWith(sqlDateMapper).as('latestRemovedAt'),
-    maxFeedee:       sql<number>`MAX(${spotFollowups.feedeeCount}) OVER (PARTITION BY ${spots.id})`.as('maxFeedee'),
-    rank:            sql<number>`RANK() OVER (PARTITION BY ${spots.id} ORDER BY ${spotFollowups.createdAt} DESC, ${spotFollowups.spawnedAt} DESC)`.as('rank'),
-  }).from(spots)
-    .innerJoin(spotFollowups, eq(spots.id, spotFollowups.spotId))
-    .as('ranked')
-
-  const query = db.select({
-    id:        spots.id,
-    title:     spots.title,
-    lat:       spots.lat,
-    lon:       spots.lon,
-    city:      spots.city,
-    town:      spots.town,
-    geohash:   spots.geohash,
-    desc:      spots.desc,
-    state:     spots.state,
-    createdAt: spots.createdAt,
-    userId:    spots.userId,
-    followerId:     spotFollowups.userId,
-    followupDesc:   spotFollowups.desc,
-    action:         spotFollowups.action,
-    spotState:      spotFollowups.spotState,
-    material:       spotFollowups.material,
-    latestFollowAt: spotFollowups.createdAt,
-    followCount:     ranked.followCount,
-    followerCount:   ranked.followerCount,
-    respawnCount:    ranked.respawnCount,
-    latestSpawnAt:   ranked.latestSpawnAt,
-    latestRemovedAt: ranked.latestRemovedAt,
-    maxFeedee:       ranked.maxFeedee,
-  }).from(spotFollowups)
-    .innerJoin(
-      ranked, and(
-        eq(spotFollowups.id, ranked.id),
-        eq(ranked.rank, 1),
-      )
-    )
-    .innerJoin(
-      spots, eq(spots.id, spotFollowups.spotId)
-    )
-    .where(
-      and(
-        inArray(spots.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped]),
-        inArray(spotFollowups.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped]),
-        inArray(spots.geohash, geohashes),
-      )
-    )
-    .orderBy(
-      asc(spots.geohash),
-    );
-
-  return query;
-};
-
-type GeoSpotsQuery = ReturnType<typeof geoSpots>;
-export type GeoSpotsResult = Awaited<ReturnType<GeoSpotsQuery['execute']>>;
-export type GeoSpotsByGeohash = {[key: string]: GeoSpotsResult};
 
 export async function createSpot(data: CreateSpotSchema) {
   let result: {

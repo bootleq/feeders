@@ -95,7 +95,7 @@ export async function createSpot(formData: FormData) {
       userId: session.userId,
     });
 
-    const reloadSpots = { [ghash]: await geoSpots([ghash]) };
+    const reloadSpots = await geoSpots([ghash]);
 
     return {
       success: true,

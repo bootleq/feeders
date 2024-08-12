@@ -10,6 +10,7 @@ export const geohash4tw = geohash4.refine(
   (val) => ({ message: `${val} 不在台灣地理範圍內` })
 );
 
+// FIXME: no longer accurate
 export const GetSpotsResult = z.object({
   id: z.number(),
   title: z.string(),
