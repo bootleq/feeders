@@ -1,6 +1,7 @@
 "use client"
 
 import { format, formatISO, formatDistanceToNow, formatDistance } from '@/lib/date-fp';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import StateLabel from './StateLabel';
 import { ArrowLongRightIcon } from '@heroicons/react/24/solid';
 
@@ -12,6 +13,11 @@ interface Foodable {
   [key: string]: any;
 }
 
+const tooltipCls = [
+  'text-xs p-1 px-2 rounded box-border w-max max-w-[100vw-10px] z-[1002]',
+  'bg-gradient-to-br from-stone-50 to-slate-100 ring-2 ring-offset-1 ring-slate-300',
+].join(' ')
+
 export default function FoodLife({ spot, now }: {
   spot: Foodable,
   now: Date | null
@@ -20,7 +26,7 @@ export default function FoodLife({ spot, now }: {
     return;
   }
   const { spawnedAt, removedAt, spotState } = spot;
-  const formatTime = format({}, 'H:m');
+  const formatTime = format({}, 'HH:mm');
   const spawned = spawnedAt ? formatTime(spawnedAt) : '??';
   const removed = removedAt ? formatTime(removedAt) : '??';
   let duration = '';
@@ -36,17 +42,22 @@ export default function FoodLife({ spot, now }: {
         {spot.material}
       </span>
 
-      {duration &&
-        <span className='text-sm whitespace-nowrap font-mono'>
-          （{duration.replace('大約', '').trim()}）
-        </span>
-      }
+      <Tooltip>
+        <TooltipTrigger className='flex items-center'>
+          {duration &&
+            <span className='text-sm whitespace-nowrap font-mono'>
+              （{duration.replace('大約', '').trim()}）
+            </span>
+          }
 
-      <div className='text-xs font-mono opacity-60 flex items-center'>
-        {spawned}
-        <ArrowLongRightIcon className='inline fill-gray-600 mx-[-9px]' width={48} height={24} />
-        {removed}
-      </div>
+          <div className='text-xs font-mono opacity-60 flex items-center'>
+            {spawned}
+            <ArrowLongRightIcon className='inline fill-gray-600 mx-[-9px]' width={48} height={24} />
+            {removed}
+          </div>
+        </TooltipTrigger>
+        <TooltipContent className={`${tooltipCls}`}>食物存活時間（放置 → 清除）</TooltipContent>
+      </Tooltip>
     </div>
   );
 }
