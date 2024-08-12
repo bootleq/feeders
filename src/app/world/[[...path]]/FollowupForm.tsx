@@ -10,6 +10,7 @@ import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 import { SpotActionEnum } from '@/lib/schema';
 import { t } from '@/lib/i18n';
+import { ariaDatePickerValueFix } from '@/lib/utils';
 import { editingFormAtom, mergeSpotsAtom } from '@/app/world/[[...path]]/store';
 import ActionLabel from '@/app/world/[[...path]]/ActionLabel';
 import { createFollowup } from '@/app/world/[[...path]]/create-followup';
@@ -18,23 +19,9 @@ import type { FieldErrors } from '@/components/form/store';
 import { TextInput, Textarea, Select } from '@/components/form/Inputs';
 import { DateTimeField } from '@/components/form/DateTimeField';
 import { parseAbsoluteToLocal } from '@internationalized/date';
+import { spotActionTooltip, spawnedAtTooltip } from './Form';
 
 const fieldName = R.partial(t, ['spotFields']);
-
-const spotActionTooltip = (
-  <ul className="p-2 px-2 ring-1 rounded box-border w-full bg-slate-100 shadow-lg">
-    {SpotActionEnum.options.map(o => {
-      return (<li key={o} className='flex items-start py-1 hover:bg-slate-200/75'>
-        <div className='whitespace-nowrap min-w-[3.85rem] text-center'>
-          <ActionLabel action={o} className='mr-1 min-w-5 block' />
-        </div>
-        <p className='text-sm break-all'>
-          {t('spotActionDesc', o)}
-        </p>
-      </li>);
-    })}
-  </ul>
-);
 
 function SimpleTooltip({ text }: {
   text: string
@@ -106,6 +93,8 @@ export function UnscopedForm({ spotId, geohash }: {
 
     const formData = new FormData(e.currentTarget);
 
+    ariaDatePickerValueFix(formData, ['removedAt', 'spawnedAt']);
+
     setSending(true);
     const res = await createFollowup(formData);
 
@@ -147,7 +136,8 @@ export function UnscopedForm({ spotId, geohash }: {
         <Textarea name='desc' />
         <TextInput name='material' inputProps={{ placeholder: '例：狗罐頭' }} />
         <TextInput name='feedeeCount' type='number' tooltip={<SimpleTooltip text='同時出現的狗群隻數' />} inputProps={{ min: 0, max: 99, defaultValue: 0 }} />
-        <DateTimeField name='spawnedAt' defaultValue={nowValue} maxValue={nowValue} tooltip={<SimpleTooltip text='推測放下食物的時間' />} />
+
+        <DateTimeField name='spawnedAt' maxValue={nowValue} tooltip={spawnedAtTooltip} />
 
         <input type='hidden' name='spotId' value={spotId} />
         <input type='hidden' name='geohash' value={geohash} />

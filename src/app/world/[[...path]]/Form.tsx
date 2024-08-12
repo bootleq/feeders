@@ -10,6 +10,7 @@ import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 import { SpotActionEnum } from '@/lib/schema';
 import { t } from '@/lib/i18n';
+import { ariaDatePickerValueFix } from '@/lib/utils';
 import { mergeTempMarkerAtom, editingFormAtom, mergeSpotsAtom } from '@/app/world/[[...path]]/store';
 import ActionLabel from '@/app/world/[[...path]]/ActionLabel';
 import { createSpot } from '@/app/world/[[...path]]/create-spot';
@@ -17,11 +18,11 @@ import { errorsAtom, metaAtom } from '@/components/form/store';
 import type { FieldErrors } from '@/components/form/store';
 import { TextInput, Textarea, Select } from '@/components/form/Inputs';
 import { DateTimeField } from '@/components/form/DateTimeField';
-import { parseAbsoluteToLocal } from '@internationalized/date';
+import { parseAbsoluteToLocal, parseZonedDateTime } from '@internationalized/date';
 
 const fieldName = R.partial(t, ['spotFields']);
 
-const spotActionTooltip = (
+export const spotActionTooltip = (
   <ul className="p-2 px-2 ring-1 rounded box-border w-full bg-slate-100 shadow-lg">
     {SpotActionEnum.options.map(o => {
       return (<li key={o} className='flex items-start py-1 hover:bg-slate-200/75'>
@@ -34,6 +35,14 @@ const spotActionTooltip = (
       </li>);
     })}
   </ul>
+);
+
+export const spawnedAtTooltip = (
+  <div className="p-2 px-2 ring-1 rounded box-border w-full bg-slate-100 shadow-lg">
+    推測放下食物的時間。<br />
+    發現「新一次的餵食」才要填寫，<br />
+    其他跟進請留空
+  </div>
 );
 
 function SimpleTooltip({ text }: {
@@ -108,6 +117,8 @@ export function UnscopedForm({ lat, lon }: {
 
     const formData = new FormData(e.currentTarget);
 
+    ariaDatePickerValueFix(formData, ['removedAt', 'spawnedAt']);
+
     setSending(true);
     const res = await createSpot(formData);
 
@@ -160,7 +171,8 @@ export function UnscopedForm({ lat, lon }: {
         <Textarea name='desc' />
         <TextInput name='material' inputProps={{ placeholder: '例：狗罐頭' }} />
         <TextInput name='feedeeCount' type='number' tooltip={<SimpleTooltip text='同時出現的狗群隻數' />} inputProps={{ min: 0, max: 99, defaultValue: 0 }} />
-        <DateTimeField name='spawnedAt' defaultValue={nowValue} maxValue={nowValue} tooltip={<SimpleTooltip text='推測放下食物的時間' />} />
+
+        <DateTimeField name='spawnedAt' maxValue={nowValue} tooltip={spawnedAtTooltip} />
 
         <input type='hidden' name='lat' value={lat} />
         <input type='hidden' name='lon' value={lon} />

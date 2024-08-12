@@ -1,5 +1,6 @@
 import * as R from 'ramda';
 import { z } from 'zod';
+import { parseZonedDateTime } from '@internationalized/date';
 
 export const present = R.both(R.isNotNil, R.isNotEmpty);
 
@@ -50,4 +51,18 @@ export const zondedDateTimeSchema =
 
 export const sleep = (seconds: number) => {
   return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+};
+
+// Workaround DatePicker loses timezond when value has once deleted
+// https://github.com/adobe/react-spectrum/issues/6005
+export const ariaDatePickerValueFix = (formData: FormData, fieldNames: string[]) => {
+  fieldNames.forEach(k => {
+    const v = formData.get('spawnedAt')
+    // e.g., convert 2024-08-07T00:00:00 to ZondedDateTime string
+    if (typeof v === 'string' && v.match(/T[\d:]+$/)) {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const converted = parseZonedDateTime(`${v}[${tz}]`);
+      formData.set(k, converted.toString());
+    }
+  });
 };

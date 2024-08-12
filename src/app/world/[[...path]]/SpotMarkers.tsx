@@ -2,7 +2,8 @@
 
 import * as R from 'ramda';
 import Leaflet, { MarkerCluster } from 'leaflet';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useThrottledCallback } from 'use-debounce';
 import { useAtom } from 'jotai';
 import { MapContainer, TileLayer, useMapEvents, Marker, Popup } from "react-leaflet";
 import MarkerClusterGroup from 'react-leaflet-cluster';
@@ -59,6 +60,17 @@ export default function SpotMarkers({ spots }: {
     setNow(new Date());
   }, []);
 
+  const throttledSetNow = useThrottledCallback(() => {
+    setNow(new Date());
+  }, 3000, { trailing: false });
+
+  const eventHandlers = useMemo(
+    () => ({
+      popupopen: throttledSetNow,
+    }),
+    [throttledSetNow],
+  );
+
   const startEdit = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -87,7 +99,7 @@ export default function SpotMarkers({ spots }: {
           const latestFollowAge = formatDistance(now, s.latestFollowAt).replace('大約', '').trim();
 
           return (
-            <Marker key={s.id} position={[s.lat, s.lon]} icon={MarkerIcon} autoPan={false}>
+            <Marker key={s.id} position={[s.lat, s.lon]} icon={MarkerIcon} autoPan={false} eventHandlers={eventHandlers}>
               <Popup className={mapStyles.popup} autoPan={false}>
                 <div className='p-1'>
                   <strong className='block mb-1'>{s.title}</strong>

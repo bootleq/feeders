@@ -1,7 +1,7 @@
 "use client"
 
 import * as R from 'ramda';
-import { forwardRef } from 'react';
+import { useState, forwardRef, useCallback } from 'react';
 import type { ZonedDateTime } from '@internationalized/date';
 import {
   Button,
@@ -23,6 +23,7 @@ import type { DatePickerProps, HeadingProps } from 'react-aria-components';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { errorsAtom } from '@/components/form/store';
 import { CalendarIcon } from '@heroicons/react/24/solid';
+import { XCircleIcon } from '@heroicons/react/24/outline';
 
 import { wordWord } from '@/lib/utils';
 import { t } from '@/lib/i18n';
@@ -58,6 +59,7 @@ const HeadingWithWords = forwardRef(HeadingWithWordsForForward);
 export function DateTimeField(
   { label, name, tooltip, ...props }: MyDatePickerProps
 ) {
+  const [key, setKey] = useState(0);
   const errors = useFieldError(name);
   const invalid = errors?.length > 0;
   const labelProps: LabelProps = {
@@ -67,9 +69,18 @@ export function DateTimeField(
     ...(invalid ? { 'aria-invalid': true } : {})
   };
 
+  const reset = useCallback((e: React.MouseEvent<HTMLOrSVGElement>) => {
+    setKey(R.inc);
+  }, []);
+
+  if (key > 0) {
+    props['defaultValue'] = null;
+  }
+
   const picker = (
     <DatePicker
       name={name}
+      key={key}
       granularity="minute"
       hourCycle={24}
       hideTimeZone
@@ -80,7 +91,8 @@ export function DateTimeField(
         <DateInput>
           {(segment) => <DateSegment segment={segment} />}
         </DateInput>
-        <Button><CalendarIcon className='fill-slate-700/75' height={20} /></Button>
+        <Button><CalendarIcon className='fill-slate-700/75 hover:fill-black' height={20} /></Button>
+        <XCircleIcon className='stroke-slate-700/75 cursor-pointer hover:stroke-red-700' height={20} onClick={reset} />
       </Group>
       <Popover className={`w-max px-2 py-1 rounded-lg drop-shadow-lg ring-1 ring-black/10 bg-white`}>
         <Dialog>
