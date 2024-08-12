@@ -8,7 +8,7 @@ import Link from 'next/link';
 
 import { userAtom, mapAtom, areaPickerAtom, viewItemAtom } from './store';
 import type { AreaPickerAtom } from './store';
-import type { GeoSpotsResult, GeoSpotsByGeohash, RecentFollowupsItemProps } from '@/models/spots';
+import type { GeoSpotsByGeohash, GeoSpotsResultSpot, RecentFollowupsItemProps } from '@/models/spots';
 import type { LatLngBounds } from '@/lib/schema';
 import { visitArea } from './util';
 import SpotInfoPreview from './SpotInfoPreview';
@@ -73,10 +73,11 @@ function Areas({ areas }: {
   const user = useAtomValue(userAtom);
   const userArea = (user?.areaId && user.bounds) ? { id: user.areaId, bounds: user.bounds } : null;
 
-  const picked: [string, GeoSpotsResult[number], number][] = R.toPairs(areas).map(([geohash, items]) => {
-    const spot = R.sortBy(R.prop('latestFollowAt'), items)[0];
-    return [geohash, spot, items.length];
-  });
+  const picked: [string, GeoSpotsResultSpot][] = R.toPairs(areas)
+    .map(([geohash, items]) => {
+      const spot = items[0].spot;
+      return [geohash, spot];
+    });
 
   return (
     <div className='mt-4 mb-2 p-1 overflow-visible'>
@@ -84,7 +85,7 @@ function Areas({ areas }: {
       <ul className='flex py-1 overflow-hidden scrollbar-thin'>
         <UserArea area={userArea} />
 
-        {picked.map(([geohash, { lat, lon, city, town }, _spotsCount]) => {
+        {picked.map(([geohash, { lat, lon, city, town }]) => {
           return (
             <li key={geohash} className={areaItemCls}>
               <Link

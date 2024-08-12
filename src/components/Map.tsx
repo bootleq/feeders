@@ -254,7 +254,7 @@ export default function Map({ preloadedAreas, children, className, width, height
     R.filter(([k, v]) => R.isNotEmpty(v)),
     R.map(R.last),
     R.flatten,
-  )(areaSpots) as GeoSpotsResult;
+  )(areaSpots) as GeoSpotsResult[];
 
   return (
     <>

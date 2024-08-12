@@ -80,7 +80,7 @@ export async function createFollowup(formData: FormData) {
       userId: session.userId,
     });
 
-    const reloadSpots = { [data.geohash]: await geoSpots([data.geohash]) };
+    const reloadSpots = await geoSpots([data.geohash]);
 
     return {
       success: true,

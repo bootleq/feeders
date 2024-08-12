@@ -20,7 +20,7 @@ import FollowupForm from './FollowupForm';
 import { editingFormAtom } from './store';
 import { present } from '@/lib/utils';
 import { format, formatDistance } from '@/lib/date-fp';
-import type { GeoSpotsResult } from '@/models/spots';
+import type { GeoSpotsResult, GeoSpotsResultFollowup } from '@/models/spots';
 import mapStyles from '@/components/map.module.scss';
 
 const googleMapURL = (lat: number, lon: number) => {
@@ -51,7 +51,7 @@ const MarkerIcon = new Leaflet.DivIcon({
 })
 
 export default function SpotMarkers({ spots }: {
-  spots: GeoSpotsResult
+  spots: GeoSpotsResult[]
 }) {
   const [editingForm, setEditingForm] = useAtom(editingFormAtom);
   const [now, setNow] = useState(() => new Date());
@@ -89,14 +89,16 @@ export default function SpotMarkers({ spots }: {
   return (
     <MarkerClusterGroup chunkedLoading removeOutsideVisibleBounds={false} iconCreateFunction={clusterIconFn}>
       {
-        spots.map(s => {
+        spots.map(({ spot: s, followups }) => {
+          const latestFollowup = R.reduce<GeoSpotsResultFollowup, GeoSpotsResultFollowup>(R.maxBy(R.prop('createdAt')), followups[0], followups);
           const foodable = {
-            ...s,
+            spotState: latestFollowup.spotState,
+            material: latestFollowup.material,
             spawnedAt: s.latestSpawnAt,
             removedAt: s.latestRemovedAt,
           };
 
-          const latestFollowAge = formatDistance(now, s.latestFollowAt).replace('大約', '').trim();
+          const latestFollowAge = formatDistance(now, latestFollowup.createdAt).replace('大約', '').trim();
 
           return (
             <Marker key={s.id} position={[s.lat, s.lon]} icon={MarkerIcon} autoPan={false} eventHandlers={eventHandlers}>
@@ -156,22 +158,24 @@ export default function SpotMarkers({ spots }: {
                   最新動態
                 </span>
 
-                <div className='flex flex-wrap justify-start items-center'>
-                  <div className='px-1 mb-0.5 flex flex-wrap justify-start text-sm items-center'>
-                    <span data-user-id={s.followerId} className='mr-3 flex items-center'>
-                      <UserCircleIcon className='fill-current' height={24} />
-                      USER NAME
-                    </span>
-                    <span className='text-sm mr-2 whitespace-nowrap font-mono'>
-                      {latestFollowAge}
-                    </span>
-                    <ActionLabel action={s.action} className='ml-auto flex items-center' />
-                  </div>
+                {followups.map(fo => (
+                  <div key={fo.id} className='flex flex-col justify-start items-start mb-2'>
+                    <div className='px-1 mb-1 flex flex-wrap justify-start text-sm items-center'>
+                      <span data-user-id={s.userId} className='mr-3 flex items-center'>
+                        <UserCircleIcon className='fill-current' height={24} />
+                        USER NAME
+                      </span>
+                      <span className='text-sm mr-2 whitespace-nowrap font-mono'>
+                        {latestFollowAge}
+                      </span>
+                      <ActionLabel action={fo.action} className='ml-auto flex items-center' />
+                    </div>
 
-                  {present(s.followupDesc) &&
-                    <div className='p-1 mb-1 mx-1 bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded'>{s.followupDesc}</div>
-                  }
-                </div>
+                    {present(fo.desc) &&
+                      <div className='p-1 mb-1 mx-1 bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded max-h-32 overflow-auto scrollbar-thin'>{fo.desc}</div>
+                    }
+                  </div>
+                ))}
 
                 {editingForm === 'followup' &&
                   <>
@@ -189,8 +193,8 @@ export default function SpotMarkers({ spots }: {
                       ➕ 跟進
                     </button>
 
-                    {s.followCount > 1 &&
-                      <div className='ml-auto text-center'>載入其他 {s.followCount - 1} 則動態</div>
+                    {s.followCount > followups.length &&
+                      <div className='ml-auto text-center'>載入其他 {s.followCount - followups.length} 則動態</div>
                     }
                   </div>
                 }
