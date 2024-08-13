@@ -3,25 +3,34 @@
 import * as R from 'ramda';
 import { useHydrateAtoms } from 'jotai/utils';
 import Nav from '@/components/Nav';
-import { userAtom } from '@/components/store';
+import { userAtom, navTitleAtom } from '@/components/store';
 import type { WorldUserResult } from '@/models/users';
 
 import { Bars3Icon } from '@heroicons/react/24/solid';
 import { XMarkIcon } from '@heroicons/react/24/solid';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSetAtom } from 'jotai';
 
 type SidebarProps = {
   user: WorldUserResult | null,
+  navTitle?: string,
   children?: React.ReactNode;
   className?: string;
 };
 
-export default function Sidebar({ user, children, className, ...rest }: SidebarProps) {
+export default function Sidebar({ user, navTitle, children, className, ...rest }: SidebarProps) {
   useHydrateAtoms([
     [userAtom, user],
   ]);
+  const setNavTitle = useSetAtom(navTitleAtom);
 
   const [open, setOpen] = useState(true);
+
+  useEffect(() => {
+    if (navTitle) {
+      setNavTitle(navTitle);
+    }
+  }, [navTitle, setNavTitle]);
 
   const toggle = () => setOpen(R.not);
 
