@@ -2,6 +2,7 @@ import * as R from 'ramda';
 import { eq, and, sql } from 'drizzle-orm';
 
 import {
+  users,
   areas,
 } from '@/lib/schema';
 import type { LatLngBounds } from '@/lib/schema';
@@ -9,6 +10,25 @@ import type { LatLngBounds } from '@/lib/schema';
 import { db } from '@/lib/db';
 
 export const runtime = 'edge';
+
+export const getWorldUsers = (userId: string) => {
+  const query = db.select({
+    id:       users.id,
+    name:     users.name,
+    state:    users.state,
+    lockedAt: users.lockedAt,
+    areaId:   areas.id,
+    bounds:   areas.bounds,
+  }).from(users)
+    .leftJoin(
+      areas, eq(users.id, areas.userId)
+    ).limit(1);
+
+  return query;
+};
+
+type WorldUserQuery = ReturnType<typeof getWorldUsers>;
+export type WorldUserResult = Awaited<ReturnType<WorldUserQuery['execute']>>[number];
 
 export const saveArea = async (userId: string, areaId: number | null, bounds: LatLngBounds) => {
   if (areaId) {

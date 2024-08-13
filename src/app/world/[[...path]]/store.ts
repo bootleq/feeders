@@ -2,7 +2,6 @@ import * as R from 'ramda';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
 import { recentFollowups } from '@/models/spots';
 import type {
-  WorldUserResult,
   RecentFollowupsItemProps,
   GeoSpotsByGeohash,
   GeoSpotsResultFollowup
@@ -10,7 +9,6 @@ import type {
 import { spotFollowups, type LatLngBounds } from '@/lib/schema';
 import Leaflet from 'leaflet';
 
-export const userAtom = atom<WorldUserResult | null>(null);
 export const mapAtom = atom<Leaflet.Map | null>(null);
 
 export const spotsAtom = atom<GeoSpotsByGeohash>({});

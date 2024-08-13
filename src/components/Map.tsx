@@ -7,7 +7,7 @@ import { useEffect, useRef, useState, ReactElement, useCallback } from 'react';
 import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
 import { useDebouncedCallback } from 'use-debounce';
 import mapStyles from './map.module.scss';
-import { alertsAtom, addAlertAtom, dismissAlertAtom } from './store';
+import { navTitleAtom, alertsAtom, addAlertAtom, dismissAlertAtom } from './store';
 import type { keyedAlert } from './store';
 
 import type { GeoSpotsResult, GeoSpotsByGeohash } from '@/models/spots';
@@ -89,6 +89,7 @@ function MapUser(props: {
   const prevStatus = useRef<string | null>(null);
   const addAlert = useSetAtom(addAlertAtom);
   const pathname = usePathname();
+  const setNavTitle = useSetAtom(navTitleAtom);
 
   const { lat, lon, mode } = parsePath(pathname);
 
@@ -143,6 +144,10 @@ function MapUser(props: {
   useEffect(() => {
     setMap(map);
   }, [map, setMap]);
+
+  useEffect(() => {
+    setNavTitle(mode === 'area' ? '區域地圖' : '世界地圖');
+  }, [mode, setNavTitle]);
 
   useEffect(() => {
     if (lat && lon) {
