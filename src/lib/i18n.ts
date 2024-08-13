@@ -1,6 +1,12 @@
 import * as R from 'ramda';
 
 const translations = {
+  userStates: {
+    'new':      '新建立',
+    'active':   '啟用',
+    'inactive': '停用',
+  },
+
   spotFields: { // NOTE: also used in FollowupForm
     'spotTitle':   '地點名稱',
     'spotDesc':    '地點說明',
@@ -41,6 +47,9 @@ const translations = {
   },
 };
 
-export function t(scope: string, term: string) {
+export function t(scope: string, term: string | null) {
+  if (!term) {
+    return '';
+  }
   return R.pathOr(term, [scope, term], translations);
 }

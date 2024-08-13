@@ -43,7 +43,7 @@ export default function Sidebar({ user, navTitle, fixed = true, children, classN
     if (bar) {
       const handler = (e: TransitionEvent) => {
         if (e.target !== bar) return;
-        open ? bar.classList.add('md:relative') : bar.classList.remove('md:relative');
+        open ? bar.classList.add('sm:relative') : bar.classList.remove('sm:relative');
       };
       bar.removeEventListener('transitionend', handler);
       bar.addEventListener('transitionend', handler);
@@ -52,7 +52,7 @@ export default function Sidebar({ user, navTitle, fixed = true, children, classN
   }, [fixed, open]);
 
   const toggle = () => setOpen(R.not);
-  const fixedCls = fixed ? 'fixed ' : 'fixed md:relative sm:h-screen';
+  const fixedCls = fixed ? 'fixed ' : 'fixed sm:relative sm:h-screen';
 
   return (
     <>

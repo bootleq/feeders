@@ -1,10 +1,12 @@
 import * as R from 'ramda';
-import { eq, and, sql } from 'drizzle-orm';
+import { eq, and, sql, count, SQL } from 'drizzle-orm';
 
 import {
   users,
   areas,
+  spotFollowups,
 } from '@/lib/schema';
+import { SpotActionEnum } from '@/lib/schema';
 import type { LatLngBounds } from '@/lib/schema';
 
 import { db } from '@/lib/db';
@@ -31,12 +33,23 @@ type WorldUserQuery = ReturnType<typeof getWorldUsers>;
 export type WorldUserResult = Awaited<ReturnType<WorldUserQuery['execute']>>[number];
 
 export const getProfile = async (userId: string) => {
+  const actionCounts = db.select({
+    action: spotFollowups.action,
+    count: count().as('count'),
+  }).from(spotFollowups)
+    .groupBy(spotFollowups.action)
+    .where(eq(spotFollowups.userId, userId))
+    .as('action_counts')
+
   const u = await db.select({
+    id:        users.id,
     name:      users.name,
     state:     users.state,
     createdAt: users.createdAt,
     lockedAt:  users.lockedAt,
+    actionCounts: sql<string>`json_group_array(json_object('action', ${actionCounts.action}, 'count', ${actionCounts.count}))`.as('action_counts'),
   }).from(users)
+  .leftJoin(actionCounts, sql`1=1`)
   .where(eq(users.id, userId));
 
   return u ? u[0] : null;
