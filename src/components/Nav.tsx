@@ -1,10 +1,9 @@
 "use client"
 
 import { useSession, signIn, signOut } from 'next-auth/react';
-import { userAtom } from './store';
+import { userAtom } from '@/app/world/[[...path]]/store';
 import type { WorldUserResult } from '@/models/spots';
 import { useHydrateAtoms } from 'jotai/utils';
-// import { HandThumbDownIcon } from '@heroicons/react/24/solid';
 import { UserIcon } from '@heroicons/react/24/outline';
 import { usePathname } from 'next/navigation';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';

@@ -8,7 +8,7 @@ import { subDays } from '@/lib/date-fp';
 import { parsePath, GEOHASH_PRECISION } from './util';
 import Sidebar from '@/components/Sidebar';
 import RecentFollowups from './RecentFollowups';
-import Nav from './Nav';
+import Nav from '@/components/Nav';
 
 export const runtime = 'edge';
 
