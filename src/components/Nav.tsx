@@ -1,12 +1,14 @@
 "use client"
 
 import { useSession, signIn, signOut } from 'next-auth/react';
-import type { WorldUserResult } from '@/models/spots';
+import Link from 'next/link';
+import type { WorldUserResult } from '@/models/users';
 import { UserIcon } from '@heroicons/react/24/outline';
+import { IdentificationIcon } from '@heroicons/react/24/solid';
 import { usePathname } from 'next/navigation';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 
-const menuItemCls = `p-2 w-full`;
+const menuItemCls = `p-2 w-full flex items-center`;
 
 export default function Nav({ user }: {
   user: WorldUserResult | null,
@@ -22,7 +24,7 @@ export default function Nav({ user }: {
   ].join(' ');
 
   return (
-    <div className='absolute bottom-0 z-[1001] mt-auto w-full flex flex-wrap items-center backdrop-blur-sm'>
+    <div className='absolute bottom-0 z-[1001] mt-auto py-1 w-full flex flex-wrap items-center backdrop-blur-sm'>
       <Tooltip>
         <TooltipTrigger>
           <UserIcon className={userIconCls} height={24} />
@@ -31,9 +33,26 @@ export default function Nav({ user }: {
           <div className={`flex flex-col divide-y w-full items-center justify-between lg:flex rounded bg-gradient-to-br from-stone-50 to-slate-100 ring-2 ring-offset-1 ring-slate-300`}>
             { status === 'authenticated' ?
               <>
-                <div className={`text-xs ${menuItemCls}`}>{session.userId} </div>
+                <div className={`text-xs ${menuItemCls}`}>
+                  {user ?
+                    <>
+                      {user.name || session.userId}
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Link href={`/user/${user.id}`} className='break-keep w-min cursor-pointer'>
+                            <IdentificationIcon className='fill-slate-600 ml-1' height={24} />
+                          </Link>
+                        </TooltipTrigger>
+                        <TooltipContent className="p-1 px-2 rounded box-border w-max bg-slate-100 ring-1 ring-slate-300 z-[1002]">前往個人資料頁</TooltipContent>
+                      </Tooltip>
+                    </>
+                    :
+                    <div>異常：沒有使用者資料</div>
+                  }
+                </div>
                 <button className={menuItemCls} onClick={async () => await signOut()}>登出</button>
-              </> :
+              </>
+              :
               <button className={menuItemCls} onClick={() => signIn('google')}>以 Google 帳號登入</button>
             }
           </div>

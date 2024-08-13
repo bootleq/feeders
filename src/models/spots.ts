@@ -98,25 +98,6 @@ type RecentFollowupsQuery = ReturnType<typeof recentFollowups>;
 export type RecentFollowupsItemProps = Awaited<RecentFollowupsQuery>[number];
 export type RecentFollowupsResult = Awaited<ReturnType<RecentFollowupsQuery['execute']>>;
 
-export const getWorldUsers = (userId: string) => {
-  const query = db.select({
-    id:       users.id,
-    name:     users.name,
-    state:    users.state,
-    lockedAt: users.lockedAt,
-    areaId:   areas.id,
-    bounds:   areas.bounds,
-  }).from(users)
-    .leftJoin(
-      areas, eq(users.id, areas.userId)
-    ).limit(1);
-
-  return query;
-};
-
-type WorldUserQuery = ReturnType<typeof getWorldUsers>;
-export type WorldUserResult = Awaited<ReturnType<WorldUserQuery['execute']>>[number];
-
 export async function queryDistrict(lat: number, lon: number) {
   const url = `${districtApiURL}${lon}/${lat}`;
   const response = await fetch(url);

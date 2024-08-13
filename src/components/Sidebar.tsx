@@ -3,8 +3,8 @@
 import * as R from 'ramda';
 import { useHydrateAtoms } from 'jotai/utils';
 import Nav from '@/components/Nav';
-import { userAtom } from '@/app/world/[[...path]]/store';
-import type { WorldUserResult } from '@/models/spots';
+import { userAtom } from '@/components/store';
+import type { WorldUserResult } from '@/models/users';
 
 import { Bars3Icon } from '@heroicons/react/24/solid';
 import { XMarkIcon } from '@heroicons/react/24/solid';
@@ -27,7 +27,7 @@ export default function Sidebar({ user, children, className, ...rest }: SidebarP
 
   return (
     <>
-      <div className={`fixed bg-slate-100 w-[100vw] min-w-[5%] max-w-full sm:min-h-full sm:w-[35%] sm:max-w-[60%] lg:w-[20%] lg:max-w-[70%] resize-x transition duration-200 ${open ? 'md:overflow-auto' : '-translate-x-full '} ${className}`}>
+      <div className={`fixed w-[100vw] min-w-[5%] max-w-full min-h-[10vh] sm:min-h-full sm:w-[35%] sm:max-w-[60%] lg:w-[20%] lg:max-w-[70%] resize-x transition duration-200 ${open ? 'md:overflow-hidden' : '-translate-x-full '} ${className}`}>
         {children}
 
         <Nav user={user} />

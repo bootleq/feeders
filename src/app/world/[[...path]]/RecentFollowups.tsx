@@ -6,7 +6,8 @@ import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
 import { subDays, format, formatISO, formatDistance } from '@/lib/date-fp';
 import Link from 'next/link';
 
-import { userAtom, mapAtom, areaPickerAtom, viewItemAtom } from './store';
+import { userAtom } from '@/components/store';
+import { mapAtom, areaPickerAtom, viewItemAtom } from './store';
 import type { AreaPickerAtom } from './store';
 import type { GeoSpotsByGeohash, GeoSpotsResultSpot, RecentFollowupsItemProps } from '@/models/spots';
 import type { LatLngBounds } from '@/lib/schema';
