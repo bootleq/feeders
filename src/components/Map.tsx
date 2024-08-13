@@ -2,7 +2,7 @@
 
 import * as R from 'ramda';
 import geohash from 'ngeohash';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState, ReactElement, useCallback } from 'react';
 import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
 import { useDebouncedCallback } from 'use-debounce';
@@ -78,7 +78,6 @@ const fetchSpotsAtom = atom(
 );
 
 function MapUser(props: {
-  pathname: string
 }) {
   const setMap = useSetAtom(mapAtom);
   const geoSet = useAtomValue(geohashesAtom);
@@ -89,8 +88,8 @@ function MapUser(props: {
   const prevMode = useRef<string | null>('world');
   const prevStatus = useRef<string | null>(null);
   const addAlert = useSetAtom(addAlertAtom);
+  const pathname = usePathname();
 
-  const { pathname } = props;
   const { lat, lon, mode } = parsePath(pathname);
 
   const debouncedZoomEnd = useDebouncedCallback(() => {
@@ -244,9 +243,6 @@ export default function Map({ preloadedAreas, children, className, width, height
     [spotsAtom, preloadedAreas],
   ]);
 
-  const pathname = usePathname();
-  // const searchParams = useSearchParams();
-
   const areaSpots = useAtomValue(spotsAtom);
   const [areaPicker, setAreaPicker] = useAtom(areaPickerAtom);
 
@@ -260,7 +256,7 @@ export default function Map({ preloadedAreas, children, className, width, height
   return (
     <>
       <MapContainer className={`w-full h-[100vh] ${mapStyles.map} ${className || ''}`} {...rest}>
-        <MapUser pathname={pathname} />
+        <MapUser />
         <TileLayer
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
           attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
