@@ -1,9 +1,7 @@
 "use client"
 
 import { useSession, signIn, signOut } from 'next-auth/react';
-import { userAtom } from '@/app/world/[[...path]]/store';
 import type { WorldUserResult } from '@/models/spots';
-import { useHydrateAtoms } from 'jotai/utils';
 import { UserIcon } from '@heroicons/react/24/outline';
 import { usePathname } from 'next/navigation';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
@@ -13,9 +11,6 @@ const menuItemCls = `p-2 w-full`;
 export default function Nav({ user }: {
   user: WorldUserResult | null,
 }) {
-  useHydrateAtoms([
-    [userAtom, user],
-  ]);
   const pathname = usePathname();
   const mode = pathname.startsWith('/world/area') ? 'area' : 'world';
   const { data: session, status } = useSession();
