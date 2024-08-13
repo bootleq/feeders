@@ -2,10 +2,11 @@
 
 import { useSession, signIn, signOut } from 'next-auth/react';
 import Link from 'next/link';
+import { useAtomValue } from 'jotai';
 import type { WorldUserResult } from '@/models/users';
+import { navTitleAtom } from '@/components/store';
 import { UserIcon } from '@heroicons/react/24/outline';
 import { IdentificationIcon } from '@heroicons/react/24/solid';
-import { usePathname } from 'next/navigation';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 
 const menuItemCls = `p-2 w-full flex items-center`;
@@ -13,8 +14,7 @@ const menuItemCls = `p-2 w-full flex items-center`;
 export default function Nav({ user }: {
   user: WorldUserResult | null,
 }) {
-  const pathname = usePathname();
-  const mode = pathname.startsWith('/world/area') ? 'area' : 'world';
+  const title = useAtomValue(navTitleAtom);
   const { data: session, status } = useSession();
   const guestIconCls = 'stroke-white bg-slate-300';
   const userIconCls = [
@@ -59,9 +59,7 @@ export default function Nav({ user }: {
         </TooltipContent>
       </Tooltip>
 
-      <span className=''>
-        { mode === 'world' ? '世界地圖' : '區域地圖' }
-      </span>
+      <span className=''>{ title }</span>
     </div>
   );
 };

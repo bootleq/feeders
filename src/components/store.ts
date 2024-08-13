@@ -9,6 +9,7 @@ import { rejectFirst } from '@/lib/utils';
 export const AREA_PICKER_MIN_ZOOM = 14;
 
 export const userAtom = atom<WorldUserResult | null>(null);
+export const navTitleAtom = atom('');
 
 export type keyedAlert = [string, 'info' | 'error', ReactElement];
 export const alertsAtom = atom<keyedAlert[]>([]);
