@@ -1,11 +1,10 @@
 import * as R from 'ramda';
 import { auth } from '@/lib/auth';
-import { t } from '@/lib/i18n';
-import { format } from '@/lib/date-fp';
 import { SpotActionEnum } from '@/lib/schema';
 import { getWorldUsers, getProfile } from '@/models/users';
 import { notFound } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
+import BasicInfo from './BasicInfo';
 import ActionLabel from '@/app/world/[[...path]]/ActionLabel';
 import { MapIcon } from '@heroicons/react/24/solid';
 
@@ -53,27 +52,7 @@ export default async function Page({ params }: {
       <div className='container mx-auto px-1 sm:px-4'>
         <h1 className='w-full text-center sm:text-start font-bold py-2 text-lg'>使用者資料</h1>
 
-        <div className='grid grid-cols-[min-content_2fr] items-center gap-x-4 gap-y-2 my-2'>
-          <div className='whitespace-nowrap'>名稱</div>
-          <div>
-            { profile.name || '--'}
-          </div>
-
-          <div className='whitespace-nowrap'>狀態</div>
-          <div>
-            { t('userStates', profile.state) }
-          </div>
-
-          <div className='whitespace-nowrap'>建立時間</div>
-          <div className='font-mono'>
-            { format({}, 'yyyy/MM/dd', profile.createdAt) }
-          </div>
-
-          <div className='whitespace-nowrap'>ID</div>
-          <div className='font-mono text-xs text-slate-800'>
-            { profile.id }
-          </div>
-        </div>
+        <BasicInfo user={user} profile={profile} />
 
         <hr className='invisible w-11/12 h-px mx-auto my-5 bg-slate-400/75 border-0' />
 

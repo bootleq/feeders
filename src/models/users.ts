@@ -55,6 +55,9 @@ export const getProfile = async (userId: string) => {
   return u ? u[0] : null;
 };
 
+type ProfileQuery = ReturnType<typeof getProfile>;
+export type ProfileResult = Awaited<ReturnType<ProfileQuery['execute']>>[number];
+
 export const saveArea = async (userId: string, areaId: number | null, bounds: LatLngBounds) => {
   if (areaId) {
     const items = await db.update(areas).set({
