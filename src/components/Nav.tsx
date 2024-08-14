@@ -53,7 +53,10 @@ export default function Nav({ user }: {
                 <button className={menuItemCls} onClick={async () => await signOut()}>登出</button>
               </>
               :
-              <button className={menuItemCls} onClick={() => signIn('google')}>以 Google 帳號登入</button>
+              <>
+                <Link href='/user/login' className={menuItemCls}>註冊或登入</Link>
+                <button className={menuItemCls} onClick={() => signIn()}>直接以 Google 帳號登入</button>
+              </>
             }
           </div>
         </TooltipContent>

@@ -4,7 +4,6 @@ import type { AdapterUser } from "@auth/core/adapters"
 
 import GoogleProvider from "next-auth/providers/google";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import { drizzle } from 'drizzle-orm/d1';
 
 import { users, accounts, sessions, verificationTokens } from '@/lib/schema';
 import { db } from '@/lib/db';
@@ -58,6 +57,9 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
     sessionsTable: sessions,
     verificationTokensTable: verificationTokens,
   }),
+  pages: {
+    signIn: '/user/login',
+  },
   callbacks: {
     async signIn({ account, profile }) {
       // Only allow users with verified email (Google)
