@@ -4,18 +4,23 @@ import * as R from 'ramda';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
 import { format } from '@/lib/date-fp';
+import { differenceInDays } from 'date-fns';
 import { t } from '@/lib/i18n';
+import { RENAME_COOL_OFF_DAYS } from '@/models/users';
 import type { WorldUserResult, ProfileResult } from '@/models/users';
 import UserAgreement from '@/app/user/UserAgreement';
 import { TextInput, Textarea, Select, inputCls } from '@/components/form/Inputs';
 import Alerts from '@/components/Alerts';
 import { alertsAtom, addAlertAtom, dismissAlertAtom } from '@/components/store';
 import activate from './activate';
+import updateUser from './update-user';
 import Spinner from '@/assets/spinner.svg';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
+import { Popover, PopoverTrigger, PopoverContent, PopoverClose } from '@/components/Popover';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import { CheckIcon } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 const tinyBtnCls = 'btn p-px ml-auto ring-1 flex items-center hover:bg-slate-100';
 const tooltipCls = [
@@ -34,6 +39,9 @@ export default function UserInfo({ user, profile }: {
 }) {
   const [editName, setEditName] = useState(false);
   const [activating, setActivating] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [now, setNow] = useState(() => new Date());
   const activateDialogRef = useRef<HTMLDialogElement>(null);
   const addAlert = useSetAtom(addAlertAtom);
 
@@ -42,6 +50,30 @@ export default function UserInfo({ user, profile }: {
     e.stopPropagation();
     setEditName(R.not);
   }, []);
+
+  const updateName = useCallback(async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    const input = document.querySelector('input[name="userAlias"]') as HTMLInputElement;
+
+    const formData = new FormData();
+    formData.set('field', 'name');
+    formData.set('value', input.value);
+
+    setSending(true);
+    try {
+      const res = await updateUser(formData);
+      if (res.success) {
+        setEditName(false);
+        return;
+      }
+      addAlert('error', res.error ? <>{res.error}</> : <>未知的錯誤</>);
+    } catch (e) {
+      addAlert('error', <>非預期的錯誤</>);
+    } finally {
+      setSending(false);
+    }
+  }, [setSending, addAlert]);
 
   const startActivate = useCallback(() => {
     const dialog = activateDialogRef.current;
@@ -80,6 +112,10 @@ export default function UserInfo({ user, profile }: {
     setActivating(false);
   }, [addAlert]);
 
+  useEffect(() => {
+    setNow(new Date());
+  }, []);
+
   if (!profile) {
     return null;
   }
@@ -87,6 +123,7 @@ export default function UserInfo({ user, profile }: {
   const isCurrentUser = user && user.id === profile.id;
   const waitingActivate = isCurrentUser && user.state === 'new';
   const canEdit = isCurrentUser && user.state === 'active';
+  // const canRename = canEdit && differenceInDays(now, profile.???) > RENAME_COOL_OFF_DAYS;
 
   return (
     <>
@@ -95,18 +132,30 @@ export default function UserInfo({ user, profile }: {
           <div className='whitespace-nowrap py-1'>名稱</div>
           {editName ?
             <div className='flex items-center gap-x-1'>
-              <input type='text' name='username' autoFocus className={`${inputCls} ml-0 w-36 box-border`} />
+              <input type='text' name='userAlias' autoFocus defaultValue={profile.name || ''} className={`${inputCls} ml-0 w-36 box-border`} />
 
-              <button aria-label='確認' className={tinyBtnCls} onClick={toggleEditName}>
-                <CheckIcon className='stroke-green-600' height={20} />
-              </button>
+              <Popover>
+                <PopoverTrigger>
+                  <button aria-label='確認' className={tinyBtnCls}>
+                    <CheckIcon className='stroke-green-600' height={20} />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className='flex flex-col items-center p-2 py-3 w-[clamp(1%,15rem,95%)] gap-y-1 bg-slate-100 ring-1 rounded-lg text-balance'>
+                  <div className='mb-2 text-balance text-center'>
+                    為避免辨識困難，<strong className='text-red-600'>每 {RENAME_COOL_OFF_DAYS} 天只能改名一次</strong>，確定要繼續嗎？
+                  </div>
+                  <button onClick={updateName} className='btn py-px mb-1 bg-slate-100 ring-1 flex items-center hover:bg-white' disabled={sending}>
+                    {sending ? '處理中……' : '確認'}
+                  </button>
+                </PopoverContent>
+              </Popover>
 
               <button aria-label='取消' className={tinyBtnCls} onClick={toggleEditName}>
                 <XMarkIcon className='stroke-red-500' height={20} />
               </button>
             </div>
             :
-            <div className='flex items-center ml-2'>
+            <div className='flex items-center ml-2 gap-x-1'>
               { profile.name || '--'}
               {canEdit &&
                 <Tooltip>

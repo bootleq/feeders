@@ -1,0 +1,77 @@
+'use server'
+
+import { z } from 'zod';
+import { differenceInDays } from 'date-fns';
+import { format } from '@/lib/date-fp';
+import { auth } from '@/lib/auth';
+import { revalidatePath } from 'next/cache';
+import { db } from '@/lib/db';
+import { parseFormData } from '@/lib/utils';
+import { eq, and, getTableName } from 'drizzle-orm';
+import { users, changes, UserStateEnum } from '@/lib/schema';
+import { getQuickProfileQuery, RENAME_COOL_OFF_DAYS } from '@/models/users';
+
+const formSchema = z.object({
+  field: z.enum(['name', 'desc']),
+  value: z.string().nullable(),
+});
+
+export default async function updateUser(formData: FormData) {
+  const session = await auth();
+
+  if (!session) return { error: '未登入' }
+
+  const params = parseFormData(formData);
+  const now = new Date();
+  const validated = formSchema.safeParse(params);
+
+  if (!validated.success) return { error: '輸入資料錯誤' };
+
+  const { data } = validated;
+  const { user } = session;
+
+  if (user.state !== UserStateEnum.enum.active) return { error: '帳號不可用' };
+  if (!user.id) throw new Error('no user id');
+
+  if (data.field === 'name') {
+    const query = getQuickProfileQuery(user.id);
+    const qProfile = await query.get();
+    if (!qProfile) return { error: '無法取得 profile' };
+
+    const renames = JSON.parse(qProfile.renames).map(JSON.parse);
+
+    const latestRename = renames[0];
+    if (latestRename) {
+      const latestRenameAt = new Date(latestRename.time);
+      const dayDiff = differenceInDays(now, latestRenameAt);
+      if (dayDiff < RENAME_COOL_OFF_DAYS) {
+        const modDay = format({}, 'M/d', latestRenameAt);
+        return { error: `上次改名時間是 ${modDay}，經過 ${RENAME_COOL_OFF_DAYS} 天才能再修改` };
+      }
+    }
+
+    try {
+      await db.batch([
+        db.update(users).set({
+          name: data.value,
+        }).where(eq(users.id, user.id)),
+
+        db.insert(changes).values({
+          docType: getTableName(users),
+          docId: user.id,
+          scope: data.field,
+          whodunnit: user.id,
+          content: data.value,
+        }).returning({ id: changes.id})
+      ]);
+    } catch (e) {
+      console.log('update-user', e);
+      return { error: '儲存失敗，非預期的錯誤' };
+    }
+
+    revalidatePath(`/user/${session.user.id}`);
+    return { success: true };
+  }
+
+  return { error: '非預期的錯誤' };
+};

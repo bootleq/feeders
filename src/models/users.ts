@@ -1,9 +1,10 @@
 import * as R from 'ramda';
-import { eq, and, sql, count, SQL } from 'drizzle-orm';
+import { eq, and, desc, sql, count, getTableName } from 'drizzle-orm';
 
 import {
   users,
   areas,
+  changes,
   spotFollowups,
 } from '@/lib/schema';
 import { SpotActionEnum } from '@/lib/schema';
@@ -12,6 +13,8 @@ import type { LatLngBounds } from '@/lib/schema';
 import { db } from '@/lib/db';
 
 export const runtime = 'edge';
+
+export const RENAME_COOL_OFF_DAYS = 30;
 
 export const getWorldUsers = (userId: string) => {
   const query = db.select({
@@ -31,6 +34,38 @@ export const getWorldUsers = (userId: string) => {
 
 type WorldUserQuery = ReturnType<typeof getWorldUsers>;
 export type WorldUserResult = Awaited<ReturnType<WorldUserQuery['execute']>>[number];
+
+export const getQuickProfileQuery = (userId: string) => {
+  const recentRenames = db
+    .select({
+      docId: changes.docId,
+      renames: sql<string>`json_object('content', json(content), 'time', createdAt * 1000)`.as('renames')
+    })
+    .from(changes)
+    .where(
+      and(
+        eq(changes.docType, getTableName(users)),
+        eq(changes.docId, userId),
+        eq(changes.scope, 'name'),
+      )
+    )
+    .orderBy(desc(changes.createdAt))
+    .limit(3)
+    .as('recent_renames');
+
+  const query = db.select({
+    id:        users.id,
+    name:      users.name,
+    state:     users.state,
+    createdAt: users.createdAt,
+    lockedAt:  users.lockedAt,
+    renames: sql<string>`json_group_array(${recentRenames.renames})`.as('renames'),
+  }).from(users)
+  .leftJoin(recentRenames, eq(recentRenames.docId, users.id))
+  .where(eq(users.id, userId));
+
+  return query;
+};
 
 export const getProfile = async (userId: string) => {
   const actionCounts = db.select({
