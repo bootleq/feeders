@@ -52,11 +52,11 @@ export const getProfile = async (userId: string) => {
   .leftJoin(actionCounts, sql`1=1`)
   .where(eq(users.id, userId));
 
-  return u ? u[0] : null;
+  return u[0].id ? u[0] : null;
 };
 
 type ProfileQuery = ReturnType<typeof getProfile>;
-export type ProfileResult = Awaited<ReturnType<ProfileQuery['execute']>>[number];
+export type ProfileResult = NonNullable<Awaited<ProfileQuery>> | null;
 
 export const saveArea = async (userId: string, areaId: number | null, bounds: LatLngBounds) => {
   if (areaId) {

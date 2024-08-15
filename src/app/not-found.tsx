@@ -1,58 +1,34 @@
-export const runtime = "edge";
+import NotFoundHelper from './NotFoundHelper';
+import Link from 'next/link';
+
+export const runtime = 'edge';
 
 export default function NotFound() {
   return (
-    <>
-      <title>404: This page could not be found.</title>
-      <div style={styles.error}>
-        <div>
-          <style
-            dangerouslySetInnerHTML={{
-              __html: `body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}`,
-            }}
-          />
-          <h1 className="next-error-h1" style={styles.h1}>
-            404
-          </h1>
-          <div style={styles.desc}>
-            <h2 style={styles.h2}>This page could not be found.</h2>
+    <html lang="zh-TW">
+      <head>
+        <title>
+          404: Not found - Feeders
+        </title>
+      </head>
+      <body>
+        <main className="flex min-h-screen flex-row items-center justify-center">
+          <div className='container mx-auto px-6 sm:px-8'>
+            <h1 className='w-full flex items-center font-bold py-2 text-xl gap-x-2'>
+              <code className='text-stone-400 text-4xl mr-2'>404</code>
+              <span className=''>
+                這個網址找不到東西
+              </span>
+            </h1>
+
+            <NotFoundHelper />
+
+            <hr className='w-full h-px mx-auto my-5 bg-slate-400/75 border-0' />
+
+            <Link href="/" className='p-1 rounded-md underline underline-offset-4 decoration-slate-500 hover:decoration-2 hover:decoration-yellow-500'>返回首頁</Link>
           </div>
-        </div>
-      </div>
-    </>
+        </main>
+      </body>
+    </html>
   );
 }
-
-const styles = {
-  error: {
-    fontFamily:
-      'system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"',
-    height: "100vh",
-    textAlign: "center",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  desc: {
-    display: "inline-block",
-  },
-
-  h1: {
-    display: "inline-block",
-    margin: "0 20px 0 0",
-    padding: "0 23px 0 0",
-    fontSize: 24,
-    fontWeight: 500,
-    verticalAlign: "top",
-    lineHeight: "49px",
-  },
-
-  h2: {
-    fontSize: 14,
-    fontWeight: 400,
-    lineHeight: "49px",
-    margin: 0,
-  },
-} as const;

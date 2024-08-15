@@ -1,5 +1,6 @@
 import * as R from 'ramda';
 import { auth } from '@/lib/auth';
+import { Fragment } from 'react';
 import { SpotActionEnum } from '@/lib/schema';
 import { getWorldUsers, getProfile } from '@/models/users';
 import { notFound } from 'next/navigation';
@@ -50,7 +51,7 @@ export default async function Page({ params }: {
       </Sidebar>
 
       <div className='container mx-auto px-1 sm:px-4'>
-        <h1 className='w-full text-center sm:text-start font-bold py-2 text-lg'>使用者資料</h1>
+        <h1 className='w-full text-center sm:text-start font-bold py-3 text-lg'>使用者資料</h1>
 
         <BasicInfo user={user} profile={profile} />
 
@@ -64,16 +65,18 @@ export default async function Page({ params }: {
             </div>
             <div className='flex items-center justify-between gap-x-4'>
               <div className='grid grid-cols-[min-content_2fr] gap-x-2 gap-y-2 w-[clamp(30%,9rem,50%)]'>
-                {SpotActionEnum.options.map(action => (<>
-                  <div className='whitespace-nowrap'><ActionLabel action={action} className='py-1' /></div>
-                  <div className='font-mono text-right'>
-                    { actionCounts[action] }
-                  </div>
-                </>))}
+                {SpotActionEnum.options.map(action => (
+                  <Fragment key={action}>
+                    <div className='whitespace-nowrap'><ActionLabel action={action} className='py-1' /></div>
+                    <div className='font-mono text-right'>
+                      { actionCounts[action] }
+                    </div>
+                  </Fragment>
+                ))}
               </div>
 
               <div className='flex items-center justify-center w-1/2'>
-                <div className='p-4 mx-5 sm:mx-16 aspect-square flex items-center rounded-full bg-slate-100 ring-2 ring-offset-4 ring-offset-stone-200 text-lg font-mono shadow-lg'>
+                <div className='p-4 mx-5 sm:mx-16 aspect-square flex items-center justify-center min-w-16 rounded-full bg-slate-100 ring-2 ring-offset-4 ring-offset-stone-200 text-lg font-mono shadow-lg'>
                   {R.sum(R.values(actionCounts))}
                 </div>
               </div>
