@@ -41,7 +41,7 @@ export default function UserInfo({ user, profile }: {
   const [activating, setActivating] = useState(false);
   const [sending, setSending] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [now, setNow] = useState(() => new Date());
+  const [coolingOff, setCoolingOff] = useState(false);
   const activateDialogRef = useRef<HTMLDialogElement>(null);
   const addAlert = useSetAtom(addAlertAtom);
 
@@ -113,8 +113,10 @@ export default function UserInfo({ user, profile }: {
   }, [addAlert]);
 
   useEffect(() => {
-    setNow(new Date());
-  }, []);
+    const renameAt = profile?.renames[0]?.time;
+    const dayDiff = renameAt ? differenceInDays(new Date(), renameAt) : -1;
+    setCoolingOff(renameAt && dayDiff < RENAME_COOL_OFF_DAYS);
+  }, [profile, setCoolingOff]);
 
   if (!profile) {
     return null;
@@ -123,7 +125,7 @@ export default function UserInfo({ user, profile }: {
   const isCurrentUser = user && user.id === profile.id;
   const waitingActivate = isCurrentUser && user.state === 'new';
   const canEdit = isCurrentUser && user.state === 'active';
-  // const canRename = canEdit && differenceInDays(now, profile.???) > RENAME_COOL_OFF_DAYS;
+  const canRename = canEdit && !coolingOff;
 
   return (
     <>
@@ -157,7 +159,7 @@ export default function UserInfo({ user, profile }: {
             :
             <div className='flex items-center ml-2 gap-x-1'>
               { profile.name || '--'}
-              {canEdit &&
+              {canEdit && canRename &&
                 <Tooltip>
                   <TooltipTrigger>
                     <button className={tinyBtnCls} onClick={toggleEditName}>

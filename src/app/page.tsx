@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { SignIn } from '@/components/sign-in-button';
 import { SignOut } from '@/components/sign-out-button';
+import Link from 'next/link';
 
 export const runtime = 'edge';
 
@@ -15,6 +16,16 @@ export default async function Home() {
     <main className="flex min-h-screen flex-col items-center p-4">
       <div className="z-10 w-full items-center justify-between text-sm lg:flex">
         { session ? <SignOut /> : <SignIn /> }
+      </div>
+
+      {session &&
+        <div className="text-lg w-full text-left">
+          <Link href={`/user/${session.userId}`} className='rounded-md underline underline-offset-4 decoration-slate-500 hover:decoration-2 hover:decoration-yellow-500'>Profile</Link>
+        </div>
+      }
+
+      <div className="text-lg w-full text-left">
+        <Link href='/world' className='rounded-md underline underline-offset-4 decoration-slate-500 hover:decoration-2 hover:decoration-yellow-500'>世界地圖</Link>
       </div>
 
       <div className="mb-32 text-center lg:w-full lg:mb-0 lg:text-left text-wrap whitespace-pre-wrap break-all">

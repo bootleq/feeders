@@ -2,12 +2,16 @@ import * as R from 'ramda';
 import { auth } from '@/lib/auth';
 import { Fragment } from 'react';
 import { SpotActionEnum } from '@/lib/schema';
+import { format } from '@/lib/date-fp';
 import { getWorldUsers, getProfile } from '@/models/users';
+import type { RenameHistoryEntry } from '@/models/users';
 import { notFound } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import BasicInfo from './BasicInfo';
 import ActionLabel from '@/app/world/[[...path]]/ActionLabel';
 import { MapIcon } from '@heroicons/react/24/solid';
+import { TrophyIcon } from '@heroicons/react/24/solid';
+import { PencilIcon } from '@heroicons/react/24/outline';
 
 export const runtime = 'edge';
 
@@ -32,6 +36,8 @@ function parseActionCounts(json: string) {
   return result;
 }
 
+const cardCls = 'my-2 px-4 pt-3 pb-4 ring-1 bg-slate-200 rounded-lg shadow-lg';
+
 export default async function Page({ params }: {
   params: { id: string }
 }) {
@@ -44,6 +50,8 @@ export default async function Page({ params }: {
   }
 
   const actionCounts = parseActionCounts(profile.actionCounts);
+  const renames = profile.renames as RenameHistoryEntry[];
+  const hasAnyRename = R.isNotNil(renames[0]);
 
   return (
     <main className="flex min-h-screen flex-row items-start justify-between">
@@ -57,8 +65,9 @@ export default async function Page({ params }: {
 
         <hr className='invisible w-11/12 h-px mx-auto my-5 bg-slate-400/75 border-0' />
 
-        <div className='grid sm:grid-cols-2 md:grid-cols-3 gap-x-2'>
-          <div className='my-2 px-4 pt-3 pb-4 sm:w-min ring-1 bg-slate-200 rounded-lg shadow-lg'>
+        <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-x-3 md:gap-x-5'>
+
+          <div className={cardCls}>
             <div className='mb-3 bg-slate-200 flex items-center font-bold'>
               <MapIcon className='mr-2 fill-current opacity-75' height={24} />
               世界地圖貢獻
@@ -69,7 +78,7 @@ export default async function Page({ params }: {
                   <Fragment key={action}>
                     <div className='whitespace-nowrap'><ActionLabel action={action} className='py-1' /></div>
                     <div className='font-mono text-right'>
-                      { actionCounts[action] }
+                      { actionCounts[action] || 0 }
                     </div>
                   </Fragment>
                 ))}
@@ -81,6 +90,33 @@ export default async function Page({ params }: {
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className={cardCls}>
+            <div className='mb-3 bg-slate-200 flex items-center font-bold'>
+              <PencilIcon className='mr-2 stroke-current opacity-75' height={24} />
+              改名履歷
+              {hasAnyRename ? <span className='font-mono font-normal ml-2 text-slate-600'>({renames.length})</span> : '' }
+            </div>
+            {hasAnyRename ?
+              <ul className='divide-y-2 divide-slate-400/75 max-h-64 overflow-auto scrollbar-thin'>
+                {renames.map((r, idx) => {
+                  if (!r) return null;
+                  const date = format({}, 'yyyy/MM/dd HH:mm', r.time);
+                  return (
+                    <li key={idx} className='flex items-center justify-center py-1'>
+                      <span className={`pr-2 ${idx === 0 ? 'font-bold' : ''}`}>{r.content}</span>
+                      <time className='font-mono text-xs ml-auto whitespace-nowrap'>{ date }</time>
+                    </li>
+                  );
+                })}
+              </ul>
+              :
+              <div className='flex items-center'>
+                <TrophyIcon className='mr-2 fill-yellow-600 opacity-75' height={24} />
+                從來沒有變更過。
+              </div>
+            }
           </div>
         </div>
 

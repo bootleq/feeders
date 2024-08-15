@@ -38,7 +38,7 @@ export default async function updateUser(formData: FormData) {
     const qProfile = await query.get();
     if (!qProfile) return { error: '無法取得 profile' };
 
-    const renames = JSON.parse(qProfile.renames).map(JSON.parse);
+    const renames = qProfile.renames;
 
     const latestRename = renames[0];
     if (latestRename) {
