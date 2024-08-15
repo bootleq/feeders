@@ -39,9 +39,10 @@ export const users = sqliteTable("users", {
   email: text("email").notNull().unique(),
   emailVerified: integer("emailVerified", { mode: "timestamp_ms" }),
   state: userStateCol(),
+  desc: text('desc'),
   image: text("image"),
   createdAt: createdAtCol(),
-  lockedAt: timestampCol('lockedAt')
+  lockedAt: timestampCol('lockedAt'),
 })
 export const usersRelations = relations(users, ({ many }) => ({
   spots: many(spots),
@@ -93,13 +94,6 @@ export const verificationTokens = sqliteTable("verification_tokens", {
 // App tables
 // {{{
 
-export const profiles = sqliteTable('profiles', {
-  id: incrementIdCol(),
-  desc: text('desc'),
-  createdAt: createdAtCol(),
-  userId: text('userId').references(() => users.id),
-})
-
 export const spots = sqliteTable("spots", {
   id: incrementIdCol(),
   title: text("title"),
@@ -147,6 +141,20 @@ export const spotFollowupsRelations = relations(spotFollowups, ({ one }) => ({
     references: [spots.id]
   })
 }));
+
+export const changes = sqliteTable("changes", {
+  id: incrementIdCol(),
+  docType: text('docType').notNull(),
+  docId: text('docId').notNull(),
+  scope: text('scope').notNull(), // field or some index-able name to denote fields
+  whodunnit: text('whodunnit').notNull(),
+  content: text('content', { mode: 'json' }).notNull(),
+  createdAt: createdAtCol(),
+}, (table) => {
+  return {
+    docIndex: index('doc').on(table.docType, table.docId, table.scope),
+  }
+});
 
 export const areas = sqliteTable("areas", {
   id: incrementIdCol(),

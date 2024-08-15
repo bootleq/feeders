@@ -24,12 +24,14 @@ CREATE TABLE `areas` (
 	FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
-CREATE TABLE `profiles` (
+CREATE TABLE `changes` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`desc` text,
-	`createdAt` integer DEFAULT (unixepoch()) NOT NULL,
-	`userId` text,
-	FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
+	`docType` text NOT NULL,
+	`docId` text NOT NULL,
+	`scope` text NOT NULL,
+	`whodunnit` text NOT NULL,
+	`content` text NOT NULL,
+	`createdAt` integer DEFAULT (unixepoch()) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `sessions` (
@@ -77,6 +79,7 @@ CREATE TABLE `users` (
 	`email` text NOT NULL,
 	`emailVerified` integer,
 	`state` text DEFAULT 'new' NOT NULL,
+	`desc` text,
 	`image` text,
 	`createdAt` integer DEFAULT (unixepoch()) NOT NULL,
 	`lockedAt` integer
@@ -89,5 +92,6 @@ CREATE TABLE `verification_tokens` (
 	PRIMARY KEY(`identifier`, `token`)
 );
 --> statement-breakpoint
+CREATE INDEX `doc` ON `changes` (`docType`,`docId`,`scope`);--> statement-breakpoint
 CREATE INDEX `geohash` ON `spots` (`geohash`);--> statement-breakpoint
 CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);

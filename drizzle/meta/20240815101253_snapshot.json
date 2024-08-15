@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "9091e2da-da32-4451-98f4-337eb5aa77a2",
+  "id": "5179bea5-3594-4409-8c20-cef7b92aa1aa",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "accounts": {
@@ -179,8 +179,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "profiles": {
-      "name": "profiles",
+    "changes": {
+      "name": "changes",
       "columns": {
         "id": {
           "name": "id",
@@ -189,11 +189,39 @@
           "notNull": true,
           "autoincrement": true
         },
-        "desc": {
-          "name": "desc",
+        "docType": {
+          "name": "docType",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "docId": {
+          "name": "docId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "scope": {
+          "name": "scope",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "whodunnit": {
+          "name": "whodunnit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
           "autoincrement": false
         },
         "createdAt": {
@@ -203,31 +231,20 @@
           "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch())"
-        },
-        "userId": {
-          "name": "userId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
         }
       },
-      "indexes": {},
-      "foreignKeys": {
-        "profiles_userId_users_id_fk": {
-          "name": "profiles_userId_users_id_fk",
-          "tableFrom": "profiles",
-          "tableTo": "users",
-          "columnsFrom": [
-            "userId"
+      "indexes": {
+        "doc": {
+          "name": "doc",
+          "columns": [
+            "docType",
+            "docId",
+            "scope"
           ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "isUnique": false
         }
       },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -545,6 +562,13 @@
           "notNull": true,
           "autoincrement": false,
           "default": "'new'"
+        },
+        "desc": {
+          "name": "desc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         },
         "image": {
           "name": "image",
