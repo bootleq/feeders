@@ -7,6 +7,7 @@ import {
   offset,
   flip,
   shift,
+  arrow,
   useClick,
   useDismiss,
   useRole,
@@ -15,6 +16,7 @@ import {
   Placement,
   FloatingPortal,
   FloatingFocusManager,
+  FloatingArrow,
   useId
 } from "@floating-ui/react";
 
@@ -25,6 +27,10 @@ interface PopoverOptions {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
+
+const ARROW_HEIGHT = 14;
+const GAP = 5;
+const ARROW_CLASSNAME = 'fill-slate-600 [&>path:last-of-type]:stroke-stone-200';
 
 export function usePopover({
   initialOpen = false,
@@ -38,6 +44,7 @@ export function usePopover({
   const [descriptionId, setDescriptionId] = React.useState<
     string | undefined
   >();
+  const arrowRef = React.useRef(null);
 
   const open = controlledOpen ?? uncontrolledOpen;
   const setOpen = setControlledOpen ?? setUncontrolledOpen;
@@ -48,13 +55,14 @@ export function usePopover({
     onOpenChange: setOpen,
     whileElementsMounted: autoUpdate,
     middleware: [
-      offset(5),
+      offset(ARROW_HEIGHT / 2 + GAP),
       flip({
         crossAxis: placement.includes("-"),
         fallbackAxisSideDirection: "end",
         padding: 5
       }),
-      shift({ padding: 5 })
+      shift({ padding: 5 }),
+      arrow({ element: arrowRef }),
     ]
   });
 
@@ -78,9 +86,10 @@ export function usePopover({
       labelId,
       descriptionId,
       setLabelId,
-      setDescriptionId
+      setDescriptionId,
+      arrowRef,
     }),
-    [open, setOpen, interactions, data, modal, labelId, descriptionId]
+    [open, setOpen, interactions, data, modal, labelId, arrowRef, descriptionId]
   );
 }
 
@@ -165,7 +174,7 @@ export const PopoverContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLProps<HTMLDivElement>
 >(function PopoverContent({ style, ...props }, propRef) {
-  const { context: floatingContext, ...context } = usePopoverContext();
+  const { context: floatingContext, arrowRef, ...context } = usePopoverContext();
   const ref = useMergeRefs([context.refs.setFloating, propRef]);
 
   if (!floatingContext.open) return null;
@@ -181,6 +190,7 @@ export const PopoverContent = React.forwardRef<
           {...context.getFloatingProps(props)}
         >
           {props.children}
+          <FloatingArrow ref={arrowRef} context={floatingContext} className={ARROW_CLASSNAME} />
         </div>
       </FloatingFocusManager>
     </FloatingPortal>
