@@ -40,7 +40,7 @@ import TempMarker from './TempMarker';
 import ResetViewControl from './ResetViewControl';
 import LocateControl from './LocateControl';
 import Alerts from './Alerts';
-import 'leaflet/dist/leaflet.css';
+import '@/components/leaflet/leaflet.css';
 
 const D1_PARAM_LIMIT = 100;
 
