@@ -97,9 +97,9 @@ export default async function Page({ params }: {
             <div className='mb-3 bg-slate-200 flex items-center font-bold'>
               <PencilIcon className='mr-2 stroke-current opacity-75' height={24} />
               改名履歷
-              {renames ? <span className='font-mono font-normal ml-2 text-slate-600'>({renames.length})</span> : '' }
+              {renames ? <span className='font-mono font-normal ml-2 text-slate-600'>({renames.length - 1})</span> : '' }
             </div>
-            {renames ?
+            {renames && renames.length > 1 ?
               <ul className='divide-y-2 divide-slate-400/75 max-h-64 overflow-auto scrollbar-thin'>
                 {renames.map((r, idx) => {
                   if (!r) return null;
