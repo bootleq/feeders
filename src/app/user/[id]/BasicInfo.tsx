@@ -113,7 +113,8 @@ export default function UserInfo({ user, profile }: {
   }, [addAlert]);
 
   useEffect(() => {
-    const renameAt = profile?.renames[0]?.time;
+    if (!profile?.renames) return;
+    const renameAt = new Date(profile.renames[0].time);
     const dayDiff = renameAt ? differenceInDays(new Date(), renameAt) : -1;
     setCoolingOff(renameAt && dayDiff < RENAME_COOL_OFF_DAYS);
   }, [profile, setCoolingOff]);

@@ -35,44 +35,33 @@ export const getWorldUsers = (userId: string) => {
 type WorldUserQuery = ReturnType<typeof getWorldUsers>;
 export type WorldUserResult = Awaited<ReturnType<WorldUserQuery['execute']>>[number];
 
-const renameHistoryQuery = (userId: string, limit: number) => {
-  const query = db
-    .select({
-      docId: changes.docId,
-      items: sql<string>`json_object('content', json(content), 'time', createdAt * 1000)`.as('items')
-    })
-    .from(changes)
-    .where(
-      and(
-        eq(changes.docType, getTableName(users)),
-        eq(changes.docId, userId),
-        eq(changes.scope, 'name'),
-      )
-    ).orderBy(desc(changes.createdAt))
-    .limit(limit)
-    .as('rename_history');
-
-  return query;
-};
-
-export type RenameHistoryEntry = {
-  content: string,
-  time: number,
+type ProfileActionCounts = {
+  coop: number,
+  downvote: number,
+  investig: number,
+  power: number,
+  remove: number,
+  see: number,
+  talk: number
 } | null;
 
-export const getQuickProfileQuery = (userId: string) => {
-  const recentRenames = renameHistoryQuery(userId, 3);
+type ProfileRenames = {
+  content: string,
+  time: number,
+}[] | null;
 
-  const query = db.select({
-    id:        users.id,
-    name:      users.name,
-    state:     users.state,
-    createdAt: users.createdAt,
-    lockedAt:  users.lockedAt,
-    renames: sql<RenameHistoryEntry>`json_group_array(${recentRenames.items})`.mapWith(deepParseJSON).as('renames'),
-  }).from(users)
-  .leftJoin(recentRenames, eq(recentRenames.docId, users.id))
-  .where(eq(users.id, userId));
+const renameHistoryQuery = (limit: number) => {
+  const query = db.$with('rename_history').as(
+    db.select({
+      docId: changes.docId,
+      items: sql<string>`json_group_array(json_object('content', json(content), 'time', createdAt * 1000) ORDER BY createdAt DESC)`.as('items')
+    }).from(changes)
+    .where(and(
+      eq(changes.docType, getTableName(users)),
+      eq(changes.scope, 'name'),
+    )).groupBy(changes.docId)
+    .limit(limit)
+  );
 
   return query;
 };
@@ -80,7 +69,6 @@ export const getQuickProfileQuery = (userId: string) => {
 const deepParseJSON = (v: any) => {
   try {
     const parsed = JSON.parse(v);
-
     const deepParse = (obj: any) => {
       if (typeof obj === 'object' && obj !== null) {
         for (const key in obj) {
@@ -98,38 +86,67 @@ const deepParseJSON = (v: any) => {
       }
       return obj;
     };
-
     return deepParse(parsed);
   } catch (e) {
     return v;
   }
 };
 
-export const getProfile = async (userId: string) => {
-  const actionCounts = db.select({
-    action: spotFollowups.action,
-    count: count().as('count'),
-  }).from(spotFollowups)
-    .groupBy(spotFollowups.action)
-    .where(eq(spotFollowups.userId, userId))
-    .as('action_counts')
+const expandActionCounts = (v: { action: string, count: number }[]) => {
+  const result = v.reduce<Record<string, number>>(
+    (acc, { action, count }) => {
+      acc[action] = count;
+      return acc;
+    }, {});
+  return result;
+};
 
-  const renameHistory = renameHistoryQuery(userId, 240);
-
-  const u = await db.select({
+export const getQuickProfileQuery = (userId: string) => {
+  const recentRenames = renameHistoryQuery(3);
+  const query = db.with(recentRenames).select({
     id:        users.id,
     name:      users.name,
     state:     users.state,
     createdAt: users.createdAt,
     lockedAt:  users.lockedAt,
-    actionCounts: sql<string>`json_group_array(json_object('action', ${actionCounts.action}, 'count', ${actionCounts.count}))`.as('action_counts'),
-    renames: sql<RenameHistoryEntry>`json_group_array(${renameHistory.items})`.mapWith(deepParseJSON).as('renames'),
+    renames: sql<ProfileRenames>`${recentRenames.items}`.mapWith(deepParseJSON as (v: any) => ProfileRenames).as('renames'),
   }).from(users)
-  .leftJoin(actionCounts, sql`1=1`)
-  .leftJoin(renameHistory, eq(renameHistory.docId, userId))
+  .leftJoin(recentRenames, eq(recentRenames.docId, users.id))
   .where(eq(users.id, userId));
 
-  return u[0].id ? u[0] : null;
+  return query;
+};
+
+export const getProfile = async (userId: string) => {
+  const actionCounts = db.$with('actionCounts').as(
+    db.select({
+      items: sql<string>`json_group_array(json_object('action', action, 'count', count))`.as('ac_items')
+    }).from(
+      db.select({
+        action: spotFollowups.action,
+        count: count().as('count'),
+      }).from(spotFollowups)
+      .groupBy(spotFollowups.action)
+      .where(eq(spotFollowups.userId, userId)).as('actionCountsSub')
+    )
+  );
+  const renameHistory = renameHistoryQuery(240);
+
+  const query = db.with(actionCounts, renameHistory).select({
+    id:        users.id,
+    name:      users.name,
+    state:     users.state,
+    createdAt: users.createdAt,
+    lockedAt:  users.lockedAt,
+    actionCounts: sql<ProfileActionCounts>`${actionCounts.items}`.mapWith(R.pipe(deepParseJSON, expandActionCounts)).as('actionCounts'),
+    renames: sql<ProfileRenames>`${renameHistory.items}`.mapWith(deepParseJSON as (v: any) => ProfileRenames).as('renames'),
+  }).from(users)
+    .leftJoin(actionCounts, eq(users.id, userId))
+    .leftJoin(renameHistory, eq(users.id, renameHistory.docId))
+    .where(eq(users.id, userId));
+
+  const result = await query;
+  return result ? result[0] : null;
 };
 
 type ProfileQuery = ReturnType<typeof getProfile>;

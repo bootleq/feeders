@@ -38,11 +38,9 @@ export default async function updateUser(formData: FormData) {
     const qProfile = await query.get();
     if (!qProfile) return { error: '無法取得 profile' };
 
-    const renames = qProfile.renames;
-
-    const latestRename = renames[0];
-    if (latestRename) {
-      const latestRenameAt = new Date(latestRename.time);
+    const { renames } = qProfile;
+    if (renames) {
+      const latestRenameAt = new Date(renames[0].time);
       const dayDiff = differenceInDays(now, latestRenameAt);
       if (dayDiff < RENAME_COOL_OFF_DAYS) {
         const modDay = format({}, 'M/d', latestRenameAt);

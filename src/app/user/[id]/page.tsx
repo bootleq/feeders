@@ -4,7 +4,6 @@ import { Fragment } from 'react';
 import { SpotActionEnum } from '@/lib/schema';
 import { format } from '@/lib/date-fp';
 import { getWorldUsers, getProfile } from '@/models/users';
-import type { RenameHistoryEntry } from '@/models/users';
 import { notFound } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import BasicInfo from './BasicInfo';
@@ -49,9 +48,7 @@ export default async function Page({ params }: {
     notFound();
   }
 
-  const actionCounts = parseActionCounts(profile.actionCounts);
-  const renames = profile.renames as RenameHistoryEntry[];
-  const hasAnyRename = R.isNotNil(renames[0]);
+  const { renames } = profile;
 
   return (
     <main className="flex min-h-screen flex-row items-start justify-between">
@@ -78,7 +75,9 @@ export default async function Page({ params }: {
                   <Fragment key={action}>
                     <div className='whitespace-nowrap'><ActionLabel action={action} className='py-1' /></div>
                     <div className='font-mono text-right'>
-                      { actionCounts[action] || 0 }
+                      {
+                        profile.actionCounts[action] || 0
+                      }
                     </div>
                   </Fragment>
                 ))}
@@ -86,7 +85,9 @@ export default async function Page({ params }: {
 
               <div className='flex items-center justify-center w-1/2'>
                 <div className='p-4 mx-5 sm:mx-16 aspect-square flex items-center justify-center min-w-16 rounded-full bg-slate-100 ring-2 ring-offset-4 ring-offset-stone-200 text-lg font-mono shadow-lg'>
-                  {R.sum(R.values(actionCounts))}
+                  {
+                    R.sum(R.values(profile.actionCounts))
+                  }
                 </div>
               </div>
             </div>
@@ -96,9 +97,9 @@ export default async function Page({ params }: {
             <div className='mb-3 bg-slate-200 flex items-center font-bold'>
               <PencilIcon className='mr-2 stroke-current opacity-75' height={24} />
               改名履歷
-              {hasAnyRename ? <span className='font-mono font-normal ml-2 text-slate-600'>({renames.length})</span> : '' }
+              {renames ? <span className='font-mono font-normal ml-2 text-slate-600'>({renames.length})</span> : '' }
             </div>
-            {hasAnyRename ?
+            {renames ?
               <ul className='divide-y-2 divide-slate-400/75 max-h-64 overflow-auto scrollbar-thin'>
                 {renames.map((r, idx) => {
                   if (!r) return null;
