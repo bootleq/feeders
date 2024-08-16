@@ -8,6 +8,7 @@ import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { MapContainer, TileLayer, useMapEvents, Marker, Popup } from "react-leaflet";
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
+import Link from 'next/link';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
 import { CheckIcon } from '@heroicons/react/24/outline';
@@ -180,7 +181,10 @@ export default function SpotMarkers({ spots }: {
                 }
 
                 <div className='mt-2 px-2 text-right text-xs text-slate-500/75'>
-                  建立：<span className='font-mono'>{format({}, 'y/M/d', s.createdAt)}</span> by {s.userId}
+                  建立：<span className='font-mono'>{format({}, 'y/M/d', s.createdAt)}</span> by
+                  <Link href={`/user/${s.userId}`} data-user-id={s.userId} className='ml-1 hover:bg-yellow-300/50 hover:text-slate-950'>
+                    {s.userName}
+                  </Link>
                 </div>
 
                 <hr className='w-11/12 h-px mx-auto my-5 bg-gray-200 border-0 dark:bg-gray-700' />
@@ -192,10 +196,10 @@ export default function SpotMarkers({ spots }: {
                   {followups.map(fo => (
                     <div key={fo.id} className='flex flex-col justify-start items-start mb-2'>
                       <div className='px-1 mb-1 flex flex-wrap justify-start text-sm items-center'>
-                        <span data-user-id={s.userId} className='mr-3 flex items-center'>
+                        <Link href={`/user/${fo.userId}`} data-user-id={fo.userId} className='mr-3 flex items-center hover:bg-yellow-300/50 text-inherit'>
                           <UserCircleIcon className='fill-current' height={24} />
-                          USER NAME
-                        </span>
+                          { fo.userName }
+                        </Link>
                         <span className='text-sm mr-2 whitespace-nowrap font-mono'>
                           {formatDistance(now, fo.createdAt).replace('大約', '').trim()}
                         </span>

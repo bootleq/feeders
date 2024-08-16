@@ -27,7 +27,8 @@ export const getWorldUsers = (userId: string) => {
   }).from(users)
     .leftJoin(
       areas, eq(users.id, areas.userId)
-    ).limit(1);
+    ).where(eq(users.id, userId))
+    .limit(1);
 
   return query;
 };
@@ -101,7 +102,7 @@ const expandActionCounts = (v: { action: string, count: number }[]) => {
   return result;
 };
 
-export const getQuickProfileQuery = (userId: string) => {
+export const getQuickProfileQuery = () => {
   const recentRenames = renameHistoryQuery(3);
   const query = db.with(recentRenames).select({
     id:        users.id,
@@ -112,7 +113,6 @@ export const getQuickProfileQuery = (userId: string) => {
     renames: sql<ProfileRenames>`${recentRenames.items}`.mapWith(deepParseJSON as (v: any) => ProfileRenames).as('renames'),
   }).from(users)
   .leftJoin(recentRenames, eq(recentRenames.docId, users.id))
-  .where(eq(users.id, userId));
 
   return query;
 };

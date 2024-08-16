@@ -34,7 +34,7 @@ export default async function updateUser(formData: FormData) {
   if (!user.id) throw new Error('no user id');
 
   if (data.field === 'name') {
-    const query = getQuickProfileQuery(user.id);
+    const query = getQuickProfileQuery().where(eq(users.id, user.id));
     const qProfile = await query.get();
     if (!qProfile) return { error: '無法取得 profile' };
 

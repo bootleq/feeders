@@ -65,10 +65,10 @@ export default function SpotInfo() {
       </Tooltip>
 
       <div className='flex flex-wrap justify-start items-center'>
-        <span data-user-id={spot.userId} className='mr-2 text-sm flex items-center'>
+        <Link href={`/user/${spot.userId}`} data-user-id={spot.userId} className='mr-2 text-sm flex items-center hover:bg-yellow-300/50'>
           <UserCircleIcon className='fill-current' height={24} />
-          USER NAME
-        </span>
+          { spot.userName }
+        </Link>
         {
           R.any(R.isNotNil)(R.props(['city', 'town'], spot)) ?
             <Link
@@ -92,13 +92,6 @@ export default function SpotInfo() {
       <FoodLife spot={spot} now={now} />
 
       <div className={descClass} ref={viewBoxRef} data-name='spot-view-item'>
-        {spot.desc}
-        {spot.desc}
-        {spot.desc}
-        {spot.desc}
-        {spot.desc}
-        {spot.desc}
-        {spot.desc}
         {spot.desc}
       </div>
     </div>

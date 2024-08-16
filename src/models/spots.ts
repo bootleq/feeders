@@ -25,6 +25,8 @@ import {
   sqlDateMapper,
 } from '@/lib/schema';
 
+import { getQuickProfileQuery } from './users';
+
 import type { Schema as CreateSpotSchema } from '@/app/world/[[...path]]/create-spot';
 import type { Schema as CreateFollowupSchema } from '@/app/world/[[...path]]/create-followup';
 
@@ -48,6 +50,8 @@ export const recentFollowups = (oldestDate: Date, fetchLimit: number) => {
     .innerJoin(spotFollowups, eq(spots.id, spotFollowups.spotId))
     .as('ranked')
 
+  const profiles = getQuickProfileQuery().as('profiles');
+
   const query = db.select({
     spotId:      spots.id,
     spotTitle:   spots.title,
@@ -67,6 +71,7 @@ export const recentFollowups = (oldestDate: Date, fetchLimit: number) => {
     createdAt:   spotFollowups.createdAt,
     followCount: ranked.followCount,
     userId:      spotFollowups.userId,
+    userName:    profiles.name,
   }).from(spotFollowups)
     .innerJoin(
       ranked, and(
@@ -76,6 +81,9 @@ export const recentFollowups = (oldestDate: Date, fetchLimit: number) => {
     )
     .innerJoin(
       spots, eq(spots.id, spotFollowups.spotId)
+    )
+    .innerJoin(
+      profiles, eq(profiles.id, spotFollowups.userId)
     )
     .where(
       and(
@@ -132,6 +140,9 @@ export const geoSpotsQuery = (geohashes: string[]) => {
     .innerJoin(spotFollowups, eq(spots.id, spotFollowups.spotId))
     .as('ranked')
 
+  const spotProfiles = getQuickProfileQuery().as('spotProfiles');
+  const followupProfiles = getQuickProfileQuery().as('followupProfiles');
+
   const query = db.select({
     spot: {
       id:        spots.id,
@@ -145,6 +156,7 @@ export const geoSpotsQuery = (geohashes: string[]) => {
       state:     spots.state,
       createdAt: spots.createdAt,
       userId:    spots.userId,
+      userName: spotProfiles.name,
 
       followCount:     ranked.followCount,
       followerCount:   ranked.followerCount,
@@ -162,6 +174,7 @@ export const geoSpotsQuery = (geohashes: string[]) => {
       spotState: spotFollowups.spotState,
       material:  spotFollowups.material,
       createdAt: spotFollowups.createdAt,
+      userName: followupProfiles.name,
     },
   }).from(ranked)
     .innerJoin(
@@ -173,8 +186,11 @@ export const geoSpotsQuery = (geohashes: string[]) => {
     .innerJoin(
       spotFollowups,
       eq(spotFollowups.id, ranked.followupId)
-    )
-    .where(
+    ).innerJoin(
+      spotProfiles, eq(spotProfiles.id, spots.userId)
+    ).innerJoin(
+      followupProfiles, eq(followupProfiles.id, spotFollowups.userId)
+    ).where(
       and(
         inArray(spots.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped]),
         inArray(spotFollowups.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped]),
