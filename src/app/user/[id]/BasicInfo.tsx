@@ -38,27 +38,31 @@ export default function UserInfo({ user, profile }: {
   profile: ProfileResult | null,
 }) {
   const [editName, setEditName] = useState(false);
+  const [confirmingRename, setConfirmingRename] = useState(false);
   const [activating, setActivating] = useState(false);
   const [sending, setSending] = useState(false);
   const [saving, setSaving] = useState(false);
   const [coolingOff, setCoolingOff] = useState(false);
   const activateDialogRef = useRef<HTMLDialogElement>(null);
+  const renameFormRef = useRef<HTMLFormElement>(null);
   const addAlert = useSetAtom(addAlertAtom);
 
   const toggleEditName = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setEditName(R.not);
-  }, []);
+    if (confirmingRename) setConfirmingRename(false);
+  }, [confirmingRename]);
 
-  const updateName = useCallback(async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+  const updateName = useCallback(async (e: React.MouseEvent<HTMLButtonElement> | null) => {
+    e && e.preventDefault();
 
-    const input = document.querySelector('input[name="userAlias"]') as HTMLInputElement;
+    const form = renameFormRef.current;
+    if (!form) return;
 
-    const formData = new FormData();
-    formData.set('field', 'name');
-    formData.set('value', input.value);
+    const formData = new FormData(form);
+    formData.set('value', (formData.get('userAlias') || '').toString());
+    formData.delete('userAlias');
 
     setSending(true);
     try {
@@ -74,6 +78,19 @@ export default function UserInfo({ user, profile }: {
       setSending(false);
     }
   }, [setSending, addAlert]);
+
+  const confirmRename = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (confirmingRename) {
+      const form = renameFormRef.current;
+      if (form) {
+        await updateName(null);
+      }
+    } else {
+      setConfirmingRename(true);
+    }
+  }, [setConfirmingRename, confirmingRename, updateName]);
 
   const startActivate = useCallback(() => {
     const dialog = activateDialogRef.current;
@@ -135,11 +152,14 @@ export default function UserInfo({ user, profile }: {
           <div className='whitespace-nowrap py-1'>名稱</div>
           {editName ?
             <div className='flex items-center gap-x-1'>
-              <input type='text' name='userAlias' autoFocus defaultValue={profile.name || ''} className={`${inputCls} ml-0 w-36 box-border`} />
+              <form ref={renameFormRef} onSubmit={confirmRename}>
+                <input type='text' name='userAlias' autoFocus defaultValue={profile.name || ''} className={`${inputCls} ml-0 w-36 box-border`} />
+                <input type='hidden' name='field' value='name' />
+              </form>
 
-              <Popover>
+              <Popover open={confirmingRename}>
                 <PopoverTrigger>
-                  <button aria-label='確認' className={tinyBtnCls}>
+                  <button aria-label='確認' className={tinyBtnCls} onClick={() => setConfirmingRename(R.not)}>
                     <CheckIcon className='stroke-green-600' height={20} />
                   </button>
                 </PopoverTrigger>
