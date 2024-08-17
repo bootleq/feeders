@@ -37,6 +37,7 @@
     "hono": "^4.4.12",
     "jotai": "^2.9.0",
     "jotai-scope": "^0.7.1",
+    "jsondiffpatch": "^0.6.0",
     "leaflet": "^1.9.4",
     "leaflet-defaulticon-compatibility": "^0.1.2",
     "leaflet.markercluster": "^1.5.3",
