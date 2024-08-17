@@ -46,7 +46,7 @@ const lonRestricted = () => faker.location.longitude({ max: geoRange.lon[1], min
 async function main() {
   const author = await db.select()
     .from(users)
-    .where(eq(users.state, 'new')) // TODO: should be 'active'
+    .where(eq(users.state, 'active'))
     .limit(1).get();
 
   if (!author) {

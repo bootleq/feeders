@@ -76,5 +76,6 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
     },
   },
   session: { strategy: 'database'},
-  debug: process.env.NODE_ENV === 'development'
+  debug: false,
+  // debug: process.env.NODE_ENV === 'development'
 })

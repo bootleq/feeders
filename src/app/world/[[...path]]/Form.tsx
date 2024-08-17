@@ -53,7 +53,7 @@ function SimpleTooltip({ text }: {
   );
 }
 
-function FormErrors({ errors }: { errors: FieldErrors}) {
+export function FormErrors({ errors }: { errors: FieldErrors}) {
   return (
     <div className='p-2 m-1 mt-3 rounded ring-1 ring-red-400 bg-red-300/50'>
       <div className='text-sm font-mono text-red-800 w-fit px-1 py-0 my-1 ring-1 ring-red-400 rounded bg-red-200 -mt-5 -ml-1'>
@@ -77,7 +77,7 @@ function FormErrors({ errors }: { errors: FieldErrors}) {
   );
 }
 
-export function UnscopedForm({ lat, lon }: {
+function UnscopedForm({ lat, lon }: {
   lat: number,
   lon: number,
 }) {

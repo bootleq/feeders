@@ -17,6 +17,7 @@ export const inputCls = [
   'ml-2 p-1 py-px flex-1',
   'rounded-md shadow-sm border-gray-300',
   'focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50',
+  'read-only:bg-gray-100',
   '[&[type="number"]]:font-mono',
   '[&:user-invalid]:border-red-300 [&:user-invalid]:ring [&:user-invalid]:ring-red-200 [&:user-invalid]:ring-opacity-80',
 ].join(' ');

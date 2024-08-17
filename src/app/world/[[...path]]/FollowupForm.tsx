@@ -15,11 +15,10 @@ import { editingFormAtom, mergeSpotFollowupsAtom } from '@/app/world/[[...path]]
 import ActionLabel from '@/app/world/[[...path]]/ActionLabel';
 import { createFollowup } from '@/app/world/[[...path]]/create-followup';
 import { errorsAtom, metaAtom } from '@/components/form/store';
-import type { FieldErrors } from '@/components/form/store';
 import { TextInput, Textarea, Select } from '@/components/form/Inputs';
 import { DateTimeField } from '@/components/form/DateTimeField';
 import { parseAbsoluteToLocal } from '@internationalized/date';
-import { spotActionTooltip, spawnedAtTooltip } from './Form';
+import { spotActionTooltip, spawnedAtTooltip, FormErrors } from './Form';
 
 const fieldName = R.partial(t, ['spotFields']);
 
@@ -31,31 +30,7 @@ function SimpleTooltip({ text }: {
   );
 }
 
-function FormErrors({ errors }: { errors: FieldErrors}) {
-  return (
-    <div className='p-2 m-1 mt-3 rounded ring-1 ring-red-400 bg-red-300/50'>
-      <div className='text-sm font-mono text-red-800 w-fit px-1 py-0 my-1 ring-1 ring-red-400 rounded bg-red-200 -mt-5 -ml-1'>
-        Errors
-      </div>
-      <ul className='list-[square] list-inside'>
-        {Object.entries(errors).map(([key, items]) => {
-          return (
-            <li key={key} className='mb-1'>
-              <span className=''>
-                {key === '_' ? '' : fieldName(key) }
-              </span>
-              <ul className='list-disc list-outside pl-5 text-xs'>
-                {items.map((msg, idx) => <li key={idx}>{msg}</li>)}
-              </ul>
-            </li>
-          );
-        })}
-      </ul>
-    </div>
-  );
-}
-
-export function UnscopedForm({ spotId, geohash }: {
+function UnscopedForm({ spotId, geohash }: {
   spotId: number,
   geohash: string,
 }) {
