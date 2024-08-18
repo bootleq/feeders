@@ -68,7 +68,7 @@ export async function createFollowup(formData: FormData) {
   }
 
   try {
-    if (errors.length) {
+    if (R.isNotEmpty(errors)) {
       return {
         errors: errors,
         msg: '儲存前發生問題',

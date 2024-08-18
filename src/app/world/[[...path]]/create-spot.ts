@@ -80,7 +80,7 @@ export async function createSpot(formData: FormData) {
       addError('_', '解析地址失敗');
     }
 
-    if (errors.length) {
+    if (R.isNotEmpty(errors)) {
       return {
         errors: errors,
         msg: '儲存前發生問題',
