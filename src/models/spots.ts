@@ -12,6 +12,7 @@ import {
   desc,
   sql,
   InferSelectModel,
+  getTableName,
 } from 'drizzle-orm';
 import { XMLParser } from 'fast-xml-parser';
 
@@ -20,6 +21,7 @@ import {
   areas,
   spots,
   spotFollowups,
+  changes,
   PubStateEnum,
   SpotStateEnum,
   sqlDateMapper,
@@ -29,6 +31,7 @@ import { getQuickProfileQuery } from './users';
 
 import type { Schema as CreateSpotSchema } from '@/app/world/[[...path]]/create-spot';
 import type { Schema as CreateFollowupSchema } from '@/app/world/[[...path]]/create-followup';
+import type { Schema as AmendSpotSchema } from '@/app/world/[[...path]]/amend-spot';
 
 import { db } from '@/lib/db';
 
@@ -143,6 +146,16 @@ export const geoSpotsQuery = (geohashes: string[]) => {
   const spotProfiles = getQuickProfileQuery().as('spotProfiles');
   const followupProfiles = getQuickProfileQuery().as('followupProfiles');
 
+  const spotChanges = db.select({
+    docId: changes.docId,
+    count: sql<number>`COUNT()`.as('spotChangesCount')
+  }).from(changes)
+    .groupBy(changes.docId)
+    .where(and(
+      eq(changes.docType, getTableName(spots)),
+      eq(changes.scope, 'amendSpot'),
+    )).as('spotChanges');
+
   const query = db.select({
     spot: {
       id:        spots.id,
@@ -157,6 +170,7 @@ export const geoSpotsQuery = (geohashes: string[]) => {
       createdAt: spots.createdAt,
       userId:    spots.userId,
       userName: spotProfiles.name,
+      changes: spotChanges.count,
 
       followCount:     ranked.followCount,
       followerCount:   ranked.followerCount,
@@ -190,6 +204,8 @@ export const geoSpotsQuery = (geohashes: string[]) => {
       spotProfiles, eq(spotProfiles.id, spots.userId)
     ).innerJoin(
       followupProfiles, eq(followupProfiles.id, spotFollowups.userId)
+    ).leftJoin(
+      spotChanges, eq(spotChanges.docId, spots.id)
     ).where(
       and(
         inArray(spots.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped]),

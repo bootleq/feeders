@@ -7,7 +7,7 @@ const translations = {
     'inactive': '停用',
   },
 
-  spotFields: { // NOTE: also used in FollowupForm
+  spotFields: { // NOTE: also used in FollowupForm / AmendSpotForm / audit/spot
     'spotTitle':   '地點名稱',
     'spotDesc':    '地點說明',
     'action':      '行動',
@@ -16,6 +16,8 @@ const translations = {
     'feedeeCount': '狗群數量',
     'spawnedAt':   '設置時間',
     'removedAt':   '移除時間',
+    'lat': '緯度',
+    'lon': '經度',
   },
 
   spotAction: {
@@ -44,6 +46,10 @@ const translations = {
     'power':    'bg-slate-900',
     'coop':     'bg-red-400',
     'downvote': 'bg-red-700',
+  },
+
+  changeScope: {
+    'amendSpot': '編修地點',
   },
 };
 

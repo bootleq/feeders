@@ -30,6 +30,7 @@
     "@next/bundle-analyzer": "^14.2.5",
     "@react-leaflet/core": "^2.1.0",
     "chanfana": "^2.0.2",
+    "change-case": "^5.4.4",
     "date-fns": "^3.6.0",
     "drizzle-orm": "^0.32.0",
     "fast-xml-parser": "^4.4.0",

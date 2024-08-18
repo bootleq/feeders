@@ -14,10 +14,14 @@ import { UserCircleIcon } from '@heroicons/react/24/solid';
 import { CheckIcon } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
+import { PencilSquareIcon } from '@heroicons/react/24/outline';
+import { Square3Stack3DIcon } from '@heroicons/react/24/outline';
 
+import { useSession } from 'next-auth/react';
 import FoodLife from './FoodLife';
 import ActionLabel from './ActionLabel';
 import FollowupForm from './FollowupForm';
+import AmendSpotForm from './AmendSpotForm';
 import { editingFormAtom, spotFollowupsAtom, mergeSpotFollowupsAtom, loadingFollowupsAtom } from './store';
 import { addAlertAtom } from '@/components/store';
 import { present } from '@/lib/utils';
@@ -78,6 +82,7 @@ const fetchFollowupsAtom = atom(
 export default function SpotMarkers({ spots }: {
   spots: GeoSpotsResult[]
 }) {
+  const { data: session, status } = useSession();
   const [editingForm, setEditingForm] = useAtom(editingFormAtom);
   const [now, setNow] = useState(() => new Date());
   const fetchFollowups = useSetAtom(fetchFollowupsAtom);
@@ -109,6 +114,12 @@ export default function SpotMarkers({ spots }: {
     setEditingForm('followup');
   }, [setEditingForm]);
 
+  const startAmendSpot = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditingForm('amendSpot');
+  }, [setEditingForm]);
+
   const cancel = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -117,6 +128,9 @@ export default function SpotMarkers({ spots }: {
 
   const statLiCls = 'hover:bg-yellow-300/50 pr-1';
   const statNumCls = 'font-mono px-1 align-baseline';
+
+  const canEdit = status === 'authenticated' && session.user.state === 'active';
+  const userId = session?.user.id;
 
   return (
     <MarkerClusterGroup chunkedLoading removeOutsideVisibleBounds={false} iconCreateFunction={clusterIconFn}>
@@ -180,11 +194,39 @@ export default function SpotMarkers({ spots }: {
                   </div>
                 }
 
-                <div className='mt-2 px-2 text-right text-xs text-slate-500/75'>
-                  建立：<span className='font-mono'>{format({}, 'y/M/d', s.createdAt)}</span> by
+                {editingForm === 'amendSpot' &&
+                  <AmendSpotForm spot={s} />
+                }
+
+                <div className='flex items-center justify-end mt-2 px-2 text-xs text-slate-500/75'>
+                  建立：<span className='font-mono mr-1'>{format({}, 'y/M/d', s.createdAt)}</span> by
                   <Link href={`/user/${s.userId}`} data-user-id={s.userId} className='ml-1 hover:bg-yellow-300/50 hover:text-slate-950'>
                     {s.userName}
                   </Link>
+
+                  {canEdit && userId === s.userId &&
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <button className='inline-flex items-center justify-center p-1 hover:bg-yellow-300/50 rounded-full' onClick={startAmendSpot}>
+                          <PencilSquareIcon className='stroke-current' height={18} />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent className={`${tooltipCls}`}>修改（會留下記錄）</TooltipContent>
+                    </Tooltip>
+                  }
+
+                  {s.changes > 0 ?
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Link href={`/audit/spot/${s.id}`} className='inline-flex items-center justify-center p-1 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
+                          <Square3Stack3DIcon className='stroke-current' height={18} />
+                          {s.changes}
+                        </Link>
+                        <TooltipContent className={`${tooltipCls}`}>調閱編修記錄（在新分頁開啟）</TooltipContent>
+                      </TooltipTrigger>
+                    </Tooltip>
+                    : ''
+                  }
                 </div>
 
                 <hr className='w-11/12 h-px mx-auto my-5 bg-gray-200 border-0 dark:bg-gray-700' />
@@ -223,7 +265,7 @@ export default function SpotMarkers({ spots }: {
                   </>
                 }
 
-                {editingForm !== 'followup' &&
+                {canEdit && editingForm !== 'followup' &&
                   <div className='w-full flex items-center mt-2'>
                     <button className='flex items-center justify-center py-1' onClick={startEdit}>
                       ➕ 跟進

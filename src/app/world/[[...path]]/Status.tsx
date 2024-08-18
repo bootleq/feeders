@@ -24,6 +24,14 @@ export default function Status(params: any) {
       msg = '正在新增跟進動態';
       control = null;
       break;
+    case 'amendSpotForm':
+      msg = '正在修改地點資料';
+      control = null;
+      break;
+    case 'amendFollowupForm':
+      msg = '正在修改跟進資料';
+      control = null;
+      break;
     default:
       break;
   }

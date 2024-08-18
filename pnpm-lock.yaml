@@ -35,6 +35,9 @@ importers:
       chanfana:
         specifier: ^2.0.2
         version: 2.0.2
+      change-case:
+        specifier: ^5.4.4
+        version: 5.4.4
       date-fns:
         specifier: ^3.6.0
         version: 3.6.0
@@ -3197,6 +3200,9 @@ packages:
 
   chanfana@2.0.2:
     resolution: {integrity: sha512-HuYjj+tIXHvKJ8FobeWOcshg35kYK15uqNQdZy22pF2DMyySW5DlnYK8jcAyoLQiCwPplQdKZonFLfP/sCFMBg==}
+
+  change-case@5.4.4:
+    resolution: {integrity: sha512-HRQyTk2/YPEkt9TnUPbOpr64Uw3KOicFWPVBb+xiHvd6eBx/qPr9xqfBFDT8P2vWsvvz4jbEkfDe71W3VyNu2w==}
 
   check-error@2.1.1:
     resolution: {integrity: sha512-OAlb+T7V4Op9OwdkjmguYRqncdlx5JiofwOAUkmTF+jNdHwzTaTs4sRAGpzLF3oOz5xAyDGrPgeIDFQmDOTiJw==}
@@ -9617,6 +9623,8 @@ snapshots:
       js-yaml: 4.1.0
       openapi3-ts: 4.3.3
       zod: 3.23.8
+
+  change-case@5.4.4: {}
 
   check-error@2.1.1: {}
 
