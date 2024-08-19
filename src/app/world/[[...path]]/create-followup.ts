@@ -2,7 +2,6 @@
 
 import * as R from 'ramda';
 import { z } from 'zod';
-import geohash from 'ngeohash';
 import { auth } from '@/lib/auth';
 import { SpotActionEnum } from '@/lib/schema';
 import { parseFormData, zondedDateTimeSchema } from '@/lib/utils';
@@ -11,7 +10,6 @@ import type { FieldErrors } from '@/components/form/store';
 
 const formSchema = z.object({
   spotId: z.coerce.number().int().nonnegative(),
-  geohash: z.string().min(4),
   action: SpotActionEnum,
   desc: z.string().nullish(),
   material: z.string().nullish(),
@@ -84,7 +82,6 @@ export async function createFollowup(formData: FormData) {
 
     return {
       success: true,
-      spotId: data.spotId,
       reloadFollowups,
     };
   } catch (e) {

@@ -57,7 +57,7 @@ export const sleep = (seconds: number) => {
 // https://github.com/adobe/react-spectrum/issues/6005
 export const ariaDatePickerValueFix = (formData: FormData, fieldNames: string[]) => {
   fieldNames.forEach(k => {
-    const v = formData.get('spawnedAt')
+    const v = formData.get(k);
     // e.g., convert 2024-08-07T00:00:00 to ZondedDateTime string
     if (typeof v === 'string' && v.match(/T[\d:]+$/)) {
       const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;

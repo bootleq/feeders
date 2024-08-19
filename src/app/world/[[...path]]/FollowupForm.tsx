@@ -20,8 +20,6 @@ import { DateTimeField } from '@/components/form/DateTimeField';
 import { parseAbsoluteToLocal } from '@internationalized/date';
 import { spotActionTooltip, spawnedAtTooltip, FormErrors } from './Form';
 
-const fieldName = R.partial(t, ['spotFields']);
-
 function SimpleTooltip({ text }: {
   text: string
 }) {
@@ -30,9 +28,8 @@ function SimpleTooltip({ text }: {
   );
 }
 
-function UnscopedForm({ spotId, geohash }: {
+function UnscopedForm({ spotId }: {
   spotId: number,
-  geohash: string,
 }) {
   const setEditingForm = useSetAtom(editingFormAtom);
   const reload = useSetAtom(mergeSpotFollowupsAtom);
@@ -75,7 +72,7 @@ function UnscopedForm({ spotId, geohash }: {
 
     if (res.success) {
       setSending(false);
-      reload([res.spotId, res.reloadFollowups]);
+      reload([spotId, res.reloadFollowups]);
       setEditingForm('');
       return;
     }
@@ -115,7 +112,6 @@ function UnscopedForm({ spotId, geohash }: {
         <DateTimeField name='spawnedAt' maxValue={nowValue} tooltip={spawnedAtTooltip} />
 
         <input type='hidden' name='spotId' value={spotId} />
-        <input type='hidden' name='geohash' value={geohash} />
       </div>
 
       {R.isNotEmpty(errors) && <FormErrors errors={errors} />}
@@ -143,13 +139,12 @@ function UnscopedForm({ spotId, geohash }: {
   );
 }
 
-export default function FollowupForm({ spotId, geohash }: {
+export default function FollowupForm({ spotId }: {
   spotId: number,
-  geohash: string,
 }) {
   return (
     <ScopeProvider atoms={[errorsAtom, metaAtom]}>
-      <UnscopedForm spotId={spotId} geohash={geohash} />
+      <UnscopedForm spotId={spotId} />
     </ScopeProvider>
   );
 }

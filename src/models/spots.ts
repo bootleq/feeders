@@ -127,6 +127,41 @@ export async function queryDistrict(lat: number, lon: number) {
   return [null, null];
 };
 
+const getFollowupsQuery = () => {
+  const followupProfiles = getQuickProfileQuery().as('followupProfiles');
+  const followupChanges = db.select({
+    docId: changes.docId,
+    count: sql<number>`COUNT()`.as('followupChangesCount')
+  }).from(changes)
+    .groupBy(changes.docId)
+    .where(and(
+      eq(changes.docType, getTableName(spotFollowups)),
+      eq(changes.scope, 'amendFollowup'),
+    )).as('followupChanges');
+
+  const query = db.select({
+    id:          spotFollowups.id,
+    userId:      spotFollowups.userId,
+    desc:        spotFollowups.desc,
+    action:      spotFollowups.action,
+    spotState:   spotFollowups.spotState,
+    material:    spotFollowups.material,
+    feedeeCount: spotFollowups.feedeeCount,
+    createdAt:   spotFollowups.createdAt,
+    removedAt:   spotFollowups.removedAt,
+    spawnedAt:   spotFollowups.spawnedAt,
+    spotId:      spotFollowups.spotId,
+    userName:    followupProfiles.name,
+    changes:     followupChanges.count,
+  }).from(spotFollowups)
+    .where(inArray(spotFollowups.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped]))
+    .innerJoin(followupProfiles, eq(followupProfiles.id, spotFollowups.userId))
+    .leftJoin(followupChanges, eq(followupChanges.docId, spotFollowups.id))
+    .orderBy(desc(spotFollowups.createdAt));
+
+  return query;
+}
+
 export const geoSpotsQuery = (geohashes: string[]) => {
   // Rank latest created followups
   const ranked = db.select({
@@ -144,8 +179,6 @@ export const geoSpotsQuery = (geohashes: string[]) => {
     .as('ranked')
 
   const spotProfiles = getQuickProfileQuery().as('spotProfiles');
-  const followupProfiles = getQuickProfileQuery().as('followupProfiles');
-
   const spotChanges = db.select({
     docId: changes.docId,
     count: sql<number>`COUNT()`.as('spotChangesCount')
@@ -155,6 +188,8 @@ export const geoSpotsQuery = (geohashes: string[]) => {
       eq(changes.docType, getTableName(spots)),
       eq(changes.scope, 'amendSpot'),
     )).as('spotChanges');
+
+  const followups = getFollowupsQuery().as('followups');
 
   const query = db.select({
     spot: {
@@ -181,14 +216,18 @@ export const geoSpotsQuery = (geohashes: string[]) => {
     },
 
     followup: {
-      id:        spotFollowups.id,
-      userId:    spotFollowups.userId,
-      desc:      spotFollowups.desc,
-      action:    spotFollowups.action,
-      spotState: spotFollowups.spotState,
-      material:  spotFollowups.material,
-      createdAt: spotFollowups.createdAt,
-      userName: followupProfiles.name,
+      id:          followups.id,
+      userId:      followups.userId,
+      desc:        followups.desc,
+      action:      followups.action,
+      spotState:   followups.spotState,
+      material:    followups.material,
+      feedeeCount: followups.feedeeCount,
+      createdAt:   followups.createdAt,
+      removedAt:   followups.removedAt,
+      spawnedAt:   followups.spawnedAt,
+      userName:    followups.userName,
+      changes:     followups.changes,
     },
   }).from(ranked)
     .innerJoin(
@@ -198,23 +237,19 @@ export const geoSpotsQuery = (geohashes: string[]) => {
       )
     )
     .innerJoin(
-      spotFollowups,
-      eq(spotFollowups.id, ranked.followupId)
+      followups,
+      eq(followups.id, ranked.followupId)
     ).innerJoin(
       spotProfiles, eq(spotProfiles.id, spots.userId)
-    ).innerJoin(
-      followupProfiles, eq(followupProfiles.id, spotFollowups.userId)
     ).leftJoin(
       spotChanges, eq(spotChanges.docId, spots.id)
     ).where(
       and(
         inArray(spots.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped]),
-        inArray(spotFollowups.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped]),
         inArray(spots.geohash, geohashes),
       )
-    )
-    .orderBy(
-      asc(spots.geohash), desc(spotFollowups.createdAt),
+    ).orderBy(
+      asc(spots.geohash), desc(followups.createdAt),
     );
 
   return query;
@@ -327,24 +362,31 @@ export async function createFollowup(data: CreateFollowupSchema) {
 }
 
 export const getFollowups = async (spotId: number) => {
+  const followups = getFollowupsQuery().as('followups');
+
   const items = await db.select({
-    id:        spotFollowups.id,
-    userId:    spotFollowups.userId,
-    desc:      spotFollowups.desc,
-    action:    spotFollowups.action,
-    spotState: spotFollowups.spotState,
-    material:  spotFollowups.material,
-    createdAt: spotFollowups.createdAt,
-  }).from(spotFollowups)
-    .innerJoin(spots, eq(spots.id, spotFollowups.spotId))
+    id:          followups.id,
+    userId:      followups.userId,
+    desc:        followups.desc,
+    action:      followups.action,
+    spotState:   followups.spotState,
+    material:    followups.material,
+    feedeeCount: followups.feedeeCount,
+    createdAt:   followups.createdAt,
+    removedAt:   followups.removedAt,
+    spawnedAt:   followups.spawnedAt,
+    spotId:      followups.spotId,
+    userName:    followups.userName,
+    changes:     followups.changes,
+  }).from(followups)
+    .innerJoin(spots, eq(spots.id, followups.spotId))
     .where(
       and(
         inArray(spots.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped]),
-        inArray(spotFollowups.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped]),
-        eq(spotFollowups.spotId, spotId),
+        eq(followups.spotId, spotId),
       )
     ).orderBy(
-      desc(spotFollowups.createdAt),
+      desc(followups.createdAt),
     );
 
   return items;

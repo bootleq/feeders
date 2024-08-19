@@ -22,6 +22,7 @@ import FoodLife from './FoodLife';
 import ActionLabel from './ActionLabel';
 import FollowupForm from './FollowupForm';
 import AmendSpotForm from './AmendSpotForm';
+import AmendFollowupForm from './AmendFollowupForm';
 import { editingFormAtom, spotFollowupsAtom, mergeSpotFollowupsAtom, loadingFollowupsAtom } from './store';
 import { addAlertAtom } from '@/components/store';
 import { present } from '@/lib/utils';
@@ -84,6 +85,7 @@ export default function SpotMarkers({ spots }: {
 }) {
   const { data: session, status } = useSession();
   const [editingForm, setEditingForm] = useAtom(editingFormAtom);
+  const [editingItemId, setEditingItemId] = useState<number | null>(null);
   const [now, setNow] = useState(() => new Date());
   const fetchFollowups = useSetAtom(fetchFollowupsAtom);
   const postloadFollowups = useAtomValue(spotFollowupsAtom);
@@ -120,10 +122,19 @@ export default function SpotMarkers({ spots }: {
     setEditingForm('amendSpot');
   }, [setEditingForm]);
 
+  const startAmendFollowup = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const id = e.currentTarget.dataset.followupId;
+    setEditingForm('amendFollowup');
+    setEditingItemId(Number(id));
+  }, [setEditingForm]);
+
   const cancel = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setEditingForm('');
+    setEditingItemId(null);
   }, [setEditingForm]);
 
   const statLiCls = 'hover:bg-yellow-300/50 pr-1';
@@ -246,10 +257,37 @@ export default function SpotMarkers({ spots }: {
                           {formatDistance(now, fo.createdAt).replace('大約', '').trim()}
                         </span>
                         <ActionLabel action={fo.action} className='ml-auto flex items-center' />
+
+                        {canEdit && userId === fo.userId &&
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <button className='inline-flex items-center justify-center p-1 ml-1 text-slate-500/75 hover:bg-yellow-300/50 rounded-full' data-followup-id={fo.id} onClick={startAmendFollowup}>
+                                <PencilSquareIcon className='stroke-current' height={18} />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent className={`${tooltipCls}`}>修改（會留下記錄）</TooltipContent>
+                          </Tooltip>
+                        }
+                        {fo.changes > 0 ?
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Link href={`/audit/followup/${fo.id}`} className='inline-flex items-center justify-center p-1 text-slate-500/75 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
+                                <Square3Stack3DIcon className='stroke-current' height={18} />
+                                {fo.changes}
+                              </Link>
+                              <TooltipContent className={`${tooltipCls}`}>調閱編修記錄（在新分頁開啟）</TooltipContent>
+                            </TooltipTrigger>
+                          </Tooltip>
+                          : ''
+                        }
                       </div>
 
                       {present(fo.desc) &&
                         <div className='p-1 mb-1 mx-1 break-anywhere bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded max-h-32 overflow-auto scrollbar-thin'>{fo.desc}</div>
+                      }
+
+                      {editingForm === 'amendFollowup' && editingItemId === fo.id &&
+                        <AmendFollowupForm followup={fo} />
                       }
                     </div>
                   ))}
@@ -261,7 +299,7 @@ export default function SpotMarkers({ spots }: {
                     <span className='block mx-auto -mt-[1.9rem] mb-2 px-3 w-min whitespace-nowrap bg-white text-sm text-center text-green-800 font-bold'>
                       新增動態
                     </span>
-                    <FollowupForm spotId={s.id} geohash={s.geohash} />
+                    <FollowupForm spotId={s.id} />
                   </>
                 }
 
