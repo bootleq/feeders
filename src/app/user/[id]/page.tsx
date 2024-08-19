@@ -96,17 +96,21 @@ export default async function Page({ params }: {
           <div className={cardCls}>
             <div className='mb-3 bg-slate-200 flex items-center font-bold'>
               <PencilIcon className='mr-2 stroke-current opacity-75' height={24} />
-              改名履歷
+              改名備份
               {renames ? <span className='font-mono font-normal ml-2 text-slate-600'>({renames.length - 1})</span> : '' }
             </div>
             {renames && renames.length > 1 ?
               <ul className='divide-y-2 divide-slate-400/75 max-h-64 overflow-auto scrollbar-thin'>
+                <li className='flex items-center justify-center py-1'>
+                  <span className='pr-2 text-slate-600'>{profile.name}</span>
+                  <span className='font-mono text-xs ml-auto whitespace-nowrap text-slate-600'>現在值</span>
+                </li>
                 {renames.map((r, idx) => {
                   if (!r) return null;
                   const date = format({}, 'yyyy/MM/dd HH:mm', r.time);
                   return (
                     <li key={idx} className='flex items-center justify-center py-1'>
-                      <span className={`pr-2 ${idx === 0 ? 'font-bold' : ''}`}>{r.content}</span>
+                      <span className={`pr-2`}>{r.content}</span>
                       <time className='font-mono text-xs ml-auto whitespace-nowrap'>{ date }</time>
                     </li>
                   );

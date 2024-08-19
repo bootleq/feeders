@@ -59,7 +59,7 @@ export default async function updateUser(formData: FormData) {
           docId: user.id,
           scope: data.field,
           whodunnit: user.id,
-          content: data.value,
+          content: user.name,
         }).returning({ id: changes.id})
       ]);
     } catch (e) {

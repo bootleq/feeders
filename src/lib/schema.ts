@@ -148,7 +148,7 @@ export const changes = sqliteTable("changes", {
   docId: text('docId').notNull(),
   scope: text('scope').notNull(), // field or some index-able name to denote fields
   whodunnit: text('whodunnit').notNull(),
-  content: text('content', { mode: 'json' }).notNull(),
+  content: text('content', { mode: 'json' }).notNull(), // snapshot of content before change
   createdAt: createdAtCol(),
 }, (table) => {
   return {
