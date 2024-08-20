@@ -72,6 +72,7 @@ function Areas({ areas }: {
   areas: GeoSpotsByGeohash
 }) {
   const user = useAtomValue(userAtom);
+  const canEdit = user?.state === 'active';
   const userArea = (user?.areaId && user.bounds) ? { id: user.areaId, bounds: user.bounds } : null;
 
   const picked: [string, GeoSpotsResultSpot][] = R.toPairs(areas)
@@ -84,7 +85,9 @@ function Areas({ areas }: {
     <div className='mt-4 mb-2 p-1 overflow-visible'>
       前往區域
       <ul className='flex py-1 overflow-hidden scrollbar-thin'>
-        <UserArea area={userArea} />
+        {canEdit &&
+          <UserArea area={userArea} />
+        }
 
         {picked.map(([geohash, { lat, lon, city, town }]) => {
           return (

@@ -1,5 +1,6 @@
 "use client"
 
+import { useSession } from 'next-auth/react';
 import Leaflet from 'leaflet';
 import { Marker, Popup } from 'react-leaflet';
 import type { Marker as LeafletMarker } from 'leaflet';
@@ -22,6 +23,7 @@ const MarkerIcon = new Leaflet.DivIcon({
 })
 
 export default function TempMarker() {
+  const { data: session, status } = useSession();
   const [marker, setMarker] = useAtom(mergeTempMarkerAtom);
   const [editingForm, setEditingForm] = useAtom(editingFormAtom);
   const { visible, lat, lon } = marker;
@@ -46,6 +48,8 @@ export default function TempMarker() {
     [setMarker, setEditingForm],
   );
 
+  const canAdd = status === 'authenticated' && session.user.state === 'active';
+
   if (!visible) {
     return;
   }
@@ -59,7 +63,18 @@ export default function TempMarker() {
       ref={markerRef}>
       <Popup minWidth={90}>
         <div className='flex flex-col items-center text-base'>
-          <Form lat={lat} lon={lon} />
+          {canAdd ?
+            <Form lat={lat} lon={lon} />
+            :
+            <div className='text-center'>
+              您目前沒有權限新增地點<br />
+              （未登入或權限有問題）
+              <button className='btn text-sm mx-auto mt-2 bg-slate-100 ring-1 flex items-center hover:bg-white' onClick={() => setMarker({ visible: false })}>
+                <XMarkIcon className='stroke-red-700' height={20} />
+                取消
+              </button>
+            </div>
+          }
         </div>
       </Popup>
     </Marker>
