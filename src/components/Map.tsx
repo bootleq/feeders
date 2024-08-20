@@ -23,6 +23,7 @@ import {
   mergeTempMarkerAtom,
   loadingFollowupsAtom,
 } from '@/app/world/[[...path]]/store';
+import { jsonReviver } from '@/lib/utils';
 import { parsePath, updatePath, AREA_ZOOM_MAX, GEOHASH_PRECISION } from '@/app/world/[[...path]]/util';
 import { useHydrateAtoms } from 'jotai/utils';
 import Status from '@/app/world/[[...path]]/Status';
@@ -61,9 +62,10 @@ const fetchSpotsAtom = atom(
 
     try {
       const response = await fetch(`/api/spots/${staleHashes.sort()}`);
-      const json: ItemsGeoSpotsByGeohash = await response.json();
+      const json = await response.text();
+      const fetched: ItemsGeoSpotsByGeohash = JSON.parse(json, jsonReviver);
       if (response.ok) {
-        set(mergeSpotsAtom, { ...json.items });
+        set(mergeSpotsAtom, { ...fetched.items });
       } else {
         const errorNode = <><code className='font-mono mr-1'>{response.status}</code>無法取得資料</>;
         set(addAlertAtom, 'error', errorNode);

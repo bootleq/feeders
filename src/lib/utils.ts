@@ -40,6 +40,14 @@ export const parseFormData = (formData: FormData) => {
   return R.map(v => v === '' ? null : v)(result);
 }
 
+export const jsonReviver = (key: string, value: any) => {
+  if (key.endsWith('At') && typeof value === 'string') {
+    return new Date(value);
+  }
+
+  return value;
+};
+
 // (internationalized/date) ZondedDateTime => Date
 // Example: '2024-08-10T20:24:29.444+08:00[Asia/Taipei]' => Date
 export const zondedDateTimeSchema =

@@ -87,8 +87,8 @@ export function UnscopedForm({ item }: {
 
   const canSave = !sending;
   const nowValue = parseAbsoluteToLocal(now.toISOString());
-  const defaultRemovedAt = item.removedAt ? fromDate(item.removedAt, getLocalTimeZone()) : nowValue;
-  const defaultSpawnedAt = item.spawnedAt ? fromDate(item.spawnedAt, getLocalTimeZone()) : nowValue;
+  const defaultRemovedAt = item.removedAt ? fromDate(item.removedAt, getLocalTimeZone()) : null;
+  const defaultSpawnedAt = item.spawnedAt ? fromDate(item.spawnedAt, getLocalTimeZone()) : null;
 
   return (
     <>
@@ -96,9 +96,9 @@ export function UnscopedForm({ item }: {
         修訂
         <ArrowsUpDownIcon className='stroke-current' height={18} />
       </div>
-      <form onSubmit={onSubmit} className='flex flex-col items-center gap-y-1 -mt-1 ml-1 pt-3 pb-2 px-0 ring ring-offset-1 ring-purple-400/75 bg-pink-100/75 rounded-lg'>
+      <form onSubmit={onSubmit} className='flex flex-col items-center gap-y-1 -mt-1 ml-1 pt-3 pb-2 px-1 text-sm ring-2 ring-offset-1 ring-purple-400/75 bg-pink-100/75 rounded-lg'>
         <div className='grid grid-cols-[min-content_2fr] gap-y-2 mb-1'>
-          <Select name='action' tooltip={spotActionTooltip} inputProps={{ onChange: onActionChange, defaultValue: item.action }}>
+          <Select name='action' tooltip={spotActionTooltip} inputProps={{ onChange: onActionChange, defaultValue: item.action, className: 'text-sm' }}>
             { SpotActionEnum.options.map(o => (
               <option key={o} value={o}>
                 {t('spotAction', o)}
@@ -110,13 +110,13 @@ export function UnscopedForm({ item }: {
               <DateTimeField name='removedAt' defaultValue={defaultRemovedAt} maxValue={nowValue} />
           }
 
-          <Textarea name='desc' inputProps={{ defaultValue: item.desc || '' }} />
-          <TextInput name='material' inputProps={{ placeholder: '例：狗罐頭', defaultValue: item.material || '' }} />
+          <Textarea name='desc' inputProps={{ defaultValue: item.desc || '', className: 'text-sm' }} />
+          <TextInput name='material' inputProps={{ placeholder: '例：狗罐頭', defaultValue: item.material || '', className: 'text-sm' }} />
           <TextInput
             name='feedeeCount' type='number' tooltip={<SimpleTooltip text='同時出現的狗群隻數' />}
-            inputProps={{ min: 0, max: 99, defaultValue: item.feedeeCount || 0 }} />
+            inputProps={{ min: 0, max: 99, defaultValue: item.feedeeCount || 0, className: 'text-sm' }} />
 
-          <DateTimeField name='spawnedAt' defaultValue={defaultSpawnedAt} tooltip={spawnedAtTooltip} />
+          <DateTimeField name='spawnedAt' defaultValue={defaultSpawnedAt} maxValue={nowValue} tooltip={spawnedAtTooltip} dateInputClass='text-sm mr-1' />
 
           <input type='hidden' name='id' value={item.id} />
         </div>

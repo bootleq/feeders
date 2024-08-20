@@ -27,13 +27,19 @@ export class getFollowups extends ApiRoute {
         content: {
           'application/json': {
             schema: z.object({
-              id:        z.number(),
-              userId:    z.string(),
-              desc:      z.string(),
-              action:    SpotActionEnum,
-              spotState: PubStateEnum,
-              material:  z.string(),
-              createdAt: z.coerce.date(),
+              id:          z.number(),
+              userId:      z.string(),
+              desc:        z.string(),
+              action:      SpotActionEnum,
+              spotState:   PubStateEnum,
+              material:    z.string(),
+              feedeeCount: z.number(),
+              createdAt:   z.coerce.date(),
+              removedAt:   z.coerce.date(),
+              spawnedAt:   z.coerce.date(),
+              spotId:      z.number(),
+              userName:    z.string(),
+              changes:     z.number(),
             }).array()
           },
         },

@@ -34,6 +34,7 @@ interface MyDatePickerProps extends DatePickerProps<ZonedDateTime> {
   label?: string,
   name: string,
   tooltip?: React.ReactNode,
+  dateInputClass?: string,
 }
 
 const fieldName = R.partial(t, ['spotFields']);
@@ -57,7 +58,7 @@ const HeadingWithWordsForForward = (props: HeadingProps, ref: React.ForwardedRef
 const HeadingWithWords = forwardRef(HeadingWithWordsForForward);
 
 export function DateTimeField(
-  { label, name, tooltip, ...props }: MyDatePickerProps
+  { label, name, tooltip, dateInputClass, ...props }: MyDatePickerProps
 ) {
   const [key, setKey] = useState(0);
   const errors = useFieldError(name);
@@ -88,7 +89,7 @@ export function DateTimeField(
       {...props}
     >
       <Group>
-        <DateInput>
+        <DateInput className={`react-aria-DateInput ${dateInputClass || ''}`}>
           {(segment) => <DateSegment segment={segment} />}
         </DateInput>
         <Button><CalendarIcon className='fill-slate-700/75 hover:fill-black' height={20} /></Button>

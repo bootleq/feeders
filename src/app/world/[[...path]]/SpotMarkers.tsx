@@ -25,7 +25,7 @@ import AmendSpotForm from './AmendSpotForm';
 import AmendFollowupForm from './AmendFollowupForm';
 import { editingFormAtom, spotFollowupsAtom, mergeSpotFollowupsAtom, loadingFollowupsAtom } from './store';
 import { addAlertAtom } from '@/components/store';
-import { present } from '@/lib/utils';
+import { present, jsonReviver } from '@/lib/utils';
 import { format, formatDistance } from '@/lib/date-fp';
 import type { GeoSpotsResult, GeoSpotsResultFollowup } from '@/models/spots';
 import mapStyles from '@/components/map.module.scss';
@@ -64,9 +64,10 @@ const fetchFollowupsAtom = atom(
     try {
       set(loadingFollowupsAtom, true);
       const response = await fetch(`/api/followups/${spotId}`);
-      const json: ItemsFollowups = await response.json();
+      const json = await response.text();
+      const fetched: ItemsFollowups = JSON.parse(json, jsonReviver);
       if (response.ok) {
-        set(mergeSpotFollowupsAtom, [spotId, json.items]);
+        set(mergeSpotFollowupsAtom, [spotId, fetched.items]);
       } else {
         const errorNode = <><code className='font-mono mr-1'>{response.status}</code>載入跟進資料失敗</>;
         set(addAlertAtom, 'error', errorNode);

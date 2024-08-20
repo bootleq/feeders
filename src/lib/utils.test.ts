@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { wordWord } from './utils';
+import { wordWord, jsonReviver } from './utils';
 
 describe('wordWord', () => {
   test('simple case', () => {
@@ -20,5 +20,19 @@ describe('wordWord', () => {
     const output = '1 🥦🥕Look👌ToMe 可以😅';
     expect(wordWord(input))
       .toBe(output);
+  });
+});
+
+describe('jsonReviver', () => {
+  test('revives Date', () => {
+    const dateStr = '2024-08-17T21:25:18.000Z';
+    const obj = {
+      foo: 'bar',
+      addedAt: new Date(dateStr),
+    };
+    const json = JSON.stringify(obj);
+
+    expect((JSON.parse(json, jsonReviver)))
+      .toEqual(obj);
   });
 });
