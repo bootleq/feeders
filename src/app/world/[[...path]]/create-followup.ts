@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { auth } from '@/lib/auth';
 import { SpotActionEnum } from '@/lib/schema';
 import { parseFormData, zondedDateTimeSchema } from '@/lib/utils';
-import { createFollowup as save, getFollowups } from '@/models/spots';
+import { createFollowup as save, geoSpots } from '@/models/spots';
 import type { FieldErrors } from '@/components/form/store';
 
 const formSchema = z.object({
@@ -16,6 +16,7 @@ const formSchema = z.object({
   feedeeCount: z.coerce.number().int().nonnegative(),
   spawnedAt: zondedDateTimeSchema,
   removedAt: zondedDateTimeSchema,
+  geohash: z.string(),
 });
 
 type FormSchema = z.infer<typeof formSchema>;
@@ -58,6 +59,10 @@ export async function createFollowup(formData: FormData) {
     delete data.removedAt;
   }
 
+  if (data.spawnedAt && R.isNil(data.material)) {
+    addError('material', '須填寫');
+  }
+
   if (data.spawnedAt && data.spawnedAt > now) {
     addError('spawnedAt', '不能是未來時間');
   }
@@ -78,11 +83,11 @@ export async function createFollowup(formData: FormData) {
       userId: session.userId,
     });
 
-    const reloadFollowups = await getFollowups(data.spotId);
+    const reloadSpots = await geoSpots([data.geohash]);
 
     return {
       success: true,
-      reloadFollowups,
+      reloadSpots,
     };
   } catch (e) {
     console.log('create-followup failed', e);

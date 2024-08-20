@@ -1,6 +1,7 @@
 "use client"
 
 import { format, formatISO, formatDistanceToNow, formatDistance } from '@/lib/date-fp';
+import { isToday } from 'date-fns';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import StateLabel from './StateLabel';
 import { ArrowLongRightIcon } from '@heroicons/react/24/solid';
@@ -8,8 +9,8 @@ import { ArrowLongRightIcon } from '@heroicons/react/24/solid';
 interface Foodable {
   spotState: string;
   material: string | null;
-  spawnedAt: Date | number | null;
-  removedAt: Date | number | null;
+  spawnedAt: Date | null;
+  removedAt: Date | null;
   [key: string]: any;
 }
 
@@ -18,6 +19,11 @@ const tooltipCls = [
   'bg-gradient-to-br from-stone-50 to-slate-100 ring-2 ring-offset-1 ring-slate-300',
 ].join(' ')
 
+const dateFormatter = (date: Date) => {
+  const dateFormat = isToday(date) ? 'HH:mm' : 'M/d HH:mm';
+  return format({}, dateFormat, date);
+};
+
 export default function FoodLife({ spot, now }: {
   spot: Foodable,
   now: Date | null
@@ -25,10 +31,11 @@ export default function FoodLife({ spot, now }: {
   if (!now) {
     return;
   }
-  const { spawnedAt, removedAt, spotState } = spot;
-  const formatTime = format({}, 'HH:mm');
-  const spawned = spawnedAt ? formatTime(spawnedAt) : '??';
-  const removed = removedAt ? formatTime(removedAt) : '??';
+  const { spawnedAt, removedAt: latestRemovedAt, spotState } = spot;
+  const removedAt = latestRemovedAt && spawnedAt && latestRemovedAt > spawnedAt ? latestRemovedAt : null;
+
+  const spawned = spawnedAt ? dateFormatter(spawnedAt) : '??';
+  const removed = removedAt ? dateFormatter(removedAt) : '??';
   let duration = '';
 
   if (spawnedAt && removedAt) {
@@ -56,7 +63,9 @@ export default function FoodLife({ spot, now }: {
             {removed}
           </div>
         </TooltipTrigger>
-        <TooltipContent className={`${tooltipCls}`}>食物存活時間（放置 → 清除）</TooltipContent>
+        <TooltipContent className={`${tooltipCls}`}>
+          食物存活時間（放置 → 清除）
+        </TooltipContent>
       </Tooltip>
     </div>
   );

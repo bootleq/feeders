@@ -11,7 +11,7 @@ import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { SpotActionEnum } from '@/lib/schema';
 import { t } from '@/lib/i18n';
 import { ariaDatePickerValueFix } from '@/lib/utils';
-import { editingFormAtom, mergeSpotFollowupsAtom } from '@/app/world/[[...path]]/store';
+import { editingFormAtom, mergeSpotsAtom } from '@/app/world/[[...path]]/store';
 import ActionLabel from '@/app/world/[[...path]]/ActionLabel';
 import { createFollowup } from '@/app/world/[[...path]]/create-followup';
 import { errorsAtom, metaAtom } from '@/components/form/store';
@@ -28,11 +28,12 @@ function SimpleTooltip({ text }: {
   );
 }
 
-function UnscopedForm({ spotId }: {
+function UnscopedForm({ spotId, geohash }: {
   spotId: number,
+  geohash: string,
 }) {
   const setEditingForm = useSetAtom(editingFormAtom);
-  const reload = useSetAtom(mergeSpotFollowupsAtom);
+  const reloadSpots = useSetAtom(mergeSpotsAtom);
   const setMeta = useSetAtom(metaAtom);
   const [errors, setErrors] = useAtom(errorsAtom);
   const [sending, setSending] = useState(false);
@@ -72,7 +73,7 @@ function UnscopedForm({ spotId }: {
 
     if (res.success) {
       setSending(false);
-      reload([spotId, res.reloadFollowups]);
+      reloadSpots(res.reloadSpots);
       setEditingForm('');
       return;
     }
@@ -112,6 +113,7 @@ function UnscopedForm({ spotId }: {
         <DateTimeField name='spawnedAt' maxValue={nowValue} tooltip={spawnedAtTooltip} />
 
         <input type='hidden' name='spotId' value={spotId} />
+        <input type='hidden' name='geohash' value={geohash} />
       </div>
 
       {R.isNotEmpty(errors) && <FormErrors errors={errors} />}
@@ -139,12 +141,13 @@ function UnscopedForm({ spotId }: {
   );
 }
 
-export default function FollowupForm({ spotId }: {
+export default function FollowupForm({ spotId, geohash }: {
   spotId: number,
+  geohash: string,
 }) {
   return (
     <ScopeProvider atoms={[errorsAtom, metaAtom]}>
-      <UnscopedForm spotId={spotId} />
+      <UnscopedForm spotId={spotId} geohash={geohash} />
     </ScopeProvider>
   );
 }

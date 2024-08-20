@@ -9,7 +9,7 @@ import { spotFollowups, changes } from '@/lib/schema';
 import { PubStateEnum, SpotActionEnum } from '@/lib/schema';
 import { and, eq, getTableName } from 'drizzle-orm';
 import { parseFormData, zondedDateTimeSchema } from '@/lib/utils';
-import { getFollowups } from '@/models/spots';
+import { geoSpots } from '@/models/spots';
 import type { FieldErrors } from '@/components/form/store';
 
 const formSchema = z.object({
@@ -20,6 +20,7 @@ const formSchema = z.object({
   feedeeCount: z.coerce.number().int().nonnegative(),
   spawnedAt: zondedDateTimeSchema,
   removedAt: zondedDateTimeSchema,
+  geohash: z.string(),
 });
 
 type FormSchema = z.infer<typeof formSchema>;
@@ -58,6 +59,10 @@ export async function amendFollowup(formData: FormData) {
     data['removedAt'] = null;
   }
 
+  if (data.spawnedAt && R.isNil(data.material)) {
+    addError('material', '須填寫');
+  }
+
   if (data.spawnedAt && data.spawnedAt > now) {
     addError('spawnedAt', '不能是未來時間');
   }
@@ -73,7 +78,6 @@ export async function amendFollowup(formData: FormData) {
     spawnedAt: spotFollowups.spawnedAt,
     removedAt: spotFollowups.removedAt,
     userId: spotFollowups.userId,
-    spotId: spotFollowups.spotId,
   }).from(spotFollowups)
     .where(and(
       eq(spotFollowups.id, data.id),
@@ -117,12 +121,11 @@ export async function amendFollowup(formData: FormData) {
       }).returning({ id: changes.id})
     ]);
 
-    const reloadFollowups = await getFollowups(followup.spotId!);
+    const reloadSpots = await geoSpots([data.geohash]);
 
     return {
       success: true,
-      spotId: followup.spotId,
-      reloadFollowups,
+      reloadSpots,
     };
   } catch (e) {
     console.log('amend-followup failed', e);

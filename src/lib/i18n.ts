@@ -49,7 +49,8 @@ const translations = {
   },
 
   changeScope: {
-    'amendSpot': '編修地點',
+    'amendSpot':     '編修地點',
+    'amendFollowup': '編修跟進',
   },
 };
 

@@ -152,7 +152,7 @@ export default function SpotMarkers({ spots }: {
           const latestFollowup = R.reduce<GeoSpotsResultFollowup, GeoSpotsResultFollowup>(R.maxBy(R.prop('createdAt')), followups[0], followups);
           const foodable = {
             spotState: latestFollowup.spotState,
-            material: latestFollowup.material,
+            material: s.latestMaterial,
             spawnedAt: s.latestSpawnAt,
             removedAt: s.latestRemovedAt,
           };
@@ -251,12 +251,15 @@ export default function SpotMarkers({ spots }: {
                     <div key={fo.id} className='flex flex-col justify-start items-start mb-2'>
                       <div className='px-1 mb-1 flex flex-wrap justify-start text-sm items-center'>
                         <Link href={`/user/${fo.userId}`} data-user-id={fo.userId} className='mr-3 flex items-center hover:bg-yellow-300/50 text-inherit'>
-                          <UserCircleIcon className='fill-current' height={24} />
+                          <UserCircleIcon className='fill-current' height={18} />
                           { fo.userName }
                         </Link>
-                        <span className='text-sm mr-2 whitespace-nowrap font-mono'>
-                          {formatDistance(now, fo.createdAt).replace('大約', '').trim()}
-                        </span>
+                        <Tooltip>
+                          <TooltipTrigger className='text-sm mr-2 whitespace-nowrap font-mono'>
+                            {formatDistance(now, fo.createdAt).replace('大約', '').trim()}
+                          </TooltipTrigger>
+                          <TooltipContent className={`${tooltipCls} font-mono`}>{format({}, 'y/M/d HH:mm', fo.createdAt)}</TooltipContent>
+                        </Tooltip>
                         <ActionLabel action={fo.action} className='ml-auto flex items-center' />
 
                         {canEdit && userId === fo.userId &&
@@ -272,7 +275,7 @@ export default function SpotMarkers({ spots }: {
                         {fo.changes > 0 ?
                           <Tooltip>
                             <TooltipTrigger>
-                              <Link href={`/audit/followup/${fo.id}`} className='inline-flex items-center justify-center p-1 text-slate-500/75 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
+                              <Link href={`/audit/followup/${fo.id}`} className='inline-flex items-center justify-center p-1 ml-1 text-slate-500/75 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
                                 <Square3Stack3DIcon className='stroke-current' height={18} />
                                 {fo.changes}
                               </Link>
@@ -288,7 +291,7 @@ export default function SpotMarkers({ spots }: {
                       }
 
                       {editingForm === 'amendFollowup' && editingItemId === fo.id &&
-                        <AmendFollowupForm followup={fo} />
+                        <AmendFollowupForm followup={fo} geohash={s.geohash} />
                       }
                     </div>
                   ))}
@@ -300,7 +303,7 @@ export default function SpotMarkers({ spots }: {
                     <span className='block mx-auto -mt-[1.9rem] mb-2 px-3 w-min whitespace-nowrap bg-white text-sm text-center text-green-800 font-bold'>
                       新增動態
                     </span>
-                    <FollowupForm spotId={s.id} />
+                    <FollowupForm spotId={s.id} geohash={s.geohash} />
                   </>
                 }
 

@@ -11,7 +11,7 @@ import { ArrowsUpDownIcon } from '@heroicons/react/24/outline';
 import { SpotActionEnum } from '@/lib/schema';
 import { t } from '@/lib/i18n';
 import { ariaDatePickerValueFix } from '@/lib/utils';
-import { mergeTempMarkerAtom, editingFormAtom, mergeSpotFollowupsAtom } from '@/app/world/[[...path]]/store';
+import { mergeTempMarkerAtom, editingFormAtom, mergeSpotsAtom } from '@/app/world/[[...path]]/store';
 import { amendFollowup } from '@/app/world/[[...path]]/amend-followup';
 import { errorsAtom, metaAtom } from '@/components/form/store';
 import type { GeoSpotsResultFollowup } from '@/models/spots';
@@ -28,11 +28,12 @@ function SimpleTooltip({ text }: {
   );
 }
 
-export function UnscopedForm({ item }: {
+export function UnscopedForm({ item, geohash }: {
   item: GeoSpotsResultFollowup,
+  geohash: string,
 }) {
   const setEditingForm = useSetAtom(editingFormAtom);
-  const reload = useSetAtom(mergeSpotFollowupsAtom);
+  const reloadSpots = useSetAtom(mergeSpotsAtom);
   const setMeta = useSetAtom(metaAtom);
   const [errors, setErrors] = useAtom(errorsAtom);
   const [sending, setSending] = useState(false);
@@ -70,7 +71,7 @@ export function UnscopedForm({ item }: {
 
     if (res.success) {
       setSending(false);
-      reload([res.spotId!, res.reloadFollowups]);
+      reloadSpots(res.reloadSpots);
       setEditingForm('');
       return;
     }
@@ -119,6 +120,7 @@ export function UnscopedForm({ item }: {
           <DateTimeField name='spawnedAt' defaultValue={defaultSpawnedAt} maxValue={nowValue} tooltip={spawnedAtTooltip} dateInputClass='text-sm mr-1' />
 
           <input type='hidden' name='id' value={item.id} />
+          <input type='hidden' name='geohash' value={geohash} />
         </div>
 
         {R.isNotEmpty(errors) && <FormErrors errors={errors} />}
@@ -140,12 +142,13 @@ export function UnscopedForm({ item }: {
   );
 }
 
-export default function Form({ followup }: {
+export default function Form({ followup, geohash }: {
   followup: GeoSpotsResultFollowup,
+  geohash: string,
 }) {
   return (
     <ScopeProvider atoms={[errorsAtom, metaAtom]}>
-      <UnscopedForm item={followup} />
+      <UnscopedForm item={followup} geohash={geohash} />
     </ScopeProvider>
   );
 }

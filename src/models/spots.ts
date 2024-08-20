@@ -163,6 +163,20 @@ const getFollowupsQuery = () => {
 }
 
 export const geoSpotsQuery = (geohashes: string[]) => {
+  const latestSpawnInner = db.select({
+      spotId:    spotFollowups.spotId,
+      material:  spotFollowups.material,
+      spawnedAt: spotFollowups.spawnedAt,
+      rowNumber: sql<number>`ROW_NUMBER() OVER (PARTITION BY ${spotFollowups.spotId} ORDER BY ${spotFollowups.spawnedAt} DESC)`.as('rowNumber'),
+    }).from(spotFollowups).as('latestSpawnInner');
+  const latestSpawn = db.select({
+    spotId:    latestSpawnInner.spotId,
+    material:  latestSpawnInner.material,
+    spawnedAt: latestSpawnInner.spawnedAt,
+  }).from(latestSpawnInner)
+    .where(eq(latestSpawnInner.rowNumber, 1))
+    .as('latestSpawn');
+
   // Rank latest created followups
   const ranked = db.select({
     id:              spots.id,
@@ -170,7 +184,6 @@ export const geoSpotsQuery = (geohashes: string[]) => {
     followCount:     sql<number>`COUNT(${spots.id}) OVER (PARTITION BY ${spots.id})`.as('followCount'),
     followerCount:   sql<number>`COUNT(${spotFollowups.spawnedAt}) OVER (PARTITION BY ${spots.id})`.as('followerCount'),
     respawnCount:    sql<number>`COUNT(${spotFollowups.spawnedAt}) OVER (PARTITION BY ${spots.id})`.as('respawnCount'),
-    latestSpawnAt:   sql<number>`MAX(${spotFollowups.spawnedAt}) OVER (PARTITION BY ${spots.id})`.mapWith(sqlDateMapper).as('latestSpawnAt'),
     latestRemovedAt: sql<number>`MAX(${spotFollowups.removedAt}) OVER (PARTITION BY ${spots.id})`.mapWith(sqlDateMapper).as('latestRemovedAt'),
     maxFeedee:       sql<number>`MAX(${spotFollowups.feedeeCount}) OVER (PARTITION BY ${spots.id})`.as('maxFeedee'),
     rank:            sql<number>`RANK() OVER (PARTITION BY ${spots.id} ORDER BY ${spotFollowups.createdAt} DESC, ${spotFollowups.spawnedAt} DESC)`.as('rank'),
@@ -210,9 +223,11 @@ export const geoSpotsQuery = (geohashes: string[]) => {
       followCount:     ranked.followCount,
       followerCount:   ranked.followerCount,
       respawnCount:    ranked.respawnCount,
-      latestSpawnAt:   ranked.latestSpawnAt,
       latestRemovedAt: ranked.latestRemovedAt,
       maxFeedee:       ranked.maxFeedee,
+
+      latestSpawnAt:  latestSpawn.spawnedAt,
+      latestMaterial: latestSpawn.material,
     },
 
     followup: {
@@ -236,7 +251,9 @@ export const geoSpotsQuery = (geohashes: string[]) => {
         lte(ranked.rank, PRELOAD_FOLLOWUPS_SIZE),
       )
     )
-    .innerJoin(
+    .leftJoin(latestSpawn,
+      eq(latestSpawn.spotId, ranked.id),
+    ).innerJoin(
       followups,
       eq(followups.id, ranked.followupId)
     ).innerJoin(
