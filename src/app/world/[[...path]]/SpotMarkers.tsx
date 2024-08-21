@@ -8,6 +8,7 @@ import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { MapContainer, TileLayer, useMapEvents, Marker, Popup } from "react-leaflet";
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
+import { Desc } from '@/components/Desc';
 import Link from 'next/link';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
@@ -201,9 +202,7 @@ export default function SpotMarkers({ spots }: {
                 </div>
 
                 {present(s.desc) &&
-                  <div className='h-max-60 px-1 py-1 mx-0.5 my-1 resize-y bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded break-anywhere'>
-                    {s.desc}
-                  </div>
+                  <Desc value={s.desc} className='max-h-60 overflow-auto md:max-w-xl px-1 py-1 mx-0.5 my-1 resize-y bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded' />
                 }
 
                 {editingForm === 'amendSpot' &&
@@ -287,7 +286,7 @@ export default function SpotMarkers({ spots }: {
                       </div>
 
                       {present(fo.desc) &&
-                        <div className='p-1 mb-1 mx-1 break-anywhere bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded max-h-32 overflow-auto scrollbar-thin'>{fo.desc}</div>
+                        <Desc value={fo.desc} className='max-h-32 overflow-auto md:max-w-xl p-1 mb-1 mx-1 resize-y bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded' />
                       }
 
                       {editingForm === 'amendFollowup' && editingItemId === fo.id &&

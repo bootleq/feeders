@@ -44,5 +44,6 @@ body {
 
   .break-anywhere {
     overflow-wrap: anywhere;
+    word-break: break-all;
   }
 }

@@ -10,6 +10,7 @@ import { viewItemAtom } from './store';
 import { visitArea } from './util';
 
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
+import { Desc } from '@/components/Desc';
 import ActionLabel from './ActionLabel';
 import FoodLife from './FoodLife';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
@@ -92,7 +93,7 @@ export default function SpotInfo() {
       <FoodLife spot={spot} now={now} />
 
       <div className={descClass} ref={viewBoxRef} data-name='spot-view-item'>
-        {spot.desc}
+        <Desc value={spot.desc} />
       </div>
     </div>
   );

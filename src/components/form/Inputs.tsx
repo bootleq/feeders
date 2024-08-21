@@ -107,7 +107,7 @@ export function Textarea({ label, name, children, tooltip, inputProps = {} }: {
   return (
     <>
       <label {...labelProps} />
-      <textarea id={id} name={name} className={`${inputCls} ${className}`} {...restProps}>
+      <textarea id={id} name={name} className={`${inputCls} text-base ${className}`} {...restProps}>
         {children}
       </textarea>
     </>

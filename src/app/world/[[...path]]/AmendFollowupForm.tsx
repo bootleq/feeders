@@ -97,7 +97,7 @@ export function UnscopedForm({ item, geohash }: {
         修訂
         <ArrowsUpDownIcon className='stroke-current' height={18} />
       </div>
-      <form onSubmit={onSubmit} className='flex flex-col items-center gap-y-1 -mt-1 ml-1 pt-3 pb-2 px-1 text-sm ring-2 ring-offset-1 ring-purple-400/75 bg-pink-100/75 rounded-lg'>
+      <form onSubmit={onSubmit} className='flex flex-col items-center gap-y-1 -mt-1 mx-auto px-2 pt-3 pb-2 text-sm ring-2 ring-offset-1 ring-purple-400/75 bg-pink-100/75 rounded-lg'>
         <div className='grid grid-cols-[min-content_2fr] gap-y-2 mb-1'>
           <Select name='action' tooltip={spotActionTooltip} inputProps={{ onChange: onActionChange, defaultValue: item.action, className: 'text-sm' }}>
             { SpotActionEnum.options.map(o => (
