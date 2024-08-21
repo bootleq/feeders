@@ -42,15 +42,15 @@ async function main() {
 
   console.log("Updating db with values:\n", values);
 
-  const result = await db.insert(spots)
-    .values(values)
-    .onConflictDoUpdate({
-      target: spots.id,
-      set: {
-        city: sql.raw(`excluded.${spots.city.name}`),
-        town: sql.raw(`excluded.${spots.town.name}`),
-      }
-    });
+  // const result = await db.insert(spots)
+  //   .values(values)
+  //   .onConflictDoUpdate({
+  //     target: spots.id,
+  //     set: {
+  //       city: sql.raw(`excluded.${spots.city.name}`),
+  //       town: sql.raw(`excluded.${spots.town.name}`),
+  //     }
+  //   });
 
   console.log('Done.');
 }
