@@ -2,6 +2,54 @@
 
 import Linkify from 'linkify-react';
 import type { Options, Opts, IntermediateRepresentation } from 'linkifyjs';
+import { useSetAtom } from 'jotai';
+import { useCallback } from 'react';
+import { linkPreviewUrlAtom } from '@/components/store';
+
+const canPreview = (href: string) => {
+  const url = new URL(href);
+  const ext = url.pathname.toLowerCase().split('.').pop();
+  return ext && [
+    'jpg',
+    'jpeg',
+    'png',
+    'gif',
+    'svg',
+    'webp',
+    'avif',
+    'apng',
+  ].includes(ext);
+}
+
+function Anchor({ href, content, ...props }: {
+  href: string,
+  content: string,
+  [attr: string]: any,
+}) {
+  const setPreviewURL = useSetAtom(linkPreviewUrlAtom);
+
+  const onMouseOver = useCallback(() => {
+    if (canPreview(href)) {
+      setPreviewURL(href);
+    }
+  }, [href, setPreviewURL]);
+
+  const onMouseOut = useCallback(() => {
+    setPreviewURL(null);
+  }, [setPreviewURL]);
+
+  return (
+    <a
+      href={href}
+      className={`underline underline-offset-[3px] decoration-slate-500 hover:bg-yellow-200/50 font-mono text-sm leading-6 align-text-bottom`}
+      onMouseOver={onMouseOver}
+      onMouseOut={onMouseOut}
+      {...props}
+    >
+      {content}
+    </a>
+  );
+}
 
 const validateFn = (href: string, linkType: string) => {
   if (!href.startsWith('https://') || linkType !== 'url') {
@@ -19,13 +67,7 @@ const renderFn = ({ attributes, content }: IntermediateRepresentation) => {
   const { href, ...props } = attributes;
 
   return (
-    <a
-      href={href}
-      className={`underline underline-offset-[3px] decoration-slate-500 hover:bg-yellow-200/50 font-mono text-sm leading-6 align-text-bottom`}
-      {...props}
-    >
-      {content}
-    </a>
+    <Anchor href={href} content={content} {...props} />
   );
 };
 

@@ -8,6 +8,7 @@ import type { RecentFollowupsResult } from '@/models/spots';
 import { subDays } from '@/lib/date-fp';
 import { parsePath, GEOHASH_PRECISION } from './util';
 import Sidebar from '@/components/Sidebar';
+import LinkPreview from '@/components/LinkPreview';
 import RecentFollowups from './RecentFollowups';
 
 export const runtime = 'edge';
@@ -97,6 +98,8 @@ export default async function Page({ params }: {
         zoomControl={false}
       >
       </LazyMap>
+
+      <LinkPreview />
     </main>
   );
 }
