@@ -19,6 +19,9 @@
     "db:migrate:drop": "LOCAL_DB_PATH=$(find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit) drizzle-kit drop",
     "db:migrate": "LOCAL_DB_PATH=$(find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit) drizzle-kit migrate",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv env.d.ts",
+    "cms": "cd directus && docker compose up --detach",
+    "cms-log": "docker logs feeders-directus -f",
+    "cms-stop": "cd directus && docker compose stop",
     "test": "vitest"
   },
   "dependencies": {

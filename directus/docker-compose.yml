@@ -1,0 +1,26 @@
+services:
+  directus:
+    image: directus/directus:11.0.2
+    container_name: feeders-directus
+    ports:
+      - 8044:8055
+    volumes:
+      - ./database:/directus/database
+      - ./uploads:/directus/uploads
+      - ./extensions:/directus/extensions
+    environment:
+      SECRET_FILE: /run/secrets/secret
+      # ADMIN_EMAIL: not-used@feeders.com
+      # ADMIN_PASSWORD: not-used
+      DB_CLIENT: sqlite3
+      DB_FILENAME: /directus/database/data.db
+      WEBSOCKETS_ENABLED: true
+      # CORS_ENABLED: true
+      # CORS_ORIGIN: true
+      # PUBLIC_URL: /feeders-cms
+    secrets:
+      - secret
+
+secrets:
+  secret:
+    file: ./secrets/secret.txt
