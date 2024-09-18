@@ -35,8 +35,8 @@ function Fact({ fact }: {
 
   return (
     <div className='px-1 pl-3 py-1 relative group rounded ring-slate-700/20'>
-      <div className='flex items-center rounded group-hover:bg-white group-hover:ring ring-slate-200'>
-        <div id={anchor} className='font-mono text-sm relative flex items-center whitespace-nowrap ml-px mr-1 px-px rounded-md ring-1 bg-gradient-to-br from-amber-300/50 to-amber-300/40'>
+      <div className='flex items-center py-1 group-hover:bg-slate-100 group-hover:ring ring-slate-200'>
+        <div id={anchor} className='font-mono text-sm relative flex items-center whitespace-nowrap ml-px mr-1 px-1 rounded-md ring-1 text-red-950 bg-gradient-to-br from-amber-200 to-amber-200/80'>
           <a className='absolute flex items-center justify-center size-3 drop-shadow z-20 -left-[15px] text-opacity-0 group-hover:text-opacity-100 text-black bg-slate-100 border border-slate-400 rounded-full' href={`#${anchor}`}>#</a>
           <div>
             {date}{datePadEnd}

@@ -18,6 +18,8 @@ services:
       # CORS_ENABLED: true
       # CORS_ORIGIN: true
       # PUBLIC_URL: /feeders-cms
+      EXT_SANITIZE_HTML_EVENT_SCOPES: "Facts.items.create,Facts.items.update"
+      EXT_SANITIZE_HTML_ALLOWED_TAGS: "p,a,b,i,em,strong,blockquote,div,span,hr,ol,ul,li,br,code,kbd"
     secrets:
       - secret
 
