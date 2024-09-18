@@ -1,0 +1,22 @@
+.timeline {
+  background-image: linear-gradient(to bottom, #ccc 2px, transparent 2px);
+  background-size: 2px 100%;
+  background-position: 12px 0;
+  background-repeat: no-repeat;
+}
+
+.line {
+  position: absolute;
+  left: 3px;
+  top: 0;
+  z-index: 10;
+  width: 2px;
+  height: 100%;
+  background-color: #6b7280;
+}
+
+.mce {
+  p {
+    padding-block: 0.25rem;
+  }
+}

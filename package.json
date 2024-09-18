@@ -28,6 +28,7 @@
     "@auth/core": "^0.34.1",
     "@auth/d1-adapter": "^1.4.1",
     "@auth/drizzle-adapter": "^1.4.1",
+    "@directus/sdk": "^17.0.1",
     "@floating-ui/react": "^0.26.20",
     "@heroicons/react": "^2.1.5",
     "@internationalized/date": "^3.5.5",
