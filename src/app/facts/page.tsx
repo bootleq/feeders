@@ -5,6 +5,7 @@ import { readItems } from '@directus/sdk';
 import { getWorldUsers } from '@/models/users';
 import Sidebar from '@/components/Sidebar';
 import Timeline from './Timeline';
+import SideControl from './SideControl';
 
 export const runtime = 'edge';
 
@@ -33,9 +34,10 @@ export default async function Page({ params }: {
   return (
     <main className="flex min-h-screen flex-row items-start justify-between">
       <Sidebar user={user} navTitle='事實記錄' fixed={false} className={`max-h-screen scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
+        <SideControl />
       </Sidebar>
 
-      <div className='w-full mx-auto px-0 grid grid-cols-2 gap-2'>
+      <div className='w-full mx-auto px-0 grid sm:grid-cols-2 gap-2'>
         <Timeline facts={facts} />
       </div>
     </main>

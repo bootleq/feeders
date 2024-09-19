@@ -1,8 +1,12 @@
 "use client"
 
 import * as R from 'ramda';
+import { useMemo } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
+import { present } from '@/lib/utils';
+import { viewCtrlAtom } from './store';
 import { getTagColor } from './colors';
-import cmsStyles from './cms.module.scss';
+import tlStyles from './timeline.module.scss';
 
 function renderHtml(html: string, opts = {}) {
   return <div dangerouslySetInnerHTML={{ __html: html }} />;
@@ -42,15 +46,30 @@ function Fact({ fact }: {
             {date}{datePadEnd}
           </div>
         </div>
-        <div className='leading-tight'>
+        <div className='leading-tight text-balance text-center sm:text-start'>
           {title}
         </div>
         <Tags tags={tags} />
       </div>
-      <div className={`text-opacity-90 pl-2 ${cmsStyles.mce}`}>
+      <div data-role='desc' className={`text-opacity-90 pl-2 ${tlStyles.mce}`}>
         {renderHtml(desc)}
       </div>
-      <div className={`drop-shadow ${cmsStyles.line}`}></div>
+
+      <div className='flex items-center flex-wrap'>
+        {present(summary) &&
+          <div data-role='summary' className={`relative text-opacity-90 p-1 py-0 ml-1 mt-1 w-fit ring-1 ${tlStyles.mce}`}>
+            <div className={tlStyles['summary-mark']} title='摘要' aria-label='摘要'></div>
+            {renderHtml(summary)}
+          </div>
+        }
+        {present(origin) &&
+          <div data-role='origin' className={`text-xs p-1 ml-1.5 w-fit text-zinc-700 ${tlStyles.origin}`}>
+            {renderHtml(origin)}
+          </div>
+        }
+      </div>
+
+      <div className={`drop-shadow ${tlStyles.line}`}></div>
     </div>
   );
 }
@@ -58,9 +77,25 @@ function Fact({ fact }: {
 export default function Timeline({ facts }: {
   facts: any[]
 }) {
+  const viewCtrl = useAtomValue(viewCtrlAtom);
+  const Facts = useMemo(() => {
+    return facts.map(fact => <Fact key={fact.id} fact={fact} />);
+  }, [facts]);
+
+  const viewCtrlData = ['desc', 'summary', 'origin'].reduce((acc: Record<string, string>, key: string) => {
+    if (!R.includes(key, viewCtrl)) {
+      acc[`data-view-ctrl-${key}`] = 'hide';
+    }
+    return acc;
+  }, {});
+  // Make dataset like { data-view-ctrl-desc="hide" }
+
   return (
-    <div className={`p-1 overflow-auto scrollbar-thin h-screen ${cmsStyles.timeline}`}>
-      {facts.map(fact => <Fact key={fact.id} fact={fact} />)}
+    <div
+      className={`p-1 overflow-auto scrollbar-thin h-screen ${tlStyles.timeline}`}
+      {...viewCtrlData}
+    >
+      {Facts}
     </div>
   );
 }

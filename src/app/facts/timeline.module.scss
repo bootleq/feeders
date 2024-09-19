@@ -1,0 +1,59 @@
+.timeline {
+  background-image: linear-gradient(to bottom, #ccc 2px, transparent 2px);
+  background-size: 2px 100%;
+  background-position: 12px 0;
+  background-repeat: no-repeat;
+
+  &[data-view-ctrl-desc="hide"] div[data-role="desc"],
+  &[data-view-ctrl-summary="hide"] div[data-role="summary"],
+  &[data-view-ctrl-origin="hide"] div[data-role="origin"] {
+    display: none;
+  }
+}
+
+.line {
+  position: absolute;
+  left: 3px;
+  top: 0;
+  z-index: 10;
+  width: 2px;
+  height: 100%;
+  background-color: #6b7280;
+}
+
+.mce {
+  p {
+    padding-block: 0.25rem;
+  }
+}
+
+.summary-mark {
+  --summary-mark-width: 8px;
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: var(--summary-mark-width) var(--summary-mark-width) 0 0;
+  border-color: #3b82f6 transparent transparent transparent;
+}
+
+.origin {
+  a[href]:hover {
+    color: black;
+    background-color: rgba(56, 189, 248, 0.19);
+  }
+  a[href]::before {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background-image: url('/assets/paper-clip.svg');
+    background-size: cover;
+    background-position: center;
+    margin-right: 2px;
+    vertical-align: middle;
+  }
+}
