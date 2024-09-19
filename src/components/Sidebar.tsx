@@ -56,7 +56,12 @@ export default function Sidebar({ user, navTitle, fixed = true, children, classN
 
   return (
     <>
-      <div ref={ref} className={`${fixedCls} ${widthCls} min-h-[10vh] sm:min-h-full resize-x transition duration-200 ${open ? 'md:overflow-hidden' : '-translate-x-full '} ${className}`}>
+      <div
+        ref={ref}
+        className={`${fixedCls} ${widthCls} min-h-[10vh] sm:min-h-full resize-x transition duration-200 ${open ? 'md:overflow-hidden' : '-translate-x-full '} ${className}`}
+        data-role='sidebar'
+        aria-expanded={open}
+      >
         {children}
 
         <Nav user={user} />

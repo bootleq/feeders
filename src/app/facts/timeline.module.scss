@@ -11,6 +11,10 @@
   }
 }
 
+:global(div[data-role="sidebar"][aria-expanded="false"]) + div .timeline {
+  padding-top: 2.5em;
+}
+
 .line {
   position: absolute;
   left: 3px;

@@ -42,7 +42,7 @@ export default function SideControl() {
   };
 
   return (
-    <div className='p-2'>
+    <div className='p-2 pb-7 sm:pb-2'>
       <div className='bold'>
         顯示控制
       </div>
