@@ -29,6 +29,10 @@
   p {
     padding-block: 0.25rem;
   }
+
+  a[href] {
+    color: #0c4a6e;
+  }
 }
 
 .summary-mark {
@@ -45,6 +49,9 @@
 }
 
 .origin {
+  a[href] {
+    color: #0c4a6e;
+  }
   a[href]:hover {
     color: black;
     background-color: rgba(56, 189, 248, 0.19);
@@ -59,6 +66,10 @@
     background-position: center;
     margin-right: 2px;
     vertical-align: middle;
+  }
+
+  ul, ol {
+    list-style: inside;
   }
 }
 

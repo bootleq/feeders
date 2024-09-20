@@ -22,7 +22,7 @@ function TagList({ tags }: {
   }
 
   return (
-    <ul className='flex items-center text-xs ml-auto'>
+    <ul className='flex items-center text-xs'>
       {tags.map(tag => (
         <li key={tag} className={`${getTagColor(tag).join(' ')} rounded-full px-1 p-px mx-px border text-nowrap`}>
           {tag}
@@ -56,18 +56,23 @@ function Fact({ fact }: {
 
   return (
     <div className='px-1 pl-3 py-1 relative group rounded ring-slate-700/20'>
-      <div className='flex items-center py-1 group-hover:bg-slate-100 group-hover:ring ring-slate-200'>
+      <div className='flex items-center py-1 group/header group-hover:bg-slate-100 group-hover:ring ring-slate-200'>
         <div id={anchor} className='font-mono text-sm relative flex items-center whitespace-nowrap ml-px mr-1 px-1 rounded-md ring-1 text-red-950 bg-gradient-to-br from-amber-200 to-amber-200/80'>
-          <a className='absolute flex items-center justify-center size-3 drop-shadow z-20 -left-[15px] text-opacity-0 group-hover:text-opacity-100 text-black bg-slate-100 border border-slate-400 rounded-full' href={`#${anchor}`}>#</a>
-          <div>
+          <a className='absolute flex items-center justify-center size-3 drop-shadow z-20 -left-[15px] bg-slate-100 border border-slate-400 rounded-full' href={`#${anchor}`}></a>
+          <div className=''>
             {date}{datePadEnd}
           </div>
         </div>
         <div className='leading-tight text-balance text-center sm:text-start'>
           {title}
         </div>
+        <a className='text-opacity-0 ml-auto px-1 rounded-full opacity-0 group-hover/header:opacity-100 hover:bg-amber-300/50 hover:scale-125 hover:-rotate-12' href={`#${anchor}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src='/assets/paper-clip.svg' alt='連結' width={16} height={16} />
+        </a>
         <TagList tags={tags} />
       </div>
+
       <div data-role='desc' className={`text-opacity-90 pl-2 ${tlStyles.mce}`}>
         {renderHtml(desc)}
       </div>
