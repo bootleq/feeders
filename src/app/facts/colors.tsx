@@ -15,6 +15,7 @@ const ensureTWClassNames = {
     'fuchsia-3': ['bg-fuchsia-300', 'text-black'],
     'pink-3':    ['bg-pink-300',    'text-black'],
     'rose-3':    ['bg-rose-300',    'text-black'],
+    'white':     ['bg-white',       'text-slate-500'],
     'fallback':  ['bg-slate-100',   'text-black'],
   },
 };
@@ -22,6 +23,8 @@ const ensureTWClassNames = {
 const tagColors = {
   '狂犬病': 'red-3',
   '動保法': 'green-2',
+  '毒殺': 'violet-3',
+  '': 'white',
 };
 
 export const getTagColor = (key: string) => {

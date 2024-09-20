@@ -2,9 +2,11 @@
 
 import * as R from 'ramda';
 import { useMemo } from 'react';
-import { useAtom, useAtomValue } from 'jotai';
+import { atom, useAtom, useAtomValue } from 'jotai';
+import { atomFamily, splitAtom } from 'jotai/utils';
 import { present } from '@/lib/utils';
-import { viewCtrlAtom } from './store';
+import { viewCtrlAtom, tagsAtom } from './store';
+import type { Tags } from './store';
 import { getTagColor } from './colors';
 import tlStyles from './timeline.module.scss';
 
@@ -12,7 +14,7 @@ function renderHtml(html: string, opts = {}) {
   return <div dangerouslySetInnerHTML={{ __html: html }} />;
 };
 
-function Tags({ tags }: {
+function TagList({ tags }: {
   tags: string[] | null
 }) {
   if (!tags || tags.length === 0) {
@@ -30,12 +32,27 @@ function Tags({ tags }: {
   );
 }
 
+const createAnyTagsHiddenAtom = (tagNames: string[]) => {
+  return atom(get => {
+    const tags = get(tagsAtom);
+    const picked = R.pick(tagNames, tags);
+    const hidden = R.values(picked).some(R.not);
+    return hidden;
+  });
+};
+
 function Fact({ fact }: {
   fact: any,
 }) {
   const { id, date, title, desc, summary, origin, tags, weight } = fact;
   const anchor = `fact-${fact.date}_${fact.id}`;
   const datePadEnd = date.length < 10 ? <span className=''>{'\u00A0'.repeat(10 - date.length)}</span> : '';
+  const anyTagHiddenAtom = useMemo(() => createAnyTagsHiddenAtom(tags || ['']), [tags]);
+  const hidden = useAtomValue(anyTagHiddenAtom);
+
+  if (hidden) {
+    return null;
+  }
 
   return (
     <div className='px-1 pl-3 py-1 relative group rounded ring-slate-700/20'>
@@ -49,7 +66,7 @@ function Fact({ fact }: {
         <div className='leading-tight text-balance text-center sm:text-start'>
           {title}
         </div>
-        <Tags tags={tags} />
+        <TagList tags={tags} />
       </div>
       <div data-role='desc' className={`text-opacity-90 pl-2 ${tlStyles.mce}`}>
         {renderHtml(desc)}

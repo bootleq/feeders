@@ -15,3 +15,18 @@ export const toggleViewCtrlAtom = atom(
     }
   }
 );
+
+export type Tags = Record<string, boolean>;
+export const tagsAtom = atom<Tags>({});
+export const mergeTagsAtom = atom(
+  get => get(tagsAtom),
+  (get, set, update: Tags) => {
+    set(tagsAtom, { ...get(tagsAtom), ...update });
+  }
+);
+export const togglaAllTagsAtom = atom(
+  null,
+  (get, set, update: boolean) => {
+    set(tagsAtom, R.mapObjIndexed(R.always(update)))
+  }
+);
