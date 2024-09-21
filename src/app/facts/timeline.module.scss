@@ -9,6 +9,46 @@
   &[data-view-ctrl-origin="hide"] div[data-role="origin"] {
     display: none;
   }
+
+  &.mark-picking {
+    background-color: white;
+
+    > [data-role='fact'] {
+      &:hover {
+        &::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(147, 197, 253, 0.3);
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}
+
+.peeking-target {
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
+  border-radius: 6px;
+}
+
+.animate-flash {
+  animation: feeders-timeline-flash 1.4s ease-in-out 1;
+}
+
+@keyframes feeders-timeline-flash {
+  0% {
+    background-color: white;
+  }
+  10% {
+    background-color: yellow;
+  }
+  100% {
+    background-color: transparent;
+  }
 }
 
 :global(div[data-role="sidebar"][aria-expanded="false"]) + div .timeline {

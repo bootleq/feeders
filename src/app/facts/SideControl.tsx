@@ -4,12 +4,27 @@ import * as R from 'ramda';
 import { useCallback } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
-import { viewCtrlAtom, toggleViewCtrlAtom, VIEW_CTRL_KEYS, tagsAtom, mergeTagsAtom, togglaAllTagsAtom } from './store';
-import type { Tags } from './store';
+import {
+  viewCtrlAtom,
+  toggleViewCtrlAtom,
+  VIEW_CTRL_KEYS,
+  tagsAtom,
+  mergeTagsAtom,
+  togglaAllTagsAtom,
+  markPickingAtom,
+  marksAtom,
+  removeMarkAtom,
+  peekingMarkAtom,
+} from './store';
+import type { Tags, FactMark } from './store';
 import tlStyles from './timeline.module.scss';
 import { getTagColor } from './colors';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
+import { addAlertAtom } from '@/components/store';
 import { EyeIcon } from '@heroicons/react/24/outline';
 import { EyeSlashIcon } from '@heroicons/react/24/outline';
+import { CursorArrowRippleIcon } from '@heroicons/react/24/solid';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 
 function ViewToggle({ section, current, setter, children }: {
   section: string,
@@ -47,7 +62,7 @@ function ViewCtrlPanel() {
   return (
     <div className='pb-3'>
       <div className='font-bold'>顯示控制</div>
-      <div className='flex flex-col items-start w-fit px-2 py-2 gap-y-2'>
+      <div className='flex flex-col items-start w-fit px-1 py-2 gap-y-2'>
         <ViewToggle section='desc' current={viewCtrl} setter={setViewCtrl}>
           <span className="px-2 ms-3 text-sm">內文</span>
         </ViewToggle>
@@ -93,7 +108,7 @@ function TagCtrlPanel() {
   return (
     <div className='py-3'>
       <div className='font-bold'>標籤篩選</div>
-      <div className='flex flex-col items-start w-fit px-2 py-2 gap-y-2'>
+      <div className='flex flex-col items-start w-fit px-1 py-2 gap-y-2'>
         <ul className='text-xs flex items-center' onClick={onClick}>
           {Object.entries(tags).map(([tag, visible]) => {
             return (
@@ -121,6 +136,121 @@ function TagCtrlPanel() {
   );
 }
 
+const markDateCls = [
+  'font-mono text-sm whitespace-nowrap ml-px mr-1 px-1 rounded-md ring-1 cursor-pointer',
+  'text-red-950 bg-gradient-to-br from-amber-200 to-amber-200/80',
+  'hover:ring hover:text-black',
+].join(' ');
+
+const findFact = (anchor?: string) => {
+  if (!anchor) return;
+  const timeline = document.querySelector('[data-role="timeline"]');
+  const target = timeline?.querySelector(`[data-role='fact'][data-anchor='${anchor}']`);
+  return target;
+};
+
+function Mark({ anchor, title, index }:
+  FactMark & { index: number }
+) {
+  const addAlert = useSetAtom(addAlertAtom);
+  const onRemove = useSetAtom(removeMarkAtom);
+
+  const onJump = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    const el = e.currentTarget;
+    const { anchor } = el.dataset;
+    const target = findFact(anchor);
+    if (!target) {
+      addAlert('error', <>無法跳到選定日期（可能已被隱藏）</>);
+      e.preventDefault();
+      return;
+    }
+
+    target.classList.remove(tlStyles['animate-flash']);
+    window.setTimeout(() =>
+      target.classList.add(tlStyles['animate-flash'])
+    );
+  }, [addAlert]);
+
+  const onMouseEnter = useCallback((e: React.MouseEvent<HTMLLIElement>) => {
+    const el = e.currentTarget;
+    const { anchor } = el.dataset;
+    const fact = findFact(anchor);
+    if (fact) {
+      fact.querySelector('[data-role="fact-date"]')?.classList.add(tlStyles['peeking-target']);
+    }
+  }, []);
+
+  const onMouseLeave = useCallback((e: React.MouseEvent<HTMLLIElement>) => {
+    const cls = tlStyles['peeking-target'];
+    document.querySelectorAll(`[data-role="fact-date"].${cls}`).forEach(el => el.classList.remove(cls));
+  }, []);
+
+  const date = R.match(/fact-(.+)_\d+/, anchor)[1];
+  const datePadEnd = date.length < 10 ? <span className=''>{'\u00A0'.repeat(10 - date.length)}</span> : '';
+
+  return (
+    <li className='flex items-center py-1' data-anchor={anchor} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+      <a className={markDateCls} data-anchor={anchor} href={`#${anchor}`} onClick={onJump}>
+        {date}{datePadEnd}
+      </a>
+      <Tooltip placement='right'>
+        <TooltipTrigger className='mb-1 block truncate'>
+          <div className='text-xs truncate'>
+            {title}
+          </div>
+        </TooltipTrigger>
+        <TooltipContent className="p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1">
+          {title}
+        </TooltipContent>
+      </Tooltip>
+      <button className='btn p-px ml-auto hover:bg-white rounded-full hover:scale-125 hover:drop-shadow' aria-label='刪除' onClick={() => onRemove(anchor)}>
+        <XMarkIcon className='stroke-slate-700 stroke-2' height={16} />
+      </button>
+    </li>
+  );
+}
+
+function MarkCtrlPanel() {
+  const [markPicking, setMarkPicking] = useAtom(markPickingAtom);
+  const [marks, setMarks] = useAtom(marksAtom);
+
+  const onTogglePicker = (e: React.MouseEvent) => {
+    setMarkPicking(R.not);
+  };
+
+  return (
+    <div className='py-3'>
+      <div className='font-bold'>記號</div>
+      <div className='flex flex-col items-start w-full pl-1 py-2 gap-y-2 text-sm'>
+        <button type='button' className={`btn flex items-center py-0.5 ring-1 ml-auto hover:bg-white ${markPicking ? 'bg-white' : 'bg-slate-100'}`} onClick={onTogglePicker}>
+          {markPicking ?
+            <span className='text-black animate-pulse'>
+              選取項目👉
+            </span>
+            :
+            <>
+              增加
+              <CursorArrowRippleIcon className='stroke-slate-700 stroke-0 ml-1' height={20} />
+            </>
+          }
+        </button>
+
+        <ul className='divide-y-2 divide-slate-300 w-full'>
+          {marks.length ?
+            marks.map(({ anchor, title }, idx) => (
+              <Mark key={anchor} index={idx} anchor={anchor} title={title} />
+            ))
+          :
+            <li>
+              Nothing
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 export default function SideControl({ tags }: {
   tags: Tags,
 }) {
@@ -129,9 +259,10 @@ export default function SideControl({ tags }: {
   ]);
 
   return (
-    <div className='p-2 pb-7 sm:pb-2 divide-y-4'>
+    <div className='p-2 pb-7 sm:pb-2 divide-y-4 overflow-auto scrollbar-thin'>
       <ViewCtrlPanel />
       <TagCtrlPanel />
+      <MarkCtrlPanel />
     </div>
   );
 }

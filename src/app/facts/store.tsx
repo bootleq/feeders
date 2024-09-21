@@ -1,5 +1,6 @@
 import * as R from 'ramda';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
+import { removeFirst } from '@/lib/utils';
 
 export const VIEW_CTRL_KEYS= ['desc', 'summary', 'origin'];
 
@@ -30,3 +31,26 @@ export const togglaAllTagsAtom = atom(
     set(tagsAtom, R.mapObjIndexed(R.always(update)))
   }
 );
+
+export type FactMark = {
+  anchor: string,
+  title: string,
+};
+export const markPickingAtom = atom(false);
+export const marksAtom = atom<FactMark[]>([]);
+export const addMarkAtom = atom(
+  null,
+  (get, set, update: FactMark) => {
+    set(marksAtom, R.pipe(
+      R.append(update),
+      R.sortBy(R.prop('anchor'))
+    ));
+  }
+);
+export const removeMarkAtom = atom(
+  null,
+  (get, set, anchor: string) => {
+    set(marksAtom, removeFirst(R.propEq(anchor, 'anchor')));
+  }
+);
+export const peekingMarkAtom = atom<string | null>(null);

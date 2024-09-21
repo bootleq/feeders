@@ -1,11 +1,12 @@
 "use client"
 
 import * as R from 'ramda';
-import { useMemo } from 'react';
-import { atom, useAtom, useAtomValue } from 'jotai';
+import { useCallback, useMemo } from 'react';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomFamily, splitAtom } from 'jotai/utils';
 import { present } from '@/lib/utils';
-import { viewCtrlAtom, tagsAtom } from './store';
+import { addAlertAtom } from '@/components/store';
+import { viewCtrlAtom, tagsAtom, marksAtom, markPickingAtom, addMarkAtom } from './store';
 import type { Tags } from './store';
 import { getTagColor } from './colors';
 import tlStyles from './timeline.module.scss';
@@ -55,15 +56,15 @@ function Fact({ fact }: {
   }
 
   return (
-    <div className='px-1 pl-3 py-1 relative group rounded ring-slate-700/20'>
+    <div data-role='fact' data-anchor={anchor} className='px-1 pl-3 py-1 relative group rounded ring-slate-700/20'>
       <div className='flex items-center py-1 group/header group-hover:bg-slate-100 group-hover:ring ring-slate-200'>
         <div id={anchor} className='font-mono text-sm relative flex items-center whitespace-nowrap ml-px mr-1 px-1 rounded-md ring-1 text-red-950 bg-gradient-to-br from-amber-200 to-amber-200/80'>
           <a className='absolute flex items-center justify-center size-3 drop-shadow z-20 -left-[15px] bg-slate-100 border border-slate-400 rounded-full' href={`#${anchor}`}></a>
-          <div className=''>
+          <div data-role='fact-date'>
             {date}{datePadEnd}
           </div>
         </div>
-        <div className='leading-tight text-balance text-center sm:text-start'>
+        <div data-role='title' className='leading-tight text-balance text-center sm:text-start'>
           {title}
         </div>
         <a className='text-opacity-0 ml-auto px-1 rounded-full opacity-0 group-hover/header:opacity-100 hover:bg-amber-300/50 hover:scale-125 hover:-rotate-12' href={`#${anchor}`}>
@@ -100,6 +101,32 @@ export default function Timeline({ facts }: {
   facts: any[]
 }) {
   const viewCtrl = useAtomValue(viewCtrlAtom);
+  const [markPicking, setMarkPicking] = useAtom(markPickingAtom);
+  const marks = useAtomValue(marksAtom);
+  const addMark = useSetAtom(addMarkAtom);
+  const addAlert = useSetAtom(addAlertAtom);
+
+  const onPickFact = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    const el = e.target as HTMLElement;
+    const fact = el.closest('[data-role="fact"]') as HTMLElement;
+    if (!fact) return;
+
+    const anchor = fact.dataset.anchor;
+    const title = fact.querySelector('[data-role="title"]')?.textContent;
+
+    if (R.any(R.propEq(anchor, 'anchor'), marks)) {
+      addAlert('info', <>已經加入過了，不能重複</>);
+      return;
+    }
+
+    if (anchor && title) {
+      addMark({ anchor, title })
+      setMarkPicking(false);
+    } else {
+      addAlert('error', <>無法取得連結或標題</>);
+    }
+  }, [marks, addMark, setMarkPicking, addAlert]);
+
   const Facts = useMemo(() => {
     return facts.map(fact => <Fact key={fact.id} fact={fact} />);
   }, [facts]);
@@ -112,9 +139,13 @@ export default function Timeline({ facts }: {
   }, {});
   // Make dataset like { data-view-ctrl-desc="hide" }
 
+  const onClickProps = markPicking ? { onClick: onPickFact } : {};
+
   return (
     <div
-      className={`p-1 overflow-auto scrollbar-thin h-screen ${tlStyles.timeline}`}
+      data-role='timeline'
+      className={`p-1 overflow-auto scroll-smooth scroll-py-8 scrollbar-thin h-screen ${tlStyles.timeline} ${markPicking ? tlStyles['mark-picking'] : ''}`}
+      {...onClickProps}
       {...viewCtrlData}
     >
       {Facts}

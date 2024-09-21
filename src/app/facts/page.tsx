@@ -4,6 +4,8 @@ import directus from '@/lib/directus';
 import { readItems } from '@directus/sdk';
 import { getWorldUsers } from '@/models/users';
 import Sidebar from '@/components/Sidebar';
+import Alerts from '@/components/Alerts';
+import { alertsAtom, dismissAlertAtom } from '@/components/store';
 import type { Tags } from './store';
 import Timeline from './Timeline';
 import SideControl from './SideControl';
@@ -48,6 +50,8 @@ export default async function Page({ params }: {
       <div className='w-full mx-auto px-0 grid sm:grid-cols-2 gap-2'>
         <Timeline facts={facts} />
       </div>
+
+      <Alerts itemsAtom={alertsAtom} dismissAtom={dismissAlertAtom} />
     </main>
   );
 }

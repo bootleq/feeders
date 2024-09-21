@@ -21,6 +21,19 @@ export const slugify = R.pipe(
   R.replace(/[^a-zA-Z\d-]+/g, ''),
 );
 
+export const removeFirst = (pred: (a: any) => boolean) => R.converge(
+  (index: number, list: Array<any>) => {
+    if (index > -1) {
+      return R.remove(index, 1, list);
+    }
+    return list;
+  },
+  [
+    R.findIndex(pred),
+    R.identity
+  ]
+);
+
 // 在中英文之間增加空白
 let wordWordRegexp = new RegExp([
   /(?<![\s\p{P}\p{Emoji_Presentation}])/u, // not begin with space, punctuation, or emoji

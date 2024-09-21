@@ -1,3 +1,5 @@
+"use client"
+
 import * as R from 'ramda';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
 import { ReactElement } from 'react';

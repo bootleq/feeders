@@ -1,3 +1,5 @@
+"use client"
+
 import { useSetAtom, useAtomValue } from 'jotai';
 import type { PrimitiveAtom, WritableAtom } from 'jotai';
 import { ReactElement } from 'react';
