@@ -1,12 +1,19 @@
 "use client"
 
 import * as R from 'ramda';
-import { useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomFamily, splitAtom } from 'jotai/utils';
 import { present } from '@/lib/utils';
 import { addAlertAtom } from '@/components/store';
-import { viewCtrlAtom, tagsAtom, marksAtom, markPickingAtom, addMarkAtom } from './store';
+import {
+  viewCtrlAtom,
+  tagsAtom,
+  marksAtom,
+  markPickingAtom,
+  addMarkAtom,
+  timelineInterObserverAtom,
+} from './store';
 import type { Tags } from './store';
 import { getTagColor } from './colors';
 import tlStyles from './timeline.module.scss';
@@ -97,14 +104,58 @@ function Fact({ fact }: {
   );
 }
 
+function MarkOffscreenIndicators({ direct }: {
+  direct: 'up' | 'down'
+}) {
+  const dirWord = direct === 'up' ? '上方' : '下方';
+  return (
+    <div className={tlStyles[`mark-offscreen-${direct}`]} aria-label={`目標在畫面外（${dirWord}）`}>
+      <div className='animate-bounce'>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className={direct === 'up' ? '-rotate-90' : 'rotate-90'} src='/assets/hand-pointer.svg' alt={`在${dirWord}`} width={96} height={96} />
+      </div>
+    </div>
+  );
+}
+
 export default function Timeline({ facts }: {
   facts: any[]
 }) {
+  const ref = useRef<HTMLDivElement>(null);
   const viewCtrl = useAtomValue(viewCtrlAtom);
   const [markPicking, setMarkPicking] = useAtom(markPickingAtom);
   const marks = useAtomValue(marksAtom);
   const addMark = useSetAtom(addMarkAtom);
   const addAlert = useSetAtom(addAlertAtom);
+  const [interObserver, setInterObserver] = useAtom(timelineInterObserverAtom);
+  const [markOffscreen, setMarkOffscreen] = useState<null | 'up' | 'down'>(null);
+
+  useEffect(() => {
+    const root = ref.current;
+    const observer = new IntersectionObserver((entries) => {
+      if (!root) return;
+      entries.forEach((e) => {
+        if (!e.rootBounds) return;
+        if (!e.isIntersecting) {
+          if (e.boundingClientRect.bottom <= e.rootBounds.top) {
+            root.dataset.markOffscreen = 'up';
+          } else {
+            root.dataset.markOffscreen = 'down';
+          }
+        }
+        observer.unobserve(e.target);
+      });
+    }, {
+      root,
+      threshold: 1.0
+    });
+    setInterObserver(observer);
+
+    return () => {
+      observer.disconnect();
+      setInterObserver(null);
+    };
+  }, [setInterObserver]);
 
   const onPickFact = useCallback((e: React.MouseEvent<HTMLElement>) => {
     const el = e.target as HTMLElement;
@@ -143,12 +194,15 @@ export default function Timeline({ facts }: {
 
   return (
     <div
+      ref={ref}
       data-role='timeline'
-      className={`p-1 overflow-auto scroll-smooth scroll-py-8 scrollbar-thin h-screen ${tlStyles.timeline} ${markPicking ? tlStyles['mark-picking'] : ''}`}
+      className={`relative p-1 overflow-auto scroll-smooth scroll-py-8 scrollbar-thin h-screen ${tlStyles.timeline} ${markPicking ? tlStyles['mark-picking'] : ''}`}
       {...onClickProps}
       {...viewCtrlData}
     >
+      <MarkOffscreenIndicators direct='up' />
       {Facts}
+      <MarkOffscreenIndicators direct='down' />
     </div>
   );
 }

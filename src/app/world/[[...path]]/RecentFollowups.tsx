@@ -1,7 +1,7 @@
 "use client"
 
 import * as R from 'ramda';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
 import { subDays, format, formatISO, formatDistance } from '@/lib/date-fp';
 import Link from 'next/link';

@@ -2,7 +2,7 @@
 
 import * as R from 'ramda';
 import { useCallback } from 'react';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
 import {
   viewCtrlAtom,
@@ -15,6 +15,7 @@ import {
   marksAtom,
   removeMarkAtom,
   peekingMarkAtom,
+  timelineInterObserverAtom,
 } from './store';
 import type { Tags, FactMark } from './store';
 import tlStyles from './timeline.module.scss';
@@ -153,7 +154,8 @@ function Mark({ anchor, title, index }:
   FactMark & { index: number }
 ) {
   const addAlert = useSetAtom(addAlertAtom);
-  const onRemove = useSetAtom(removeMarkAtom);
+  const removeMark = useSetAtom(removeMarkAtom);
+  const interObserver = useAtomValue(timelineInterObserverAtom);
 
   const onJump = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
     const el = e.currentTarget;
@@ -169,20 +171,40 @@ function Mark({ anchor, title, index }:
     window.setTimeout(() =>
       target.classList.add(tlStyles['animate-flash'])
     );
+
+    const tl = target.closest('[data-role="timeline"]') as HTMLElement;
+    if (tl) {
+      delete tl.dataset.markOffscreen;
+    }
   }, [addAlert]);
+
+  const onRemove = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    const el = e.currentTarget;
+    const li = el.closest('li');
+    if (li) {
+      const { anchor } = li.dataset;
+      if (anchor) removeMark(anchor);
+      const tl = document.querySelector('[data-role="timeline"]') as HTMLElement;
+      if (tl) { delete tl.dataset.markOffscreen; }
+    }
+  }, [removeMark]);
 
   const onMouseEnter = useCallback((e: React.MouseEvent<HTMLLIElement>) => {
     const el = e.currentTarget;
     const { anchor } = el.dataset;
     const fact = findFact(anchor);
-    if (fact) {
-      fact.querySelector('[data-role="fact-date"]')?.classList.add(tlStyles['peeking-target']);
+    const target = fact?.querySelector('[data-role="fact-date"]');
+    if (target) {
+      target.classList.add(tlStyles['peeking-target']);
+      interObserver?.observe(target);
     }
-  }, []);
+  }, [interObserver]);
 
   const onMouseLeave = useCallback((e: React.MouseEvent<HTMLLIElement>) => {
     const cls = tlStyles['peeking-target'];
+    const tl = document.querySelector('[data-role="timeline"]') as HTMLElement;
     document.querySelectorAll(`[data-role="fact-date"].${cls}`).forEach(el => el.classList.remove(cls));
+    delete tl.dataset.markOffscreen;
   }, []);
 
   const date = R.match(/fact-(.+)_\d+/, anchor)[1];
@@ -203,7 +225,7 @@ function Mark({ anchor, title, index }:
           {title}
         </TooltipContent>
       </Tooltip>
-      <button className='btn p-px ml-auto hover:bg-white rounded-full hover:scale-125 hover:drop-shadow' aria-label='刪除' onClick={() => onRemove(anchor)}>
+      <button className='btn p-px ml-auto hover:bg-white rounded-full hover:scale-125 hover:drop-shadow' aria-label='刪除' onClick={onRemove}>
         <XMarkIcon className='stroke-slate-700 stroke-2' height={16} />
       </button>
     </li>
@@ -224,8 +246,10 @@ function MarkCtrlPanel() {
       <div className='flex flex-col items-start w-full pl-1 py-2 gap-y-2 text-sm'>
         <button type='button' className={`btn flex items-center py-0.5 ring-1 ml-auto hover:bg-white ${markPicking ? 'bg-white' : 'bg-slate-100'}`} onClick={onTogglePicker}>
           {markPicking ?
-            <span className='text-black animate-pulse'>
-              選取項目👉
+            <span className='text-black animate-pulse flex items-center'>
+              選取項目
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className='ml-1' src='/assets/hand-pointer.svg' alt='右側' width={18} height={18} />
             </span>
             :
             <>
@@ -241,9 +265,7 @@ function MarkCtrlPanel() {
               <Mark key={anchor} index={idx} anchor={anchor} title={title} />
             ))
           :
-            <li>
-              Nothing
-            </li>
+            <li className='text-slate-600'>（空）</li>
           }
         </ul>
       </div>
