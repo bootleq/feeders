@@ -49,8 +49,9 @@ const createAnyTagsHiddenAtom = (tagNames: string[]) => {
   });
 };
 
-function Fact({ fact }: {
+function Fact({ fact, isSubView }: {
   fact: any,
+  isSubView?: boolean,
 }) {
   const { id, date, title, desc, summary, origin, tags, weight } = fact;
   const anchor = `fact-${fact.date}_${fact.id}`;
@@ -62,10 +63,12 @@ function Fact({ fact }: {
     return null;
   }
 
+  const idProp = isSubView ? {} : { id: anchor };
+
   return (
     <div data-role='fact' data-anchor={anchor} className='px-1 pl-3 py-1 relative group rounded ring-slate-700/20'>
       <div className='flex items-center py-1 group/header group-hover:bg-slate-100 group-hover:ring ring-slate-200'>
-        <div id={anchor} className='font-mono text-sm relative flex items-center whitespace-nowrap ml-px mr-1 px-1 rounded-md ring-1 text-red-950 bg-gradient-to-br from-amber-200 to-amber-200/80'>
+        <div {...idProp} className='font-mono text-sm relative flex items-center whitespace-nowrap ml-px mr-1 px-1 rounded-md ring-1 text-red-950 bg-gradient-to-br from-amber-200 to-amber-200/80'>
           <a className='absolute flex items-center justify-center size-3 drop-shadow z-20 -left-[15px] bg-slate-100 border border-slate-400 rounded-full' href={`#${anchor}`}></a>
           <div data-role='fact-date'>
             {date}{datePadEnd}
@@ -118,8 +121,9 @@ function MarkOffscreenIndicators({ direct }: {
   );
 }
 
-export default function Timeline({ facts }: {
-  facts: any[]
+export default function Timeline({ facts, isSubView = false }: {
+  facts: any[],
+  isSubView?: boolean,
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const viewCtrl = useAtomValue(viewCtrlAtom);
@@ -127,10 +131,12 @@ export default function Timeline({ facts }: {
   const marks = useAtomValue(marksAtom);
   const addMark = useSetAtom(addMarkAtom);
   const addAlert = useSetAtom(addAlertAtom);
-  const [interObserver, setInterObserver] = useAtom(timelineInterObserverAtom);
+  const setInterObserver = useSetAtom(timelineInterObserverAtom);
   const [markOffscreen, setMarkOffscreen] = useState<null | 'up' | 'down'>(null);
 
   useEffect(() => {
+    if (isSubView) return;
+
     const root = ref.current;
     const observer = new IntersectionObserver((entries) => {
       if (!root) return;
@@ -155,7 +161,7 @@ export default function Timeline({ facts }: {
       observer.disconnect();
       setInterObserver(null);
     };
-  }, [setInterObserver]);
+  }, [setInterObserver, isSubView]);
 
   const onPickFact = useCallback((e: React.MouseEvent<HTMLElement>) => {
     const el = e.target as HTMLElement;
@@ -179,8 +185,8 @@ export default function Timeline({ facts }: {
   }, [marks, addMark, setMarkPicking, addAlert]);
 
   const Facts = useMemo(() => {
-    return facts.map(fact => <Fact key={fact.id} fact={fact} />);
-  }, [facts]);
+    return facts.map(fact => <Fact key={fact.id} fact={fact} isSubView={isSubView} />);
+  }, [facts, isSubView]);
 
   const viewCtrlData = ['desc', 'summary', 'origin'].reduce((acc: Record<string, string>, key: string) => {
     if (!R.includes(key, viewCtrl)) {
@@ -190,19 +196,27 @@ export default function Timeline({ facts }: {
   }, {});
   // Make dataset like { data-view-ctrl-desc="hide" }
 
-  const onClickProps = markPicking ? { onClick: onPickFact } : {};
+  const markPickingInMainView = (markPicking && !isSubView);
+  const onClickProps = markPickingInMainView ? { onClick: onPickFact } : {};
+
+  const rootClassName = [
+    'relative p-1 overflow-auto scroll-smooth scroll-py-8 scrollbar-thin h-screen',
+    tlStyles.timeline,
+    markPickingInMainView ? tlStyles['mark-picking'] : '',
+    isSubView ? 'hidden md:block' : '',
+  ].join(' ');
 
   return (
     <div
       ref={ref}
       data-role='timeline'
-      className={`relative p-1 overflow-auto scroll-smooth scroll-py-8 scrollbar-thin h-screen ${tlStyles.timeline} ${markPicking ? tlStyles['mark-picking'] : ''}`}
+      className={rootClassName}
       {...onClickProps}
       {...viewCtrlData}
     >
-      <MarkOffscreenIndicators direct='up' />
+      {!isSubView && <MarkOffscreenIndicators direct='up' />}
       {Facts}
-      <MarkOffscreenIndicators direct='down' />
+      {!isSubView && <MarkOffscreenIndicators direct='down' />}
     </div>
   );
 }

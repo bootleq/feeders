@@ -7,7 +7,7 @@ import Sidebar from '@/components/Sidebar';
 import Alerts from '@/components/Alerts';
 import { alertsAtom, dismissAlertAtom } from '@/components/store';
 import type { Tags } from './store';
-import Timeline from './Timeline';
+import TimelineContainer from './TimelineContainer';
 import SideControl from './SideControl';
 
 export const runtime = 'edge';
@@ -47,9 +47,7 @@ export default async function Page({ params }: {
         <SideControl tags={tags} />
       </Sidebar>
 
-      <div className='w-full mx-auto px-0 grid sm:grid-cols-2 gap-2'>
-        <Timeline facts={facts} />
-      </div>
+      <TimelineContainer facts={facts} />
 
       <Alerts itemsAtom={alertsAtom} dismissAtom={dismissAlertAtom} />
     </main>

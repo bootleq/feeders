@@ -17,6 +17,8 @@ export const toggleViewCtrlAtom = atom(
   }
 );
 
+export const columnsAtom = atom<boolean[]>([true, false]);
+
 export type Tags = Record<string, boolean>;
 export const tagsAtom = atom<Tags>({});
 export const mergeTagsAtom = atom(

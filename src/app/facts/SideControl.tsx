@@ -8,6 +8,7 @@ import {
   viewCtrlAtom,
   toggleViewCtrlAtom,
   VIEW_CTRL_KEYS,
+  columnsAtom,
   tagsAtom,
   mergeTagsAtom,
   togglaAllTagsAtom,
@@ -31,6 +32,8 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 
 const localMarksAtom = atomWithStorage<FactMark[]>('feeders.factMarks', []);
+
+const MAX_COLUMNS = 4;
 
 function ViewToggle({ section, current, setter, children }: {
   section: string,
@@ -57,6 +60,8 @@ function ViewToggle({ section, current, setter, children }: {
 function ViewCtrlPanel() {
   const setWholeViewCtrl = useSetAtom(viewCtrlAtom);
   const [viewCtrl, setViewCtrl] = useAtom(toggleViewCtrlAtom);
+  const [columns, setColumns] = useAtom(columnsAtom);
+
   const onToggleAll = (toggle: boolean) => {
     if (toggle) {
       return () => setWholeViewCtrl(VIEW_CTRL_KEYS);
@@ -65,32 +70,85 @@ function ViewCtrlPanel() {
     }
   };
 
+  const onToggleColumn = (e: React.MouseEvent) => {
+    const el = e.currentTarget as HTMLElement;
+    const idx = parseInt(el.dataset.index || '', 10);
+    if (idx > 0) {
+      const newColumns = R.over(R.lensIndex(idx), R.not, columns);
+      setColumns(newColumns);
+    }
+  };
+  const onAddColumn = () => {
+    if (columns.length <= MAX_COLUMNS) {
+      setColumns(R.append(false, columns));
+    }
+  };
+  const onRemoveColumn = () => {
+    if (columns.length > 1) {
+      setColumns(columns.slice(0, -1));
+    }
+  };
+
+  const colFilledCls = 'bg-[repeating-linear-gradient(-45deg,rgba(0,0,0,.2),rgba(0,0,0,.2)_2px,transparent_3px,transparent_6px)]';
+
   return (
     <div className='pb-3'>
       <div className='font-bold'>顯示控制</div>
-      <div className='flex flex-col items-start w-fit px-1 py-2 gap-y-2'>
-        <ViewToggle section='desc' current={viewCtrl} setter={setViewCtrl}>
-          <span className="px-2 ms-3 text-sm">內文</span>
-        </ViewToggle>
-        <ViewToggle section='summary' current={viewCtrl} setter={setViewCtrl}>
-          <span className={`relative px-2 ms-3 text-sm ring-1`}>
-            <div className={tlStyles['summary-mark']}></div>
-            摘要
-          </span>
-        </ViewToggle>
-        <ViewToggle section='origin' current={viewCtrl} setter={setViewCtrl}>
-          <span className="px-2 ms-3 text-sm text-zinc-700">出處</span>
-        </ViewToggle>
+      <div className='flex items-start flex-wrap justify-between'>
+        <div className='flex flex-col items-start w-fit px-1 py-2 gap-y-2'>
+          <ViewToggle section='desc' current={viewCtrl} setter={setViewCtrl}>
+            <span className="px-2 ms-3 text-sm text-nowrap">內文</span>
+          </ViewToggle>
+          <ViewToggle section='summary' current={viewCtrl} setter={setViewCtrl}>
+            <span className={`relative px-2 ms-3 text-sm text-nowrap ring-1`}>
+              <div className={tlStyles['summary-mark']}></div>
+              摘要
+            </span>
+          </ViewToggle>
+          <ViewToggle section='origin' current={viewCtrl} setter={setViewCtrl}>
+            <span className="px-2 ms-3 text-sm text-zinc-700 text-nowrap">出處</span>
+          </ViewToggle>
 
-        <div className="inline-flex items-center justify-start text-sm mt-1">
-          全部
-          <div className='inline-flex items-center gap-x-1 ml-2'>
-            <button type='button' className='btn bg-slate-100 py-0 ring-1 hover:bg-white' onClick={onToggleAll(true)} disabled={viewCtrl.length === VIEW_CTRL_KEYS.length} aria-label='顯示'>
-              <EyeIcon className='stroke-slate-700' height={20} />
-            </button>
-            <button type='button' className='btn bg-slate-100 py-0 ring-1 hover:bg-white' onClick={onToggleAll(false)} disabled={viewCtrl.length === 0} aria-label='隱藏'>
-              <EyeSlashIcon className='stroke-slate-700' height={20} />
-            </button>
+          <div className="inline-flex items-center justify-start text-sm mt-1">
+            <div className='text-nowrap'>
+              全部
+            </div>
+            <div className='inline-flex items-center gap-x-1 ml-2'>
+              <button type='button' className='btn bg-slate-100 py-0 ring-1 hover:bg-white' onClick={onToggleAll(true)} disabled={viewCtrl.length === VIEW_CTRL_KEYS.length} aria-label='顯示'>
+                <EyeIcon className='stroke-slate-700' height={20} />
+              </button>
+              <button type='button' className='btn bg-slate-100 py-0 ring-1 hover:bg-white' onClick={onToggleAll(false)} disabled={viewCtrl.length === 0} aria-label='隱藏'>
+                <EyeSlashIcon className='stroke-slate-700' height={20} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className='group flex-col items-center flex-grow w-fit px-2 py-1 gap-y-1 text-sm hidden md:flex'>
+          <div className='text-slate-700 invisible group-hover:visible'>
+            分欄
+          </div>
+          <div className='flex items-start gap-x-2'>
+            {
+              columns.map((col, idx) => (
+                <div
+                  key={idx}
+                  className={`flex flex-col items-center justify-center h-14 ring ring-slate-400/50 hover:ring-slate-500 px-px ${idx > 0 ? 'cursor-pointer' : 'cursor-default'} ${col ? colFilledCls : ''}`}
+                >
+                  <div className='flex-grow content-center font-mono text-slate-300 group-hover:text-slate-700 group-hover:font-bold' data-index={idx} onClick={onToggleColumn}>
+                    {idx + 1}
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+          <div className='mt-1 font-mono font-bold invisible group-hover:visible sm:[@media(any-hover:none)]:visible'>
+            {columns.length > 1 &&
+              <button type='button' className='btn p-1 text-slate-600/50 hover:text-black hover:ring' onClick={onRemoveColumn} aria-label='減少分欄'> - </button>
+            }
+            { columns.length <= MAX_COLUMNS &&
+              <button type='button' className='btn p-1 text-slate-600/50 hover:text-black hover:ring' onClick={onAddColumn} aria-label='增加分欄'> + </button>
+            }
           </div>
         </div>
       </div>
