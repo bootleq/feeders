@@ -44,7 +44,7 @@ function InfoItem(key: string, content: ReactElement, dismiss: (key: string) => 
   );
 }
 
-export default function ALert(params: {
+export default function Alert(params: {
   itemsAtom: PrimitiveAtom<keyedAlert[]>,
   dismissAtom: WritableAtom<null, [key: string], void>,
 }) {

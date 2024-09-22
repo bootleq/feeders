@@ -2,6 +2,8 @@ import * as R from 'ramda';
 import { z } from 'zod';
 import { parseZonedDateTime } from '@internationalized/date';
 
+export type AnyFunction = (...args: any[]) => any;
+
 export const present = R.both(R.isNotNil, R.isNotEmpty);
 
 // slugify
