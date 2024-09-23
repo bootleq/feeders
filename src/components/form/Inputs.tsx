@@ -10,7 +10,7 @@ import { atom, useAtomValue } from 'jotai';
 import { errorsAtom, metaAtom } from '@/components/form/store';
 
 export const labelCls = [
-  'flex items-center justify-end my-1 whitespace-nowrap active:font-bold',
+  'inline-flex items-center justify-end my-1 whitespace-nowrap active:font-bold',
   'aria-[invalid]:text-red-700 aria-[invalid]:font-bold aria-[invalid]:ring-red-200 aria-[invalid]:ring-opacity-80',
 ].join(' ');
 export const inputCls = [
@@ -19,6 +19,7 @@ export const inputCls = [
   'focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50',
   'read-only:bg-gray-100',
   '[&[type="number"]]:font-mono',
+  '[&[type="date"]]:font-mono',
   '[&:user-invalid]:border-red-300 [&:user-invalid]:ring [&:user-invalid]:ring-red-200 [&:user-invalid]:ring-opacity-80',
 ].join(' ');
 
@@ -43,7 +44,7 @@ const fieldName = R.partial(t, ['spotFields']);
 export function TextInput({ label, name, tooltip, type = 'text', inputProps = {} }: {
   label?: string,
   name: string,
-  type?: 'text' | 'number' | 'datetime-local',
+  type?: 'text' | 'number' | 'date' | 'datetime-local',
   tooltip?: React.ReactNode,
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>,
 }) {

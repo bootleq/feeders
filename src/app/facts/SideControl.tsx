@@ -1,6 +1,7 @@
 "use client"
 
 import * as R from 'ramda';
+import { z } from 'zod';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useHydrateAtoms, atomWithStorage } from 'jotai/utils';
@@ -9,6 +10,8 @@ import {
   toggleViewCtrlAtom,
   VIEW_CTRL_KEYS,
   columnsAtom,
+  dateRangeAtom,
+  dateRejectedCountAtom,
   tagsAtom,
   mergeTagsAtom,
   togglaAllTagsAtom,
@@ -18,9 +21,10 @@ import {
   peekingMarkAtom,
   timelineInterObserverAtom,
 } from './store';
-import type { Tags, FactMark } from './store';
+import type { Tags, FactMark, DateRange } from './store';
 import tlStyles from './timeline.module.scss';
 import { getTagColor } from './colors';
+import { TextInput } from '@/components/form/Inputs';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { AnimateOnce } from '@/components/AnimateOnce';
 import { addAlertAtom } from '@/components/store';
@@ -28,12 +32,15 @@ import { EyeIcon } from '@heroicons/react/24/outline';
 import { EyeSlashIcon } from '@heroicons/react/24/outline';
 import { CursorArrowRippleIcon } from '@heroicons/react/24/solid';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
+import { CheckIcon } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 
 const localMarksAtom = atomWithStorage<FactMark[]>('feeders.factMarks', []);
 
 const MAX_COLUMNS = 4;
+
+const dateSchema = z.string().date();
 
 function ViewToggle({ section, current, setter, children }: {
   section: string,
@@ -196,6 +203,54 @@ function TagCtrlPanel() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function DateCtrlPanel() {
+  const [range, setRange] = useAtom(dateRangeAtom);
+  const rejectedCount = useAtomValue(dateRejectedCountAtom);
+  const inputCls = 'text-xs bg-slate-300/50 focus:bg-transparent';
+
+  const onApply = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const newRange = [formData.get('fromDate'), formData.get('toDate')];
+    if (newRange.every(str => dateSchema.safeParse(str).success)) {
+      setRange(newRange as DateRange);
+    } else {
+      console.error('日期不正確');
+    }
+  };
+
+  const onReset = () => {
+    setRange(['', '']);
+  };
+
+  return (
+    <div className='py-3'>
+      <div className='font-bold'>日期篩選</div>
+      <form onSubmit={onApply} className={`flex flex-wrap items-center gap-x-1 my-1 text-sm ${tlStyles['ctrl-date-filter']}`}>
+        <div className='whitespace-nowrap inline-flex items-center'>
+          <TextInput label='從' name='fromDate' type='date' inputProps={{required: true, className: inputCls, defaultValue: '1900-01-01', 'aria-label': '從'}} />
+        </div>
+        <div className='whitespace-nowrap inline-flex items-center'>
+          <TextInput label='到' name='toDate' type='date' inputProps={{required: true, className: inputCls}} />
+        </div>
+
+        <button className='btn ml-1 flex items-center hover:ring-1 hover:bg-white active:ring' aria-label='套用'>
+          <CheckIcon className='stroke-current' height={20} />
+        </button>
+
+        <div className='flex items-center text-xs text-slate-600'>
+          <div>
+            已排除：<span className='text-sm font-mono'>{rejectedCount}</span>
+          </div>
+          <button type='reset' className='btn ml-2 hover:ring-1 hover:bg-white active:ring' onClick={onReset}>
+            重設
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
@@ -395,6 +450,7 @@ export default function SideControl({ tags }: {
     <div className='p-2 pb-7 sm:pb-2 divide-y-4 overflow-auto scrollbar-thin'>
       <ViewCtrlPanel />
       <TagCtrlPanel />
+      <DateCtrlPanel />
       <MarkCtrlPanel />
     </div>
   );

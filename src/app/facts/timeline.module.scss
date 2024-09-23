@@ -159,3 +159,14 @@
     transform-origin: center;
   }
 }
+
+.ctrl-date-filter {
+  > div:first-child {
+    > label {
+      display: none;
+    }
+    > input {
+      margin-left: 0;
+    }
+  }
+}

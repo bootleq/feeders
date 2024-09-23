@@ -34,6 +34,10 @@ export const togglaAllTagsAtom = atom(
   }
 );
 
+export type DateRange = [string, string];
+export const dateRangeAtom = atom<DateRange>(['', '']);
+export const dateRejectedCountAtom = atom(0);
+
 export type FactMark = {
   anchor: string,
   title: string,
