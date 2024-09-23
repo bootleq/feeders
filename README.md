@@ -65,6 +65,10 @@ Install extensions:
 
 - https://github.com/licitdev/directus-extension-sanitize-html
 
+  Note the extension is not flexible configurable so I use a dirty customized
+  version instead. Need to build and install locally for every change. And it
+  is not published so far.
+
 General WYSIWYG field settings:
 
 - Custom Formats:
