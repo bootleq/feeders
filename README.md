@@ -84,6 +84,12 @@ pnpm cms-stop
     "title": "等寬字",
     "inline": "span",
     "classes": "font-mono"
+  },
+  {
+    "title": "數值表格",
+    "block": "table",
+    "selector": "table",
+    "classes": "feeders-mce-digit"
   }
 ]
 ```
