@@ -147,6 +147,14 @@
     padding-inline: 0.5rem;
   }
 
+  :global(figure.feeders-mce-figure) {
+    margin-inline: auto;
+
+    > img {
+      margin-inline: auto;
+    }
+  }
+
   :global(table.feeders-mce-digit) {
     td {
       font-family: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", monospace;

@@ -87,6 +87,12 @@ pnpm cms-stop
     "classes": "font-mono"
   },
   {
+    "title": "圖說",
+    "block": "figure",
+    "wrapper": true,
+    "classes": "feeders-mce-figure"
+  },
+  {
     "title": "數值表格",
     "block": "table",
     "selector": "table",
@@ -99,7 +105,6 @@ pnpm cms-stop
 
 ```json
 {
-  "force_p_newlines": false,
   "fix_list_elements": true,
   "invalid_elements": "img,h1,h2,h3,h4,h5,h6",
   "content_style": "p { padding-block: 0.25rem; } .font-mono { font-family: monospace; }"
