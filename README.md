@@ -65,6 +65,7 @@ pnpm cms-stop
 
 - Make a `public` folder for user upload instead of default as file library root.
 - Turn off storage asset transform, let's use other service instead.
+- Expect storage is defined with Cloudflare R2 backend, see config in docker-compose.yml. Note the secret text files must not contain EOL character.
 
 ### HTML sanitize extension
 
