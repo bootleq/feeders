@@ -18,8 +18,11 @@ import type { Tags } from './store';
 import { getTagColor } from './colors';
 import tlStyles from './timeline.module.scss';
 
-function renderHtml(html: string, opts = {}) {
-  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+function Html({ html, ...props }: {
+  html: string,
+  [key: string]: any,
+}) {
+  return <div dangerouslySetInnerHTML={{ __html: html }} {...props} />;
 };
 
 function TagList({ tags }: {
@@ -85,19 +88,19 @@ function Fact({ fact, isSubView }: {
       </div>
 
       <div data-role='desc' className={`text-opacity-90 pl-2 ${tlStyles.mce}`}>
-        {renderHtml(desc)}
+        <Html html={desc} />
       </div>
 
       <div className='flex items-center flex-wrap'>
         {present(summary) &&
           <div data-role='summary' className={`relative text-opacity-90 p-1 py-0 ml-1 mt-1 w-fit ring-1 ${tlStyles.mce}`}>
             <div className={tlStyles['summary-mark']} title='摘要' aria-label='摘要'></div>
-            {renderHtml(summary)}
+            <Html html={summary} />
           </div>
         }
         {present(origin) &&
           <div data-role='origin' className={`text-xs p-1 ml-1.5 w-fit text-zinc-700 ${tlStyles.origin}`}>
-            {renderHtml(origin)}
+            <Html html={origin} />
           </div>
         }
       </div>

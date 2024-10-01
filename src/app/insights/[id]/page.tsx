@@ -1,7 +1,10 @@
 import * as R from 'ramda';
 import { auth } from '@/lib/auth';
-import directus from '@/lib/directus';
-import { readItem } from '@directus/sdk';
+import directus, { CMS_URL } from '@/lib/directus';
+import { readItem, readFiles } from '@directus/sdk';
+import Image from 'next/image';
+import parse, { HTMLReactParserOptions, Element, DOMNode } from 'html-react-parser';
+import { selectOne } from 'css-select';
 import { getWorldUsers } from '@/models/users';
 import Sidebar from '@/components/Sidebar';
 import Alerts from '@/components/Alerts';
@@ -9,6 +12,15 @@ import { alertsAtom, dismissAlertAtom } from '@/components/store';
 import Article from './Article';
 
 export const runtime = 'edge';
+
+type Insight = {
+  content: ReturnType<typeof parse>,
+  [key: string]: any,
+};
+
+type File = {
+  [key: string]: any,
+};
 
 async function getUser(id: string | undefined) {
   if (id) {
@@ -21,15 +33,85 @@ async function getUser(id: string | undefined) {
   return null;
 }
 
+const cmsFileIdFromSrc = (src: string) => {
+  const prefix = `${CMS_URL}/assets/`;
+  if (!src || !src.startsWith(prefix)) {
+    return null;
+  }
+
+  const leaf = src.slice(prefix.length);
+  const id = leaf.match(/^[\w-]+/)?.[0];
+  return id;
+};
+
+const makeParserOptions = (files: File[]) => {
+  const fileIdMapping = files.reduce((acc, file) => {
+    acc[file.id] = file;
+    return acc;
+  }, {});
+
+  const imgTransform = (node: Element) => {
+    const { type, name, attribs, children } = node;
+
+    if (type === 'tag' && name === 'figure' && attribs.class.split(/\s+/).includes('feeders-mce-figure')) {
+      const img = selectOne('img[src]', children);
+      if (img?.type === 'tag') {
+        const { src, alt } = img.attribs;
+        const fileId = cmsFileIdFromSrc(src);
+        if (fileId) {
+          const file = fileIdMapping[fileId];
+          if (file) {
+            const { width, height } = file;
+            return <Image src={src} alt={alt} className='feeders-mce-figure' { ...{ width, height }} />;
+          }
+        }
+      }
+      return <></>;
+    }
+
+    return null; // no touch
+  };
+
+  const options: HTMLReactParserOptions = {
+    replace(domNode) {
+      if (domNode instanceof Element && domNode.attribs) {
+        return imgTransform(domNode);
+      }
+    }
+  };
+
+  return options;
+};
+
 async function getInsight(id: string) {
-  return directus.request(readItem('insights', id, {
+  const insight = await directus.request(readItem('insights', id, {
     fields: [
       'id',
       'title',
       'content',
       'publishedAt',
+      'cms_file_ids',
     ]
   }));
+
+  let files: File[] = [];
+
+  try {
+    files = await directus.request(readFiles({
+      filter: {
+        folder: { name: { _eq: 'public' } },
+        id: {
+          _in: JSON.parse(insight.cms_file_ids)
+        }
+      },
+    }));
+  } catch (e) {
+    console.log("Failed reading files", e);
+  }
+
+  const parserOptions = makeParserOptions(files);
+  const content = parse(insight.content, parserOptions);
+  return { ...insight, content } as Insight;
 }
 
 export default async function Page({ params }: {

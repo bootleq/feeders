@@ -70,6 +70,7 @@
   }
 
   > p,
+  > img,
   > table,
   > figure {
     margin-inline: auto;
@@ -147,12 +148,9 @@
     padding-inline: 0.5rem;
   }
 
-  :global(figure.feeders-mce-figure) {
+  :global(.feeders-mce-figure) {
     margin-inline: auto;
-
-    > img {
-      margin-inline: auto;
-    }
+    margin-block: 1rem;
   }
 
   :global(table.feeders-mce-digit) {

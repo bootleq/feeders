@@ -5,13 +5,6 @@ import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { format } from '@/lib/date-fp';
 import styles from './article.module.scss';
 
-function Html({ html, ...props }: {
-  html: string,
-  [key: string]: any,
-}) {
-  return <div dangerouslySetInnerHTML={{ __html: html }} {...props} />;
-};
-
 export default function Article({ post }: {
   post: any,
 }) {
@@ -22,9 +15,11 @@ export default function Article({ post }: {
       <div className={styles.meta}>
         <time className='font-mono'>{format({}, 'yyyy/M/d', publishedAt)}</time>
       </div>
-      <article className={styles.article}>
 
-        <Html html={content} className={styles.content} />
+      <article className={styles.article}>
+        <div className={styles.content}>
+          { content }
+        </div>
       </article>
     </>
   );

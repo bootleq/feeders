@@ -24,7 +24,7 @@ services:
       STORAGE_S3_ENDPOINT_FILE: /run/secrets/s3_endpoint
       # CORS_ENABLED: true
       # CORS_ORIGIN: true
-      # PUBLIC_URL: /feeders-cms
+      PUBLIC_URL: ${PUBLIC_URL}
     secrets:
       - secret
       - s3_key
