@@ -22,6 +22,7 @@
     "cms": "cd ./directus && docker compose up --detach",
     "cms-log": "docker logs feeders-directus -f",
     "cms-stop": "cd ./directus && docker compose stop",
+    "cms-restart": "cd ./directus && docker compose stop && docker compose up --detach && docker logs feeders-directus -f",
     "test": "vitest"
   },
   "dependencies": {

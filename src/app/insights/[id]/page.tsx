@@ -3,7 +3,7 @@ import { auth } from '@/lib/auth';
 import directus, { CMS_URL } from '@/lib/directus';
 import { readItem, readFiles } from '@directus/sdk';
 import Image from 'next/image';
-import parse, { HTMLReactParserOptions, Element, DOMNode } from 'html-react-parser';
+import parse, { HTMLReactParserOptions, Element, DOMNode, attributesToProps } from 'html-react-parser';
 import { selectOne } from 'css-select';
 import { getWorldUsers } from '@/models/users';
 import Sidebar from '@/components/Sidebar';
@@ -44,29 +44,53 @@ const cmsFileIdFromSrc = (src: string) => {
   return id;
 };
 
+const calcAspectRatio = (w: any, h: any) => {
+  if (typeof w === 'string' && typeof h === 'string') {
+    const width = Number.parseInt(w, 10);
+    const height = Number.parseInt(h, 10);
+    if (width && height) {
+      return (width / height).toFixed(4);
+    }
+  }
+
+  return null;
+}
+
 const makeParserOptions = (files: File[]) => {
   const fileIdMapping = files.reduce((acc, file) => {
     acc[file.id] = file;
     return acc;
   }, {});
 
-  const imgTransform = (node: Element) => {
+  const replacer = (node: Element) => {
     const { type, name, attribs, children } = node;
 
-    if (type === 'tag' && name === 'figure' && attribs.class.split(/\s+/).includes('feeders-mce-figure')) {
-      const img = selectOne('img[src]', children);
-      if (img?.type === 'tag') {
-        const { src, alt } = img.attribs;
-        const fileId = cmsFileIdFromSrc(src);
-        if (fileId) {
-          const file = fileIdMapping[fileId];
-          if (file) {
-            const { width, height } = file;
-            return <Image src={src} alt={alt} className='feeders-mce-figure' { ...{ width, height }} />;
+    if (type === 'tag') {
+      if (name === 'figure' && attribs.class.split(/\s+/).includes('feeders-mce-figure')) {
+        const img = selectOne('img[src]', children);
+        if (img?.type === 'tag') {
+          const { src, alt } = img.attribs;
+          const fileId = cmsFileIdFromSrc(src);
+          if (fileId) {
+            const file = fileIdMapping[fileId];
+            if (file) {
+              const { width, height } = file;
+              return <Image src={src} alt={alt} className='feeders-mce-figure' { ...{ width, height }} />;
+            }
           }
         }
+        return <></>; // remove unrecognized node
+      } else if (name === 'p' && attribs.class?.split(/\s+/).includes('feeders-mce-iframe')) {
+        const iframe = selectOne('iframe[src]', children);
+
+        if (iframe?.type === 'tag') {
+          const props = attributesToProps(iframe.attribs);
+          const { width, height } = props;
+          const aspectRatio = calcAspectRatio(width, height);
+          return <iframe {...props} className='feeders-mce-iframe' style={aspectRatio ? { aspectRatio } : {}} />;
+        }
+        return <></>; // remove unrecognized node
       }
-      return <></>;
     }
 
     return null; // no touch
@@ -75,7 +99,7 @@ const makeParserOptions = (files: File[]) => {
   const options: HTMLReactParserOptions = {
     replace(domNode) {
       if (domNode instanceof Element && domNode.attribs) {
-        return imgTransform(domNode);
+        return replacer(domNode);
       }
     }
   };

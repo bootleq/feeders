@@ -160,6 +160,16 @@
     }
   }
 
+  :global(iframe.feeders-mce-iframe) {
+    max-width: 100%;
+    margin-inline: auto;
+    margin-block: 1rem;
+    background-color: white;
+    &[style] {
+      height: auto;
+    }
+  }
+
   a[href] {
     color: #0c4a6e;
   }

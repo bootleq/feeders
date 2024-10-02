@@ -25,6 +25,7 @@ services:
       # CORS_ENABLED: true
       # CORS_ORIGIN: true
       PUBLIC_URL: ${PUBLIC_URL}
+      CONTENT_SECURITY_POLICY_DIRECTIVES__FRAME_SRC: ${CSP__FRAME_SRC}
     secrets:
       - secret
       - s3_key

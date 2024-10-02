@@ -59,6 +59,7 @@ First time setup will create default admin user, see cms-log to get username/pas
 pnpm cms
 pnpm cms-log
 pnpm cms-stop
+pnpm cms-restart
 ```
 
 ### Asset management
@@ -93,6 +94,11 @@ pnpm cms-stop
     "classes": "feeders-mce-figure"
   },
   {
+    "title": "內嵌容器",
+    "block": "p",
+    "classes": "feeders-mce-iframe"
+  },
+  {
     "title": "數值表格",
     "block": "table",
     "selector": "table",
@@ -107,7 +113,14 @@ pnpm cms-stop
 {
   "fix_list_elements": true,
   "invalid_elements": "img,h1,h2,h3,h4,h5,h6",
-  "content_style": "p { padding-block: 0.25rem; } .font-mono { font-family: monospace; }"
+  "content_style": "p { padding-block: 0.25rem; } .font-mono { font-family: monospace; }",
+  "content_css": "http://localhost:8055/tinymce/article.css",
+  "preview_styles": "color font-size font-family font-weight",
+  "sandbox_iframes_exclusions": [
+    "youtube.com",
+    "youtu.be",
+    "bootleq.github.io"
+  ]
 }
 ```
 
