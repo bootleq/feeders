@@ -4,6 +4,8 @@ import { parseZonedDateTime } from '@internationalized/date';
 
 export type AnyFunction = (...args: any[]) => any;
 
+export const APP_URL = new URL(process.env.NEXT_PUBLIC_APP_URL!);
+
 export const present = R.both(R.isNotNil, R.isNotEmpty);
 
 // slugify
@@ -22,6 +24,12 @@ export const slugify = R.pipe(
   R.join('-'),
   R.replace(/[^a-zA-Z\d-]+/g, ''),
 );
+
+export const parseSlug = (slug: string) => {
+  const [head, tail] = slug.split('-', 2);
+  const id = Number.parseInt(head, 10);
+  return [id, tail] as [number, string];
+};
 
 export const removeFirst = (pred: (a: any) => boolean) => R.converge(
   (index: number, list: Array<any>) => {

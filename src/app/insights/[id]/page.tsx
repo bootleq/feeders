@@ -2,9 +2,12 @@ import * as R from 'ramda';
 import { auth } from '@/lib/auth';
 import directus, { CMS_URL } from '@/lib/directus';
 import { readItem, readFiles } from '@directus/sdk';
+import { notFound } from 'next/navigation';
 import Image from 'next/image';
+import type { Metadata, ResolvingMetadata } from 'next';
 import parse, { HTMLReactParserOptions, Element, DOMNode, attributesToProps } from 'html-react-parser';
 import { selectOne } from 'css-select';
+import { parseSlug, APP_URL } from '@/lib/utils';
 import { getWorldUsers } from '@/models/users';
 import Sidebar from '@/components/Sidebar';
 import Alerts from '@/components/Alerts';
@@ -107,14 +110,25 @@ const makeParserOptions = (files: File[]) => {
   return options;
 };
 
-async function getInsight(id: string) {
+async function getInsight(id: number) {
   const insight = await directus.request(readItem('insights', id, {
     fields: [
       'id',
       'title',
+      'slug',
       'content',
       'publishedAt',
+      'modifiedAt',
+      'editors',
+      'tags',
       'cms_file_ids',
+      {
+        'facts.Facts_id': [
+          'id',
+          'title',
+          'date'
+        ],
+      },
     ]
   }));
 
@@ -135,31 +149,41 @@ async function getInsight(id: string) {
 
   const parserOptions = makeParserOptions(files);
   const content = parse(insight.content, parserOptions);
-  return { ...insight, content } as Insight;
+  const facts = R.map(R.prop('Facts_id'), insight.facts);
+  return { ...insight, content, facts } as Insight;
 }
 
-export default async function Page({ params }: {
-  params: {
-    id: string
-  }
-}) {
-  const { id } = params;
+type Props = {
+  params: { id: string }
+};
+
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const [id] = parseSlug(params.id);
+  if (!id) notFound();
+  const insight = await getInsight(id);
+
+  return {
+    metadataBase: APP_URL,
+    alternates: {
+      canonical: `/insights/${id}-${insight.slug}`
+    },
+  };
+}
+
+export default async function Page({ params }: Props) {
+  const [id] = parseSlug(params.id);
+  if (!id) notFound();
   const session = await auth();
   const user = await getUser(session?.userId);
   const insight = await getInsight(id);
-  // const tags = R.pipe(
-  //   R.flatten,
-  //   R.uniq,
-  // )(facts.map(i => i.tags)).reduce((acc, tag) => {
-  //   acc[tag || ''] = true;
-  //   return acc;
-  // }, {});
   const { title } = insight;
 
   return (
     <main className="flex min-h-screen flex-row items-start justify-start">
       <Sidebar user={user} navTitle='見解' defaultOpen={false} className={`max-h-screen scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
-        TODO
       </Sidebar>
 
       <div className='container mx-auto ring'>
