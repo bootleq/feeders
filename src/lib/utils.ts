@@ -2,6 +2,10 @@ import * as R from 'ramda';
 import { z } from 'zod';
 import { parseZonedDateTime } from '@internationalized/date';
 
+export type AnyFunction = (...args: any[]) => any;
+
+export const APP_URL = new URL(process.env.NEXT_PUBLIC_APP_URL!);
+
 export const present = R.both(R.isNotNil, R.isNotEmpty);
 
 // slugify
@@ -19,6 +23,25 @@ export const slugify = R.pipe(
   R.split(wordRegexp),
   R.join('-'),
   R.replace(/[^a-zA-Z\d-]+/g, ''),
+);
+
+export const parseSlug = (slug: string) => {
+  const [head, tail] = slug.split('-', 2);
+  const id = Number.parseInt(head, 10);
+  return [id, tail] as [number, string];
+};
+
+export const removeFirst = (pred: (a: any) => boolean) => R.converge(
+  (index: number, list: Array<any>) => {
+    if (index > -1) {
+      return R.remove(index, 1, list);
+    }
+    return list;
+  },
+  [
+    R.findIndex(pred),
+    R.identity
+  ]
 );
 
 // 在中英文之間增加空白

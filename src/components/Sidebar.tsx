@@ -15,6 +15,7 @@ type SidebarProps = {
   user: WorldUserResult | null,
   navTitle?: string,
   fixed?: boolean,
+  defaultOpen?: boolean,
   children?: React.ReactNode;
   className?: string;
 };
@@ -22,13 +23,13 @@ type SidebarProps = {
 const toggleBtnBaseCls = 'cursor-pointer absolute insert-0 size-8 fill-current bg-transparent transition delay-200 duration-500';
 const widthCls = 'w-[100vw] min-w-[5%] max-w-full sm:w-[35%] sm:max-w-[60%] lg:w-[20%] lg:max-w-[70%]';
 
-export default function Sidebar({ user, navTitle, fixed = true, children, className, ...rest }: SidebarProps) {
+export default function Sidebar({ user, navTitle, fixed = true, defaultOpen = true, children, className, ...rest }: SidebarProps) {
   useHydrateAtoms([
     [userAtom, user],
   ]);
   const setNavTitle = useSetAtom(navTitleAtom);
   const ref = useRef<HTMLDivElement>(null);
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(defaultOpen);
 
   useEffect(() => {
     if (navTitle) {
@@ -56,7 +57,12 @@ export default function Sidebar({ user, navTitle, fixed = true, children, classN
 
   return (
     <>
-      <div ref={ref} className={`${fixedCls} ${widthCls} min-h-[10vh] sm:min-h-full resize-x transition duration-200 ${open ? 'md:overflow-hidden' : '-translate-x-full '} ${className}`}>
+      <div
+        ref={ref}
+        className={`${fixedCls} ${widthCls} min-h-[10vh] sm:min-h-full resize-x transition duration-200 ${open ? 'md:overflow-hidden' : '-translate-x-full '} ${className}`}
+        data-role='sidebar'
+        aria-expanded={open}
+      >
         {children}
 
         <Nav user={user} />

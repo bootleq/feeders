@@ -1,0 +1,43 @@
+services:
+  directus:
+    image: directus/directus:11.1.0
+    container_name: feeders-directus
+    ports:
+      - 8044:8055
+    volumes:
+      - ./database:/directus/database
+      - ./uploads:/directus/uploads
+      - ./extensions:/directus/extensions
+    environment:
+      SECRET_FILE: /run/secrets/secret
+      # ADMIN_EMAIL: not-used@feeders.com
+      # ADMIN_PASSWORD: not-used
+      DB_CLIENT: sqlite3
+      DB_FILENAME: /directus/database/data.db
+      WEBSOCKETS_ENABLED: true
+      STORAGE_LOCATIONS: s3
+      STORAGE_S3_DRIVER: s3
+      STORAGE_S3_KEY_FILE: /run/secrets/s3_key
+      STORAGE_S3_SECRET_FILE: /run/secrets/s3_secret
+      STORAGE_S3_BUCKET: feeders
+      STORAGE_S3_REGION: apac
+      STORAGE_S3_ENDPOINT_FILE: /run/secrets/s3_endpoint
+      # CORS_ENABLED: true
+      # CORS_ORIGIN: true
+      PUBLIC_URL: ${PUBLIC_URL}
+      CONTENT_SECURITY_POLICY_DIRECTIVES__FRAME_SRC: ${CSP__FRAME_SRC}
+    secrets:
+      - secret
+      - s3_key
+      - s3_secret
+      - s3_endpoint
+
+secrets:
+  secret:
+    file: ./secrets/secret.txt
+  s3_key:
+    file: ./secrets/s3_key.txt
+  s3_secret:
+    file: ./secrets/s3_secret.txt
+  s3_endpoint:
+    file: ./secrets/s3_endpoint.txt
