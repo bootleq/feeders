@@ -47,10 +47,18 @@ const nextConfig = {
   images: imagesConfig,
 
   webpack(config) {
+    const fileLoaderRule = config.module.rules.find((rule) => rule.test?.test?.(".svg"));
+
     config.module.rules = [
       ...config.module.rules,
       {
+        ...fileLoaderRule,
+        test: /icon.svg$/,
+      },
+      {
         test: /\.svg$/,
+        exclude: /icon.svg$/,
+        issuer: /\.[jt]sx?$/,
         use: ["@svgr/webpack"],
       },
       {
