@@ -166,6 +166,7 @@ export async function generateMetadata(
   const insight = await getInsight(id);
 
   return {
+    title: insight.title,
     metadataBase: APP_URL,
     alternates: {
       canonical: `/insights/${id}-${insight.slug}`

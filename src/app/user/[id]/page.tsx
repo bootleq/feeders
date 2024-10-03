@@ -1,4 +1,5 @@
 import * as R from 'ramda';
+import type { Metadata } from "next";
 import { auth } from '@/lib/auth';
 import { Fragment } from 'react';
 import { SpotActionEnum } from '@/lib/schema';
@@ -36,6 +37,10 @@ function parseActionCounts(json: string) {
 }
 
 const cardCls = 'my-2 px-4 pt-3 pb-4 ring-1 bg-slate-200 rounded-lg shadow-lg';
+
+export const metadata: Metadata = {
+  title: '使用者資料',
+};
 
 export default async function Page({ params }: {
   params: { id: string }

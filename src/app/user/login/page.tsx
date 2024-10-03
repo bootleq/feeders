@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { auth, signIn } from '@/lib/auth';
 import SubmitButton from '@/components/form/SubmitButton';
 import UserAgreement from '@/app/user/UserAgreement';
@@ -16,6 +17,10 @@ async function onSubmit() {
     throw error;
   }
 }
+
+export const metadata: Metadata = {
+  title: '使用者登入',
+};
 
 export default async function Page() {
   const session = await auth();

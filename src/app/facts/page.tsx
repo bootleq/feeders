@@ -1,4 +1,5 @@
 import * as R from 'ramda';
+import type { Metadata } from "next";
 import { auth } from '@/lib/auth';
 import directus from '@/lib/directus';
 import { readItems } from '@directus/sdk';
@@ -26,6 +27,11 @@ async function getUser(id: string | undefined) {
 async function getFacts() {
   return directus.request(readItems('Facts'));
 }
+
+export const metadata: Metadata = {
+  title: '事實記錄',
+  description: '台灣地區與遊蕩犬、流浪狗相關的歷史事件表列',
+};
 
 export default async function Page({ params }: {
   params: { path: string[] }

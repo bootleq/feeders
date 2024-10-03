@@ -1,4 +1,5 @@
 import * as R from 'ramda';
+import type { Metadata } from "next";
 import { Fragment } from 'react';
 import Link from 'next/link';
 import { t } from '@/lib/i18n';
@@ -128,6 +129,11 @@ function Entry({ item }: {
     </li>
   );
 }
+
+export const metadata: Metadata = {
+  title: '地點跟進記錄',
+  description: '世界地圖中每個地點的「跟進」項目，每次修改的變更歷史',
+};
 
 export default async function Page({ params }: {
   params: {

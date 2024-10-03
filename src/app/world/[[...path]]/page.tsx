@@ -1,4 +1,5 @@
 import * as R from 'ramda';
+import type { Metadata } from "next";
 import { auth } from '@/lib/auth';
 import dynamic from 'next/dynamic';
 import geohash from 'ngeohash';
@@ -53,6 +54,11 @@ async function getUser(id: string | undefined) {
 
   return null;
 }
+
+export const metadata: Metadata = {
+  title: '世界地圖',
+  description: '各地餵食點回報、追蹤、封鎖或監督管理',
+};
 
 export default async function Page({ params }: {
   params: { path: string[] }

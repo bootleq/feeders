@@ -4,6 +4,7 @@ import { parseZonedDateTime } from '@internationalized/date';
 
 export type AnyFunction = (...args: any[]) => any;
 
+export const SITE_NAME = 'Feeders';
 export const APP_URL = new URL(process.env.NEXT_PUBLIC_APP_URL!);
 
 export const present = R.both(R.isNotNil, R.isNotEmpty);

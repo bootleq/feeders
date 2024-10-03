@@ -1,11 +1,17 @@
+import type { Metadata } from "next";
 import { users, accounts, spots } from '@/lib/schema';
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { SITE_NAME } from '@/lib/utils';
 import { SignIn } from '@/components/sign-in-button';
 import { SignOut } from '@/components/sign-out-button';
 import Link from 'next/link';
 
 export const runtime = 'edge';
+
+export const metadata: Metadata = {
+  title: `首頁 - ${SITE_NAME}`
+};
 
 export default async function Home() {
   const session = await auth();

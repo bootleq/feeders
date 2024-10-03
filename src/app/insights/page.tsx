@@ -1,4 +1,5 @@
 import * as R from 'ramda';
+import type { Metadata } from "next";
 import { auth } from '@/lib/auth';
 import directus from '@/lib/directus';
 import { readItems } from '@directus/sdk';
@@ -25,6 +26,11 @@ async function getUser(id: string | undefined) {
 async function getInsights() {
   return directus.request(readItems('insights'));
 }
+
+export const metadata: Metadata = {
+  title: '見解列表',
+  description: '遊蕩犬餵食問題與對策',
+};
 
 export default async function Page({ params }: {
   params: { path: string[] }
