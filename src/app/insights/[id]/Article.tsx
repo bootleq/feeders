@@ -65,7 +65,7 @@ export default function Article({ post }: {
           </Link>
         </div>
 
-        {tags.length &&
+        {tags?.length &&
           <ul className='my-2 flex items-center justify-end'>
             {tags.map((tag: string) => (
               <li key={tag} className='text-sm p-px px-1 m-1 rounded-full ring-1 ring-offset-1 ring-slate-600'>

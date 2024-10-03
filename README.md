@@ -88,6 +88,11 @@ pnpm cms-restart
     "classes": "font-mono"
   },
   {
+    "title": "冗長網址",
+    "selector": "a[href]",
+    "classes": "feeders-mce-lengthy"
+  },
+  {
     "title": "圖說",
     "block": "figure",
     "wrapper": true,
@@ -121,6 +126,11 @@ pnpm cms-restart
     "youtu.be",
     "bootleq.github.io"
   ]
+}
+
+{
+  "content_css": "http://localhost:8055/tinymce/general.css",
+  "preview_styles": "color font-size font-family font-weight"
 }
 ```
 

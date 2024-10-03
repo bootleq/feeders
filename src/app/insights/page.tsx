@@ -63,7 +63,7 @@ export default async function Page({ params }: {
                   {title}
                 </Link>
 
-                {tags.length &&
+                {tags?.length &&
                   <ul className='ml-2 flex items-center justify-end'>
                     {tags.map((tag: string) => (
                       <li key={tag} className='text-sm text-slate-600 p-px px-1.5 m-1 rounded-full ring-1 ring-slate-400'>
