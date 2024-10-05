@@ -2,11 +2,18 @@
 
 import { auth } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
+import { ENABLE_ACTIVATE } from '@/lib/utils';
 import { db } from '@/lib/db';
 import { eq, and, getTableName } from 'drizzle-orm';
 import { users, changes, UserStateEnum } from '@/lib/schema';
 
 export default async function saveUserArea() {
+  if (ENABLE_ACTIVATE !== 'on') {
+    return {
+      error: '目前未開放自動啟用帳號',
+    };
+  }
+
   const session = await auth();
 
   if (!session) {

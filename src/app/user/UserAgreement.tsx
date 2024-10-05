@@ -25,19 +25,19 @@ export default function UserAgreement() {
           餵食者常有偏執、不理性、暴力情況，<br />
           請留意不要輕易洩漏自己個資。<br />
           網站提供「現況」「現有」技術服務，<br />
-          不承擔任何使用者個人風險。
+          不承擔任何個人風險。
         </li>
         <li>
           網站使用 OAuth 認證身分，主要只確認信箱，且不會公開。<br />
           盡力保護隱私，僅主管機關依法調閱的情況會交出資料。
         </li>
         <li>
-          網站有權停止使用者的帳號，或刪除已發布的內容。
+          網站因管理需要，有權停止你的帳號或刪除已發布內容。
         </li>
       </ul>
 
       <div className='flex items-center justify-center font-mono text-xs text-slate-600 mt-4 text-center'>
-        2024-08-14
+        2024-10-05
       </div>
     </>
   );

@@ -7,6 +7,7 @@ export type AnyFunction = (...args: any[]) => any;
 export const SITE_NAME = 'Feeders';
 export const APP_URL = new URL(process.env.NEXT_PUBLIC_APP_URL!);
 export const ACCESS_CTRL = process.env.NEXT_PUBLIC_ACCESS_CTRL || 'close';
+export const ENABLE_ACTIVATE = process.env.NEXT_PUBLIC_ENABLE_ACTIVATE || 'off';
 
 export const present = R.both(R.isNotNil, R.isNotEmpty);
 

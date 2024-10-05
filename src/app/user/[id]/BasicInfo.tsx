@@ -3,7 +3,7 @@
 import * as R from 'ramda';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
-import { ACCESS_CTRL } from '@/lib/utils';
+import { ACCESS_CTRL, ENABLE_ACTIVATE } from '@/lib/utils';
 import { format } from '@/lib/date-fp';
 import { differenceInDays } from 'date-fns';
 import { t } from '@/lib/i18n';
@@ -197,11 +197,16 @@ export default function UserInfo({ user, profile }: {
           <div className='whitespace-nowrap py-1'>狀態</div>
           <div className='flex items-center ml-2'>
             { t('userStates', profile.state) }
-            {waitingActivate &&
-              <button type='button' onClick={startActivate} className='btn ring-1 ml-auto bg-gradient-to-br from-yellow-100 to-yellow-200 shadow-lg'>
-                啟用帳號
-              </button>
-            }
+            {waitingActivate && (
+              ENABLE_ACTIVATE === 'on' ?
+                <button type='button' onClick={startActivate} className='btn ring-1 ml-auto bg-gradient-to-br from-yellow-100 to-yellow-200 shadow-lg'>
+                  啟用帳號
+                </button>
+              :
+              <p className='text-red-800 text-sm ml-3 p-2 rounded bg-red-300 shadow-lg'>
+                暫不開放自動啟用
+              </p>
+            )}
           </div>
 
           <div className='whitespace-nowrap py-1'>建立時間</div>
