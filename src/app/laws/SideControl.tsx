@@ -28,7 +28,15 @@ import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 
 const localMarksAtom = atomWithStorage<Mark[]>('feeders.lawMarks', []);
 
-const MAX_COLUMNS = 4;
+const actAbbrs: Record<string, string> = {
+  '廢棄物清理法': '廢清法',
+  '動物保護法': '動保法',
+  '社會秩序維護法': '社維法',
+  '道路交通管理處罰條例': '道交條例',
+  '新北市動物保護自治條例': '新北動保自治',
+  '臺北市公園管理自治條例': '北市公園自治',
+  '國立政治大學犬隻管理原則': '政大犬管原則'
+};
 
 function ViewToggle({ section, current, setter, children }: {
   section: string,
@@ -126,6 +134,10 @@ const findItem = (anchor?: string) => {
   return target;
 };
 
+const abbreviateAct = (act: string) => {
+  return actAbbrs[act] || act;
+}
+
 function Mark({ anchor, title: pickableTitle, index }:
   Mark & { index: number }
 ) {
@@ -183,12 +195,13 @@ function Mark({ anchor, title: pickableTitle, index }:
     delete acts.dataset.markOffscreen;
   }, []);
 
-  const [article, title] = pickableTitle.split(' $$ ', 2);
+  const [actArticle, title] = pickableTitle.split(' $$ ', 2);
+  const [act, article] = actArticle.match(/(.+) ([\w-]+)/)?.slice(1) || [];
 
   return (
     <li className='flex items-center py-1' data-anchor={anchor} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
       <a className={MarkArticleCls} data-anchor={anchor} href={`#${anchor}`} onClick={onJump}>
-        {article}
+        {abbreviateAct(act)} {article}
       </a>
       <Tooltip placement='right'>
         <TooltipTrigger className='mb-1 block truncate'>
