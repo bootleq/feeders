@@ -59,7 +59,6 @@ export default function Article({ post }: {
 
         <div className='text-sm my-1'>
           <Link href='#related-facts' className='flex items-center justify-end w-fit ml-auto rounded-lg hover:bg-white'>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src='/assets/paper-clip.svg' alt='連結' width={16} height={16} />
             相關事實
           </Link>

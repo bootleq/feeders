@@ -410,7 +410,6 @@ function MarkCtrlPanel() {
             {markPicking ?
               <span className='text-black animate-pulse flex items-center'>
                 選取項目
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img className='ml-1' src='/assets/hand-pointer.svg' alt='右側' width={18} height={18} />
               </span>
               :

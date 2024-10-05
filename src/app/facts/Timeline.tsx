@@ -81,7 +81,6 @@ function Fact({ fact, isSubView }: {
           {title}
         </div>
         <a className='text-opacity-0 ml-auto px-1 rounded-full opacity-0 group-hover/header:opacity-100 hover:bg-amber-300/50 hover:scale-125 hover:-rotate-12' href={`#${anchor}`}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src='/assets/paper-clip.svg' alt='連結' width={16} height={16} />
         </a>
         <TagList tags={tags} />
@@ -117,7 +116,6 @@ function MarkOffscreenIndicators({ direct }: {
   return (
     <div className={tlStyles[`mark-offscreen-${direct}`]} aria-label={`目標在畫面外（${dirWord}）`}>
       <div className='animate-bounce'>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className={direct === 'up' ? '-rotate-90' : 'rotate-90'} src='/assets/hand-pointer.svg' alt={`在${dirWord}`} width={96} height={96} />
       </div>
     </div>
