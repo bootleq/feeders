@@ -3,8 +3,10 @@
 import { useSession, signIn, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { useAtomValue } from 'jotai';
+import Sitemap from '@/components/Sitemap';
 import type { WorldUserResult } from '@/models/users';
 import { navTitleAtom } from '@/components/store';
+import { HomeIcon } from '@heroicons/react/24/outline';
 import { UserIcon } from '@heroicons/react/24/outline';
 import { IdentificationIcon } from '@heroicons/react/24/solid';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
@@ -12,9 +14,19 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 const menuItemCls = `p-2 w-full flex items-center`;
 
 function NavMenu() {
+  const cls = [
+    'flex flex-col divide-y',
+    'w-[clamp(100%,80vw,280px)]',
+    'lg:flex items-center justify-between rounded bg-gradient-to-br from-stone-50 to-slate-100 ring-2 ring-offset-1 ring-slate-300',
+  ].join(' ');
+
   return (
-    <div className={`flex flex-col divide-y w-full items-center justify-between lg:flex rounded bg-gradient-to-br from-stone-50 to-slate-100 ring-2 ring-offset-1 ring-slate-300`}>
-      <Link href='/' className={menuItemCls}>首頁</Link>
+    <div className={cls}>
+      <Link href='/' className='w-full p-2 flex items-center justify-center'>
+        <HomeIcon className='stroke-slate-500 mr-1.5 -mt-[2px]' height={19} />
+        首頁
+      </Link>
+      <Sitemap />
     </div>
   );
 }

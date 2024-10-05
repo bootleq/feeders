@@ -24,7 +24,7 @@ export default function Sitemap({ className }: {
   }
 
   return (
-    <div className={`${styles.container} ${className}`}>
+    <div className={`${styles.container} ${className || ''}`}>
       <div className={`backdrop-blur-sm ${styles.map}`}>
         <div className={styles.body}>
 
