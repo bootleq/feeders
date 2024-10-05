@@ -36,6 +36,13 @@ export async function saveUserArea(formData: FormData) {
       msg: '未登入',
     }
   }
+  const { user } = session;
+  if (user.state !== 'active') {
+    return {
+      errors: '使用者帳號不可用',
+      msg: '未登入',
+    };
+  }
 
   const params = parseFormData(formData);
   const validated = schema.safeParse(params);

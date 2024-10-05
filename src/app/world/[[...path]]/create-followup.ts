@@ -32,6 +32,8 @@ export async function createFollowup(formData: FormData) {
       errors: { _: ['未登入'] },
     }
   }
+  const { user } = session;
+  if (user.state !== 'active') return { errors: { _: ['使用者帳號不可用'] } };
 
   const params = parseFormData(formData);
   const now = new Date();
