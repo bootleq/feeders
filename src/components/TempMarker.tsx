@@ -29,7 +29,7 @@ export default function TempMarker() {
   const [editingForm, setEditingForm] = useAtom(editingFormAtom);
   const { visible, lat, lon } = marker;
 
-  const markerRef = useRef<LeafletMarker>(null);
+  const markerRef = useRef<LeafletMarker | any>(null);
   const eventHandlers = useMemo(
     () => ({
       dragend() {
@@ -61,7 +61,7 @@ export default function TempMarker() {
       icon={MarkerIcon}
       eventHandlers={eventHandlers}
       position={[lat, lon]}
-      ref={markerRef}>
+      ref={(node: any) => { if (node) markerRef.current = node; }}>
       <Popup minWidth={90}>
         <div className='flex flex-col items-center text-base'>
           {canAdd ?

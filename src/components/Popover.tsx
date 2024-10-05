@@ -190,7 +190,11 @@ export const PopoverContent = React.forwardRef<
           {...context.getFloatingProps(props)}
         >
           {props.children}
-          <FloatingArrow ref={arrowRef} context={floatingContext} className={ARROW_CLASSNAME} />
+          <FloatingArrow
+            ref={(node: any) => { if (node) arrowRef.current = node; }}
+            context={floatingContext}
+            className={ARROW_CLASSNAME}
+          />
         </div>
       </FloatingFocusManager>
     </FloatingPortal>
