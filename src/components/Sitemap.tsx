@@ -18,9 +18,14 @@ export default function Sitemap({ className }: {
 }) {
   const { data: session, status } = useSession();
   let userLink = '/user/login';
+  let userDisplay = '我';
 
   if (status === 'authenticated') {
     userLink = `/user/${session.userId}`;
+    const name = session.user.name;
+    if (name) {
+      userDisplay = name;
+    }
   }
 
   return (
@@ -31,7 +36,7 @@ export default function Sitemap({ className }: {
           <div className={styles.user}>
             <Link href={userLink}>
               <HumanIcon className='fill-slate-700 scale-110 -mr-1.5' width={iconSize} height={iconSize} />
-              <span>{ status === 'authenticated' ? '使用者' : '登入' }</span>
+              <span className='truncate'>{ status === 'authenticated' ? userDisplay : '登入' }</span>
             </Link>
           </div>
 
