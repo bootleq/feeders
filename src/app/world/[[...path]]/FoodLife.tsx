@@ -15,7 +15,7 @@ interface Foodable {
 }
 
 const tooltipCls = [
-  'text-xs p-1 px-2 rounded box-border w-max max-w-[100vw-10px] z-[1002]',
+  'text-xs p-1 px-2 rounded box-border w-max max-w-[calc(100vw_-_10px)] z-[1002]',
   'bg-gradient-to-br from-stone-50 to-slate-100 ring-2 ring-offset-1 ring-slate-300',
 ].join(' ')
 

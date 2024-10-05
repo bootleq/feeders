@@ -58,7 +58,7 @@ function UserArea({ area }: {
           <StarIcon className={`${canFit ? '' : 'dotted-stroke stroke-slate-500'}`} height={24} />
           我的
         </TooltipTrigger>
-        <TooltipContent className="p-1 px-2 rounded box-border w-max max-w-[100vw-10px] z-[1002]">
+        <TooltipContent className="p-1 px-2 rounded box-border w-max max-w-[calc(100vw_-_10px)] z-[1002]">
           <div className={`flex flex-col divide-y w-full items-center justify-between lg:flex rounded bg-gradient-to-br from-stone-50 to-slate-100 ring-2 ring-offset-1 ring-slate-300`}>
             <button className={menuItemCls} onClick={onEdit}>{canFit ? '編輯' : '新增'}</button>
           </div>
