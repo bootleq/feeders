@@ -87,9 +87,7 @@ export default function Article({ post }: {
           <ul>
             {
               facts.map((fact: any) => (
-                <li key={fact.id}>
-                  <Fact fact={fact} />
-                </li>
+                <Fact key={fact.id} fact={fact} />
               ))
             }
           </ul>
