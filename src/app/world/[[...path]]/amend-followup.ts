@@ -8,7 +8,7 @@ import { diffForm } from '@/lib/diff';
 import { spotFollowups, changes } from '@/lib/schema';
 import { PubStateEnum, SpotActionEnum } from '@/lib/schema';
 import { and, eq, getTableName } from 'drizzle-orm';
-import { parseFormData, zondedDateTimeSchema } from '@/lib/utils';
+import { parseFormData, zondedDateTimeSchema, ACCESS_CTRL } from '@/lib/utils';
 import { geoSpots } from '@/models/spots';
 import type { FieldErrors } from '@/components/form/store';
 
@@ -31,6 +31,7 @@ export type Schema = FormSchema & {
 const diffProps = ['action', 'desc', 'material', 'feedeeCount', 'spawnedAt', 'removedAt'] as const;
 
 export async function amendFollowup(formData: FormData) {
+  if (ACCESS_CTRL !== 'open') return { errors: { _: ['功能未開放'] } };
   const session = await auth();
   if (!session) return { errors: { _: ['未登入'] } };
 

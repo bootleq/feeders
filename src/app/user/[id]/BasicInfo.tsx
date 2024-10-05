@@ -3,6 +3,7 @@
 import * as R from 'ramda';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
+import { ACCESS_CTRL } from '@/lib/utils';
 import { format } from '@/lib/date-fp';
 import { differenceInDays } from 'date-fns';
 import { t } from '@/lib/i18n';
@@ -142,7 +143,7 @@ export default function UserInfo({ user, profile }: {
 
   const isCurrentUser = user && user.id === profile.id;
   const waitingActivate = isCurrentUser && user.state === 'new';
-  const canEdit = isCurrentUser && user.state === 'active';
+  const canEdit = ACCESS_CTRL === 'open' && isCurrentUser && user.state === 'active';
   const canRename = canEdit && !coolingOff;
 
   return (

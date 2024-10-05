@@ -6,7 +6,7 @@ import { format } from '@/lib/date-fp';
 import { auth } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
-import { parseFormData } from '@/lib/utils';
+import { parseFormData, ACCESS_CTRL } from '@/lib/utils';
 import { eq, and, getTableName } from 'drizzle-orm';
 import { users, changes, UserStateEnum } from '@/lib/schema';
 import { getQuickProfileQuery, RENAME_COOL_OFF_DAYS } from '@/models/users';
@@ -17,6 +17,8 @@ const formSchema = z.object({
 });
 
 export default async function updateUser(formData: FormData) {
+  if (ACCESS_CTRL !== 'open') return { error: '功能未開放' };
+
   const session = await auth();
 
   if (!session) return { error: '未登入' }

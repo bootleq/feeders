@@ -9,7 +9,7 @@ import { diffForm } from '@/lib/diff';
 import { spots, changes } from '@/lib/schema';
 import { PubStateEnum } from '@/lib/schema';
 import { and, eq, getTableName } from 'drizzle-orm';
-import { parseFormData } from '@/lib/utils';
+import { parseFormData, ACCESS_CTRL } from '@/lib/utils';
 import { queryDistrict, geoSpots } from '@/models/spots';
 import type { FieldErrors } from '@/components/form/store';
 
@@ -32,6 +32,7 @@ export type Schema = FormSchema & {
 const diffProps = ['title', 'desc', 'lat', 'lon'] as const;
 
 export async function amendSpot(formData: FormData) {
+  if (ACCESS_CTRL !== 'open') return { errors: { _: ['功能未開放'] } };
   const session = await auth();
   if (!session) return { errors: { _: ['未登入'] } };
 

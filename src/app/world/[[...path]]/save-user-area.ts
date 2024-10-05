@@ -5,7 +5,7 @@ import { z } from 'zod';
 import geohash from 'ngeohash';
 import { auth } from '@/lib/auth';
 import { GEOHASH_PRECISION } from './util';
-import { parseFormData } from '@/lib/utils';
+import { parseFormData, ACCESS_CTRL } from '@/lib/utils';
 import { saveArea } from '@/models/users';
 import type { LatLngBounds } from '@/lib/schema';
 
@@ -28,6 +28,13 @@ const schema = z.object({
 })
 
 export async function saveUserArea(formData: FormData) {
+  if (ACCESS_CTRL !== 'open') {
+    return {
+      errors: '功能未開放',
+      msg: '功能未開放'
+    };
+  }
+
   const session = await auth();
 
   if (!session) {

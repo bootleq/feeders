@@ -3,6 +3,7 @@
 import * as R from 'ramda';
 import { useState, useEffect, useCallback } from 'react';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
+import { ACCESS_CTRL } from '@/lib/utils';
 import { subDays, format, formatISO, formatDistance } from '@/lib/date-fp';
 import Link from 'next/link';
 
@@ -72,7 +73,7 @@ function Areas({ areas }: {
   areas: GeoSpotsByGeohash
 }) {
   const user = useAtomValue(userAtom);
-  const canEdit = user?.state === 'active';
+  const canEdit = ACCESS_CTRL === 'open' && user?.state === 'active';
   const userArea = (user?.areaId && user.bounds) ? { id: user.areaId, bounds: user.bounds } : null;
 
   const picked: [string, GeoSpotsResultSpot][] = R.toPairs(areas)

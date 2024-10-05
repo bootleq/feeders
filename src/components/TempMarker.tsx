@@ -7,6 +7,7 @@ import type { Marker as LeafletMarker } from 'leaflet';
 import type { LatLngExpression } from 'leaflet';
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { useAtom } from 'jotai';
+import { ACCESS_CTRL } from '@/lib/utils';
 import { mergeTempMarkerAtom, editingFormAtom } from '@/app/world/[[...path]]/store';
 import Form from '@/app/world/[[...path]]/Form';
 import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
@@ -48,7 +49,7 @@ export default function TempMarker() {
     [setMarker, setEditingForm],
   );
 
-  const canAdd = status === 'authenticated' && session.user.state === 'active';
+  const canAdd = ACCESS_CTRL === 'open' && status === 'authenticated' && session.user.state === 'active';
 
   if (!visible) {
     return;
@@ -67,8 +68,14 @@ export default function TempMarker() {
             <Form lat={lat} lon={lon} />
             :
             <div className='text-center'>
-              您目前沒有權限新增地點<br />
-              （未登入或權限有問題）
+              {
+                ACCESS_CTRL === 'open' ?
+                  <>
+                    您目前沒有權限新增地點<br />
+                    （未登入或權限有問題）
+                  </> :
+                '新增地點功能目前未開放'
+              }
               <button className='btn text-sm mx-auto mt-2 bg-slate-100 ring-1 flex items-center hover:bg-white' onClick={() => setMarker({ visible: false })}>
                 <XMarkIcon className='stroke-red-700' height={20} />
                 取消

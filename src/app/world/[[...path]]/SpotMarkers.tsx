@@ -26,7 +26,7 @@ import AmendSpotForm from './AmendSpotForm';
 import AmendFollowupForm from './AmendFollowupForm';
 import { editingFormAtom, spotFollowupsAtom, mergeSpotFollowupsAtom, loadingFollowupsAtom } from './store';
 import { addAlertAtom } from '@/components/store';
-import { present, jsonReviver } from '@/lib/utils';
+import { present, jsonReviver, ACCESS_CTRL } from '@/lib/utils';
 import { format, formatDistance } from '@/lib/date-fp';
 import type { GeoSpotsResult, GeoSpotsResultFollowup } from '@/models/spots';
 import mapStyles from '@/components/map.module.scss';
@@ -142,7 +142,7 @@ export default function SpotMarkers({ spots }: {
   const statLiCls = 'hover:bg-yellow-300/50 pr-1';
   const statNumCls = 'font-mono px-1 align-baseline';
 
-  const canEdit = status === 'authenticated' && session.user.state === 'active';
+  const canEdit = ACCESS_CTRL === 'open' && status === 'authenticated' && session.user.state === 'active';
   const userId = session?.user.id;
 
   return (

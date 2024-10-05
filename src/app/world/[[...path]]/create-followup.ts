@@ -4,7 +4,7 @@ import * as R from 'ramda';
 import { z } from 'zod';
 import { auth } from '@/lib/auth';
 import { SpotActionEnum } from '@/lib/schema';
-import { parseFormData, zondedDateTimeSchema } from '@/lib/utils';
+import { parseFormData, zondedDateTimeSchema, ACCESS_CTRL } from '@/lib/utils';
 import { createFollowup as save, geoSpots } from '@/models/spots';
 import type { FieldErrors } from '@/components/form/store';
 
@@ -25,6 +25,7 @@ export type Schema = FormSchema & {
 };
 
 export async function createFollowup(formData: FormData) {
+  if (ACCESS_CTRL !== 'open') return { errors: { _: ['功能未開放'] } };
   const session = await auth();
 
   if (!session) {
