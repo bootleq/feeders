@@ -7,6 +7,7 @@ import { atomFamily, splitAtom } from 'jotai/utils';
 import { present } from '@/lib/utils';
 import { addAlertAtom } from '@/components/store';
 import {
+  VIEW_CTRL_KEYS,
   viewCtrlAtom,
   tagsAtom,
   marksAtom,
@@ -189,7 +190,7 @@ export default function Timeline({ facts, isSubView = false }: {
     return facts.map(fact => <Fact key={fact.id} fact={fact} isSubView={isSubView} />);
   }, [facts, isSubView]);
 
-  const viewCtrlData = ['desc', 'summary', 'origin'].reduce((acc: Record<string, string>, key: string) => {
+  const viewCtrlData = VIEW_CTRL_KEYS.reduce((acc: Record<string, string>, key: string) => {
     if (!R.includes(key, viewCtrl)) {
       acc[`data-view-ctrl-${key}`] = 'hide';
     }
