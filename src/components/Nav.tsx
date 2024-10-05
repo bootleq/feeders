@@ -11,6 +11,14 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 
 const menuItemCls = `p-2 w-full flex items-center`;
 
+function NavMenu() {
+  return (
+    <div className={`flex flex-col divide-y w-full items-center justify-between lg:flex rounded bg-gradient-to-br from-stone-50 to-slate-100 ring-2 ring-offset-1 ring-slate-300`}>
+      <Link href='/' className={menuItemCls}>首頁</Link>
+    </div>
+  );
+}
+
 export default function Nav({ user }: {
   user: WorldUserResult | null,
 }) {
@@ -62,7 +70,14 @@ export default function Nav({ user }: {
         </TooltipContent>
       </Tooltip>
 
-      <span className=''>{ title }</span>
+      <Tooltip>
+        <TooltipTrigger>
+          <span className=''>{ title }</span>
+        </TooltipTrigger>
+        <TooltipContent className="p-1 px-2 rounded box-border w-max max-w-[100vw-10px] z-[1002]">
+          <NavMenu />
+        </TooltipContent>
+      </Tooltip>
     </div>
   );
 };

@@ -1,0 +1,96 @@
+.container {
+  container-type: inline-size;
+  --bg-color: #fff7ed;
+  width: 100%;
+}
+
+.map {
+  background-color: var(--bg-color);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  width: 100%;
+  margin: auto;
+
+  @container (min-width: 240px) {
+    padding: 3em 0;
+  }
+
+  @container (min-width: 460px) {
+    width: 440px;
+    padding: 3em 2em;
+  }
+}
+
+.body {
+  aspect-ratio: 5/3;
+
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+
+  width: 100%;
+  margin: auto;
+  padding: 1em 0;
+  position: relative;
+
+  @container (min-width: 240px) {
+    width: 240px;
+    padding: 1em;
+  }
+
+  > div {
+    display: flex;
+    align-items: center;
+
+    a {
+      display: flex;
+      align-items: center;
+
+      @container (min-width: 240px) {
+        position: absolute;
+      }
+
+      &:hover {
+        transform: scale(1.1);
+        transition: transform 90ms ease-in;
+        filter: drop-shadow(rgba(0,0,50,0.3) 0 40px 3px);
+
+        span {
+        }
+      }
+    }
+  }
+}
+
+.facts {
+  a {
+    top: 2%;
+    left: 4%;
+  }
+}
+
+.insights {
+  a {
+    top: 8%;
+    right: 4%;
+  }
+}
+
+.user {
+  a {
+    top: 35%;
+    left: 20%;
+  }
+}
+
+.world {
+  a {
+    bottom: 8%;
+    right: 4%;
+  }
+}
+
+.laws {
+  a {
+    bottom: 10%;
+    left: 5%;
+  }
+}
