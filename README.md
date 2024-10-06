@@ -8,6 +8,7 @@ First, run the development server:
 pnpm dev
 
 pnpm lint
+pnpm pages:build
 pnpm preview
 pnpm deploy
 ```

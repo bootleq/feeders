@@ -44,6 +44,8 @@ if (enableImgOptimize) {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // distDir: 'build', // next-on-pages doesn't support, can cause problems
+
   images: imagesConfig,
 
   webpack(config) {
