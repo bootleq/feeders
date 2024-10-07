@@ -38,5 +38,5 @@ export default function CloudinaryImageLoader({
     return `https://res.cloudinary.com/${cloudName}/image/upload/${params.join(',')}/${mappedUploadFolder}/${encodeURIComponent(partialPath)}`;
   }
 
-  return ''; // remove to avoid expose local cms path
+  return src;
 }

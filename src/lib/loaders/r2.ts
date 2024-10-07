@@ -22,5 +22,5 @@ export default function R2ImageLoader({
     return `${r2Prefix}${basename}`;
   }
 
-  return '';
+  return src;
 }
