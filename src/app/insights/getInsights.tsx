@@ -21,7 +21,18 @@ export async function getInsights(build = false) {
     return await fromR2();
   }
 
-  const items = await directus.request(readItems('insights'));
+  const items = await directus.request(
+    readItems('insights', {
+      fields: [
+        'id',
+        'title',
+        'slug',
+        'content',
+        'publishedAt',
+        'modifiedAt',
+        'tags',
+      ],
+    })
+  );
   return items;
 }
-
