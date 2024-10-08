@@ -18,7 +18,7 @@ async function fromR2() {
     const result = await res.json();
     return result as {
       byAct: Record<string, LawItem[]>,
-      tagList: Set<string>,
+      tagList: string[],
     }
   });
 
@@ -59,5 +59,5 @@ export async function getLaws(build = false) {
 
   tagList.add(''); // ensure '無' tag present
 
-  return { byAct, tagList };
+  return { byAct, tagList: Array.from(tagList) };
 }

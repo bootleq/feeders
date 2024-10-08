@@ -35,7 +35,7 @@ export default async function Page({ params }: {
   const session = await auth();
   const user = await getUser(session?.userId);
   const { byAct, tagList } = await getLaws();
-  const tags = Array.from(tagList).reduce((acc: Tags, tag: string) => {
+  const tags = tagList.reduce((acc: Tags, tag: string) => {
     acc[tag] = true;
     return acc;
   }, {});
