@@ -1,11 +1,12 @@
 import directus from '@/lib/directus';
 import { readItems } from '@directus/sdk';
+import { cmsBuiltURL } from '@/lib/utils';
 import type { LawItem } from './store';
 
 export const runtime = 'edge';
 
 async function fromR2() {
-  const url = `${process.env.NEXT_PUBLIC_R2_URL_PATH}/cms/laws.json`;
+  const url = cmsBuiltURL('laws.json');
 
   const { byAct, tagList } = await fetch(
     url,

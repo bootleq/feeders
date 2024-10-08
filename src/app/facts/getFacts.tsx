@@ -1,12 +1,13 @@
 import * as R from 'ramda';
 import directus from '@/lib/directus';
 import { readItems } from '@directus/sdk';
+import { cmsBuiltURL } from '@/lib/utils';
 import type { Tags } from '@/app/facts/store';
 
 export const runtime = 'edge';
 
 async function fromR2() {
-  const url = `${process.env.NEXT_PUBLIC_R2_URL_PATH}/cms/facts.json`;
+  const url = cmsBuiltURL('facts.json');
 
   const { facts, tags } = await fetch(url, {
     next: { revalidate: false }

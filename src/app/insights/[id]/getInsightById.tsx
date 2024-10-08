@@ -1,6 +1,7 @@
 import * as R from 'ramda';
 import directus from '@/lib/directus';
 import { readItem, readFiles } from '@directus/sdk';
+import { cmsBuiltURL } from '@/lib/utils';
 
 export const runtime = 'edge';
 
@@ -14,7 +15,7 @@ type Result = {
 };
 
 async function fromR2(id: number) {
-  const url = `${process.env.NEXT_PUBLIC_R2_URL_PATH}/cms/insights-${id}.json`;
+  const url = cmsBuiltURL(`insights/${id}.json`);
 
   const item = await fetch(url, {
     next: { revalidate: false }
