@@ -1,5 +1,7 @@
 import fs from 'node:fs';
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getFacts } from '@/app/facts/getFacts';
+import { getInsights } from '@/app/insights/getInsights';
 import { getLaws } from '@/app/laws/getLaws';
 
 // Fetch CMS data and upload JSON to R2.
@@ -58,7 +60,11 @@ const saveAndUpload = async (data, name) => {
   await upload(json, key);
 };
 
+const facts = await getFacts(true);
+const insights = await getInsights(true);
 const laws = await getLaws(true);
+await saveAndUpload(facts, 'facts.json');
+await saveAndUpload(insights, 'insights.json');
 await saveAndUpload(laws, 'laws.json');
 
 console.log('Done');
