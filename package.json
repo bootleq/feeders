@@ -23,6 +23,7 @@
     "cms-log": "docker logs feeders-directus -f",
     "cms-stop": "cd ./directus && docker compose stop",
     "cms-restart": "cd ./directus && docker compose stop && docker compose up --detach && docker logs feeders-directus -f",
+    "cms:build-local": "tsx --env-file=.env.local directus/scripts/build_to_r2.mjs",
     "test": "vitest"
   },
   "dependencies": {
@@ -66,6 +67,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@aws-sdk/client-s3": "^3.666.0",
     "@cloudflare/next-on-pages": "1",
     "@cloudflare/workers-types": "^4.20240620.0",
     "@faker-js/faker": "^8.4.1",
@@ -96,6 +98,7 @@
     "sass": "^1.77.8",
     "tailwind-scrollbar": "^3.1.0",
     "tailwindcss": "^3.3.0",
+    "tsx": "^4.19.1",
     "typescript": "^5",
     "vercel": "^34.3.0",
     "vitest": "^2.0.3",

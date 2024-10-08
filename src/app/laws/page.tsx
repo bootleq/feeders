@@ -1,9 +1,8 @@
 import * as R from 'ramda';
 import type { Metadata } from "next";
 import { auth } from '@/lib/auth';
-import directus from '@/lib/directus';
 import { present } from '@/lib/utils';
-import { readItems } from '@directus/sdk';
+import { getLaws } from './getLaws';
 import { getWorldUsers } from '@/models/users';
 import Sidebar from '@/components/Sidebar';
 import Alerts from '@/components/Alerts';
@@ -23,30 +22,6 @@ async function getUser(id: string | undefined) {
   }
 
   return null;
-}
-
-async function getLaws() {
-  const byAct: Record<string, LawItem[]> = {};
-  const tagList = new Set<string>();
-  const items = await directus.request(readItems('laws')) as LawItem[];
-
-  items.forEach(i => {
-    const { act, tags } = i;
-
-    if (!byAct[act]) byAct[act] = [];
-    byAct[act].push(i);
-
-    tags?.forEach((tag: string | null) => {
-      const t = tag || '';
-      if (!tagList.has(t)) {
-        tagList.add(t);
-      }
-    });
-  });
-
-  tagList.add(''); // ensure 無 tag present
-
-  return { byAct, tagList };
 }
 
 export const metadata: Metadata = {
