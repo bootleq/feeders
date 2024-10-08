@@ -19,7 +19,7 @@ export default function R2ImageLoader({
     const basename = src.substring(cmsPrefix.length);
 
     // Do no optimization
-    return `${r2Prefix}${basename}`;
+    return `${r2Prefix}/${basename}`;
   }
 
   return src;

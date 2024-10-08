@@ -24,7 +24,7 @@ export default function CloudinaryImageLoader({
     //                        ^^^^^^
     //  https://feedersrc.example.com/b64f2e08-ff55-4f98-9b1a-33900ad0d809.png
     const basename = src.substring(cmsPrefix.length).match(/[\w-]+\.[\w]+/)?.[0];
-    const r2Src = `${r2Prefix}${basename}`;
+    const r2Src = `${r2Prefix}/${basename}`;
 
     // https://nextjs.org/docs/pages/building-your-application/deploying/static-exports#image-optimization
     const params = ['f_auto', 'c_limit', `w_${width}`, `q_${quality || 'auto'}`]
