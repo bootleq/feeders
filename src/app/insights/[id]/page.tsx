@@ -9,6 +9,8 @@ import parse, { HTMLReactParserOptions, Element, DOMNode, attributesToProps } fr
 import { selectOne } from 'css-select';
 import { parseSlug, APP_URL } from '@/lib/utils';
 import { getWorldUsers } from '@/models/users';
+import { getInsightById } from './getInsightById';
+import type { File } from './getInsightById';
 import Sidebar from '@/components/Sidebar';
 import Alerts from '@/components/Alerts';
 import { alertsAtom, dismissAlertAtom } from '@/components/store';
@@ -18,10 +20,6 @@ export const runtime = 'edge';
 
 type Insight = {
   content: ReturnType<typeof parse>,
-  [key: string]: any,
-};
-
-type File = {
   [key: string]: any,
 };
 
@@ -111,46 +109,11 @@ const makeParserOptions = (files: File[]) => {
 };
 
 async function getInsight(id: number) {
-  const insight = await directus.request(readItem('insights', id, {
-    fields: [
-      'id',
-      'title',
-      'slug',
-      'content',
-      'publishedAt',
-      'modifiedAt',
-      'editors',
-      'tags',
-      'cms_file_ids',
-      {
-        'facts.Facts_id': [
-          'id',
-          'title',
-          'date'
-        ],
-      },
-    ]
-  }));
-
-  let files: File[] = [];
-
-  try {
-    files = await directus.request(readFiles({
-      filter: {
-        folder: { name: { _eq: 'public' } },
-        id: {
-          _in: JSON.parse(insight.cms_file_ids)
-        }
-      },
-    }));
-  } catch (e) {
-    console.log("Failed reading files", e);
-  }
+  const { insight, files } = await getInsightById(id);
 
   const parserOptions = makeParserOptions(files);
   const content = parse(insight.content, parserOptions);
-  const facts = R.map(R.prop('Facts_id'), insight.facts);
-  return { ...insight, content, facts } as Insight;
+  return { ...insight, content } as Insight;
 }
 
 type Props = {

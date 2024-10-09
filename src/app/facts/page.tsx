@@ -1,13 +1,11 @@
 import * as R from 'ramda';
 import type { Metadata } from "next";
 import { auth } from '@/lib/auth';
-import directus from '@/lib/directus';
-import { readItems } from '@directus/sdk';
 import { getWorldUsers } from '@/models/users';
+import { getFacts } from './getFacts';
 import Sidebar from '@/components/Sidebar';
 import Alerts from '@/components/Alerts';
 import { alertsAtom, dismissAlertAtom } from '@/components/store';
-import type { Tags } from './store';
 import TimelineContainer from './TimelineContainer';
 import SideControl from './SideControl';
 
@@ -24,10 +22,6 @@ async function getUser(id: string | undefined) {
   return null;
 }
 
-async function getFacts() {
-  return directus.request(readItems('Facts'));
-}
-
 export const metadata: Metadata = {
   title: '事實記錄',
   description: '台灣地區與遊蕩犬、流浪狗相關的歷史事件表列',
@@ -38,14 +32,7 @@ export default async function Page({ params }: {
 }) {
   const session = await auth();
   const user = await getUser(session?.userId);
-  const facts = await getFacts();
-  const tags = R.pipe(
-    R.flatten,
-    R.uniq,
-  )(facts.map(i => i.tags)).reduce((acc, tag) => {
-    acc[tag || ''] = true;
-    return acc;
-  }, {});
+  const { facts, tags } = await getFacts();
 
   return (
     <main className="flex min-h-screen flex-row items-start justify-between">

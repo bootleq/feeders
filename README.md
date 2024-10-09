@@ -7,13 +7,22 @@ First, run the development server:
 ```bash
 pnpm dev
 
-pnpm lint
-pnpm pages:build
-pnpm preview
-pnpm deploy
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+
+Prepare to deploy:
+
+```bash
+pnpm lint
+pnpm pages:build
+pnpm cms:build-local
+pnpm preview
+```
+
+`cms:build-local` uploads local CMS data to external storage, our built
+application fetches pre-build JSON instead of hit CMS again.
 
 
 ## Database

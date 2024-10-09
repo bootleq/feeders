@@ -38,6 +38,7 @@ yarn-error.log*
 /directus/database
 /directus/uploads
 /directus/extensions
+/directus/build
 
 # typescript
 *.tsbuildinfo
@@ -48,4 +49,4 @@ next-env.d.ts
 .dev.vars
 
 # for personal
-scripts
+/scripts/

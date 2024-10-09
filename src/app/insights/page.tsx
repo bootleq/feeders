@@ -6,6 +6,7 @@ import { readItems } from '@directus/sdk';
 import Link from 'next/link';
 import { format } from '@/lib/date-fp';
 import { getWorldUsers } from '@/models/users';
+import { getInsights } from './getInsights';
 import Sidebar from '@/components/Sidebar';
 import Alerts from '@/components/Alerts';
 import { alertsAtom, dismissAlertAtom } from '@/components/store';
@@ -21,10 +22,6 @@ async function getUser(id: string | undefined) {
   }
 
   return null;
-}
-
-async function getInsights() {
-  return directus.request(readItems('insights'));
 }
 
 export const metadata: Metadata = {

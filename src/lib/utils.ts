@@ -11,6 +11,13 @@ export const ENABLE_ACTIVATE = process.env.NEXT_PUBLIC_ENABLE_ACTIVATE || 'off';
 
 export const present = R.both(R.isNotNil, R.isNotEmpty);
 
+export const cmsBuiltURL = (path: string) => {
+  const r2Path = process.env.NEXT_PUBLIC_R2_URL_PATH;
+  const buildKey = process.env.NEXT_PUBLIC_CMS_BUILD_KEY;
+  const url = `${r2Path}/cms/${path}?at${buildKey}`;
+  return url;
+}
+
 // slugify
 // Refer from @jmlweb/ramdu
 // https://jmlweb.github.io/ramdu/slugify.js.html
