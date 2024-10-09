@@ -36,20 +36,7 @@ const S3 = new S3Client({
 const localDir = 'directus/build';
 const r2Dir = 'cms';
 const buildKeyPath = path.join(localDir, 'BUILD_KEY');
-fs.rmSync(localDir, { recursive: true, force: true });
 fs.mkdirSync(`${localDir}/${r2Dir}`, { recursive: true });
-
-const collectFiles = (dir, acc) => {
-  fs.readdirSync(dir).forEach(name => {
-    const fullpath = path.join(dir, name);
-    const stat = fs.statSync(fullpath);
-    if (stat.isFile()) {
-      acc.push(fullpath);
-    } else if (stat.isDirectory()) {
-      collectFiles(fullpath, acc);
-    }
-  })
-};
 
 const upload = async (aFile) => {
   const file = fs.readFileSync(aFile);
@@ -75,6 +62,16 @@ const upload = async (aFile) => {
 const saveToDisk = (data, name) => {
   const json = JSON.stringify(data);
   const key = `${r2Dir}/${name}`;
+  const destPath = `${localDir}/${key}`;
+
+  if (fs.existsSync(destPath)) {
+    const extFile = fs.readFileSync(destPath, 'utf8');
+    if (extFile === json) {
+      console.log(`  skip ${key} (unchanged).`);
+      return;
+    }
+  }
+
   console.log('Write to disk', key);
   fs.writeFileSync(`${localDir}/${key}`, json);
 };
@@ -93,15 +90,19 @@ for (let idx = 0; idx < insights.length; idx++) {
   saveToDisk(insight, `insights/${id}.json`);
 }
 
-const localFiles = [];
-collectFiles(`${localDir}/${r2Dir}`, localFiles);
-
-for (let idx = 0; idx < localFiles.length; idx++) {
-  await upload(localFiles[idx]);
-}
-
 const buildKey = Date.now().toString();
 fs.writeFileSync(buildKeyPath, buildKey);
-console.log(`Done, BUILD_KEY:`, buildKey);
+
+console.log(`\nDone, BUILD_KEY:`, buildKey);
+
+console.log("\nPlease upload files to R2, example:");
+console.log([
+  '  rclone sync',
+  fs.realpathSync('directus/build/cms'),
+  'r2:feeders/cms',
+  '--metadata-set content-type=application/json',
+  '--metadata-set cache-control="public, max-age=10368000"',
+  '-v'
+].join(' '));
 
 process.exit();
