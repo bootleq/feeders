@@ -30,7 +30,7 @@ export default function TimelineContainer({ facts }: {
 
     const [from, to] = dateRangeKey.split(',');
     return R.filter(({ date }) => {
-      if (present(from) && /\d/.test(date[0]) && date < from) {
+      if (present(from) && date < from) {
         return false;
       }
       if (present(to) && date > to) {

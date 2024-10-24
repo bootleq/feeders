@@ -27,7 +27,10 @@ export async function getFacts(build = false) {
     return await fromR2();
   }
 
-  const facts = await directus.request(readItems('Facts'));
+  const facts = await directus.request(readItems('facts', {
+    limit: -1,
+    sort: ['date'],
+  }));
 
   const tags = R.pipe(
     R.flatten,

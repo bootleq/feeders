@@ -39,6 +39,7 @@ yarn-error.log*
 /directus/uploads
 /directus/extensions
 /directus/build
+/directus/export
 
 # typescript
 *.tsbuildinfo

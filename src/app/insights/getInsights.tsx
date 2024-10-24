@@ -24,6 +24,7 @@ export async function getInsights(build = false) {
 
   const items = await directus.request(
     readItems('insights', {
+      limit: -1,
       fields: [
         'id',
         'title',

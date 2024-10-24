@@ -180,7 +180,7 @@ function TagCtrlPanel() {
     <div className='py-3'>
       <div className='font-bold'>標籤篩選</div>
       <div className='flex flex-col items-start w-fit px-1 py-2 gap-y-2'>
-        <ul className='text-xs flex items-center' onClick={onClick}>
+        <ul className='text-xs flex flex-wrap items-center' onClick={onClick}>
           {Object.entries(tags).map(([tag, visible]) => {
             return (
               <li key={tag} data-tag={tag} data-visible={visible} className={`py-0.5 relative cursor-pointer ${!visible && tlStyles.strikethrough}`}>

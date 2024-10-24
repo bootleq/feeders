@@ -34,7 +34,7 @@ function TagList({ tags }: {
   }
 
   return (
-    <ul className='flex items-center text-xs'>
+    <ul className='flex flex-wrap items-center text-xs'>
       {tags.map(tag => (
         <li key={tag} className={`${getTagColor(tag).join(' ')} rounded-full px-1 p-px mx-px border text-nowrap`}>
           {tag}
@@ -44,11 +44,11 @@ function TagList({ tags }: {
   );
 }
 
-const createAnyTagsHiddenAtom = (tagNames: string[]) => {
+const createTagsHiddenAtom = (tagNames: string[]) => {
   return atom(get => {
     const tags = get(tagsAtom);
     const picked = R.pick(tagNames, tags);
-    const hidden = R.values(picked).some(R.not);
+    const hidden = R.values(picked).every(R.not);
     return hidden;
   });
 };
@@ -60,8 +60,8 @@ function Fact({ fact, isSubView }: {
   const { id, date, title, desc, summary, origin, tags, weight } = fact;
   const anchor = `fact-${fact.date}_${fact.id}`;
   const datePadEnd = date.length < 10 ? <span className=''>{'\u00A0'.repeat(10 - date.length)}</span> : '';
-  const anyTagHiddenAtom = useMemo(() => createAnyTagsHiddenAtom(tags || ['']), [tags]);
-  const hidden = useAtomValue(anyTagHiddenAtom);
+  const allTagsHiddenAtom = useMemo(() => createTagsHiddenAtom(tags || ['']), [tags]);
+  const hidden = useAtomValue(allTagsHiddenAtom);
 
   if (hidden) {
     return null;
