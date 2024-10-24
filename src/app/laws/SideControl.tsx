@@ -24,7 +24,7 @@ import { EyeSlashIcon } from '@heroicons/react/24/outline';
 import { CursorArrowRippleIcon } from '@heroicons/react/24/solid';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftEndOnRectangleIcon } from '@heroicons/react/24/outline';
 
 const localMarksAtom = atomWithStorage<Mark[]>('feeders.lawMarks', []);
 
@@ -268,7 +268,7 @@ function MarkCtrlPanel() {
           <Tooltip placement='bottom-end'>
             <TooltipTrigger className=''>
               <button type='button' className='btn bg-slate-100 text-slate-600 hover:text-black hover:ring-1 hover:bg-white' aria-label='儲存到瀏覽器空間' onClick={onSave}>
-                <ArrowDownTrayIcon className='stroke-current' height={20} />
+                <ArrowLeftEndOnRectangleIcon className='stroke-current' height={20} />
               </button>
             </TooltipTrigger>
             <TooltipContent className="p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1 text-balance">
@@ -284,7 +284,7 @@ function MarkCtrlPanel() {
               </span>
               :
               <>
-                增加
+                選取
                 <CursorArrowRippleIcon className='stroke-slate-700 stroke-0 ml-1' height={20} />
               </>
             }
