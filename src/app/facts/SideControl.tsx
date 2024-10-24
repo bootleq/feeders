@@ -2,7 +2,7 @@
 
 import * as R from 'ramda';
 import { z } from 'zod';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useHydrateAtoms, atomWithStorage } from 'jotai/utils';
 import {
@@ -223,6 +223,10 @@ function DateCtrlPanel() {
     }
   };
 
+  const rangeValid = useMemo(() => {
+    return range.every(str => dateSchema.safeParse(str).success);
+  }, [range]);
+
   const onReset = () => {
     setRange(['', '']);
   };
@@ -238,8 +242,8 @@ function DateCtrlPanel() {
           <TextInput label='到' name='toDate' type='date' inputProps={{required: true, className: inputCls}} />
         </div>
 
-        <button className='btn ml-1 flex items-center hover:ring-1 hover:bg-white active:ring' aria-label='套用'>
-          <CheckIcon className='stroke-current' height={20} />
+        <button className='btn ml-1 flex items-center hover:ring-1 hover:bg-white active:ring' disabled={!rangeValid} aria-label='套用'>
+          <CheckIcon className={`stroke-current ${rangeValid ? '' : 'opacity-30'}`} height={20} />
         </button>
 
         <div className='flex items-center text-xs text-slate-600'>
