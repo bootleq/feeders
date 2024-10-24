@@ -3,7 +3,7 @@
 import * as R from 'ramda';
 import { z } from 'zod';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useHydrateAtoms, atomWithStorage } from 'jotai/utils';
 import {
   viewCtrlAtom,
@@ -34,9 +34,11 @@ import { CursorArrowRippleIcon } from '@heroicons/react/24/solid';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import { CheckIcon } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftEndOnRectangleIcon } from '@heroicons/react/24/outline';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 
-const localMarksAtom = atomWithStorage<FactMark[]>('feeders.factMarks', []);
+const currentMarkSlotAtom = atomWithStorage('feeders.factMarks.slot', 0);
+const markSlotAtoms = R.range(0, 4).map(n => atomWithStorage<FactMark[]>(`feeders.factMarks.${n}`, []));
 
 const MAX_COLUMNS = 4;
 
@@ -360,12 +362,23 @@ const validateLocalMark = ({ anchor, title }: FactMark) => {
   }
 };
 
+const createStorageAtom = (slot: number) => {
+  return atom(
+    get => get(markSlotAtoms[slot]),
+    (get, set, update: FactMark[]) => {
+      set(markSlotAtoms[slot], update);
+    }
+  );
+};
+
 function MarkCtrlPanel() {
-  const [localMarks, setLocalMarks] = useAtom(localMarksAtom);
+  const [slot, setSlot] = useAtom(currentMarkSlotAtom);
   const [markPicking, setMarkPicking] = useAtom(markPickingAtom);
   const [marks, setMarks] = useAtom(marksAtom);
   const [savedHint, setSavedHint] = useState(false);
   const initialLoad = useRef(true);
+  const slotAtom = useMemo(() => createStorageAtom(slot), [slot]);
+  const [localMarks, setLocalMarks] = useAtom(slotAtom);
 
   useEffect(() => {
     if (initialLoad) {
@@ -375,13 +388,42 @@ function MarkCtrlPanel() {
     }
   }, [setMarks, localMarks]);
 
+  const isSlotDirty = useMemo(() => {
+    if (marks.length !== localMarks.length) {
+      return true;
+    }
+    if (marks.length === 0) {
+      return false;
+    }
+    const makeKey = (items: FactMark[]) => items.map(R.prop('anchor')).join();
+    return makeKey(marks) !== makeKey(localMarks);
+  }, [marks, localMarks]);
+
   const onTogglePicker = (e: React.MouseEvent) => {
     setMarkPicking(R.not);
+  };
+
+  const onSwitchSlot = (e: React.MouseEvent<HTMLElement>) => {
+    const el = e.currentTarget as HTMLElement;
+    const idx = parseInt(el.dataset.slot || '', 10);
+    setSlot(idx);
   };
 
   const onSave = () => {
     setLocalMarks(marks);
     setSavedHint(true);
+  };
+
+  const onDownload = () => {
+    const blob = new Blob([JSON.stringify(marks, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `fact-marks-${slot}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   const onSavedHintFaded = () => {
@@ -392,37 +434,68 @@ function MarkCtrlPanel() {
     <div className='py-3'>
       <div className='font-bold'>記號</div>
       <div className='flex flex-col items-start w-full pl-1 py-2 gap-y-2 text-sm'>
-        <div className='w-full flex items-center justify-end gap-x-1'>
-          {savedHint &&
-            <AnimateOnce onComplete={onSavedHintFaded} className='flex items-center w-fit mr-2 text-green-700'>
-              <CheckCircleIcon className='stroke-current' height={20} />
-              已儲存
-            </AnimateOnce>
-          }
-          <Tooltip placement='bottom-end'>
-            <TooltipTrigger className=''>
-              <button type='button' className='btn bg-slate-100 text-slate-600 hover:text-black hover:ring-1 hover:bg-white' aria-label='儲存到瀏覽器空間' onClick={onSave}>
-                <ArrowDownTrayIcon className='stroke-current' height={20} />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent className="p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1 text-balance">
-              記住目前清單（儲存在瀏覽器本機空間）
-            </TooltipContent>
-          </Tooltip>
+        <div className='w-full flex items-center'>
+          <ul className='flex items-center font-mono text-xs gap-x-1'>
+            {markSlotAtoms.map((a, idx) => {
+              const cls = 'rounded-full bg-white text-slate-600 text-opacity-0 ring-1 ring-slate-400';
+              const current = idx === slot;
+              return (
+                <li key={idx} className=''>
+                  <button type='button' data-slot={idx} className={`${cls} ${current ? 'bg-slate-500' : ''}`} aria-label='切換 slot' onClick={onSwitchSlot}>
+                    {idx}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
 
-          <button type='button' className={`btn flex items-center py-0.5 text-slate-600 hover:text-black hover:ring-1 hover:bg-white ${markPicking ? 'bg-white' : 'bg-slate-100'}`} onClick={onTogglePicker}>
-            {markPicking ?
-              <span className='text-black animate-pulse flex items-center'>
-                選取項目
-                <img className='ml-1' src='/assets/hand-pointer.svg' alt='右側' width={18} height={18} />
-              </span>
-              :
-              <>
-                增加
-                <CursorArrowRippleIcon className='stroke-slate-700 stroke-0 ml-1' height={20} />
-              </>
+          <div className='flex items-center justify-end ml-auto gap-x-1'>
+            {savedHint &&
+              <AnimateOnce onComplete={onSavedHintFaded} className='flex items-center w-fit mr-2 text-green-700'>
+                <CheckCircleIcon className='stroke-current' height={20} />
+                已儲存
+              </AnimateOnce>
             }
-          </button>
+
+            <Tooltip placement='bottom-end'>
+              <TooltipTrigger className=''>
+                <button
+                  type='button' className='btn bg-slate-100 text-slate-600 hover:text-black hover:ring-1 hover:bg-white disabled:opacity-30'
+                  disabled={!isSlotDirty} aria-label='儲存到瀏覽器空間' onClick={onSave}
+                >
+                  <ArrowLeftEndOnRectangleIcon className='stroke-current' height={20} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1 text-balance">
+                記住目前清單（儲存在瀏覽器本機空間）
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip placement='bottom-end'>
+              <TooltipTrigger className=''>
+                <button type='button' className='btn bg-slate-100 text-slate-600 hover:text-black hover:ring-1 hover:bg-white' aria-label='儲存目前清單到本機' onClick={onDownload}>
+                  <ArrowDownTrayIcon className='stroke-current' height={20} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1 text-balance">
+                下載目前清單
+              </TooltipContent>
+            </Tooltip>
+
+            <button type='button' className={`btn flex items-center py-0.5 text-slate-600 hover:text-black hover:ring-1 hover:bg-white ${markPicking ? 'bg-white' : 'bg-slate-100'}`} onClick={onTogglePicker}>
+              {markPicking ?
+                <span className='text-black animate-pulse flex items-center'>
+                  選取項目
+                  <img className='ml-1' src='/assets/hand-pointer.svg' alt='右側' width={18} height={18} />
+                </span>
+                :
+                <>
+                  選取
+                  <CursorArrowRippleIcon className='stroke-slate-700 stroke-0 ml-1' height={20} />
+                </>
+              }
+            </button>
+          </div>
         </div>
 
         <ul className='divide-y-2 divide-slate-300 w-full'>
