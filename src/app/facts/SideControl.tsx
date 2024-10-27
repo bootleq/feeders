@@ -437,11 +437,11 @@ function MarkCtrlPanel() {
         <div className='w-full flex items-center'>
           <ul className='flex items-center font-mono text-xs gap-x-1'>
             {markSlotAtoms.map((a, idx) => {
-              const cls = 'rounded-full bg-white text-slate-600 text-opacity-0 ring-1 ring-slate-400';
+              const cls = 'rounded-full text-slate-600 text-opacity-0 ring-1 ring-slate-400';
               const current = idx === slot;
               return (
                 <li key={idx} className=''>
-                  <button type='button' data-slot={idx} className={`${cls} ${current ? 'bg-slate-500' : ''}`} aria-label='切換 slot' onClick={onSwitchSlot}>
+                  <button type='button' data-slot={idx} className={`${cls} ${current ? 'bg-slate-500' : 'bg-white'}`} aria-label='切換 slot' onClick={onSwitchSlot}>
                     {idx}
                   </button>
                 </li>

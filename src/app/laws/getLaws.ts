@@ -1,6 +1,7 @@
 import directus from '@/lib/directus';
 import { readItems } from '@directus/sdk';
 import { cmsBuiltURL } from '@/lib/utils';
+import { ACTS } from './store';
 import type { LawItem } from './store';
 
 export const runtime = 'edge';
@@ -35,6 +36,7 @@ export async function getLaws(build = false) {
   const items = await directus.request(
     readItems('laws', {
       limit: -1,
+      sort: ['act', 'article'],
       filter: {
         status: {
           _eq: 'published',
@@ -57,7 +59,21 @@ export async function getLaws(build = false) {
     });
   });
 
+  Object.keys(byAct).forEach(act => {
+    byAct[act].sort((a, b) => {
+      return Number.parseFloat(a.article.replaceAll('-', '.')) - Number.parseFloat(b.article.replaceAll('-', '.'));
+    });
+  });
+
   tagList.add(''); // ensure '無' tag present
 
-  return { byAct, tagList: Array.from(tagList) };
+  const bySortedAct = ACTS.reduce((acc: Record<string, LawItem[]>, act) => {
+    acc[act] = byAct[act];
+    return acc;
+  }, {});
+
+  return {
+    byAct: bySortedAct,
+    tagList: Array.from(tagList)
+  };
 }

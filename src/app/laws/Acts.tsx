@@ -3,6 +3,7 @@
 import * as R from 'ramda';
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import Link from 'next/link';
 import { present } from '@/lib/utils';
 import { addAlertAtom } from '@/components/store';
 import type { Tags, LawItem } from './store';
@@ -101,7 +102,7 @@ export default function Acts({ acts }: {
 
   const onClickProps = markPicking ? { onClick: onPickItem } : {};
   const rootClassName = [
-    'relative p-1 max-w-screen-2xl overflow-auto scroll-smooth scroll-py-8 scrollbar-thin h-screen',
+    'relative p-1 max-w-screen-2xl overflow-y-scroll scroll-smooth scroll-py-8 h-screen',
     styles.acts,
     markPicking ? styles['mark-picking'] : '',
   ].join(' ');
@@ -120,11 +121,13 @@ export default function Acts({ acts }: {
           Object.entries(acts).map(([act, laws]) => (
             <li key={act}>
               <div className='flex items-center text-lg p-1 pr-5 my-1 mb-2 ring ring-slate-800'>
-                <img src='/assets/dictionary.svg' alt='法律' width={18} height={18} className='mr-1' />
-                <strong>{act}</strong>
+                <Link href={`#act-${act}`} className='hover:scale-125'>
+                  <img src='/assets/dictionary.svg' alt='法律' width={18} height={18} className='mr-1' />
+                </Link>
+                <strong id={`act-${act}`}>{act}</strong>
               </div>
 
-              <ul className='pb-2'>
+              <ul className='pb-2 px-1.5'>
                 {laws.map((law: any) => (
                   <Law key={law.id} item={law} />
                 ))}

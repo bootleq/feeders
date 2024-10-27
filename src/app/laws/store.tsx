@@ -7,7 +7,21 @@ export type LawItem = {
   [key: string]: any,
 };
 
-export const VIEW_CTRL_KEYS = ['body'];
+export const VIEW_CTRL_KEYS = ['body', 'penalty'];
+
+export const ACT_ABBRS: Record<string, string> = {
+  '廢棄物清理法': '廢清法',
+  '刑法': '刑法',
+  '動物保護法': '動保法',
+  '社會秩序維護法': '社維法',
+  '道路交通管理處罰條例': '道交條例',
+  '公寓大廈管理條例': '公寓大廈條例',
+  '臺北市公園管理自治條例': '北市公園自治',
+  '新北市動物保護自治條例': '新北動保自治',
+  '國立政治大學犬隻管理原則': '政大犬管原則'
+};
+
+export const ACTS = Object.keys(ACT_ABBRS);
 
 export const viewCtrlAtom = atom(VIEW_CTRL_KEYS);
 export const toggleViewCtrlAtom = atom(

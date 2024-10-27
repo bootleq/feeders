@@ -23,7 +23,7 @@ function TagList({ tags }: {
   }
 
   return (
-    <ul className='flex items-center my-1 text-sm ml-auto'>
+    <ul className='float-right flex items-center flex-wrap gap-y-2 justify-end my-1 py-1 text-sm ml-auto'>
       {tags.map(tag => (
         <li key={tag} className={`rounded-full py-px px-1 mx-1 border text-nowrap ring-1 ring-slate-500`}>
           {tag}
@@ -33,11 +33,11 @@ function TagList({ tags }: {
   );
 }
 
-const createAnyTagsHiddenAtom = (tagNames: string[]) => {
+const createTagsHiddenAtom = (tagNames: string[]) => {
   return atom(get => {
     const tags = get(tagsAtom);
     const picked = R.pick(tagNames, tags);
-    const hidden = R.values(picked).some(R.not);
+    const hidden = R.values(picked).every(R.not);
     return hidden;
   });
 };
@@ -48,50 +48,49 @@ export default function Law({ item }: {
   const { id, act, article, title, link, summary, judgements, penalty, tags, effectiveAt } = item;
   const anchor = `law-${item.id}`;
   const pickableTitle = `${act} ${article} $$ ${title}`;
-  const anyTagHiddenAtom = useMemo(() => createAnyTagsHiddenAtom(tags || ['']), [tags]);
-  const hidden = useAtomValue(anyTagHiddenAtom);
+  const allTagsHiddenAtom = useMemo(() => createTagsHiddenAtom(tags || ['']), [tags]);
+  const hidden = useAtomValue(allTagsHiddenAtom);
 
   if (hidden) {
     return null;
   }
 
   return (
-    <li data-role='law' data-anchor={anchor} data-pickable-title={pickableTitle} className='p-1 my-2 ml-2 relative group rounded ring-1 ring-slate-600/20'>
-      <div className='flex flex-wrap gap-y-1 items-center justify-center group/header group-hover:bg-slate-100 group-hover:ring ring-slate-200'>
+    <li data-role='law' data-anchor={anchor} data-pickable-title={pickableTitle} className='p-1 my-5 w-full relative group rounded ring-2 ring-slate-600/40'>
+      <div className='flex flex-wrap gap-y-1 items-center justify-start group/header group-hover:bg-slate-100 group-hover:ring ring-slate-200'>
         <a id={anchor} data-role='article' className='font-mono text-base hover:text-sky-700 hover:font-bold whitespace-nowrap mr-px px-1 rounded-md' href={`#${anchor}`}>
           {article}.
         </a>
 
-        <div data-role='title' className='flex items-center leading-tight text-balance text-center sm:text-start'>
+        <div data-role='title' className='flex items-center leading-tight sm:text-start'>
           <strong className='mr-2 text-lg'>{title}</strong>
           <Link href={link} target='_blank' className='hover:bg-amber-300/50 hover:scale-125'>
             <ArrowTopRightOnSquareIcon className='stroke-current' height={16} />
           </Link>
         </div>
 
-        <a className='text-opacity-0 ml-2 px-1 rounded-full opacity-0 group-hover/header:opacity-100 hover:bg-amber-300/50 hover:scale-125 hover:-rotate-12' href={`#${anchor}`}>
+        <a className='text-opacity-0 ml-auto sm:ml-1 mr-1 px-1 rounded-full opacity-90 group-hover/header:opacity-100 hover:bg-amber-300/50 hover:scale-125 hover:-rotate-12' href={`#${anchor}`}>
           <img src='/assets/paper-clip.svg' alt='連結' width={16} height={16} />
         </a>
 
-        <Html html={penalty} className={`ml-auto px-1 text-slate-200 bg-slate-700/60 hover:bg-red-900/80 text-sm ${styles.penalty}`} />
+        <Html data-role='penalty' html={penalty} className={`ml-0 sm:ml-auto px-1 text-slate-200 bg-slate-700/60 hover:bg-red-900/80 text-sm ${styles.penalty}`} />
       </div>
 
       <div data-role='body' className={styles.body}>
-        <div className='flex items-start ml-2'>
-          <div data-role='summary' className={`text-opacity-90 p-1 ${styles.mce}`}>
+        <div className='ml-2'>
+          <div data-role='summary' className={`text-opacity-90 p-1 float-left ${styles.mce}`}>
             <Html html={summary} />
           </div>
-
           <TagList tags={tags} />
         </div>
 
         { judgements &&
-          <details className={`ml-2 break-words ${styles.judgements}`}>
-            <summary className='flex items-center cursor-pointer'>
+          <details className={`ml-2 clear-both break-words ${styles.judgements}`}>
+            <summary className='flex items-center cursor-pointer text-red-900/80'>
               <img src='/assets/gavel.svg' alt='法槌' width={20} height={20} className='-scale-x-100' />
               判例
             </summary>
-            <Html html={judgements} className='p-1 mb-2 text-sm ring' />
+            <Html html={judgements} className='p-1 mb-2 text-sm' />
           </details>
         }
       </div>

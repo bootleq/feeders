@@ -4,7 +4,9 @@ import * as R from 'ramda';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useHydrateAtoms, atomWithStorage } from 'jotai/utils';
+import Link from 'next/link';
 import {
+  ACT_ABBRS,
   toggleViewCtrlAtom,
   tagsAtom,
   mergeTagsAtom,
@@ -27,16 +29,6 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import { ArrowLeftEndOnRectangleIcon } from '@heroicons/react/24/outline';
 
 const localMarksAtom = atomWithStorage<Mark[]>('feeders.lawMarks', []);
-
-const actAbbrs: Record<string, string> = {
-  '廢棄物清理法': '廢清法',
-  '動物保護法': '動保法',
-  '社會秩序維護法': '社維法',
-  '道路交通管理處罰條例': '道交條例',
-  '新北市動物保護自治條例': '新北動保自治',
-  '臺北市公園管理自治條例': '北市公園自治',
-  '國立政治大學犬隻管理原則': '政大犬管原則'
-};
 
 function ViewToggle({ section, current, setter, children }: {
   section: string,
@@ -71,7 +63,31 @@ function ViewCtrlPanel() {
           <ViewToggle section='body' current={viewCtrl} setter={setViewCtrl}>
             <span className="px-2 ms-3 text-sm text-zinc-700 text-nowrap">詳細</span>
           </ViewToggle>
+          <ViewToggle section='penalty' current={viewCtrl} setter={setViewCtrl}>
+            <span className="px-2 ms-3 text-sm text-zinc-700 text-nowrap">罰則</span>
+          </ViewToggle>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function ActCtrlPanel() {
+  return (
+    <div className='py-3'>
+      <div className='font-bold'>法規</div>
+      <div className='flex flex-col items-start w-fit px-1 py-2'>
+        <ul className='text-sm flex flex-wrap items-center gap-y-1'>
+          {Object.entries(ACT_ABBRS).map(([act, abbr]) => {
+            return (
+              <li key={abbr} className='mx-1'>
+                <Link href={`#act-${act}`} className='p-1 hover:bg-amber-300/50 hover:scale-125'>
+                  {abbr}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </div>
   );
@@ -135,7 +151,7 @@ const findItem = (anchor?: string) => {
 };
 
 const abbreviateAct = (act: string) => {
-  return actAbbrs[act] || act;
+  return ACT_ABBRS[act] || act;
 }
 
 function Mark({ anchor, title: pickableTitle, index }:
@@ -318,6 +334,7 @@ export default function SideControl({ tags }: {
   return (
     <div className='p-2 pb-7 sm:pb-2 divide-y-4 overflow-auto scrollbar-thin'>
       <ViewCtrlPanel />
+      <ActCtrlPanel />
       <TagCtrlPanel />
       <MarkCtrlPanel />
     </div>
