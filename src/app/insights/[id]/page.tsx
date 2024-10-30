@@ -150,7 +150,7 @@ export default async function Page({ params }: Props) {
       <Sidebar user={user} navTitle='見解' defaultOpen={false} className={`max-h-screen scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
       </Sidebar>
 
-      <div className='container mx-auto ring'>
+      <div className='container mx-auto'>
         <h1 className='text-4xl py-3 text-center'>
           {title}
         </h1>

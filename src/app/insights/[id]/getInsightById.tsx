@@ -44,7 +44,7 @@ export async function getInsightById(id: number, build = false) {
         'tags',
         'cms_file_ids',
         {
-          'facts.Facts_id': [
+          'facts.facts_id': [
             'id',
             'title',
             'date'
@@ -69,7 +69,7 @@ export async function getInsightById(id: number, build = false) {
     console.log("Failed reading files", e);
   }
 
-  const facts = R.map(R.prop('Facts_id'), insight.facts);
+  const facts = R.map(R.prop('facts_id'), insight.facts || []);
 
   return {
     insight: { ...insight, facts },

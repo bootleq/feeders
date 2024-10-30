@@ -3,6 +3,7 @@
 import * as R from 'ramda';
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { blank } from '@/lib/utils';
 import { format } from '@/lib/date-fp';
 import styles from './article.module.scss';
 
@@ -24,6 +25,29 @@ function Fact({ fact }: {
         {title}
       </div>
     </li>
+  );
+}
+
+function Footer({ facts }: {
+  facts: Record<string, any>[],
+}) {
+  if (blank(facts)) {
+    return null;
+  }
+
+  return (
+    <footer className='p-2 py-4 mb-4 border-t-2'>
+      <div className=' w-fit mx-auto'>
+        <h2 id='related-facts' className='text-xl font-bold'>相關事實</h2>
+        <ul>
+          {
+            facts.map((fact: any) => (
+              <Fact key={fact.id} fact={fact} />
+            ))
+          }
+        </ul>
+      </div>
+    </footer>
   );
 }
 
@@ -81,18 +105,7 @@ export default function Article({ post }: {
         </div>
       </article>
 
-      <footer className='p-2 py-4 mb-4 border-t-2'>
-        <h2 id='related-facts' className='text-xl'>相關事實</h2>
-        {facts.length &&
-          <ul>
-            {
-              facts.map((fact: any) => (
-                <Fact key={fact.id} fact={fact} />
-              ))
-            }
-          </ul>
-        }
-      </footer>
+      <Footer facts={facts} />
     </>
   );
 }

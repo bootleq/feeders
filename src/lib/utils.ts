@@ -10,6 +10,7 @@ export const ACCESS_CTRL = process.env.NEXT_PUBLIC_ACCESS_CTRL || 'close';
 export const ENABLE_ACTIVATE = process.env.NEXT_PUBLIC_ENABLE_ACTIVATE || 'off';
 
 export const present = R.both(R.isNotNil, R.isNotEmpty);
+export const blank = R.complement(present);
 
 export const cmsBuiltURL = (path: string) => {
   const r2Path = process.env.NEXT_PUBLIC_R2_URL_PATH;

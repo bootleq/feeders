@@ -51,7 +51,6 @@
   --font-mono: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", monospace;
 
   width: var(--content-max-width);
-  outline: 1px solid blue;
   margin-inline: auto;
   margin-bottom: 3rem;
 
@@ -75,7 +74,9 @@
   > p,
   > img,
   > table,
-  > figure {
+  > figure,
+  > ol,
+  > ul {
     margin-inline: auto;
   }
 
@@ -92,14 +93,28 @@
     line-height: 2rem;
   }
 
+  > p,
+  > ul,
+  > ol {
+    width: var(--content-width);
+  }
+
+  ul, ol {
+    list-style-position: inside;
+  }
+  ul {
+    list-style-type: disc;
+  }
+  ol {
+    list-style-type: decimal;
+  }
+
   > p {
     // text-base
     font-size: 1rem;
     line-height: 1.5rem;
 
-    width: var(--content-width);
-    padding-block: 0.25rem;
-    outline: 1px solid red;
+    padding-block: 0.75rem;
   }
 
   > table {
@@ -174,7 +189,6 @@
   :global(iframe.feeders-mce-iframe) {
     max-width: 100%;
     margin-inline: auto;
-    margin-block: 1rem;
     background-color: white;
     &[style] {
       height: auto;
