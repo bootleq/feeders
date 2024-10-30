@@ -364,7 +364,7 @@ export async function createSpot(data: CreateSpotSchema) {
 export async function createFollowup(data: CreateFollowupSchema) {
   const followup = await db.insert(spotFollowups).values({
     action:      data.action,
-    spotState:   data.action === 'remove' ? SpotStateEnum.enum.clean : SpotStateEnum.enum.dirty,
+    spotState:   ['remove', 'resolve'].includes(data.action) ? SpotStateEnum.enum.clean : SpotStateEnum.enum.dirty,
     desc:        data.desc,
     material:    data.material,
     feedeeCount: data.feedeeCount,

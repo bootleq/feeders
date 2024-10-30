@@ -51,11 +51,19 @@ function clusterIconFn(cluster: MarkerCluster) {
   });
 };
 
+const mapIconSize = 36;
+
 const MarkerIcon = new Leaflet.DivIcon({
-  html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 -translate-x-3 -translate-y-3">
+  html: `<svg width="${mapIconSize}px" height="${mapIconSize}px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 26" fill="currentColor" class="-translate-x-3 -translate-y-5">
     <path fill-rule="evenodd" d="m11.54 22.351.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 0 0-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 0 0 2.682 2.282 16.975 16.975 0 0 0 1.145.742ZM12 13.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" clip-rule="evenodd" /></svg>`,
   className: 'leaflet-div-marker',
-  popupAnchor: [-6, -18],
+  popupAnchor: [-1, -23],
+})
+
+const ResolvedMarkerIcon = new Leaflet.DivIcon({
+  html: `<svg width="${mapIconSize}px" height="${mapIconSize}px" viewBox="0 0 24 24" fill="none" class="-translate-x-3 -translate-y-6" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5304 7.46967C15.8232 7.76256 15.8232 8.23744 15.5304 8.53033L12.0304 12.0303C11.7375 12.3232 11.2626 12.3232 10.9697 12.0303L8.9697 10.0303C8.6768 9.73744 8.6768 9.26256 8.9697 8.96967C9.26259 8.67678 9.73746 8.67678 10.0304 8.96967L11.5 10.4393L14.4697 7.46967C14.7626 7.17678 15.2375 7.17678 15.5304 7.46967Z" fill="#000000"/><path fill-rule="evenodd" clip-rule="evenodd" d="M3.52439 8.85685C3.87872 4.55824 7.47087 1.25 11.7841 1.25H12.216C16.5292 1.25 20.1213 4.55824 20.4757 8.85685C20.666 11.166 19.9527 13.4589 18.4861 15.2526L13.693 21.1144C12.818 22.1845 11.1821 22.1845 10.307 21.1144L5.51399 15.2526C4.04733 13.4589 3.33405 11.166 3.52439 8.85685ZM11.7841 2.75C8.25152 2.75 5.30952 5.45948 5.01932 8.98008C4.8609 10.9019 5.45455 12.8102 6.67521 14.3031L11.4683 20.1649C11.7431 20.501 12.2569 20.501 12.5318 20.1649L17.3248 14.3031C18.5455 12.8102 19.1391 10.9019 18.9807 8.98008C18.6905 5.45948 15.7485 2.75 12.216 2.75H11.7841Z" fill="#000000"/></svg>`,
+  className: 'leaflet-div-marker',
+  popupAnchor: [0, -28],
 })
 
 type ItemsFollowups = { items: GeoSpotsResultFollowup[] }
@@ -157,9 +165,10 @@ export default function SpotMarkers({ spots }: {
             spawnedAt: s.latestSpawnAt,
             removedAt: s.latestRemovedAt,
           };
+          const icon = latestFollowup.action === 'resolve' ? ResolvedMarkerIcon : MarkerIcon;
 
           return (
-            <Marker key={s.id} position={[s.lat, s.lon]} icon={MarkerIcon} autoPan={false} eventHandlers={eventHandlers}>
+            <Marker key={s.id} position={[s.lat, s.lon]} icon={icon} autoPan={false} eventHandlers={eventHandlers}>
               <Popup className={mapStyles.popup} autoPan={false}>
                 <div className='p-1'>
                   <strong className='block mb-1'>{s.title}</strong>

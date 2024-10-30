@@ -12,6 +12,7 @@ const ensureTWClassNames = {
     'power':    'bg-slate-900',
     'coop':     'bg-red-400',
     'downvote': 'bg-red-700',
+    'resolve':  'bg-green-900',
   },
 };
 

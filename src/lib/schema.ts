@@ -14,6 +14,7 @@ export const SpotActionEnum = z.enum([
   'power',    // 公權力
   'coop',     // 互助
   'downvote', // 扣分
+  'resolve',  // 已解決
 ] as const);
 export const SpotStateEnum = z.enum(['dirty', 'clean', 'tolerated'] as const);
 

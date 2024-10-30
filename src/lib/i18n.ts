@@ -28,6 +28,7 @@ const translations = {
     'power':    '公權力',
     'coop':     '互助',
     'downvote': '扣分',
+    'resolve':  '已解決',
   },
   spotActionDesc: {
     'see':      '親眼確認現場',
@@ -37,6 +38,7 @@ const translations = {
     'power':    '檢舉或回報公家單位，促成具體行動',
     'coop':     '如果需要幫忙，或願意協助友軍，請選互助',
     'downvote': '記錄有誤或不當使用，請選扣分回饋',
+    'resolve':  '狀況穩定後，可標記為已解決（仍可修改）',
   },
   spotActionColor: { // NOTE: must sync with ActionLabel
     'see':      'bg-slate-900 opacity-70',
@@ -46,6 +48,7 @@ const translations = {
     'power':    'bg-slate-900',
     'coop':     'bg-red-400',
     'downvote': 'bg-red-700',
+    'resolve':  'bg-green-900',
   },
 
   changeScope: {
