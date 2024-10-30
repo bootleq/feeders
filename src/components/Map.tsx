@@ -46,6 +46,7 @@ import '@/components/leaflet/leaflet.css';
 const D1_PARAM_LIMIT = 100;
 
 const loadingHashesAtom = atom<string[]>([]);
+const loadedHashesAtom = atom<string[]>([]);
 const loadingAtom = atom((get) => R.isNotEmpty(get(loadingHashesAtom)) || get(loadingFollowupsAtom));
 
 type ItemsGeoSpotsByGeohash = { items: GeoSpotsByGeohash }
@@ -53,7 +54,12 @@ const fetchSpotsAtom = atom(
   null,
   async (get, set, geohash: string[]) => {
     const loadingHashes = get(loadingHashesAtom);
-    const staleHashes = R.difference(geohash, loadingHashes);
+    const loadedHashes = R.union(get(loadedHashesAtom), Object.keys(get(spotsAtom)));
+
+    const staleHashes = R.difference(
+      R.difference(geohash, loadedHashes),
+      loadingHashes
+    );
 
     if (R.isEmpty(staleHashes)) {
       return; // already loading, do nothing
@@ -66,6 +72,7 @@ const fetchSpotsAtom = atom(
       const fetched: ItemsGeoSpotsByGeohash = JSON.parse(json, jsonReviver);
       if (response.ok) {
         set(mergeSpotsAtom, { ...fetched.items });
+        set(loadedHashesAtom, R.union(get(loadedHashesAtom), staleHashes));
       } else {
         const errorNode = <><code className='font-mono mr-1'>{response.status}</code>無法取得資料</>;
         set(addAlertAtom, 'error', errorNode);

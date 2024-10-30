@@ -1,6 +1,6 @@
 import { LatLng } from 'leaflet';
 
-export const AREA_ZOOM_MAX = 14;
+export const AREA_ZOOM_MAX = 12;
 export const GEOHASH_PRECISION = 4;
 
 const atRegexp = /\/@([\d.]+),([\d.]+)/g;

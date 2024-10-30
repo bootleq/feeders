@@ -154,7 +154,7 @@ export default function SpotMarkers({ spots }: {
   const userId = session?.user.id;
 
   return (
-    <MarkerClusterGroup chunkedLoading removeOutsideVisibleBounds={false} iconCreateFunction={clusterIconFn}>
+    <MarkerClusterGroup chunkedLoading removeOutsideVisibleBounds={false} iconCreateFunction={clusterIconFn} disableClusteringAtZoom={18}>
       {
         spots.map(({ spot: s, followups: foFromProps }) => {
           const followups = postloadFollowups[s.id] || foFromProps;
