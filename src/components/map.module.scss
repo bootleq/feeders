@@ -8,6 +8,13 @@
   animation: feeders-flip-x 1.2s ease-in-out infinite, feeders-fall-in 400ms cubic-bezier(0.57, 0.4, 0.55, 1.17) 1;
 }
 
+.div-marker-svg-icon {
+  img {
+    width: 36px;
+    height: 36px;
+  }
+}
+
 @keyframes feeders-flip-x {
   0% {
     transform: scaleX(1);
@@ -77,5 +84,38 @@
   }
   :global(.leaflet-bottom .leaflet-control) {
     margin-bottom: 8px;
+  }
+}
+
+.help {
+  p {
+    padding: 0.25rem 0;
+
+    &:first-child {
+      padding-bottom: 0.55rem;
+    }
+  }
+
+  h3 {
+    font-weight: bold;
+    margin-block: 1rem;
+  }
+
+  ul {
+    list-style: outside;
+    margin-left: 1.25em;
+    margin-bottom: 0.5rem;
+  }
+
+  li {
+    margin-bottom: 0.25rem;
+  }
+
+  img[src$='svg'] {
+    display: inline;
+    width: 1.5rem;
+    aspect-ratio: 1;
+    vertical-align: bottom;
+    margin-inline: -5px;
   }
 }

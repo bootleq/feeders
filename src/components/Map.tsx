@@ -22,6 +22,7 @@ import {
   statusAtom,
   mergeTempMarkerAtom,
   loadingFollowupsAtom,
+  toggleHelpAtom,
 } from '@/app/world/[[...path]]/store';
 import { jsonReviver } from '@/lib/utils';
 import { parsePath, updatePath, AREA_ZOOM_MAX, GEOHASH_PRECISION } from '@/app/world/[[...path]]/util';
@@ -34,10 +35,12 @@ import { MapIcon } from '@heroicons/react/24/solid';
 import { StarIcon } from '@heroicons/react/24/outline';
 
 import SpotMarkers from '@/app/world/[[...path]]/SpotMarkers';
+import Help from '@/app/world/[[...path]]/Help';
 
 import Leaflet from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
 import TempMarker from './TempMarker';
+import HelpControl from './HelpControl';
 import ResetViewControl from './ResetViewControl';
 import LocateControl from './LocateControl';
 import Alerts from './Alerts';
@@ -252,10 +255,12 @@ type MapProps = {
   [key: string]: any;
 };
 
-export default function Map({ preloadedAreas, children, className, width, height, ...rest }: MapProps) {
+export default function Map({ preloadedAreas, helpContent, children, className, width, height, ...rest }: MapProps) {
   useHydrateAtoms([
     [spotsAtom, preloadedAreas],
   ]);
+
+  const toggleHelp = useSetAtom(toggleHelpAtom);
 
   const areaSpots = useAtomValue(spotsAtom);
   const [areaPicker, setAreaPicker] = useAtom(areaPickerAtom);
@@ -284,10 +289,12 @@ export default function Map({ preloadedAreas, children, className, width, height
 
         <LocateControl className={mapStyles['reset-view-ctrl']} />;
         <ResetViewControl className={mapStyles['reset-view-ctrl']} title='整個台灣' position='bottomright' />
+        <HelpControl className={mapStyles['reset-view-ctrl']} title='說明' position='bottomright' onClick={toggleHelp} />
       </MapContainer>
 
       <Status />
       <Alerts itemsAtom={alertsAtom} dismissAtom={dismissAlertAtom} />
+      <Help content={helpContent} />
       <LoadingIndicator />
     </>
   );

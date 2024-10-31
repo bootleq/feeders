@@ -5,6 +5,7 @@ import { getFacts } from '@/app/facts/getFacts';
 import { getInsights } from '@/app/insights/getInsights';
 import { getInsightById } from '@/app/insights/[id]/getInsightById';
 import { getLaws } from '@/app/laws/getLaws';
+import { getAllBlocks } from '@/models/blocks';
 
 // Fetch CMS data and upload JSONs to R2.
 // Put files to bucket's r2Dir (`cms`) folder.
@@ -64,6 +65,8 @@ const saveToDisk = (data, name) => {
   const key = `${r2Dir}/${name}`;
   const destPath = `${localDir}/${key}`;
 
+  fs.mkdirSync(path.dirname(destPath), { recursive: true });
+
   if (fs.existsSync(destPath)) {
     const extFile = fs.readFileSync(destPath, 'utf8');
     if (extFile === json) {
@@ -79,6 +82,7 @@ const saveToDisk = (data, name) => {
 const facts = await getFacts(true);
 const insights = await getInsights(true);
 const laws = await getLaws(true);
+const blocks = await getAllBlocks();
 saveToDisk(facts, 'facts.json');
 saveToDisk(insights, 'insights.json');
 saveToDisk(laws, 'laws.json');
@@ -89,6 +93,11 @@ for (let idx = 0; idx < insights.length; idx++) {
   const insight = await getInsightById(id, true);
   saveToDisk(insight, `insights/${id}.json`);
 }
+
+blocks.forEach(block => {
+  const { slug } = block;
+  saveToDisk(block, `blocks/${slug}.json`);
+});
 
 const buildKey = Date.now().toString();
 fs.writeFileSync(buildKeyPath, buildKey);

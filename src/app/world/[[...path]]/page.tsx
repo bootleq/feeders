@@ -3,14 +3,19 @@ import type { Metadata } from "next";
 import { auth } from '@/lib/auth';
 import dynamic from 'next/dynamic';
 import geohash from 'ngeohash';
+import parse, { HTMLReactParserOptions, Element, Text, DOMNode } from 'html-react-parser';
+import { selectOne } from 'css-select';
 import { getWorldUsers } from '@/models/users';
+import { getBlock } from '@/models/blocks';
 import { recentFollowups, geoSpots } from '@/models/spots';
 import type { RecentFollowupsResult } from '@/models/spots';
 import { subDays } from '@/lib/date-fp';
 import { parsePath, GEOHASH_PRECISION } from './util';
+import mapStyles from '@/components/map.module.scss';
 import Sidebar from '@/components/Sidebar';
 import LinkPreview from '@/components/LinkPreview';
 import RecentFollowups from './RecentFollowups';
+import { MapPinIcon } from '@heroicons/react/24/solid';
 
 export const runtime = 'edge';
 
@@ -55,6 +60,42 @@ async function getUser(id: string | undefined) {
   return null;
 }
 
+const helpHtmlParserOption: HTMLReactParserOptions = {
+  replace(domNode) {
+    if (domNode instanceof Element && domNode.attribs) {
+      const { type, name, attribs, children } = domNode;
+
+      if (type === 'tag') {
+        if (name === 'span' && attribs.class === 'font-mono italic') {
+          const text = (domNode.firstChild as Text).data;
+          switch (text) {
+            case 'MAP-PIN':
+              return <img src="/assets/map-pin.svg" alt='地圖點' className='translate-x-[1px]' />;
+              break;
+            case 'MAP-PIN-DONE':
+              return <img src="/assets/location-check.svg" alt='完成地圖點' className='-translate-y-[1px]' />;
+              break;
+            case 'MAP-PIN-NEW':
+              return <MapPinIcon height={24} className='inline fill-red-500 align-text-bottom -mx-[5px]' />
+              break;
+          }
+          return <></>; // remove unrecognized node
+        }
+      }
+      return null; // no touch
+    }
+  }
+};
+
+async function getHelpContent() {
+  const help = await getBlock('world/map-help');
+  if (!help) {
+    return null;
+  }
+  const content = parse(help.content, helpHtmlParserOption);
+  return content;
+}
+
 export const metadata: Metadata = {
   title: '世界地圖',
   description: '各地餵食點回報、追蹤、封鎖或監督管理',
@@ -85,6 +126,7 @@ export default async function Page({ params }: {
   }
 
   const preloadedAreas = await preloadGeoSpots(hashes);
+  const helpContent = await getHelpContent();
 
   return (
     <main className="flex min-h-screen flex-row items-start justify-between">
@@ -94,6 +136,7 @@ export default async function Page({ params }: {
 
       <LazyMap
         preloadedAreas={preloadedAreas}
+        helpContent={helpContent}
         preferCanvas={true}
         center={SAMPLE_CENTER}
         minZoom={8}

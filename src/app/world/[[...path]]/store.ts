@@ -58,6 +58,14 @@ export const statusAtom = atom<string | null>(get => {
   return null;
 });
 
+export const showHelpAtom = atom(false);
+export const toggleHelpAtom = atom(
+  get => get(showHelpAtom),
+  (get, set) => {
+    set(showHelpAtom, R.not);
+  }
+);
+
 export const viewItemAtom = atom<RecentFollowupsItemProps | null>(null);
 
 export const tempMarkerAtom = atom({
