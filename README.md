@@ -143,20 +143,20 @@ pnpm cms-restart
     "bold": {
       "inline": "strong"
     },
-      "underline": {
-        "inline": "span",
-        "classes": "underline",
-        "exact": true
-      },
-      "italic": {
-        "inline": "span",
-        "classes": "italic"
-      },
-      "strikethrough": {
-        "inline": "span",
-        "classes": "line-through",
-        "exact": true
-      }
+    "underline": {
+      "inline": "span",
+      "classes": "underline",
+      "exact": true
+    },
+    "italic": {
+      "inline": "span",
+      "classes": "italic"
+    },
+    "strikethrough": {
+      "inline": "span",
+      "classes": "line-through",
+      "exact": true
+    }
   },
   "content_css": "http://localhost:8055/tinymce/general.css",
   "preview_styles": "color font-size font-family font-weight"
