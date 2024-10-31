@@ -48,7 +48,6 @@ export default function Acts({ acts }: {
     const observer = new IntersectionObserver((entries) => {
       if (!root) return;
       entries.forEach((e) => {
-        console.log('interseet', e);
         if (!e.rootBounds) return;
         if (!e.isIntersecting) {
           if (e.boundingClientRect.bottom <= e.rootBounds.top) {
@@ -77,15 +76,15 @@ export default function Acts({ acts }: {
     if (!law) return;
 
     const anchor = law.dataset.anchor;
-    const pickableTitle = law.dataset.pickableTitle;
+    const title = law.dataset.title;
 
     if (R.any(R.propEq(anchor, 'anchor'), marks)) {
       addAlert('info', <>已經加入過了，不能重複</>);
       return;
     }
 
-    if (anchor && pickableTitle) {
-      addMark({ anchor, title: pickableTitle })
+    if (anchor && title) {
+      addMark({ anchor, title })
       setMarkPicking(false);
     } else {
       addAlert('error', <>無法取得連結或標題</>);

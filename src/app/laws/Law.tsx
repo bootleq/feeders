@@ -4,7 +4,7 @@ import * as R from 'ramda';
 import { useMemo } from 'react';
 import { atom, useAtomValue } from 'jotai';
 import Link from 'next/link';
-import { tagsAtom } from './store';
+import { tagsAtom, ACT_ABBRS } from './store';
 import styles from './laws.module.scss';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 
@@ -46,8 +46,8 @@ export default function Law({ item }: {
   item: any,
 }) {
   const { id, act, article, title, link, summary, judgements, penalty, tags, effectiveAt } = item;
-  const anchor = `law-${item.id}`;
-  const pickableTitle = `${act} ${article} $$ ${title}`;
+  const actAbbr = ACT_ABBRS[act] || '';
+  const anchor = `${actAbbr}_${article}`;
   const allTagsHiddenAtom = useMemo(() => createTagsHiddenAtom(tags || ['']), [tags]);
   const hidden = useAtomValue(allTagsHiddenAtom);
 
@@ -56,7 +56,7 @@ export default function Law({ item }: {
   }
 
   return (
-    <li data-role='law' data-anchor={anchor} data-pickable-title={pickableTitle} className='p-1 my-5 w-full relative group rounded ring-2 ring-slate-600/40'>
+    <li data-role='law' data-anchor={anchor} data-title={title} className='p-1 my-5 w-full relative group rounded ring-2 ring-slate-600/40'>
       <div className='flex flex-wrap gap-y-1 items-center justify-start group/header group-hover:bg-slate-100 group-hover:ring ring-slate-200'>
         <a id={anchor} data-role='article' className='font-mono text-base hover:text-sky-700 hover:font-bold whitespace-nowrap mr-px px-1 rounded-md' href={`#${anchor}`}>
           {article}.

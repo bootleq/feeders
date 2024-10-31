@@ -60,9 +60,13 @@ export const marksAtom = atom<Mark[]>([]);
 export const addMarkAtom = atom(
   null,
   (get, set, update: Mark) => {
+    const abbrOrder = Object.values(ACT_ABBRS);
     set(marksAtom, R.pipe(
       R.append(update),
-      R.sortBy(R.prop('anchor'))
+      R.sortWith([
+        R.ascend(a => R.indexOf(a.anchor.split('_')[0], abbrOrder)),
+        R.ascend(a => Number.parseFloat(a.anchor.split('_')[1].replace('-', '.'))),
+      ])
     ));
   }
 );

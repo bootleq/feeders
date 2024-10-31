@@ -150,11 +150,7 @@ const findItem = (anchor?: string) => {
   return target;
 };
 
-const abbreviateAct = (act: string) => {
-  return ACT_ABBRS[act] || act;
-}
-
-function Mark({ anchor, title: pickableTitle, index }:
+function Mark({ anchor, title, index }:
   Mark & { index: number }
 ) {
   const addAlert = useSetAtom(addAlertAtom);
@@ -211,13 +207,12 @@ function Mark({ anchor, title: pickableTitle, index }:
     delete acts.dataset.markOffscreen;
   }, []);
 
-  const [actArticle, title] = pickableTitle.split(' $$ ', 2);
-  const [act, article] = actArticle.match(/(.+) ([\w-]+)/)?.slice(1) || [];
+  const [act, article] = anchor.split('_', 2);
 
   return (
     <li className='flex items-center py-1' data-anchor={anchor} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
       <a className={MarkArticleCls} data-anchor={anchor} href={`#${anchor}`} onClick={onJump}>
-        {abbreviateAct(act)} {article}
+        {act} {article}
       </a>
       <Tooltip placement='right'>
         <TooltipTrigger className='mb-1 block truncate'>
