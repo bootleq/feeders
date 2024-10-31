@@ -24,7 +24,7 @@
 }
 
 .body {
-  aspect-ratio: 5/3;
+  aspect-ratio: 5/4;
 
   font-size: 1.125rem;
   line-height: 1.75rem;
@@ -84,21 +84,29 @@
 
 .user {
   a {
-    top: 35%;
+    top: 30%;
     left: 20%;
+  }
+}
+
+.actions {
+  pointer-events: none;
+  a {
+    bottom: 33%;
+    right: 13%;
   }
 }
 
 .world {
   a {
     bottom: 8%;
-    right: 4%;
+    right: 0;
   }
 }
 
 .laws {
   a {
-    bottom: 10%;
-    left: 5%;
+    bottom: 12%;
+    left: 7%;
   }
 }

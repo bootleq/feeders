@@ -9,6 +9,7 @@ import TaiwanIcon from '@/assets/main-island.svg';
 import JudgeIcon from '/public/assets/gavel.svg';
 import ThinkIcon from '@/assets/brain-and-head.svg';
 import HumanIcon from '@/assets/man-walk.svg';
+import LightingIcon from '@/assets/lightning.svg';
 import { ListBulletIcon } from '@heroicons/react/24/solid';
 
 const iconSize = 32;
@@ -58,6 +59,13 @@ export default function Sitemap({ className }: {
             <Link href='/laws'>
               <JudgeIcon className='fill-yellow-600' width={iconSize} height={iconSize} />
               <span>法規</span>
+            </Link>
+          </div>
+
+          <div className={styles.actions}>
+            <Link href='' className='invisible'>
+              <LightingIcon className='grayscale fill-gray-300' width={iconSize} height={iconSize} />
+              <span className='text-gray-300'>行動</span>
             </Link>
           </div>
 
