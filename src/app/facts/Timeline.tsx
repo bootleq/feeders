@@ -34,7 +34,7 @@ function TagList({ tags }: {
   }
 
   return (
-    <ul className='flex flex-wrap items-center text-xs'>
+    <ul data-role='tags' className='flex flex-wrap items-center justify-end gap-y-1 text-xs'>
       {tags.map(tag => (
         <li key={tag} className={`${getTagColor(tag).join(' ')} rounded-full px-1 p-px mx-px border text-nowrap`}>
           {tag}

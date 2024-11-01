@@ -117,6 +117,9 @@ function ViewCtrlPanel() {
           <ViewToggle section='origin' current={viewCtrl} setter={setViewCtrl}>
             <span className="px-2 ms-3 text-sm text-zinc-700 text-nowrap">出處</span>
           </ViewToggle>
+          <ViewToggle section='tags' current={viewCtrl} setter={setViewCtrl}>
+            <span className="px-2 ms-3 text-xs rounded-full border">標籤</span>
+          </ViewToggle>
 
           <div className="inline-flex items-center justify-start text-sm mt-1">
             <div className='text-nowrap'>

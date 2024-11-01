@@ -8,7 +8,8 @@
 
   &[data-view-ctrl-desc="hide"] div[data-role="desc"],
   &[data-view-ctrl-summary="hide"] div[data-role="summary"],
-  &[data-view-ctrl-origin="hide"] div[data-role="origin"] {
+  &[data-view-ctrl-origin="hide"] div[data-role="origin"],
+  &[data-view-ctrl-tags="hide"] ul[data-role="tags"] {
     display: none;
   }
 
