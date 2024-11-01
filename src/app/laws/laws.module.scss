@@ -123,6 +123,9 @@
     ol {
       list-style-position: inside;
       list-style-type: decimal;
+      li::marker {
+        color: #777;
+      }
     }
   }
 }
