@@ -1,19 +1,13 @@
 import * as R from 'ramda';
-import { auth } from '@/lib/auth';
-import directus, { CMS_URL } from '@/lib/directus';
-import { readItem, readFiles } from '@directus/sdk';
+import { CMS_URL } from '@/lib/directus';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import type { Metadata, ResolvingMetadata } from 'next';
 import parse, { HTMLReactParserOptions, Element, DOMNode, attributesToProps } from 'html-react-parser';
 import { selectOne } from 'css-select';
 import { parseSlug, APP_URL } from '@/lib/utils';
-import { getWorldUsers } from '@/models/users';
 import { getInsightById } from './getInsightById';
 import type { File } from './getInsightById';
-import Sidebar from '@/components/Sidebar';
-import Alerts from '@/components/Alerts';
-import { alertsAtom, dismissAlertAtom } from '@/components/store';
 import Article from './Article';
 
 export const runtime = 'edge';
@@ -22,17 +16,6 @@ type Insight = {
   content: ReturnType<typeof parse>,
   [key: string]: any,
 };
-
-async function getUser(id: string | undefined) {
-  if (id) {
-    const users = await getWorldUsers(id);
-    if (users) {
-      return users[0];
-    }
-  }
-
-  return null;
-}
 
 const cmsFileIdFromSrc = (src: string) => {
   const prefix = `${CMS_URL}/assets/`;
@@ -140,24 +123,15 @@ export async function generateMetadata(
 export default async function Page({ params }: Props) {
   const [id] = parseSlug(params.id);
   if (!id) notFound();
-  const session = await auth();
-  const user = await getUser(session?.userId);
   const insight = await getInsight(id);
   const { title } = insight;
 
   return (
-    <main className="flex min-h-screen flex-row items-start justify-start">
-      <Sidebar user={user} navTitle='見解' defaultOpen={false} className={`max-h-screen scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
-      </Sidebar>
-
-      <div className='container mx-auto'>
-        <h1 className='text-4xl py-3 text-center'>
-          {title}
-        </h1>
-        <Article post={insight} />
-      </div>
-
-      <Alerts itemsAtom={alertsAtom} dismissAtom={dismissAlertAtom} />
-    </main>
+    <div className='container mx-auto peer-[[aria-expanded="false"]]:pt-5 sm:peer-[[aria-expanded="false"]]:pt-0'>
+      <h1 className='text-4xl py-3 text-center'>
+        {title}
+      </h1>
+      <Article post={insight} />
+    </div>
   );
 }
