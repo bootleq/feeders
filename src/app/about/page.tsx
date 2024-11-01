@@ -2,7 +2,7 @@ import { auth } from '@/lib/auth';
 import type { Metadata } from "next";
 import Image from 'next/image';
 import Link from 'next/link';
-import { SITE_NAME } from '@/lib/utils';
+import { SITE_NAME, SITE_CONTACT_EMAIL } from '@/lib/utils';
 import { getWorldUsers } from '@/models/users';
 import Sidebar from '@/components/Sidebar';
 
@@ -39,13 +39,16 @@ export default async function Page() {
       <div className='p-2 px-4 max-w-screen-sm space-y-6'>
         <h1 className='text-3xl py-3'>關於本站</h1>
         <p className=''>
-          本站是由個人建立，起源於鄉里流浪狗問題的親身經驗，在當地，最關鍵的要素就是餵食，但大眾缺乏這個觀念，或刻意不面對。
+          本站由個人建立，起源於鄉里流浪狗問題的親身經驗，在當地，最關鍵的要素就是餵食，但民眾缺乏這個觀念，或囿於成見，刻意不面對。
+        </p>
+        <p>
+          做了很多功課，認為情況並非無可救藥，而是資訊隱藏、無效溝通阻礙著我們。
         </p>
         <p>
           公共議題能否順利討論，與人民知識、道德與理性有直接關係。
         </p>
         <p>
-          先進社會，一定能解決流浪狗問題。
+          當人心提昇，以更高格局看待問題，先進社會，一定能解決流浪狗問題。
         </p>
 
         <Hr />
@@ -61,7 +64,7 @@ export default async function Page() {
         <Hr />
 
         <h2 className='text-2xl'>聯絡信箱</h2>
-        <address>human@feeders.***</address>
+        <address>{SITE_CONTACT_EMAIL}</address>
         <p>
           歡迎指教，不用拘謹
         </p>
