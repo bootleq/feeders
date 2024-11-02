@@ -71,6 +71,18 @@ export default async function updateUser(formData: FormData) {
 
     revalidatePath(`/user/${session.user.id}`);
     return { success: true };
+  } else if (data.field === 'desc') {
+    try {
+      await db.update(users)
+        .set({ desc: data.value })
+        .where(eq(users.id, user.id));
+    } catch (e) {
+      console.log('update-user', e);
+      return { error: '儲存失敗，非預期的錯誤' };
+    }
+
+    revalidatePath(`/user/${session.user.id}`);
+    return { success: true };
   }
 
   return { error: '非預期的錯誤' };

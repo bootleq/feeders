@@ -136,6 +136,7 @@ export const getProfile = async (userId: string) => {
     id:        users.id,
     name:      users.name,
     state:     users.state,
+    desc:      users.desc,
     createdAt: users.createdAt,
     lockedAt:  users.lockedAt,
     actionCounts: sql<ProfileActionCounts>`${actionCounts.items}`.mapWith(R.pipe(deepParseJSON, expandActionCounts)).as('actionCounts'),

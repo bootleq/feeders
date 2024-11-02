@@ -10,7 +10,7 @@ import { t } from '@/lib/i18n';
 import { RENAME_COOL_OFF_DAYS } from '@/models/users';
 import type { WorldUserResult, ProfileResult } from '@/models/users';
 import UserAgreement from '@/app/user/UserAgreement';
-import { TextInput, Textarea, Select, inputCls } from '@/components/form/Inputs';
+import { inputCls } from '@/components/form/Inputs';
 import Alerts from '@/components/Alerts';
 import { alertsAtom, addAlertAtom, dismissAlertAtom } from '@/components/store';
 import activate from './activate';
@@ -23,7 +23,7 @@ import { CheckIcon } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
-const tinyBtnCls = 'btn p-px ml-auto ring-1 flex items-center hover:bg-slate-100';
+const tinyBtnCls = 'btn p-px ml-1 ring-1 flex items-center hover:bg-slate-100';
 const tooltipCls = [
   'text-xs p-1 px-2 rounded box-border w-max max-w-[calc(100vw_-_10px)] z-[1002]',
   'bg-gradient-to-br from-stone-50 to-slate-100 ring-2 ring-offset-1 ring-slate-300',
@@ -39,6 +39,7 @@ export default function UserInfo({ user, profile }: {
   profile: ProfileResult | null,
 }) {
   const [editName, setEditName] = useState(false);
+  const [editDesc, setEditDesc] = useState(false);
   const [confirmingRename, setConfirmingRename] = useState(false);
   const [activating, setActivating] = useState(false);
   const [sending, setSending] = useState(false);
@@ -55,6 +56,12 @@ export default function UserInfo({ user, profile }: {
     if (confirmingRename) setConfirmingRename(false);
   }, [confirmingRename]);
 
+  const toggleEditDesc = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditDesc(R.not);
+  }, []);
+
   const updateName = useCallback(async (e: React.MouseEvent<HTMLButtonElement> | null) => {
     e && e.preventDefault();
 
@@ -70,6 +77,28 @@ export default function UserInfo({ user, profile }: {
       const res = await updateUser(formData);
       if (res.success) {
         setEditName(false);
+        return;
+      }
+      addAlert('error', res.error ? <>{res.error}</> : <>未知的錯誤</>);
+    } catch (e) {
+      addAlert('error', <>非預期的錯誤</>);
+    } finally {
+      setSending(false);
+    }
+  }, [setSending, addAlert]);
+
+  const updateDesc = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+
+    formData.set('value', (formData.get('desc') || '').toString());
+    formData.delete('desc');
+
+    setSending(true);
+    try {
+      const res = await updateUser(formData);
+      if (res.success) {
+        setEditDesc(false);
         return;
       }
       addAlert('error', res.error ? <>{res.error}</> : <>未知的錯誤</>);
@@ -145,11 +174,12 @@ export default function UserInfo({ user, profile }: {
   const waitingActivate = isCurrentUser && user.state === 'new';
   const canEdit = ACCESS_CTRL === 'open' && isCurrentUser && user.state === 'active';
   const canRename = canEdit && !coolingOff;
+  const anyEditing = editName || editDesc;
 
   return (
     <>
       <div className='flex items-center flex-wrap gap-x-3 gap-y-3 h-full'>
-        <div className='grid grid-cols-[min-content_2fr] w-fit min-w-[300px] items-center gap-x-4 px-4'>
+        <div className='grid grid-cols-[min-content_2fr] w-fit min-w-[300px] max-w-[90vw] md:max-w-screen-sm items-center gap-x-4 px-4'>
           <div className='whitespace-nowrap py-1'>名稱</div>
           {editName ?
             <div className='flex items-center gap-x-1'>
@@ -184,7 +214,7 @@ export default function UserInfo({ user, profile }: {
               {canEdit && canRename &&
                 <Tooltip>
                   <TooltipTrigger>
-                    <button className={tinyBtnCls} onClick={toggleEditName}>
+                    <button className={tinyBtnCls} onClick={toggleEditName} disabled={anyEditing}>
                       <PencilSquareIcon className='stroke-current' height={20} />
                     </button>
                   </TooltipTrigger>
@@ -214,10 +244,42 @@ export default function UserInfo({ user, profile }: {
             { format({}, 'yyyy/MM/dd', profile.createdAt) }
           </div>
 
-          <div className='whitespace-nowrap py-1'>ID</div>
-          <div className='font-mono text-xs text-slate-800 ml-2'>
-            { profile.id }
-          </div>
+          <div className='whitespace-nowrap py-1 self-start'>介紹</div>
+          {editDesc ?
+            <form onSubmit={updateDesc} className='flex flex-col items-center gap-x-1'>
+              <div>
+                <textarea name='desc' autoFocus cols={36} rows={8} className={`${inputCls} resize`}>
+                  {profile.desc}
+                </textarea>
+                <input type='hidden' name='field' value='desc' />
+              </div>
+
+              <div className='flex items-center self-end gap-x-1 mt-1'>
+                <button aria-label='確認' className={tinyBtnCls}>
+                  {sending ? '處理中……' : <CheckIcon className='stroke-green-600' height={20} />}
+                </button>
+                <button aria-label='取消' className={tinyBtnCls} onClick={toggleEditDesc}>
+                  <XMarkIcon className='stroke-red-500' height={20} />
+                </button>
+              </div>
+            </form>
+            :
+            <div className='flex items-center ml-2 gap-x-1 whitespace-break-spaces'>
+              <div className='p-1 my-2 mr-2 text-sm ring-1 ring-slate-500/50 rounded max-h-60 overflow-auto scrollbar-thin'>
+                { profile.desc }
+              </div>
+              {canEdit &&
+                <Tooltip>
+                  <TooltipTrigger>
+                    <button className={tinyBtnCls} onClick={toggleEditDesc} disabled={anyEditing}>
+                      <PencilSquareIcon className='stroke-current' height={20} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className={tooltipCls}>編輯</TooltipContent>
+                </Tooltip>
+              }
+            </div>
+          }
         </div>
       </div>
 
