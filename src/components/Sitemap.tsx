@@ -14,6 +14,8 @@ import { ListBulletIcon } from '@heroicons/react/24/solid';
 
 const iconSize = 32;
 
+const disableCls = 'grayscale fill-gray-300';
+
 export default function Sitemap({ className }: {
   className?: string,
 }) {
@@ -63,16 +65,16 @@ export default function Sitemap({ className }: {
           </div>
 
           <div className={styles.actions}>
-            <Link href='' className='invisible'>
-              <LightingIcon className='grayscale fill-gray-300' width={iconSize} height={iconSize} />
+            <Link href='' className={`${styles.unreleased}`}>
+              <LightingIcon className={ disableCls } width={iconSize} height={iconSize} />
               <span className='text-gray-300'>行動</span>
             </Link>
           </div>
 
           <div className={styles.world}>
-            <Link href='/world'>
-              <TaiwanIcon className='fill-lime-700 -mr-1.5' width={iconSize} height={iconSize} />
-              <span>世界地圖</span>
+            <Link href='/world' className={`${styles.unreleased}`}>
+              <TaiwanIcon className={ disableCls || 'fill-lime-700 -mr-1.5'} width={iconSize} height={iconSize} />
+              <span className='text-gray-300'>世界地圖</span>
             </Link>
           </div>
         </div>
