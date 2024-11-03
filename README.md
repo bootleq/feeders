@@ -27,17 +27,22 @@ application fetches pre-build JSON instead of hit CMS again.
 
 ## Database
 
+Currently, local pages dev doesn't support `--remote` D1, so we use local
+sqlite db during development.
+
+When everything is ready, run the drizzle migrations on remote D1.
+
 - List tables, can also used to establish local db first time
 
     pnpm db:tables
 
-- Migrations with drizzle-kit
+- Migrations with drizzle-kit (locally)
 
     pnpm db:migrate:gen
     pnpm db:migrate:drop
     pnpm db:migrate
 
-- Remove local db + drizzle meta, then reset with migrations
+- Remove local db + drizzle meta, then reset with migrations (DANGER)
 
     pnpm db:delete
     pnpm db:delete && pnpm db:tables && pnpm db:migrate:gen && pnpm db:migrate
@@ -49,6 +54,11 @@ application fetches pre-build JSON instead of hit CMS again.
     PRAGMA table_xinfo(TABLE_NAME)
     PRAGMA defer_foreign_keys = (on|off)
     SELECT name, sql FROM sqlite_master
+
+- Run migrations on remote D1
+
+    pnpm wrangler d1 list
+    pnpm wrangler d1 migrations apply feeders --remote
 
 
 ## Authentication
