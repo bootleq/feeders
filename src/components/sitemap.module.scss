@@ -68,6 +68,10 @@
   }
 }
 
+.unreleased {
+  pointer-events: none;
+}
+
 .facts {
   a {
     top: 2%;
@@ -90,7 +94,6 @@
 }
 
 .actions {
-  pointer-events: none;
   a {
     bottom: 33%;
     right: 13%;
