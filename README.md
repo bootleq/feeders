@@ -2,6 +2,8 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`c3`](https:
 
 ## Getting Started
 
+Prepare env file by copy `.env.sample` to `.env.development`.
+
 First, run the development server:
 
 ```bash
@@ -12,7 +14,7 @@ pnpm dev
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 
-Prepare to deploy:
+Prepare to preview:
 
 ```bash
 pnpm lint
@@ -23,6 +25,18 @@ pnpm preview
 
 `cms:build-local` uploads local CMS data to external storage, our built
 application fetches pre-build JSON instead of hit CMS again.
+
+
+Then prepare to deploy:
+
+```bash
+pnpm pages:build:prod
+pnpm env:push:prod
+pnpm run deploy
+```
+
+The `env:push:prod` loads variables in `env.production` and uploads them as
+Pages secrets. This is to avoid exposing them in `wrangler.toml`.
 
 
 ## Database
