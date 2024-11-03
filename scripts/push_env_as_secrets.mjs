@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import { execSync } from 'child_process';
 import dotenv from 'dotenv';
@@ -10,7 +11,12 @@ if (envConfig.error) {
   process.exit(1);
 }
 
-const envJson = JSON.stringify(envConfig.parsed);
+const buildKey = fs.readFileSync('directus/build/BUILD_KEY', 'utf8');
+
+const envJson = JSON.stringify({
+  NEXT_PUBLIC_CMS_BUILD_KEY: buildKey,
+  ...envConfig.parsed
+});
 
 try {
   execSync(`echo '${envJson}' | wrangler pages secret bulk --project feeders`, { stdio: 'inherit' });
