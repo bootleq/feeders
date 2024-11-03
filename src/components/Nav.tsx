@@ -82,7 +82,7 @@ export default function Nav({ user }: {
         </TooltipContent>
       </Tooltip>
 
-      <Tooltip>
+      <Tooltip transform={false}>
         <TooltipTrigger>
           <span className=''>{ title }</span>
         </TooltipTrigger>

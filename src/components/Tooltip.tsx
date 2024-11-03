@@ -23,12 +23,14 @@ interface TooltipOptions {
   placement?: Placement;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  transform?: boolean,
   hoverProps?: UseHoverProps;
 }
 
 export function useTooltip({
   initialOpen = false,
   placement = "top",
+  transform = true,
   hoverProps = { delay: { open: 0, close: 240 } },
   open: controlledOpen,
   onOpenChange: setControlledOpen,
@@ -40,6 +42,7 @@ export function useTooltip({
 
   const data = useFloating({
     placement,
+    transform,
     open,
     onOpenChange: setOpen,
     whileElementsMounted: autoUpdate,
