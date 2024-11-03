@@ -56,8 +56,8 @@ export default async function Page() {
         <h2 className='text-2xl'>時間線</h2>
         <ol>
           <li>
-            <time className='font-mono mr-2'>2024-99-99</time>
-            網站開始測試
+            <time className='font-mono mr-2'>2024-11-04</time>
+            初期測試
           </li>
         </ol>
 
@@ -72,11 +72,13 @@ export default async function Page() {
         <Hr />
 
         <h2 className='text-2xl'>小額捐款</h2>
-        <div className='flex items-center justify-between'>
-          <p>
-            沒有保證專款專用
-          </p>
-        </div>
+        <p>
+          不保證專款專用
+        </p>
+
+        <a className='block' href="https://www.buymeacoffee.com/bootleq">
+          <img alt='Buy me a coffee' src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=bootleq&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" />
+        </a>
 
       </div>
     </main>

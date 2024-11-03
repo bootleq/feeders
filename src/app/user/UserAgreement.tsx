@@ -37,7 +37,7 @@ export default function UserAgreement() {
       </ul>
 
       <div className='flex items-center justify-center font-mono text-xs text-slate-600 mt-4 text-center'>
-        2024-10-05
+        2024-11-04
       </div>
     </>
   );
