@@ -25,7 +25,7 @@
     "cms-log": "docker logs feeders-directus -f",
     "cms-stop": "cd ./directus && docker compose stop",
     "cms-restart": "cd ./directus && docker compose stop && docker compose up --detach && docker logs feeders-directus -f",
-    "cms:build-local": "tsx --env-file=.env.local directus/scripts/build_to_r2.mjs",
+    "cms:build-local": "tsx --env-file=.env.development directus/scripts/build_to_r2.mjs",
     "test": "vitest"
   },
   "dependencies": {
