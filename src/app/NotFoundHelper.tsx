@@ -1,12 +1,15 @@
 "use client"
 
+import { usePathname, useSearchParams } from 'next/navigation';
+
 export default function NotFoundHelper() {
-  const url = new URL(window.location.href);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   return (
     <div>
       <code>
-        {url.pathname}
+        {pathname}{searchParams.size ? `?${searchParams.toString()}` : ''}
       </code>
     </div>
   );
