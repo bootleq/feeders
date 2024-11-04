@@ -36,8 +36,8 @@ importers:
         specifier: ^2.1.0
         version: 2.1.0(leaflet@1.9.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       chanfana:
-        specifier: ^2.0.2
-        version: 2.0.2
+        specifier: ^2.1.0
+        version: 2.1.0
       change-case:
         specifier: ^5.4.4
         version: 5.4.4
@@ -3599,8 +3599,8 @@ packages:
     resolution: {integrity: sha512-dLitG79d+GV1Nb/VYcCDFivJeK1hiukt9QjRNVOsUtTy1rR1YJsmpGGTZ3qJos+uw7WmWF4wUwBd9jxjocFC2w==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
 
-  chanfana@2.0.2:
-    resolution: {integrity: sha512-HuYjj+tIXHvKJ8FobeWOcshg35kYK15uqNQdZy22pF2DMyySW5DlnYK8jcAyoLQiCwPplQdKZonFLfP/sCFMBg==}
+  chanfana@2.1.0:
+    resolution: {integrity: sha512-/PWIOZU85kyRE/HqEzL/H46ZxVMk9KeA6dcykVKai7SHG3OsRmJk154QYoDo3u05BPWJk//SqSif8Xhvd8RkQA==}
 
   change-case@5.4.4:
     resolution: {integrity: sha512-HRQyTk2/YPEkt9TnUPbOpr64Uw3KOicFWPVBb+xiHvd6eBx/qPr9xqfBFDT8P2vWsvvz4jbEkfDe71W3VyNu2w==}
@@ -10914,7 +10914,7 @@ snapshots:
 
   chalk@5.3.0: {}
 
-  chanfana@2.0.2:
+  chanfana@2.1.0:
     dependencies:
       '@asteasolutions/zod-to-openapi': 7.1.1(zod@3.23.8)
       js-yaml: 4.1.0

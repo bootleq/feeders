@@ -38,7 +38,7 @@
     "@internationalized/date": "^3.5.5",
     "@next/bundle-analyzer": "^14.2.5",
     "@react-leaflet/core": "^2.1.0",
-    "chanfana": "^2.0.2",
+    "chanfana": "^2.1.0",
     "change-case": "^5.4.4",
     "css-select": "^5.1.0",
     "date-fns": "^3.6.0",
