@@ -36,6 +36,9 @@ export default async function updateUser(formData: FormData) {
   if (!user.id) throw new Error('no user id');
 
   if (data.field === 'name') {
+    if (!data.value || data.value.trim() === '') {
+      return { error: '名稱不可以空白' };
+    }
     const query = getQuickProfileQuery().where(eq(users.id, user.id));
     const qProfile = await query.get();
     if (!qProfile) return { error: '無法取得 profile' };
