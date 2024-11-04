@@ -31,7 +31,9 @@ export function useTooltip({
   initialOpen = false,
   placement = "top",
   transform = true,
-  hoverProps = { delay: { open: 0, close: 240 } },
+  hoverProps = {
+    delay: { open: 0, close: 240 },
+  },
   open: controlledOpen,
   onOpenChange: setControlledOpen,
 }: TooltipOptions = {}) {

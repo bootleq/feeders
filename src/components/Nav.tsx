@@ -3,6 +3,7 @@
 import { useSession, signIn, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { useAtomValue } from 'jotai';
+import { safePolygon } from "@floating-ui/react";
 import Sitemap from '@/components/Sitemap';
 import type { WorldUserResult } from '@/models/users';
 import { navTitleAtom } from '@/components/store';
@@ -12,6 +13,11 @@ import { IdentificationIcon } from '@heroicons/react/24/solid';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 
 const menuItemCls = `p-2 w-full flex items-center`;
+
+const hoverProps = {
+  delay: { open: 0, close: 240 },
+  handleClose: safePolygon(),
+};
 
 function NavMenu() {
   const cls = [
@@ -82,7 +88,7 @@ export default function Nav({ user }: {
         </TooltipContent>
       </Tooltip>
 
-      <Tooltip transform={false}>
+      <Tooltip transform={false} hoverProps={hoverProps}>
         <TooltipTrigger>
           <span className=''>{ title }</span>
         </TooltipTrigger>
