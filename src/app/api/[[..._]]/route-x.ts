@@ -12,7 +12,10 @@ export const runtime = 'edge'
 const app = new Hono().basePath('/api')
 
 const openapi = fromHono(app, {
-  base: '/api'
+  base: '/api',
+  docs_url: null,
+  redoc_url: null,
+  openapi_url: null,
 });
 
 openapi.get('/spots/:geohash', getSpots);
