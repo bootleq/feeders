@@ -42,13 +42,21 @@ export default async function Page() {
           本站由個人建立，起源於鄉里流浪狗問題的親身經驗，在當地，最關鍵的要素就是餵食，但民眾缺乏這個觀念，或囿於成見，刻意不面對。
         </p>
         <p>
-          做了很多功課，認為情況並非無可救藥，而是資訊隱藏、無效溝通阻礙著我們。
+          做了很多功課，認為情況並非無可救藥，而是資訊屏障、無效溝通阻礙著我們。
         </p>
         <p>
           公共議題能否順利討論，與人民知識、道德與理性有直接關係。
         </p>
         <p>
-          當人心提昇，以更高格局看待問題，先進社會，一定能解決流浪狗問題。
+          當人心提昇，以更高格局看待，先進社會，一定能解決流浪狗問題。
+        </p>
+
+        <Hr />
+
+        <h2 className='text-2xl'>關於測試</h2>
+        <p>
+          網站目前是測試階段。
+          使用者和上傳的資料，日後可能會清空重來。
         </p>
 
         <Hr />
@@ -71,12 +79,12 @@ export default async function Page() {
 
         <Hr />
 
-        <h2 className='text-2xl'>小額捐款</h2>
+        <h2 className='text-2xl'>捐款</h2>
         <p>
           不保證專款專用
         </p>
 
-        <a className='block' href="https://www.buymeacoffee.com/bootleq">
+        <a className='block' target='_blank' href="https://www.buymeacoffee.com/bootleq">
           <img alt='Buy me a coffee' src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=bootleq&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" />
         </a>
 
