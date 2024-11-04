@@ -12,6 +12,7 @@ import type { WorldUserResult, ProfileResult } from '@/models/users';
 import UserAgreement from '@/app/user/UserAgreement';
 import { inputCls } from '@/components/form/Inputs';
 import Alerts from '@/components/Alerts';
+import ClientDate from '@/components/ClientDate';
 import { alertsAtom, addAlertAtom, dismissAlertAtom } from '@/components/store';
 import activate from './activate';
 import updateUser from './update-user';
@@ -241,7 +242,9 @@ export default function UserInfo({ user, profile }: {
 
           <div className='whitespace-nowrap py-1'>建立時間</div>
           <div className='font-mono ml-2'>
-            { format({}, 'yyyy/MM/dd', profile.createdAt) }
+            <ClientDate fallback='--'>
+              {format({}, 'yyyy/MM/dd', profile.createdAt)}
+            </ClientDate>
           </div>
 
           <div className='whitespace-nowrap py-1 self-start'>介紹</div>

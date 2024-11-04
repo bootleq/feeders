@@ -2,6 +2,7 @@ import * as R from 'ramda';
 import type { Metadata } from "next";
 import Link from 'next/link';
 import { format } from '@/lib/date-fp';
+import ClientDate from '@/components/ClientDate';
 import { getInsights } from './getInsights';
 
 export const runtime = 'edge';
@@ -32,7 +33,11 @@ export default async function Page({ params }: {
         return (
         <li key={id} className='flex items-center text-lg'>
           <Link href={`/insights/${id}-${slug}`} className='flex items-center hover:text-sky-900'>
-            <time className='font-mono mr-3 text-base'>{format({}, 'yyyy-MM-dd', publishedAt)}</time>
+            <time className='font-mono mr-3 text-base'>
+              <ClientDate fallback={<span className='opacity-20'>{format({}, 'yyyy-MM-dd', publishedAt)}</span>}>
+                {format({}, 'yyyy-MM-dd', publishedAt)}
+              </ClientDate>
+            </time>
             {title}
           </Link>
 

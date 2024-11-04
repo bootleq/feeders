@@ -7,6 +7,7 @@ import { format } from '@/lib/date-fp';
 import { getWorldUsers, getProfile } from '@/models/users';
 import { notFound } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
+import ClientDate from '@/components/ClientDate';
 import BasicInfo from './BasicInfo';
 import ActionLabel from '@/app/world/[[...path]]/ActionLabel';
 import { MapIcon } from '@heroicons/react/24/solid';
@@ -116,7 +117,11 @@ export default async function Page({ params }: {
                   return (
                     <li key={idx} className='flex items-center justify-center py-1'>
                       <span className={`pr-2`}>{r.content}</span>
-                      <time className='font-mono text-xs ml-auto whitespace-nowrap'>{ date }</time>
+                      <time className='font-mono text-xs ml-auto whitespace-nowrap'>
+                        <ClientDate fallback={'--'}>
+                          { date }
+                        </ClientDate>
+                      </time>
                     </li>
                   );
                 })}

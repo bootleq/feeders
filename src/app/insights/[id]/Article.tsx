@@ -5,6 +5,7 @@ import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { blank } from '@/lib/utils';
 import { format } from '@/lib/date-fp';
+import ClientDate from '@/components/ClientDate';
 import styles from './article.module.scss';
 
 function Fact({ fact }: {
@@ -63,7 +64,11 @@ export default function Article({ post }: {
           <span className='mr-2'>
             刊出日期
           </span>
-          <time className=''>{format({}, 'yyyy/M/d', publishedAt)}</time>
+          <time className=''>
+            <ClientDate fallback={<span className='opacity-20'>{format({}, 'yyyy/M/d', publishedAt)}</span>}>
+              {format({}, 'yyyy/M/d', publishedAt)}
+            </ClientDate>
+          </time>
         </div>
 
         {modifiedAt &&
@@ -71,7 +76,11 @@ export default function Article({ post }: {
             <span className='mr-2'>
               最後修改
             </span>
-            <time className=''>{format({}, 'yyyy/M/d', modifiedAt)}</time>
+            <time className=''>
+              <ClientDate fallback={<span className='opacity-20'>{format({}, 'yyyy/M/d', modifiedAt)}</span>}>
+                {format({}, 'yyyy/M/d', modifiedAt)}
+              </ClientDate>
+            </time>
           </div>
         }
 
