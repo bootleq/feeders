@@ -72,9 +72,9 @@ export default function Sitemap({ className }: {
           </div>
 
           <div className={styles.world}>
-            <Link href='/world' className={`${styles.unreleased}`}>
-              <TaiwanIcon className={ disableCls || 'fill-lime-700 -mr-1.5'} width={iconSize} height={iconSize} />
-              <span className='text-gray-300'>世界地圖</span>
+            <Link href='/world' className=''>
+              <TaiwanIcon className='fill-lime-700 -mr-1.5' width={iconSize} height={iconSize} />
+              <span className=''>世界地圖</span>
             </Link>
           </div>
         </div>
