@@ -10,11 +10,7 @@ import MarkerClusterGroup from 'react-leaflet-cluster';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { Desc } from '@/components/Desc';
 import Link from 'next/link';
-import { PlusIcon } from '@heroicons/react/24/outline';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
-import { CheckIcon } from '@heroicons/react/24/outline';
-import { XMarkIcon } from '@heroicons/react/24/outline';
-import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import { Square3Stack3DIcon } from '@heroicons/react/24/outline';
 
