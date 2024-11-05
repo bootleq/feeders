@@ -56,25 +56,27 @@ export const recentFollowups = (oldestDate: Date, fetchLimit: number) => {
   const profiles = getQuickProfileQuery().as('profiles');
 
   const query = db.select({
-    spotId:      spots.id,
-    spotTitle:   spots.title,
-    lat:         spots.lat,
-    lon:         spots.lon,
-    city:        spots.city,
-    town:        spots.town,
-    geohash:     spots.geohash,
-    followupId:  spotFollowups.id,
-    action:      spotFollowups.action,
-    spotState:   spotFollowups.spotState,
-    desc:        spotFollowups.desc,
-    material:    spotFollowups.material,
-    feedeeCount: spotFollowups.feedeeCount,
-    spawnedAt:   spotFollowups.spawnedAt,
-    removedAt:   spotFollowups.removedAt,
-    createdAt:   spotFollowups.createdAt,
-    followCount: ranked.followCount,
-    userId:      spotFollowups.userId,
-    userName:    profiles.name,
+    spotId:       spots.id,
+    spotPubState: spots.state,
+    spotTitle:    spots.title,
+    lat:          spots.lat,
+    lon:          spots.lon,
+    city:         spots.city,
+    town:         spots.town,
+    geohash:      spots.geohash,
+    followupId:   spotFollowups.id,
+    pubState:     spotFollowups.state,
+    action:       spotFollowups.action,
+    spotState:    spotFollowups.spotState,
+    desc:         spotFollowups.desc,
+    material:     spotFollowups.material,
+    feedeeCount:  spotFollowups.feedeeCount,
+    spawnedAt:    spotFollowups.spawnedAt,
+    removedAt:    spotFollowups.removedAt,
+    createdAt:    spotFollowups.createdAt,
+    followCount:  ranked.followCount,
+    userId:       spotFollowups.userId,
+    userName:     profiles.name,
   }).from(spotFollowups)
     .innerJoin(
       ranked, and(
@@ -141,6 +143,7 @@ const getFollowupsQuery = () => {
 
   const query = db.select({
     id:          spotFollowups.id,
+    state:       spotFollowups.state,
     userId:      spotFollowups.userId,
     desc:        spotFollowups.desc,
     action:      spotFollowups.action,
@@ -232,6 +235,7 @@ export const geoSpotsQuery = (geohashes: string[]) => {
 
     followup: {
       id:          followups.id,
+      state:       followups.state,
       userId:      followups.userId,
       desc:        followups.desc,
       action:      followups.action,
@@ -384,6 +388,7 @@ export const getFollowups = async (spotId: number) => {
   const items = await db.select({
     id:          followups.id,
     userId:      followups.userId,
+    state:       followups.state,
     desc:        followups.desc,
     action:      followups.action,
     spotState:   followups.spotState,

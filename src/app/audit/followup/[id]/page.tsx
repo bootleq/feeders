@@ -164,9 +164,16 @@ export default async function Page({ params }: {
       <div className='container mx-auto px-1 sm:px-4'>
         <h1 className='flex items-center w-full text-center sm:text-start font-bold py-3 text-lg'>
           舊版本記錄
-          <span className='font-normal font-mono mx-2'>
-            ({items.length})
-          </span>
+          {
+            items.length ?
+              <span className='font-normal font-mono mx-2'>
+                ({items.length})
+              </span>
+              :
+              <span className='font-normal mx-2'>
+                （無記錄，或受網站管理處分不公開）
+              </span>
+          }
         </h1>
 
         <ol className='list-decimal list-inside flex flex-col-reverse px-1 sm:px-2 gap-y-2 mb-10'>

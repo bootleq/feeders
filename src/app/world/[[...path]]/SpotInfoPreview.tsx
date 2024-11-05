@@ -54,6 +54,16 @@ export default function SpotInfo() {
     );
   }
 
+  if (spot.spotPubState === 'dropped' || spot.pubState === 'dropped') {
+    return (
+      <div className='relative px-2 py-1'>
+        <strong className='mb-1 block'></strong>
+        <div className='py-2 text-red-950/80'>（網站管理處分，看不見）</div>
+        <div className={descClass}></div>
+      </div>
+    );
+  }
+
   return (
     <div className='relative px-2 py-1'>
       <Tooltip placement='bottom-end'>
