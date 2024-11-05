@@ -49,20 +49,23 @@ function clusterIconFn(cluster: MarkerCluster) {
   });
 };
 
+const markerImgSize = 36;
+const markerImgSizeAttrs = `width="${markerImgSize}" height="${markerImgSize}"`;
+
 const MarkerIcon = new Leaflet.DivIcon({
-  html: `<img src="/assets/map-pin.svg" alt='pin' class="-translate-x-3 -translate-y-5" />`,
+  html: `<img src="/assets/map-pin.svg" alt='pin' class="-translate-x-3 -translate-y-5" ${markerImgSizeAttrs} />`,
   className: `leaflet-div-marker ${mapStyles['div-marker-svg-icon']}`,
   popupAnchor: [-1, -25],
 });
 
 const ResolvedMarkerIcon = new Leaflet.DivIcon({
-  html: `<img src="/assets/location-check.svg" alt='checked' class="-translate-x-3 -translate-y-6" />`,
+  html: `<img src="/assets/location-check.svg" alt='checked' class="-translate-x-3 -translate-y-6" ${markerImgSizeAttrs} />`,
   className: `leaflet-div-marker ${mapStyles['div-marker-svg-icon']}`,
   popupAnchor: [0, -28],
 });
 
 const DroppedMarkerIcon = new Leaflet.DivIcon({
-  html: `<img src="/assets/map-pin.svg" alt='暫時關閉' class="-translate-x-2 -translate-y-5 rotate-45 skew-x-[1deg] skew-y-[12deg] scale-x-75 cursor-not-allowed opacity-60" />`,
+  html: `<img src="/assets/map-pin.svg" alt='暫時關閉' class="-translate-x-2 -translate-y-5 rotate-45 skew-x-[1deg] skew-y-[12deg] scale-x-75 cursor-not-allowed opacity-60" ${markerImgSizeAttrs} />`,
   className: `leaflet-div-marker ${mapStyles['div-marker-svg-icon']}`,
   popupAnchor: [0, -21],
 });

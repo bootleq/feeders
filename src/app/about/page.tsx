@@ -85,7 +85,7 @@ export default async function Page() {
         </p>
 
         <a className='block' target='_blank' href="https://www.buymeacoffee.com/bootleq">
-          <img alt='Buy me a coffee' src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=bootleq&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" />
+          <img alt='Buy me a coffee' src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=bootleq&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" width='235' height='50' />
         </a>
 
       </div>
