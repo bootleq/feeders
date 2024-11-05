@@ -1,10 +1,8 @@
 "use client"
 
 import * as R from 'ramda';
-import { useHydrateAtoms } from 'jotai/utils';
 import Nav from '@/components/Nav';
 import { userAtom, navTitleAtom } from '@/components/store';
-import type { WorldUserResult } from '@/models/users';
 
 import { Bars3Icon } from '@heroicons/react/24/solid';
 import { XMarkIcon } from '@heroicons/react/24/solid';
@@ -12,7 +10,6 @@ import { useEffect, useState, useRef } from 'react';
 import { useSetAtom } from 'jotai';
 
 type SidebarProps = {
-  user: WorldUserResult | null,
   navTitle?: string,
   fixed?: boolean,
   defaultOpen?: boolean,
@@ -23,10 +20,7 @@ type SidebarProps = {
 const toggleBtnBaseCls = 'cursor-pointer absolute insert-0 size-8 fill-current bg-transparent transition delay-200 duration-500';
 const widthCls = 'w-[100vw] min-w-[5%] max-w-full sm:w-[35%] sm:max-w-[60%] lg:w-[20%] lg:max-w-[70%]';
 
-export default function Sidebar({ user, navTitle, fixed = true, defaultOpen = true, children, className, ...rest }: SidebarProps) {
-  useHydrateAtoms([
-    [userAtom, user],
-  ]);
+export default function Sidebar({ navTitle, fixed = true, defaultOpen = true, children, className, ...rest }: SidebarProps) {
   const setNavTitle = useSetAtom(navTitleAtom);
   const ref = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(defaultOpen);
@@ -65,7 +59,7 @@ export default function Sidebar({ user, navTitle, fixed = true, defaultOpen = tr
       >
         {children}
 
-        <Nav user={user} />
+        <Nav />
 
         <div className={`absolute top-0 z-[900] min-w-8 min-h-8 -right-8 transition ${open ? '-translate-x-8' : 'translate-x-1 sm:translate-x-4 sm:translate-y-2'}`}>
           <Bars3Icon onClick={toggle} className={`${toggleBtnBaseCls} ${open ? '-scale-x-0' : 'sm:scale-150'} drop-shadow-lg`} height={24} />

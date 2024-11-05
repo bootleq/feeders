@@ -20,7 +20,11 @@ export default async function Home() {
         （遊蕩犬清零）
       </p>
 
-      <Sitemap className='mt-16 md:mt-auto' />
+      <Sitemap
+        className='mt-16 md:mt-auto'
+        userDisplay='我'
+        userLink='/user/login'
+      />
 
       <Link href='about' className='self-end mt-5 text-slate-600 w-fit hover:text-black hover:underline decoration-yellow-300 decoration-4 underline-offset-3'>
         關於本站

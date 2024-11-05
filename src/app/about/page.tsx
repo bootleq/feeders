@@ -1,9 +1,7 @@
-import { auth } from '@/lib/auth';
 import type { Metadata } from "next";
 import Image from 'next/image';
 import Link from 'next/link';
 import { SITE_NAME, SITE_CONTACT_EMAIL } from '@/lib/utils';
-import { getWorldUsers } from '@/models/users';
 import Sidebar from '@/components/Sidebar';
 
 export const runtime = 'edge';
@@ -12,28 +10,14 @@ export const metadata: Metadata = {
   title: '關於本站',
 };
 
-async function getUser(id: string | undefined) {
-  if (id) {
-    const users = await getWorldUsers(id);
-    if (users) {
-      return users[0];
-    }
-  }
-
-  return null;
-}
-
 function Hr() {
   return <hr className='w-11/12 h-[2px] my-5 bg-slate-400/75 border-0' />;
 }
 
 export default async function Page() {
-  const session = await auth();
-  const user = await getUser(session?.userId);
-
   return (
     <main className="flex min-h-screen flex-row items-start justify-start">
-      <Sidebar user={user} navTitle='關於' fixed={false} className={`max-h-screen scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
+      <Sidebar navTitle='關於' fixed={false} className={`max-h-screen scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
       </Sidebar>
 
       <div className='p-2 px-4 max-w-screen-sm space-y-6'>
