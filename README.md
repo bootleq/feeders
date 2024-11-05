@@ -24,7 +24,7 @@ pnpm preview
 ```
 
 `cms:build-local` uploads local CMS data to external storage, our built
-application fetches pre-build JSON instead of hit CMS again.
+application fetches pre-build JSON instead of hitting CMS again.
 
 
 Then prepare to deploy:
@@ -35,7 +35,7 @@ pnpm env:push:prod
 pnpm run deploy
 ```
 
-The `env:push:prod` loads variables in `env.production` and uploads them as
+The `env:push:prod` loads variables in `.env.production` and uploads them as
 Pages secrets. This is to avoid exposing them in `wrangler.toml`.
 
 
