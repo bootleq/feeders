@@ -209,3 +209,7 @@ With Bundle Analyzer
 
     pnpm tsx scripts/admin_activate_user.mjs {USER_ID} inactive --remote
 
+- Drop spot, or followup
+
+    pnpm tsx scripts/admin_drop_spot.mjs {ID} dropped --remote
+    pnpm tsx scripts/admin_drop_followup.mjs {ID} dropped --remote

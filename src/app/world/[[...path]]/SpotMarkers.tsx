@@ -14,6 +14,7 @@ import Link from 'next/link';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import { Square3Stack3DIcon } from '@heroicons/react/24/outline';
+import { NoSymbolIcon } from '@heroicons/react/24/solid';
 
 import { useSession } from 'next-auth/react';
 import FoodLife from './FoodLife';
@@ -52,13 +53,19 @@ const MarkerIcon = new Leaflet.DivIcon({
   html: `<img src="/assets/map-pin.svg" alt='pin' class="-translate-x-3 -translate-y-5" />`,
   className: `leaflet-div-marker ${mapStyles['div-marker-svg-icon']}`,
   popupAnchor: [-1, -25],
-})
+});
 
 const ResolvedMarkerIcon = new Leaflet.DivIcon({
   html: `<img src="/assets/location-check.svg" alt='checked' class="-translate-x-3 -translate-y-6" />`,
   className: `leaflet-div-marker ${mapStyles['div-marker-svg-icon']}`,
   popupAnchor: [0, -28],
-})
+});
+
+const DroppedMarkerIcon = new Leaflet.DivIcon({
+  html: `<img src="/assets/map-pin.svg" alt='暫時關閉' class="-translate-x-2 -translate-y-5 rotate-45 skew-x-[1deg] skew-y-[12deg] scale-x-75 cursor-not-allowed opacity-60" />`,
+  className: `leaflet-div-marker ${mapStyles['div-marker-svg-icon']}`,
+  popupAnchor: [0, -21],
+});
 
 type ItemsFollowups = { items: GeoSpotsResultFollowup[] }
 const fetchFollowupsAtom = atom(
@@ -83,6 +90,95 @@ const fetchFollowupsAtom = atom(
     }
   }
 );
+
+function DroppedSpotMarker({ spot }: {
+  spot: GeoSpotsResult['spot'],
+}) {
+  return (
+    <Marker key={spot.id} position={[spot.lat, spot.lon]} icon={DroppedMarkerIcon} autoPan={false}>
+      <Popup className={``} autoPan={false}>
+        <div className='py-2 text-red-950/80'>（受網站管理處分，看不見）</div>
+      </Popup>
+    </Marker>
+  );
+}
+
+function Followup({ fo, now, canEdit, startAmendFollowup, editingItemId, geohash }: {
+  fo: GeoSpotsResultFollowup,
+  now: Date,
+  canEdit: boolean,
+  startAmendFollowup: any,
+  editingItemId: number | null,
+  geohash: string,
+}) {
+  const [editingForm, setEditingForm] = useAtom(editingFormAtom);
+
+  return (
+    <div className='flex flex-col justify-start items-start mb-2'>
+      <div className='px-1 mb-1 flex flex-wrap justify-start text-sm items-center'>
+        <Link href={`/user/${fo.userId}`} data-user-id={fo.userId} className='mr-3 flex items-start hover:bg-yellow-300/50 text-inherit'>
+          <UserCircleIcon className='fill-current' height={18} />
+          { fo.userName }
+        </Link>
+        <Tooltip>
+          <TooltipTrigger className='text-sm mr-2 whitespace-nowrap font-mono'>
+            {formatDistance(now, fo.createdAt).replace('大約', '').trim()}
+          </TooltipTrigger>
+          <TooltipContent className={`${tooltipCls} font-mono`}>
+            <ClientDate>
+              {format({}, 'y/M/d HH:mm', fo.createdAt)}
+            </ClientDate>
+          </TooltipContent>
+        </Tooltip>
+        <ActionLabel action={fo.action} className='ml-auto flex items-center' />
+
+        {canEdit &&
+          <Tooltip>
+            <TooltipTrigger>
+              <button className='inline-flex items-center justify-center p-1 ml-1 text-slate-500/75 hover:bg-yellow-300/50 rounded-full' data-followup-id={fo.id} onClick={startAmendFollowup}>
+                <PencilSquareIcon className='stroke-current' height={18} />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className={`${tooltipCls}`}>修改（會留下記錄）</TooltipContent>
+          </Tooltip>
+        }
+        {fo.changes > 0 ?
+          <Tooltip>
+            <TooltipTrigger>
+              <Link href={`/audit/followup/${fo.id}`} className='inline-flex items-center justify-center p-1 ml-1 text-slate-500/75 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
+                <Square3Stack3DIcon className='stroke-current' height={18} />
+                {fo.changes}
+              </Link>
+              <TooltipContent className={`${tooltipCls}`}>調閱編修記錄（在新分頁開啟）</TooltipContent>
+            </TooltipTrigger>
+          </Tooltip>
+          : ''
+        }
+      </div>
+
+      {present(fo.desc) &&
+        <Desc value={fo.desc} className='max-h-32 overflow-auto md:max-w-xl p-1 mb-1 mx-1 resize-y bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded' />
+      }
+
+      {editingForm === 'amendFollowup' && editingItemId === fo.id &&
+        <AmendFollowupForm followup={fo} geohash={geohash} />
+      }
+    </div>
+  );
+}
+
+function DroppedFollowup({ fo }: {
+  fo: GeoSpotsResultFollowup,
+}) {
+  return (
+    <div key={fo.id} className='flex flex-col justify-start items-start mb-1'>
+      <div className='flex items-start justify-start self-stretch text-left px-1 py-1 text-red-950/75'>
+        <NoSymbolIcon className='fill-current opacity-50' height={18} />
+        <span className='opacity-50'>（這個跟進受到網站管理處分，看不見）</span>
+      </div>
+    </div>
+  );
+}
 
 export default function SpotMarkers({ spots }: {
   spots: GeoSpotsResult[]
@@ -160,6 +256,10 @@ export default function SpotMarkers({ spots }: {
             removedAt: s.latestRemovedAt,
           };
           const icon = latestFollowup.action === 'resolve' ? ResolvedMarkerIcon : MarkerIcon;
+
+          if (s.state === 'dropped') {
+            return <DroppedSpotMarker key={s.id} spot={s} />;
+          }
 
           return (
             <Marker key={s.id} position={[s.lat, s.lon]} icon={icon} autoPan={false} eventHandlers={eventHandlers}>
@@ -253,58 +353,23 @@ export default function SpotMarkers({ spots }: {
                 </span>
 
                 <div className='max-h-[65vh] overflow-auto scrollbar-thin'>
-                  {followups.map(fo => (
-                    <div key={fo.id} className='flex flex-col justify-start items-start mb-2'>
-                      <div className='px-1 mb-1 flex flex-wrap justify-start text-sm items-center'>
-                        <Link href={`/user/${fo.userId}`} data-user-id={fo.userId} className='mr-3 flex items-center hover:bg-yellow-300/50 text-inherit'>
-                          <UserCircleIcon className='fill-current' height={18} />
-                          { fo.userName }
-                        </Link>
-                        <Tooltip>
-                          <TooltipTrigger className='text-sm mr-2 whitespace-nowrap font-mono'>
-                            {formatDistance(now, fo.createdAt).replace('大約', '').trim()}
-                          </TooltipTrigger>
-                          <TooltipContent className={`${tooltipCls} font-mono`}>
-                            <ClientDate>
-                              {format({}, 'y/M/d HH:mm', fo.createdAt)}
-                            </ClientDate>
-                          </TooltipContent>
-                        </Tooltip>
-                        <ActionLabel action={fo.action} className='ml-auto flex items-center' />
+                  {followups.map(fo => {
+                    if (fo.state === 'dropped') {
+                      return <DroppedFollowup key={fo.id} fo={fo} />;
+                    }
 
-                        {canEdit && userId === fo.userId &&
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <button className='inline-flex items-center justify-center p-1 ml-1 text-slate-500/75 hover:bg-yellow-300/50 rounded-full' data-followup-id={fo.id} onClick={startAmendFollowup}>
-                                <PencilSquareIcon className='stroke-current' height={18} />
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent className={`${tooltipCls}`}>修改（會留下記錄）</TooltipContent>
-                          </Tooltip>
-                        }
-                        {fo.changes > 0 ?
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <Link href={`/audit/followup/${fo.id}`} className='inline-flex items-center justify-center p-1 ml-1 text-slate-500/75 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
-                                <Square3Stack3DIcon className='stroke-current' height={18} />
-                                {fo.changes}
-                              </Link>
-                              <TooltipContent className={`${tooltipCls}`}>調閱編修記錄（在新分頁開啟）</TooltipContent>
-                            </TooltipTrigger>
-                          </Tooltip>
-                          : ''
-                        }
-                      </div>
-
-                      {present(fo.desc) &&
-                        <Desc value={fo.desc} className='max-h-32 overflow-auto md:max-w-xl p-1 mb-1 mx-1 resize-y bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded' />
-                      }
-
-                      {editingForm === 'amendFollowup' && editingItemId === fo.id &&
-                        <AmendFollowupForm followup={fo} geohash={s.geohash} />
-                      }
-                    </div>
-                  ))}
+                    return (
+                      <Followup
+                        key={fo.id}
+                        fo={fo}
+                        now={now}
+                        canEdit={canEdit && userId === fo.userId}
+                        startAmendFollowup={startAmendFollowup}
+                        editingItemId={editingItemId}
+                        geohash={s.geohash}
+                      />
+                    );
+                  })}
                 </div>
 
                 {editingForm === 'followup' &&
