@@ -1,10 +1,11 @@
 "use client"
 
 import * as R from 'ramda';
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
 import { ACCESS_CTRL } from '@/lib/utils';
-import { subDays, format, formatISO, formatDistance } from '@/lib/date-fp';
+import { subDays, formatISO } from '@/lib/date-fp';
+import useClientOnly from '@/lib/useClientOnly';
 import Link from 'next/link';
 
 import { userAtom } from '@/components/store';
@@ -137,6 +138,7 @@ function Followups({ items, today, oldestDate }: {
   oldestDate: Date
 }) {
   const [viewItem, setViewItem] = useAtom(viewItemAtom);
+  const inClient = useClientOnly();
 
   const onKeyUp = (e: React.KeyboardEvent<HTMLLIElement>) => {
     if (!viewItem) return;
@@ -187,9 +189,9 @@ function Followups({ items, today, oldestDate }: {
         <time
           data-spot-count={itemsCount}
           className={`px-2 py-1 flex items-center text-slate-900 font-mono data-[spot-count="0"]:text-opacity-50 hover:bg-gray-200`}
-          dateTime={date}
+          dateTime={inClient ? date : undefined}
         >
-          {shortDate}
+          {inClient ? shortDate : <span className='opacity-50'>-/-</span>}
           <span className={`text-sm ml-auto text-gray-800 ${itemsCount === 0 ? 'text-opacity-50' : ''}`}>
             {itemsCount} 個地點
           </span>

@@ -9,6 +9,7 @@ import { MapContainer, TileLayer, useMapEvents, Marker, Popup } from "react-leaf
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { Desc } from '@/components/Desc';
+import ClientDate from '@/components/ClientDate';
 import Link from 'next/link';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
@@ -212,7 +213,11 @@ export default function SpotMarkers({ spots }: {
                 }
 
                 <div className='flex items-center justify-end mt-2 px-2 text-xs text-slate-500/75'>
-                  建立：<span className='font-mono mr-1'>{format({}, 'y/M/d', s.createdAt)}</span> by
+                  建立：<span className='font-mono mr-1'>
+                    <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
+                      {format({}, 'y/M/d', s.createdAt)}
+                    </ClientDate>
+                  </span> by
                   <Link href={`/user/${s.userId}`} data-user-id={s.userId} className='ml-1 hover:bg-yellow-300/50 hover:text-slate-950'>
                     {s.userName}
                   </Link>
@@ -259,7 +264,11 @@ export default function SpotMarkers({ spots }: {
                           <TooltipTrigger className='text-sm mr-2 whitespace-nowrap font-mono'>
                             {formatDistance(now, fo.createdAt).replace('大約', '').trim()}
                           </TooltipTrigger>
-                          <TooltipContent className={`${tooltipCls} font-mono`}>{format({}, 'y/M/d HH:mm', fo.createdAt)}</TooltipContent>
+                          <TooltipContent className={`${tooltipCls} font-mono`}>
+                            <ClientDate>
+                              {format({}, 'y/M/d HH:mm', fo.createdAt)}
+                            </ClientDate>
+                          </TooltipContent>
                         </Tooltip>
                         <ActionLabel action={fo.action} className='ml-auto flex items-center' />
 

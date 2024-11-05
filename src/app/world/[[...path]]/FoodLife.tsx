@@ -1,8 +1,9 @@
 "use client"
 
-import { format, formatISO, formatDistanceToNow, formatDistance } from '@/lib/date-fp';
+import { format, formatDistance } from '@/lib/date-fp';
 import { isToday } from 'date-fns';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
+import ClientDate from '@/components/ClientDate';
 import StateLabel from './StateLabel';
 import { ArrowLongRightIcon } from '@heroicons/react/24/solid';
 
@@ -23,6 +24,12 @@ const dateFormatter = (date: Date) => {
   const dateFormat = isToday(date) ? 'HH:mm' : 'M/d HH:mm';
   return format({}, dateFormat, date);
 };
+
+function FallbackDate() {
+  return (
+    <span className='opacity-50'>--:--</span>
+  );
+}
 
 export default function FoodLife({ spot, now }: {
   spot: Foodable,
@@ -58,9 +65,9 @@ export default function FoodLife({ spot, now }: {
           }
 
           <div className='text-xs font-mono opacity-60 flex items-center'>
-            {spawned}
+            <ClientDate fallback={<FallbackDate />}>{spawned}</ClientDate>
             <ArrowLongRightIcon className='inline fill-gray-600 mx-[-9px]' width={48} height={24} />
-            {removed}
+            <ClientDate fallback={<FallbackDate />}>{removed}</ClientDate>
           </div>
         </TooltipTrigger>
         <TooltipContent className={`${tooltipCls}`}>

@@ -1,18 +1,15 @@
 "use client"
 
 import { useState, useEffect } from 'react';
+import useClientOnly from '@/lib/useClientOnly';
 
 export default function ClientDate({ fallback, children }: {
   fallback?: React.ReactNode,
   children?: React.ReactNode,
 }) {
-  const [effected, setEffected] = useState(false);
+  const inClient = useClientOnly();
 
-  useEffect(() => {
-    setEffected(true);
-  }, []);
-
-  if (!effected) {
+  if (!inClient) {
     return fallback || null;
   }
 

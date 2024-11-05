@@ -4,6 +4,7 @@ import { Fragment } from 'react';
 import Link from 'next/link';
 import { t } from '@/lib/i18n';
 import { format, formatISO } from '@/lib/date-fp';
+import ClientDate from '@/components/ClientDate';
 import { camelCase } from 'change-case';
 import { UserIcon } from '@heroicons/react/24/outline';
 
@@ -66,6 +67,16 @@ type Changeset = {
   lon?: number,
 }
 
+function FallbackTime() {
+  return (
+    <time className='font-mono bg-purple-800/75 text-slate-100 px-2 align-text-bottom'>
+      <span className='opacity-50'>
+        ----/--/-- --:--
+      </span>
+    </time>
+  );
+}
+
 function Entry({ item }: {
   item: {
     id: number,
@@ -89,9 +100,11 @@ function Entry({ item }: {
         </div>
 
         <Link href={`#${id}`}>
-          <time dateTime={createdAtISO} className='font-mono bg-purple-800/75 text-slate-100 px-2 align-text-bottom'>
-            {createdAtString}
-          </time>
+          <ClientDate fallback={<FallbackTime />}>
+            <time dateTime={createdAtISO} className='font-mono bg-purple-800/75 text-slate-100 px-2 align-text-bottom'>
+              {createdAtString}
+            </time>
+          </ClientDate>
         </Link>
 
         <Link href={`/user/${whodunnit}`} className='flex items-center'>
