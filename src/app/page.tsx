@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from 'next/image';
 import Link from 'next/link';
 import { SITE_NAME } from '@/lib/utils';
-import Sitemap from '@/components/Sitemap';
+import HomeNav from './HomeNav';
 import siteIcon from './icon.svg'
 
 export const runtime = 'edge';
@@ -20,11 +20,7 @@ export default async function Home() {
         （遊蕩犬清零）
       </p>
 
-      <Sitemap
-        className='mt-16 md:mt-auto'
-        userDisplay='我'
-        userLink='/user/login'
-      />
+      <HomeNav />
 
       <Link href='about' className='self-end mt-5 text-slate-600 w-fit hover:text-black hover:underline decoration-yellow-300 decoration-4 underline-offset-3'>
         關於本站

@@ -50,7 +50,7 @@ export default function Nav() {
     status === 'authenticated' ? '' : guestIconCls,
   ].join(' ');
 
-  const userDisplay = session?.user?.name || '登入';
+  const userDisplay = status === 'loading' ? ''  : session?.user?.name || '登入';
   const userLink = status === 'authenticated' ? `/user/${session.userId}` : '/user/login';
 
   return (
