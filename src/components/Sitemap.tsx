@@ -1,6 +1,5 @@
 "use client"
 
-import { useSession, signIn, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import Image from 'next/image';
 import styles from './sitemap.module.scss';
@@ -16,21 +15,12 @@ const iconSize = 32;
 
 const disableCls = 'grayscale fill-gray-300';
 
-export default function Sitemap({ className }: {
+
+export default function Sitemap({ className, userDisplay, userLink }: {
   className?: string,
+  userDisplay: string,
+  userLink: string,
 }) {
-  const { data: session, status } = useSession();
-  let userLink = '/user/login';
-  let userDisplay = '我';
-
-  if (status === 'authenticated') {
-    userLink = `/user/${session.userId}`;
-    const name = session.user.name;
-    if (name) {
-      userDisplay = name;
-    }
-  }
-
   return (
     <div className={`${styles.container} ${className || ''}`}>
       <div className={`backdrop-blur-sm ${styles.map}`}>
@@ -39,7 +29,7 @@ export default function Sitemap({ className }: {
           <div className={styles.user}>
             <Link href={userLink}>
               <HumanIcon className='fill-slate-700 scale-110 -mr-1.5' width={iconSize} height={iconSize} />
-              <span className='truncate'>{ status === 'authenticated' ? userDisplay : '登入' }</span>
+              <span className='truncate'>{userDisplay}</span>
             </Link>
           </div>
 

@@ -58,7 +58,7 @@ export default async function Page({ params }: {
 
   return (
     <main className="flex min-h-screen flex-row items-start justify-between">
-      <Sidebar user={user} navTitle='使用者資料' fixed={false} className={`max-h-screen scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
+      <Sidebar navTitle='使用者資料' fixed={false} className={`max-h-screen scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
       </Sidebar>
 
       <div className='container mx-auto px-1 sm:px-4'>

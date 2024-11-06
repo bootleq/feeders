@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useAtomValue } from 'jotai';
 import { safePolygon } from "@floating-ui/react";
 import Sitemap from '@/components/Sitemap';
-import type { WorldUserResult } from '@/models/users';
 import { navTitleAtom } from '@/components/store';
 import { HomeIcon } from '@heroicons/react/24/outline';
 import { UserIcon } from '@heroicons/react/24/outline';
@@ -19,7 +18,11 @@ const hoverProps = {
   handleClose: safePolygon(),
 };
 
-function NavMenu() {
+function NavMenu({ className, userDisplay, userLink }: {
+  className?: string,
+  userDisplay: string,
+  userLink: string,
+}) {
   const cls = [
     'flex flex-col divide-y',
     'w-[clamp(100%,80vw,280px)]',
@@ -32,14 +35,12 @@ function NavMenu() {
         <HomeIcon className='stroke-slate-500 mr-1.5 -mt-[2px]' height={19} />
         首頁
       </Link>
-      <Sitemap />
+      <Sitemap userDisplay={userDisplay} userLink={userLink} />
     </div>
   );
 }
 
-export default function Nav({ user }: {
-  user: WorldUserResult | null,
-}) {
+export default function Nav() {
   const title = useAtomValue(navTitleAtom);
   const { data: session, status } = useSession();
   const guestIconCls = 'stroke-white bg-slate-300';
@@ -48,6 +49,9 @@ export default function Nav({ user }: {
     'data-[state=open]:stroke-2 data-[state=open]:bg-slate-300/75 data-[state=open]:animate-pulse',
     status === 'authenticated' ? '' : guestIconCls,
   ].join(' ');
+
+  const userDisplay = status === 'loading' ? ''  : session?.user?.name || '登入';
+  const userLink = status === 'authenticated' ? `/user/${session.userId}` : '/user/login';
 
   return (
     <div className='absolute bottom-0 z-[1001] mt-auto py-1 w-full flex flex-wrap items-center backdrop-blur-sm'>
@@ -60,21 +64,15 @@ export default function Nav({ user }: {
             { status === 'authenticated' ?
               <>
                 <div className={`text-xs ${menuItemCls}`}>
-                  {user ?
-                    <>
-                      {user.name || session.userId}
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <Link href={`/user/${user.id}`} className='break-keep w-min cursor-pointer'>
-                            <IdentificationIcon className='fill-slate-600 ml-1' height={24} />
-                          </Link>
-                        </TooltipTrigger>
-                        <TooltipContent className="p-1 px-2 rounded box-border w-max bg-slate-100 ring-1 ring-slate-300 z-[1002]">前往個人資料頁</TooltipContent>
-                      </Tooltip>
-                    </>
-                    :
-                    <div>異常：沒有使用者資料</div>
-                  }
+                  {userDisplay || session.userId}
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Link href={`/user/${session.userId}`} className='break-keep w-min cursor-pointer'>
+                        <IdentificationIcon className='fill-slate-600 ml-1' height={24} />
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent className="p-1 px-2 rounded box-border w-max bg-slate-100 ring-1 ring-slate-300 z-[1002]">前往個人資料頁</TooltipContent>
+                  </Tooltip>
                 </div>
                 <button className={menuItemCls} onClick={async () => await signOut()}>登出</button>
               </>
@@ -93,7 +91,7 @@ export default function Nav({ user }: {
           <span className=''>{ title }</span>
         </TooltipTrigger>
         <TooltipContent className="p-1 px-2 rounded box-border w-max max-w-[calc(100vw_-_10px)] z-[1002]">
-          <NavMenu />
+          <NavMenu userDisplay={userDisplay} userLink={userLink} />
         </TooltipContent>
       </Tooltip>
     </div>
