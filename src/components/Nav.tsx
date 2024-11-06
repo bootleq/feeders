@@ -86,7 +86,7 @@ export default function Nav() {
         </TooltipContent>
       </Tooltip>
 
-      <Tooltip transform={false} hoverProps={hoverProps}>
+      <Tooltip hoverProps={hoverProps}>
         <TooltipTrigger>
           <span className=''>{ title }</span>
         </TooltipTrigger>
