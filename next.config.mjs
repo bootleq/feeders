@@ -8,6 +8,7 @@ import path from 'path';
 
 const require = createRequire(import.meta.url);
 const htmlDomParserPath = path.dirname(require.resolve('html-dom-parser'));
+const webpack = require('webpack');
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -77,6 +78,13 @@ const nextConfig = {
       optimizeLocales.webpack({
         locales: ['zh-TW']
       })
+    );
+
+    config.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(
+        /^leaflet$/,
+        'leaflet/dist/leaflet.js'
+      )
     );
 
     return config;
