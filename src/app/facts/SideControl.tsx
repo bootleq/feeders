@@ -212,15 +212,39 @@ function TagCtrlPanel() {
   );
 }
 
+const checkDateRageInput = (form: HTMLFormElement) => {
+  const formData = new FormData(form);
+  const newRange = [
+    formData.get('fromDate')?.toString() || '',
+    formData.get('toDate')?.toString() || ''
+  ];
+  const valid = newRange.every(str => dateSchema.safeParse(str).success);
+  return [newRange, valid] as [[string, string], boolean];
+};
+
 function DateCtrlPanel() {
   const [range, setRange] = useAtom(dateRangeAtom);
+  const [inputValid, setInputValid] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+
   const rejectedCount = useAtomValue(dateRejectedCountAtom);
   const inputCls = 'text-xs bg-slate-300/50 focus:bg-transparent';
 
+  useEffect(() => {
+    if (formRef.current) {
+      const [, valid] = checkDateRageInput(formRef.current);
+      setInputValid(valid);
+    }
+  }, []);
+
+  const onChange = (e: React.FormEvent<HTMLFormElement>) => {
+    const [, valid] = checkDateRageInput(e.currentTarget);
+    setInputValid(valid);
+  };
+
   const onApply = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const newRange = [formData.get('fromDate'), formData.get('toDate')];
+    const [newRange,] = checkDateRageInput(e.currentTarget);
     if (newRange.every(str => dateSchema.safeParse(str).success)) {
       setRange(newRange as DateRange);
     } else {
@@ -228,27 +252,26 @@ function DateCtrlPanel() {
     }
   };
 
-  const rangeValid = useMemo(() => {
-    return range.every(str => dateSchema.safeParse(str).success);
-  }, [range]);
-
   const onReset = () => {
     setRange(['', '']);
   };
 
+  const defaultFromDate = range[0] || '1900-01-01';
+  const defaultToDate = range[1];
+
   return (
     <div className='py-3'>
       <div className='font-bold'>日期篩選</div>
-      <form onSubmit={onApply} className={`flex flex-wrap items-center gap-x-1 my-1 text-sm ${tlStyles['ctrl-date-filter']}`}>
+      <form ref={formRef} onSubmit={onApply} onChange={onChange} className={`flex flex-wrap items-center gap-x-1 my-1 text-sm ${tlStyles['ctrl-date-filter']}`}>
         <div className='whitespace-nowrap inline-flex items-center'>
-          <TextInput label='從' name='fromDate' type='date' inputProps={{required: true, className: inputCls, defaultValue: '1900-01-01', 'aria-label': '從'}} />
+          <TextInput label='從' name='fromDate' type='date' inputProps={{required: true, className: inputCls, defaultValue: defaultFromDate, 'aria-label': '從'}} />
         </div>
         <div className='whitespace-nowrap inline-flex items-center'>
-          <TextInput label='到' name='toDate' type='date' inputProps={{required: true, className: inputCls}} />
+          <TextInput label='到' name='toDate' type='date' inputProps={{required: true, className: inputCls, defaultValue: defaultToDate}} />
         </div>
 
-        <button className='btn ml-1 flex items-center hover:ring-1 hover:bg-white active:ring' disabled={!rangeValid} aria-label='套用'>
-          <CheckIcon className={`stroke-current ${rangeValid ? '' : 'opacity-30'}`} height={20} />
+        <button className='btn ml-1 flex items-center hover:ring-1 hover:bg-white active:ring' disabled={!inputValid} aria-label='套用'>
+          <CheckIcon className={`stroke-current ${inputValid ? '' : 'opacity-30'}`} height={20} />
         </button>
 
         <div className='flex items-center text-xs text-slate-600'>
