@@ -71,6 +71,8 @@
     font-size: 1rem;
     margin: 6px 10px 9px 10px;
     min-width: clamp(10vw, 22rem, 40vw);
+    max-height: 85vh;
+    overflow-y: auto;
   }
 }
 

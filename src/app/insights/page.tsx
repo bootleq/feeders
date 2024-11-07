@@ -18,7 +18,7 @@ export default async function Page({ params }: {
   const insights = await getInsights();
 
   return (
-    <div className='container mx-auto peer-[[aria-expanded="false"]]:pt-5 sm:peer-[[aria-expanded="false"]]:pt-0'>
+    <div className='container mx-auto px-2 sm:px-0 peer-[[aria-expanded="false"]]:pt-5 sm:peer-[[aria-expanded="false"]]:pt-0'>
       <h1 className='text-3xl py-3'>
         見解
       </h1>
@@ -42,9 +42,9 @@ export default async function Page({ params }: {
           </Link>
 
           {tags?.length &&
-          <ul className='ml-2 flex items-center justify-end'>
+          <ul className='ml-2 flex flex-wrap items-center justify-end'>
             {tags.map((tag: string) => (
-              <li key={tag} className='text-sm text-slate-600 p-px px-1.5 m-1 rounded-full ring-1 ring-slate-400'>
+              <li key={tag} className='text-sm text-slate-600 p-px px-1.5 m-1 text-nowrap rounded-full ring-1 ring-slate-400'>
                 {tag}
               </li>
             ))}

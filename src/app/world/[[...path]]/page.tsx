@@ -133,7 +133,7 @@ export default async function Page({ params }: {
 
   return (
     <main className="flex min-h-screen flex-row items-start justify-between">
-      <Sidebar className={`max-h-screen scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
+      <Sidebar className={`max-h-screen scrollbar-thin flex flex-col pb-1 z-[810] bg-gradient-to-br from-stone-50 to-slate-200`}>
         <RecentFollowups user={user} items={items} preloadedAreas={preloadedAreas} today={today} oldestDate={oldestDate} />
       </Sidebar>
 

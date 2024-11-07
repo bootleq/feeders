@@ -87,7 +87,7 @@ function Fact({ fact, isSubView }: {
         <TagList tags={tags} />
       </div>
 
-      <div data-role='desc' className={`text-opacity-90 pl-2 ${tlStyles.mce}`}>
+      <div data-role='desc' className={`text-opacity-90 pl-2 break-words ${tlStyles.mce}`}>
         <Html html={desc} />
       </div>
 

@@ -99,7 +99,7 @@ function DroppedSpotMarker({ spot }: {
 }) {
   return (
     <Marker key={spot.id} position={[spot.lat, spot.lon]} icon={DroppedMarkerIcon} autoPan={false}>
-      <Popup className={``} autoPan={false}>
+      <Popup autoPan={false}>
         <div className='py-2 text-red-950/80'>（受網站管理處分，看不見）</div>
       </Popup>
     </Marker>

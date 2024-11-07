@@ -17,10 +17,10 @@ function Hr() {
 export default async function Page() {
   return (
     <main className="flex min-h-screen flex-row items-start justify-start">
-      <Sidebar navTitle='關於' fixed={false} className={`max-h-screen scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
+      <Sidebar navTitle='關於' fixed={false} className={`peer max-h-screen scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
       </Sidebar>
 
-      <div className='p-2 px-4 max-w-screen-sm space-y-6'>
+      <div className='p-2 px-4 max-w-screen-sm space-y-6 peer-[[aria-expanded="false"]]:pt-8'>
         <h1 className='text-3xl py-3'>關於本站</h1>
         <p className=''>
           本站由個人建立，起源於鄉里流浪狗問題的親身經驗，在當地，最關鍵的要素就是餵食，但民眾缺乏這個觀念，或囿於成見，刻意不面對。
