@@ -2,28 +2,30 @@
 
 import * as R from 'ramda';
 import Nav from '@/components/Nav';
-import { userAtom, navTitleAtom } from '@/components/store';
+import { userAtom, navTitleAtom, sidebarOpenedAtom } from '@/components/store';
 
 import { Bars3Icon } from '@heroicons/react/24/solid';
 import { XMarkIcon } from '@heroicons/react/24/solid';
-import { useEffect, useState, useRef } from 'react';
-import { useSetAtom } from 'jotai';
+import { useEffect, useRef } from 'react';
+import { useSetAtom, useAtom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
 
 type SidebarProps = {
   navTitle?: string,
   fixed?: boolean,
-  defaultOpen?: boolean,
   children?: React.ReactNode;
   className?: string;
 };
 
+const openedStateAtom = atomWithStorage('feeders.sidebar.open', true);
+
 const toggleBtnBaseCls = 'cursor-pointer absolute insert-0 size-8 fill-current bg-transparent transition delay-200 duration-500';
 const widthCls = 'w-[100vw] min-w-[5%] max-w-full sm:w-[35%] sm:max-w-[60%] lg:w-[20%] lg:max-w-[70%]';
 
-export default function Sidebar({ navTitle, fixed = true, defaultOpen = true, children, className, ...rest }: SidebarProps) {
+export default function Sidebar({ navTitle, fixed = true, children, className, ...rest }: SidebarProps) {
   const setNavTitle = useSetAtom(navTitleAtom);
   const ref = useRef<HTMLDivElement>(null);
-  const [open, setOpen] = useState(defaultOpen);
+  const [open, setOpen] = useAtom(openedStateAtom);
 
   useEffect(() => {
     if (navTitle) {
