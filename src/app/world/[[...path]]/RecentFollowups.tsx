@@ -3,6 +3,7 @@
 import * as R from 'ramda';
 import { useEffect, useCallback } from 'react';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
+import { useHydrateAtoms } from 'jotai/utils';
 import { ACCESS_CTRL } from '@/lib/utils';
 import { subDays, formatISO } from '@/lib/date-fp';
 import useClientOnly from '@/lib/useClientOnly';
@@ -11,6 +12,7 @@ import Link from 'next/link';
 import { userAtom } from '@/components/store';
 import { mapAtom, areaPickerAtom, viewItemAtom } from './store';
 import type { AreaPickerAtom } from './store';
+import type { WorldUserResult } from '@/models/users';
 import type { GeoSpotsByGeohash, GeoSpotsResultSpot, RecentFollowupsItemProps } from '@/models/spots';
 import type { LatLngBounds } from '@/lib/schema';
 import { visitArea } from './util';
@@ -236,12 +238,16 @@ function Followups({ items, today, oldestDate }: {
 }
 
 
-export default function RecentFollowups({ items, preloadedAreas, today, oldestDate }: {
+export default function RecentFollowups({ user, items, preloadedAreas, today, oldestDate }: {
+  user: WorldUserResult | null,
   items: RecentFollowupsItemProps[],
   preloadedAreas: GeoSpotsByGeohash,
   today: Date,
   oldestDate: Date
 }) {
+  useHydrateAtoms([
+    [userAtom, user],
+  ]);
   const setDefaultViewItem = useSetAtom(setDefaultViewItemAtom);
 
   useEffect(() => {

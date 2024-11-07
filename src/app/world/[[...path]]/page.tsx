@@ -11,6 +11,7 @@ import { recentFollowups, geoSpots } from '@/models/spots';
 import type { RecentFollowupsResult } from '@/models/spots';
 import { subDays } from '@/lib/date-fp';
 import { parsePath, GEOHASH_PRECISION } from './util';
+import { userAtom } from '@/components/store';
 import mapStyles from '@/components/map.module.scss';
 import Sidebar from '@/components/Sidebar';
 import LinkPreview from '@/components/LinkPreview';
@@ -133,7 +134,7 @@ export default async function Page({ params }: {
   return (
     <main className="flex min-h-screen flex-row items-start justify-between">
       <Sidebar className={`max-h-screen scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
-        <RecentFollowups items={items} preloadedAreas={preloadedAreas} today={today} oldestDate={oldestDate} />
+        <RecentFollowups user={user} items={items} preloadedAreas={preloadedAreas} today={today} oldestDate={oldestDate} />
       </Sidebar>
 
       <LazyMap
