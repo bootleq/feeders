@@ -208,7 +208,7 @@ function Followups({ items, today, oldestDate }: {
                     <TooltipTrigger className='break-keep w-min cursor-pointer'>
                       <Link
                         href={`/world/area/@${i.lat},${i.lon}`}
-                        onClick={(e) => { e.preventDefault(); setViewItem(i); } }
+                        onClick={(e) => { e.preventDefault(); e.nativeEvent.stopImmediatePropagation(); setViewItem(i); } }
                         className='break-keep w-min cursor-pointer'
                         prefetch={false}
                       >
