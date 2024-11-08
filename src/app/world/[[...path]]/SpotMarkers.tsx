@@ -160,7 +160,7 @@ function Followup({ fo, now, canEdit, startAmendFollowup, editingItemId, geohash
       </div>
 
       {present(fo.desc) &&
-        <Desc value={fo.desc} className='max-h-32 overflow-auto md:max-w-xl p-1 mb-1 mx-1 resize-y bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded' />
+        <Desc value={fo.desc} className='max-h-32 overflow-auto md:max-w-xl p-1 mb-1 mx-1 resize-y text-sm bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded' />
       }
 
       {editingForm === 'amendFollowup' && editingItemId === fo.id &&
@@ -308,7 +308,7 @@ export default function SpotMarkers({ spots }: {
                 </div>
 
                 {present(s.desc) &&
-                  <Desc value={s.desc} className='max-h-60 overflow-auto md:max-w-xl px-1 py-1 mx-0.5 my-1 resize-y bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded' />
+                  <Desc value={s.desc} className='max-h-60 overflow-auto md:max-w-xl px-1 py-1 mx-0.5 my-1 text-sm resize-y bg-gradient-to-br from-stone-50 to-slate-100 ring-1 rounded' />
                 }
 
                 {editingForm === 'amendSpot' &&
