@@ -18,7 +18,7 @@ export default async function Layout({
 
   return (
     <main className="flex min-h-screen h-full flex-row items-start justify-start">
-      <Sidebar navTitle='見解' fixed={false} className={`peer scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
+      <Sidebar navTitle='見解' fixed={true} defaultOpen={false} className={`peer scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
       </Sidebar>
 
       {children}

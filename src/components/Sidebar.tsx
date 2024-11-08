@@ -2,7 +2,7 @@
 
 import * as R from 'ramda';
 import Nav from '@/components/Nav';
-import { userAtom, navTitleAtom, sidebarOpenedAtom } from '@/components/store';
+import { userAtom, navTitleAtom } from '@/components/store';
 
 import { Bars3Icon } from '@heroicons/react/24/solid';
 import { XMarkIcon } from '@heroicons/react/24/solid';
@@ -13,19 +13,21 @@ import { atomWithStorage } from 'jotai/utils';
 type SidebarProps = {
   navTitle?: string,
   fixed?: boolean,
+  defaultOpen?: boolean,
   children?: React.ReactNode;
   className?: string;
 };
 
-const openedStateAtom = atomWithStorage('feeders.sidebar.open', true);
+const openedStateAtom = atomWithStorage<boolean | null>('feeders.sidebar.open', null);
 
 const toggleBtnBaseCls = 'cursor-pointer absolute insert-0 size-8 fill-current bg-transparent transition delay-200 duration-500';
 const widthCls = 'w-[100vw] min-w-[5%] max-w-full sm:w-[35%] sm:max-w-[60%] lg:w-[20%] lg:max-w-[70%]';
 
-export default function Sidebar({ navTitle, fixed = true, children, className, ...rest }: SidebarProps) {
+export default function Sidebar({ navTitle, fixed = true, defaultOpen = true, children, className, ...rest }: SidebarProps) {
   const setNavTitle = useSetAtom(navTitleAtom);
   const ref = useRef<HTMLDivElement>(null);
-  const [open, setOpen] = useAtom(openedStateAtom);
+  const [storedOpen, setOpen] = useAtom(openedStateAtom);
+  const open = R.isNil(storedOpen) ? defaultOpen : storedOpen;
 
   useEffect(() => {
     if (navTitle) {

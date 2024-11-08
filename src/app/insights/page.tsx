@@ -12,13 +12,19 @@ export const metadata: Metadata = {
   description: '遊蕩犬餵食問題與對策',
 };
 
+const wrapperCls = [
+  'container max-w-screen-xl mx-auto px-2 sm:px-0',
+  'peer-[[aria-expanded="false"]]:pt-5 sm:peer-[[aria-expanded="false"]]:pt-9 2xl:peer-[[aria-expanded="false"]]:pt-0',
+  'sm:peer-[[aria-expanded=true]]:ml-[40%] md:peer-[[aria-expanded=true]]:ml-[37%] lg:peer-[[aria-expanded=true]]:ml-[25%]',
+].join(' ');
+
 export default async function Page({ params }: {
   params: { path: string[] }
 }) {
   const insights = await getInsights();
 
   return (
-    <div className='container mx-auto px-2 sm:px-0 peer-[[aria-expanded="false"]]:pt-5 sm:peer-[[aria-expanded="false"]]:pt-0'>
+    <div className={wrapperCls}>
       <h1 className='text-3xl py-3'>
         見解
       </h1>
