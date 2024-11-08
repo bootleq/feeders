@@ -231,7 +231,7 @@ function Followups({ items, today, oldestDate }: {
   });
 
   return (
-    <ul className='mt-3 mb-1'>
+    <ul className='mb-1'>
       {list}
     </ul>
   )
@@ -260,6 +260,7 @@ export default function RecentFollowups({ user, items, preloadedAreas, today, ol
     <div className=''>
       <SpotInfoPreview />
       <Areas areas={preloadedAreas} />
+      <div className='mt-3 px-1'>最近更新</div>
       <Followups items={items} today={today} oldestDate={oldestDate} />
     </div>
   );
