@@ -69,11 +69,11 @@ export function UnscopedForm({ spot }: {
 
   return (
     <>
-      <div className='flex items-center ml-1 mr-auto translate-y-0.5 px-1 w-min whitespace-nowrap text-white text-sm bg-purple-800 font-bold ring-2 ring-purple-400/75'>
+      <div className='flex items-center ml-2 mr-auto translate-y-0.5 px-1 w-min whitespace-nowrap text-white text-sm bg-purple-800 font-bold ring-2 ring-purple-400/75'>
         修訂
         <ArrowsUpDownIcon className='stroke-current' height={18} />
       </div>
-      <form onSubmit={onSubmit} className='flex flex-col items-center gap-y-1 -mt-1 pt-3 pb-2 ring ring-offset-2 ring-purple-400/75 bg-pink-100/75 rounded-lg'>
+      <form onSubmit={onSubmit} className='flex flex-col items-center gap-y-1 -mt-1 ml-1.5 mr-1 pt-3 pb-2 ring ring-offset-2 ring-purple-400/75 bg-pink-100/75 rounded-lg'>
         <div className='grid grid-cols-[min-content_2fr] gap-y-2 mb-1'>
           <TextInput name='spotTitle' inputProps={{ required: true, defaultValue: spot.title || '' }} />
           <TextInput name='lat' inputProps={{ required: true, defaultValue: spot.lat || '', className: 'font-mono', readOnly: false }} />
