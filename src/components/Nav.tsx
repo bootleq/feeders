@@ -2,10 +2,12 @@
 
 import { useSession, signIn, signOut } from 'next-auth/react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAtomValue } from 'jotai';
 import { safePolygon } from "@floating-ui/react";
 import Sitemap from '@/components/Sitemap';
 import { navTitleAtom } from '@/components/store';
+import siteIcon from '@/app/icon.svg'
 import { HomeIcon } from '@heroicons/react/24/outline';
 import { UserIcon } from '@heroicons/react/24/outline';
 import { IdentificationIcon } from '@heroicons/react/24/solid';
@@ -87,8 +89,9 @@ export default function Nav() {
       </Tooltip>
 
       <Tooltip hoverProps={hoverProps}>
-        <TooltipTrigger>
+        <TooltipTrigger className='flex items-center'>
           <span className=''>{ title }</span>
+          <Image src={siteIcon} alt='導覽' className='ml-1.5 -translate-y-[0.175rem] opacity-60' width={22} height={22} />
         </TooltipTrigger>
         <TooltipContent className="p-1 px-2 rounded box-border w-max max-w-[calc(100vw_-_10px)] z-[1002]">
           <NavMenu userDisplay={userDisplay} userLink={userLink} />
