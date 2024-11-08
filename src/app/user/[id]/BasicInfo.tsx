@@ -63,13 +63,16 @@ export default function UserInfo({ user, profile }: {
     setEditDesc(R.not);
   }, []);
 
-  const updateName = useCallback(async (e: React.MouseEvent<HTMLButtonElement> | null) => {
+  const updateName = useCallback(async (e: React.FormEvent<HTMLFormElement> | null) => {
     e && e.preventDefault();
 
     const form = renameFormRef.current;
     if (!form) return;
 
+    form.submit(); // dual submit to noop
+
     const formData = new FormData(form);
+
     formData.set('value', (formData.get('userAlias') || '').toString());
     formData.delete('userAlias');
 
@@ -184,8 +187,8 @@ export default function UserInfo({ user, profile }: {
           <div className='whitespace-nowrap py-1'>名稱</div>
           {editName ?
             <div className='flex items-center gap-x-1'>
-              <form ref={renameFormRef} onSubmit={confirmRename}>
-                <input type='text' name='userAlias' autoFocus defaultValue={profile.name || ''} className={`${inputCls} ml-0 w-36 box-border`} />
+              <form ref={renameFormRef} action='/api/noop' method='POST' onSubmit={confirmRename} target='noop-trap'>
+                <input type='text' name='userAlias' autoFocus required defaultValue={profile.name || ''} className={`${inputCls} ml-0 w-36 box-border`} />
                 <input type='hidden' name='field' value='name' />
               </form>
 
@@ -199,9 +202,11 @@ export default function UserInfo({ user, profile }: {
                   <div className='mb-2 text-balance text-center'>
                     為避免辨識困難，<strong className='text-red-600'>每 {RENAME_COOL_OFF_DAYS} 天只能改名一次</strong>，確定要繼續嗎？
                   </div>
-                  <button onClick={updateName} className='btn py-px mb-1 bg-slate-100 ring-1 flex items-center hover:bg-white' disabled={sending}>
-                    {sending ? '處理中……' : '確認'}
-                  </button>
+                  <form onSubmit={updateName}>
+                    <button className='btn py-px mb-1 bg-slate-100 ring-1 flex items-center hover:bg-white' disabled={sending}>
+                      {sending ? '處理中……' : '確認'}
+                    </button>
+                  </form>
                 </PopoverContent>
               </Popover>
 
@@ -311,6 +316,7 @@ export default function UserInfo({ user, profile }: {
       }
 
       <Alerts itemsAtom={alertsAtom} dismissAtom={dismissAlertAtom} />
+      <iframe name='noop-trap' className='hidden' />
     </>
   );
 }
