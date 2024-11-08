@@ -107,6 +107,11 @@ function MapUser(props: {
 
   const debouncedZoomEnd = useDebouncedCallback(() => {
     const zoom = map.getZoom();
+
+    if (zoom < AREA_PICKER_MIN_ZOOM) {
+      setPicker(null);
+    }
+
     updatePath({ newZoom: zoom });
   }, 800);
 
