@@ -73,6 +73,7 @@
     min-width: clamp(10vw, 22rem, 40vw);
     max-height: 85vh;
     overflow-y: auto;
+    scrollbar-width: thin;
   }
 }
 
