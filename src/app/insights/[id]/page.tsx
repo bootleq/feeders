@@ -5,7 +5,7 @@ import Image from 'next/image';
 import type { Metadata, ResolvingMetadata } from 'next';
 import parse, { HTMLReactParserOptions, Element, DOMNode, attributesToProps } from 'html-react-parser';
 import { selectOne } from 'css-select';
-import { parseSlug, APP_URL } from '@/lib/utils';
+import { parseSlug } from '@/lib/utils';
 import { getInsightById } from './getInsightById';
 import type { File } from './getInsightById';
 import Article from './Article';
@@ -113,7 +113,6 @@ export async function generateMetadata(
 
   return {
     title: insight.title,
-    metadataBase: APP_URL,
     alternates: {
       canonical: `/insights/${id}-${insight.slug}`
     },

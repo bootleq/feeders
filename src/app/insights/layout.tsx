@@ -1,5 +1,4 @@
 import * as R from 'ramda';
-import type { Metadata } from "next";
 import directus from '@/lib/directus';
 import { readItems } from '@directus/sdk';
 import Link from 'next/link';

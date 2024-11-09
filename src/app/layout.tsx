@@ -4,7 +4,7 @@ import { Provider } from 'jotai';
 import { SessionProvider } from 'next-auth/react';
 import NextTopLoader from 'nextjs-toploader';
 import "./globals.css";
-import { SITE_NAME } from '@/lib/utils';
+import { SITE_NAME, APP_URL } from '@/lib/utils';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -14,6 +14,7 @@ export const metadata: Metadata = {
     default: SITE_NAME,
   },
   description: '遊蕩犬餵食問題與對策',
+  metadataBase: new URL(APP_URL),
 };
 
 export default async function RootLayout({
