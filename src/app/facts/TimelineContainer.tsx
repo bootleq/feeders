@@ -44,7 +44,8 @@ export default function TimelineContainer({ facts }: {
       }
 
       if (present(textFilter)) {
-        if (title?.includes(textFilter) || desc?.includes(textFilter)) {
+        const t = textFilter.toLowerCase();
+        if (title?.toLowerCase().includes(t) || desc?.toLowerCase().includes(t)) {
           return true;
         } else {
           return false;
