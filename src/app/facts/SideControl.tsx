@@ -24,6 +24,7 @@ import {
   timelineInterObserverAtom,
 } from './store';
 import type { Tags, FactMark, DateRange } from './store';
+import type { AnyFunction } from '@/lib/utils';
 import tlStyles from './timeline.module.scss';
 import { getTagColor } from './colors';
 import { TextInput } from '@/components/form/Inputs';
@@ -226,6 +227,28 @@ function TagCtrlPanel() {
   );
 }
 
+function FiltersCtrl() {
+  const [panelOpen, setPanelOpen] = useState(true);
+  const rejectedCount = useAtomValue(filterRejectedCountAtom);
+
+  const toggle = () => {
+    setPanelOpen(R.not);
+  };
+
+  return (
+    <div className='py-3'>
+      <div className='font-bold cursor-pointer' onClick={toggle}>文字篩選</div>
+      <div className={`${panelOpen ? '' : 'hidden'}`}>
+        <TextFilterCtrlPanel />
+        <DateCtrlPanel />
+        <div className='flex items-center text-xs text-slate-600'>
+          已排除：<span className='text-sm font-mono'>{rejectedCount}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function TextFilterCtrlPanel() {
   const [text, setText] = useAtom(textFilterAtom);
   const formRef = useRef<HTMLFormElement>(null);
@@ -244,7 +267,6 @@ function TextFilterCtrlPanel() {
 
   return (
     <div className='pb-2'>
-      <div className='font-bold'>文字篩選</div>
       <form ref={formRef} onChange={debouncedChanged} className={`flex flex-wrap items-center gap-x-1 my-1 text-sm`}>
         <div className='whitespace-nowrap inline-flex items-center'>
           <TextInput label='包含' name='targetText' inputProps={{className: 'text-sm placeholder-opacity-50 placeholder-slate-800', placeholder: '輸入至少 3 個字', defaultValue: defaultText}} />
@@ -588,19 +610,12 @@ export default function SideControl({ tags }: {
   useHydrateAtoms([
     [tagsAtom, tags],
   ]);
-  const rejectedCount = useAtomValue(filterRejectedCountAtom);
 
   return (
     <div className='p-2 pb-7 sm:pb-2 divide-y-4 overflow-auto scrollbar-thin'>
       <ViewCtrlPanel />
       <TagCtrlPanel />
-      <div className='py-3'>
-        <TextFilterCtrlPanel />
-        <DateCtrlPanel />
-        <div className='flex items-center text-xs text-slate-600'>
-          已排除：<span className='text-sm font-mono'>{rejectedCount}</span>
-        </div>
-      </div>
+      <FiltersCtrl />
       <MarkCtrlPanel />
     </div>
   );
