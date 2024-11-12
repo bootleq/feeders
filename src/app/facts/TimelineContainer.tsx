@@ -7,7 +7,7 @@ import { present, blank } from '@/lib/utils';
 import {
   textFilterAtom,
   dateRangeAtom,
-  dateRejectedCountAtom,
+  filterRejectedCountAtom,
   columnsAtom
 } from './store';
 
@@ -26,7 +26,7 @@ export default function TimelineContainer({ facts }: {
 }) {
   const textFilter = useAtomValue(textFilterAtom);
   const dateRange = useAtomValue(dateRangeAtom);
-  const setDateRejected = useSetAtom(dateRejectedCountAtom);
+  const setRejectCount = useSetAtom(filterRejectedCountAtom);
   const columns = useAtomValue(columnsAtom);
   const colsClass = columnClassMapping[columns.length];
   const dateRangeKey = dateRange.join(',');
@@ -57,8 +57,8 @@ export default function TimelineContainer({ facts }: {
 
   useEffect(() => {
     const diff = facts.length - validFacts.length;
-    setDateRejected(diff);
-  }, [facts, validFacts, textFilter, setDateRejected]);
+    setRejectCount(diff);
+  }, [facts, validFacts, textFilter, setRejectCount]);
 
   return (
     <div className={`w-full mx-auto px-0 grid gap-2 ${colsClass}`}>

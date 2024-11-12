@@ -13,7 +13,7 @@ import {
   columnsAtom,
   textFilterAtom,
   dateRangeAtom,
-  dateRejectedCountAtom,
+  filterRejectedCountAtom,
   tagsAtom,
   mergeTagsAtom,
   togglaAllTagsAtom,
@@ -35,6 +35,7 @@ import { EyeSlashIcon } from '@heroicons/react/24/outline';
 import { CursorArrowRippleIcon } from '@heroicons/react/24/solid';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import { CheckIcon } from '@heroicons/react/24/outline';
+import { XCircleIcon } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { ArrowLeftEndOnRectangleIcon } from '@heroicons/react/24/outline';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
@@ -231,7 +232,7 @@ function TextFilterCtrlPanel() {
   const defaultText = text;
 
   return (
-    <div className='py-3'>
+    <div className='pb-2'>
       <div className='font-bold'>文字篩選</div>
       <form ref={formRef} onChange={debouncedChanged} className={`flex flex-wrap items-center gap-x-1 my-1 text-sm`}>
         <div className='whitespace-nowrap inline-flex items-center'>
@@ -257,7 +258,6 @@ function DateCtrlPanel() {
   const [inputValid, setInputValid] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const rejectedCount = useAtomValue(dateRejectedCountAtom);
   const inputCls = 'text-xs bg-slate-300/50 focus:bg-transparent';
 
   useEffect(() => {
@@ -290,7 +290,7 @@ function DateCtrlPanel() {
   const defaultToDate = range[1];
 
   return (
-    <div className='py-3'>
+    <div className='pb-2'>
       <div className='font-bold'>日期篩選</div>
       <form ref={formRef} onSubmit={onApply} onChange={onChange} className={`flex flex-wrap items-center gap-x-1 my-1 text-sm ${tlStyles['ctrl-date-filter']}`}>
         <div className='whitespace-nowrap inline-flex items-center'>
@@ -300,18 +300,13 @@ function DateCtrlPanel() {
           <TextInput label='到' name='toDate' type='date' inputProps={{required: true, className: inputCls, defaultValue: defaultToDate}} />
         </div>
 
-        <button className='btn ml-1 flex items-center hover:ring-1 hover:bg-white active:ring' disabled={!inputValid} aria-label='套用'>
+        <button className='btn ml-1 px-px flex items-center hover:ring-1 hover:bg-white active:ring' disabled={!inputValid} aria-label='套用'>
           <CheckIcon className={`stroke-current ${inputValid ? '' : 'opacity-30'}`} height={20} />
         </button>
 
-        <div className='flex items-center text-xs text-slate-600'>
-          <div>
-            已排除：<span className='text-sm font-mono'>{rejectedCount}</span>
-          </div>
-          <button type='reset' className='btn ml-2 hover:ring-1 hover:bg-white active:ring' onClick={onReset}>
-            重設
-          </button>
-        </div>
+        <button type='reset' className='btn px-px hover:ring-1 hover:bg-white active:ring' onClick={onReset} aria-label='重設'>
+          <XCircleIcon className='stroke-slate-600' height={20} />
+        </button>
       </form>
     </div>
   );
@@ -577,13 +572,19 @@ export default function SideControl({ tags }: {
   useHydrateAtoms([
     [tagsAtom, tags],
   ]);
+  const rejectedCount = useAtomValue(filterRejectedCountAtom);
 
   return (
     <div className='p-2 pb-7 sm:pb-2 divide-y-4 overflow-auto scrollbar-thin'>
       <ViewCtrlPanel />
       <TagCtrlPanel />
-      <TextFilterCtrlPanel />
-      <DateCtrlPanel />
+      <div className='py-3'>
+        <TextFilterCtrlPanel />
+        <DateCtrlPanel />
+        <div className='flex items-center text-xs text-slate-600'>
+          已排除：<span className='text-sm font-mono'>{rejectedCount}</span>
+        </div>
+      </div>
       <MarkCtrlPanel />
     </div>
   );
