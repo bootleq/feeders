@@ -70,9 +70,14 @@ function ViewToggle({ section, current, setter, children }: {
 }
 
 function ViewCtrlPanel() {
+  const [panelOpen, setPanelOpen] = useState(true);
   const setWholeViewCtrl = useSetAtom(viewCtrlAtom);
   const [viewCtrl, setViewCtrl] = useAtom(toggleViewCtrlAtom);
   const [columns, setColumns] = useAtom(columnsAtom);
+
+  const toggle = () => {
+    setPanelOpen(R.not);
+  };
 
   const onToggleAll = (toggle: boolean) => {
     if (toggle) {
@@ -105,8 +110,8 @@ function ViewCtrlPanel() {
 
   return (
     <div className='pb-3'>
-      <div className='font-bold'>顯示控制</div>
-      <div className='flex items-start flex-wrap justify-between'>
+      <div className='font-bold cursor-pointer' onClick={toggle}>顯示控制</div>
+      <div className={`flex items-start flex-wrap justify-between ${panelOpen ? '' : 'hidden'}`}>
         <div className='flex flex-col items-start w-fit px-1 py-2 gap-y-2'>
           <ViewToggle section='desc' current={viewCtrl} setter={setViewCtrl}>
             <span className="px-2 ms-3 text-sm text-nowrap">內文</span>
@@ -172,7 +177,13 @@ function ViewCtrlPanel() {
 }
 
 function TagCtrlPanel() {
+  const [panelOpen, setPanelOpen] = useState(true);
   const [tags, setTags] = useAtom(mergeTagsAtom);
+
+  const toggle = () => {
+    setPanelOpen(R.not);
+  };
+
   const toggleAllTags = useSetAtom(togglaAllTagsAtom);
   const onClick = (e: React.MouseEvent) => {
     const el = e.target as HTMLElement;
@@ -186,8 +197,8 @@ function TagCtrlPanel() {
 
   return (
     <div className='py-3'>
-      <div className='font-bold'>標籤篩選</div>
-      <div className='flex flex-col items-start w-fit px-1 py-2 gap-y-2'>
+      <div className='font-bold cursor-pointer' onClick={toggle}>標籤篩選</div>
+      <div className={`flex flex-col items-start w-fit px-1 py-2 gap-y-2 ${panelOpen ? '' : 'hidden'}`}>
         <ul className='text-xs flex flex-wrap items-center' onClick={onClick}>
           {Object.entries(tags).map(([tag, visible]) => {
             return (
@@ -423,6 +434,7 @@ const createStorageAtom = (slot: number) => {
 };
 
 function MarkCtrlPanel() {
+  const [panelOpen, setPanelOpen] = useState(true);
   const [slot, setSlot] = useAtom(currentMarkSlotAtom);
   const [markPicking, setMarkPicking] = useAtom(markPickingAtom);
   const [marks, setMarks] = useAtom(marksAtom);
@@ -430,6 +442,10 @@ function MarkCtrlPanel() {
   const initialLoad = useRef(true);
   const slotAtom = useMemo(() => createStorageAtom(slot), [slot]);
   const [localMarks, setLocalMarks] = useAtom(slotAtom);
+
+  const toggle = () => {
+    setPanelOpen(R.not);
+  };
 
   useEffect(() => {
     if (initialLoad) {
@@ -483,8 +499,8 @@ function MarkCtrlPanel() {
 
   return (
     <div className='py-3'>
-      <div className='font-bold'>記號</div>
-      <div className='flex flex-col items-start w-full pl-1 py-2 gap-y-2 text-sm'>
+      <div className='font-bold cursor-pointer' onClick={toggle}>記號</div>
+      <div className={`flex flex-col items-start w-full pl-1 py-2 gap-y-2 text-sm ${panelOpen ? '' : 'hidden'}`}>
         <div className='w-full flex items-center'>
           <ul className='flex items-center font-mono text-xs gap-x-1'>
             {markSlotAtoms.map((a, idx) => {
