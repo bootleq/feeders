@@ -3,6 +3,7 @@
 import * as R from 'ramda';
 import { z } from 'zod';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useHydrateAtoms, atomWithStorage } from 'jotai/utils';
 import {
@@ -10,8 +11,9 @@ import {
   toggleViewCtrlAtom,
   VIEW_CTRL_KEYS,
   columnsAtom,
+  textFilterAtom,
   dateRangeAtom,
-  dateRejectedCountAtom,
+  filterRejectedCountAtom,
   tagsAtom,
   mergeTagsAtom,
   togglaAllTagsAtom,
@@ -22,6 +24,7 @@ import {
   timelineInterObserverAtom,
 } from './store';
 import type { Tags, FactMark, DateRange } from './store';
+import type { AnyFunction } from '@/lib/utils';
 import tlStyles from './timeline.module.scss';
 import { getTagColor } from './colors';
 import { TextInput } from '@/components/form/Inputs';
@@ -33,6 +36,7 @@ import { EyeSlashIcon } from '@heroicons/react/24/outline';
 import { CursorArrowRippleIcon } from '@heroicons/react/24/solid';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import { CheckIcon } from '@heroicons/react/24/outline';
+import { XCircleIcon } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { ArrowLeftEndOnRectangleIcon } from '@heroicons/react/24/outline';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
@@ -67,9 +71,14 @@ function ViewToggle({ section, current, setter, children }: {
 }
 
 function ViewCtrlPanel() {
+  const [panelOpen, setPanelOpen] = useState(true);
   const setWholeViewCtrl = useSetAtom(viewCtrlAtom);
   const [viewCtrl, setViewCtrl] = useAtom(toggleViewCtrlAtom);
   const [columns, setColumns] = useAtom(columnsAtom);
+
+  const toggle = () => {
+    setPanelOpen(R.not);
+  };
 
   const onToggleAll = (toggle: boolean) => {
     if (toggle) {
@@ -102,8 +111,8 @@ function ViewCtrlPanel() {
 
   return (
     <div className='pb-3'>
-      <div className='font-bold'>顯示控制</div>
-      <div className='flex items-start flex-wrap justify-between'>
+      <div className='font-bold cursor-pointer' onClick={toggle}>顯示控制</div>
+      <div className={`flex items-start flex-wrap justify-between ${panelOpen ? '' : 'hidden'}`}>
         <div className='flex flex-col items-start w-fit px-1 py-2 gap-y-2'>
           <ViewToggle section='desc' current={viewCtrl} setter={setViewCtrl}>
             <span className="px-2 ms-3 text-sm text-nowrap">內文</span>
@@ -169,7 +178,13 @@ function ViewCtrlPanel() {
 }
 
 function TagCtrlPanel() {
+  const [panelOpen, setPanelOpen] = useState(true);
   const [tags, setTags] = useAtom(mergeTagsAtom);
+
+  const toggle = () => {
+    setPanelOpen(R.not);
+  };
+
   const toggleAllTags = useSetAtom(togglaAllTagsAtom);
   const onClick = (e: React.MouseEvent) => {
     const el = e.target as HTMLElement;
@@ -183,8 +198,8 @@ function TagCtrlPanel() {
 
   return (
     <div className='py-3'>
-      <div className='font-bold'>標籤篩選</div>
-      <div className='flex flex-col items-start w-fit px-1 py-2 gap-y-2'>
+      <div className='font-bold cursor-pointer' onClick={toggle}>標籤篩選</div>
+      <div className={`flex flex-col items-start w-fit px-1 py-2 gap-y-2 ${panelOpen ? '' : 'hidden'}`}>
         <ul className='text-xs flex flex-wrap items-center' onClick={onClick}>
           {Object.entries(tags).map(([tag, visible]) => {
             return (
@@ -212,6 +227,55 @@ function TagCtrlPanel() {
   );
 }
 
+function FiltersCtrl() {
+  const [panelOpen, setPanelOpen] = useState(true);
+  const rejectedCount = useAtomValue(filterRejectedCountAtom);
+
+  const toggle = () => {
+    setPanelOpen(R.not);
+  };
+
+  return (
+    <div className='py-3'>
+      <div className='font-bold cursor-pointer' onClick={toggle}>文字篩選</div>
+      <div className={`${panelOpen ? '' : 'hidden'}`}>
+        <TextFilterCtrlPanel />
+        <DateCtrlPanel />
+        <div className='flex items-center text-xs text-slate-600'>
+          已排除：<span className='text-sm font-mono'>{rejectedCount}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TextFilterCtrlPanel() {
+  const [text, setText] = useAtom(textFilterAtom);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const debouncedChanged = useDebouncedCallback((event: React.FormEvent) => {
+    const el = event.target as HTMLInputElement;
+    const v = el.value;
+    if (v.length > 2) {
+      setText(v);
+    } else {
+      setText('');
+    }
+  }, 360);
+
+  const defaultText = text;
+
+  return (
+    <div className='pb-2'>
+      <form ref={formRef} onChange={debouncedChanged} className={`flex flex-wrap items-center gap-x-1 my-1 text-sm`}>
+        <div className='whitespace-nowrap inline-flex items-center'>
+          <TextInput label='包含' name='targetText' inputProps={{className: 'text-sm placeholder-opacity-50 placeholder-slate-800', placeholder: '輸入至少 3 個字', defaultValue: defaultText}} />
+        </div>
+      </form>
+    </div>
+  );
+}
+
 const checkDateRageInput = (form: HTMLFormElement) => {
   const formData = new FormData(form);
   const newRange = [
@@ -227,7 +291,6 @@ function DateCtrlPanel() {
   const [inputValid, setInputValid] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const rejectedCount = useAtomValue(dateRejectedCountAtom);
   const inputCls = 'text-xs bg-slate-300/50 focus:bg-transparent';
 
   useEffect(() => {
@@ -260,7 +323,7 @@ function DateCtrlPanel() {
   const defaultToDate = range[1];
 
   return (
-    <div className='py-3'>
+    <div className='pb-2'>
       <div className='font-bold'>日期篩選</div>
       <form ref={formRef} onSubmit={onApply} onChange={onChange} className={`flex flex-wrap items-center gap-x-1 my-1 text-sm ${tlStyles['ctrl-date-filter']}`}>
         <div className='whitespace-nowrap inline-flex items-center'>
@@ -270,18 +333,13 @@ function DateCtrlPanel() {
           <TextInput label='到' name='toDate' type='date' inputProps={{required: true, className: inputCls, defaultValue: defaultToDate}} />
         </div>
 
-        <button className='btn ml-1 flex items-center hover:ring-1 hover:bg-white active:ring' disabled={!inputValid} aria-label='套用'>
+        <button className='btn ml-1 px-px flex items-center hover:ring-1 hover:bg-white active:ring' disabled={!inputValid} aria-label='套用'>
           <CheckIcon className={`stroke-current ${inputValid ? '' : 'opacity-30'}`} height={20} />
         </button>
 
-        <div className='flex items-center text-xs text-slate-600'>
-          <div>
-            已排除：<span className='text-sm font-mono'>{rejectedCount}</span>
-          </div>
-          <button type='reset' className='btn ml-2 hover:ring-1 hover:bg-white active:ring' onClick={onReset}>
-            重設
-          </button>
-        </div>
+        <button type='reset' className='btn px-px hover:ring-1 hover:bg-white active:ring' onClick={onReset} aria-label='重設'>
+          <XCircleIcon className='stroke-slate-600' height={20} />
+        </button>
       </form>
     </div>
   );
@@ -398,6 +456,7 @@ const createStorageAtom = (slot: number) => {
 };
 
 function MarkCtrlPanel() {
+  const [panelOpen, setPanelOpen] = useState(true);
   const [slot, setSlot] = useAtom(currentMarkSlotAtom);
   const [markPicking, setMarkPicking] = useAtom(markPickingAtom);
   const [marks, setMarks] = useAtom(marksAtom);
@@ -405,6 +464,10 @@ function MarkCtrlPanel() {
   const initialLoad = useRef(true);
   const slotAtom = useMemo(() => createStorageAtom(slot), [slot]);
   const [localMarks, setLocalMarks] = useAtom(slotAtom);
+
+  const toggle = () => {
+    setPanelOpen(R.not);
+  };
 
   useEffect(() => {
     if (initialLoad) {
@@ -458,8 +521,8 @@ function MarkCtrlPanel() {
 
   return (
     <div className='py-3'>
-      <div className='font-bold'>記號</div>
-      <div className='flex flex-col items-start w-full pl-1 py-2 gap-y-2 text-sm'>
+      <div className='font-bold cursor-pointer' onClick={toggle}>記號</div>
+      <div className={`flex flex-col items-start w-full pl-1 py-2 gap-y-2 text-sm ${panelOpen ? '' : 'hidden'}`}>
         <div className='w-full flex items-center'>
           <ul className='flex items-center font-mono text-xs gap-x-1'>
             {markSlotAtoms.map((a, idx) => {
@@ -552,7 +615,7 @@ export default function SideControl({ tags }: {
     <div className='p-2 pb-7 sm:pb-2 divide-y-4 overflow-auto scrollbar-thin'>
       <ViewCtrlPanel />
       <TagCtrlPanel />
-      <DateCtrlPanel />
+      <FiltersCtrl />
       <MarkCtrlPanel />
     </div>
   );

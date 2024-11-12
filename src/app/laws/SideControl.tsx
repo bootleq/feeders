@@ -53,12 +53,14 @@ function ViewToggle({ section, current, setter, children }: {
 }
 
 function ViewCtrlPanel() {
+  const [panelOpen, setPanelOpen] = useState(true);
   const [viewCtrl, setViewCtrl] = useAtom(toggleViewCtrlAtom);
+  const toggle = () => setPanelOpen(R.not);
 
   return (
     <div className='pb-3'>
-      <div className='font-bold'>顯示控制</div>
-      <div className='flex items-start flex-wrap justify-between'>
+      <div className='font-bold cursor-pointer' onClick={toggle}>顯示控制</div>
+      <div className={`flex items-start flex-wrap justify-between ${panelOpen ? '' : 'hidden'}`}>
         <div className='flex flex-col items-start w-fit px-1 py-2 gap-y-2'>
           <ViewToggle section='body' current={viewCtrl} setter={setViewCtrl}>
             <span className="px-2 ms-3 text-sm text-zinc-700 text-nowrap">詳細</span>
@@ -73,10 +75,13 @@ function ViewCtrlPanel() {
 }
 
 function ActCtrlPanel() {
+  const [panelOpen, setPanelOpen] = useState(true);
+  const toggle = () => setPanelOpen(R.not);
+
   return (
     <div className='py-3'>
-      <div className='font-bold'>法規</div>
-      <div className='flex flex-col items-start w-fit px-1 py-2'>
+      <div className='font-bold cursor-pointer' onClick={toggle}>法規</div>
+      <div className={`flex flex-col items-start w-fit px-1 py-2 ${panelOpen ? '' : 'hidden'}`}>
         <ul className='text-sm flex flex-wrap items-center gap-y-1'>
           {Object.entries(ACT_ABBRS).map(([act, abbr]) => {
             return (
@@ -94,6 +99,7 @@ function ActCtrlPanel() {
 }
 
 function TagCtrlPanel() {
+  const [panelOpen, setPanelOpen] = useState(true);
   const [tags, setTags] = useAtom(mergeTagsAtom);
   const toggleAllTags = useSetAtom(togglaAllTagsAtom);
   const onClick = (e: React.MouseEvent) => {
@@ -105,11 +111,12 @@ function TagCtrlPanel() {
     }
   };
   const onToggleAll = (toggle: boolean) => () => toggleAllTags(toggle);
+  const toggle = () => setPanelOpen(R.not);
 
   return (
     <div className='py-3'>
-      <div className='font-bold'>標籤篩選</div>
-      <div className='flex flex-col items-start w-fit px-1 py-2 gap-y-2'>
+      <div className='font-bold cursor-pointer' onClick={toggle}>標籤篩選</div>
+      <div className={`flex flex-col items-start w-fit px-1 py-2 gap-y-2 ${panelOpen ? '' : 'hidden'}`}>
         <ul className='text-xs flex flex-wrap items-center' onClick={onClick}>
           {Object.entries(tags).map(([tag, visible]) => {
             return (
@@ -238,11 +245,13 @@ const validateLocalMark = ({ anchor, title }: Mark) => {
 };
 
 function MarkCtrlPanel() {
+  const [panelOpen, setPanelOpen] = useState(true);
   const [localMarks, setLocalMarks] = useAtom(localMarksAtom);
   const [markPicking, setMarkPicking] = useAtom(markPickingAtom);
   const [marks, setMarks] = useAtom(marksAtom);
   const [savedHint, setSavedHint] = useState(false);
   const initialLoad = useRef(true);
+  const toggle = () => setPanelOpen(R.not);
 
   useEffect(() => {
     if (initialLoad) {
@@ -267,8 +276,8 @@ function MarkCtrlPanel() {
 
   return (
     <div className='py-3'>
-      <div className='font-bold'>記號</div>
-      <div className='flex flex-col items-start w-full pl-1 py-2 gap-y-2 text-sm'>
+      <div className='font-bold cursor-pointer' onClick={toggle}>記號</div>
+      <div className={`flex flex-col items-start w-full pl-1 py-2 gap-y-2 text-sm ${panelOpen ? '' : 'hidden'}`}>
         <div className='w-full flex items-center justify-end gap-x-1'>
           {savedHint &&
             <AnimateOnce onComplete={onSavedHintFaded} className='flex items-center w-fit mr-2 text-green-700'>
