@@ -3,8 +3,13 @@
 import * as R from 'ramda';
 import { useEffect, useMemo } from 'react';
 import { useSetAtom, useAtomValue } from 'jotai';
-import { present } from '@/lib/utils';
-import { dateRangeAtom, dateRejectedCountAtom, columnsAtom } from './store';
+import { present, blank } from '@/lib/utils';
+import {
+  textFilterAtom,
+  dateRangeAtom,
+  dateRejectedCountAtom,
+  columnsAtom
+} from './store';
 
 import Timeline from './Timeline';
 
@@ -19,6 +24,7 @@ const columnClassMapping: Record<number, string> = {
 export default function TimelineContainer({ facts }: {
   facts: any[],
 }) {
+  const textFilter = useAtomValue(textFilterAtom);
   const dateRange = useAtomValue(dateRangeAtom);
   const setDateRejected = useSetAtom(dateRejectedCountAtom);
   const columns = useAtomValue(columnsAtom);
@@ -26,24 +32,33 @@ export default function TimelineContainer({ facts }: {
   const dateRangeKey = dateRange.join(',');
 
   const validFacts = useMemo(() => {
-    if (dateRangeKey === ',') return facts;
+    if (dateRangeKey === ',' && blank(textFilter)) return facts;
 
     const [from, to] = dateRangeKey.split(',');
-    return R.filter(({ date }) => {
+    return R.filter(({ title, desc, date }) => {
       if (present(from) && date < from) {
         return false;
       }
       if (present(to) && date > to) {
         return false;
       }
+
+      if (present(textFilter)) {
+        if (title?.includes(textFilter) || desc?.includes(textFilter)) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+
       return true;
     }, facts);
-  }, [facts, dateRangeKey]);
+  }, [facts, textFilter, dateRangeKey]);
 
   useEffect(() => {
     const diff = facts.length - validFacts.length;
     setDateRejected(diff);
-  }, [facts, validFacts, setDateRejected]);
+  }, [facts, validFacts, textFilter, setDateRejected]);
 
   return (
     <div className={`w-full mx-auto px-0 grid gap-2 ${colsClass}`}>

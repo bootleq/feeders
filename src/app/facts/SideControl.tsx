@@ -3,6 +3,7 @@
 import * as R from 'ramda';
 import { z } from 'zod';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useHydrateAtoms, atomWithStorage } from 'jotai/utils';
 import {
@@ -10,6 +11,7 @@ import {
   toggleViewCtrlAtom,
   VIEW_CTRL_KEYS,
   columnsAtom,
+  textFilterAtom,
   dateRangeAtom,
   dateRejectedCountAtom,
   tagsAtom,
@@ -208,6 +210,34 @@ function TagCtrlPanel() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function TextFilterCtrlPanel() {
+  const [text, setText] = useAtom(textFilterAtom);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const debouncedChanged = useDebouncedCallback((event: React.FormEvent) => {
+    const el = event.target as HTMLInputElement;
+    const v = el.value;
+    if (v.length > 2) {
+      setText(v);
+    } else {
+      setText('');
+    }
+  }, 360);
+
+  const defaultText = text;
+
+  return (
+    <div className='py-3'>
+      <div className='font-bold'>文字篩選</div>
+      <form ref={formRef} onChange={debouncedChanged} className={`flex flex-wrap items-center gap-x-1 my-1 text-sm`}>
+        <div className='whitespace-nowrap inline-flex items-center'>
+          <TextInput label='包含' name='targetText' inputProps={{className: 'text-sm placeholder-opacity-50 placeholder-slate-800', placeholder: '輸入至少 3 個字', defaultValue: defaultText}} />
+        </div>
+      </form>
     </div>
   );
 }
@@ -552,6 +582,7 @@ export default function SideControl({ tags }: {
     <div className='p-2 pb-7 sm:pb-2 divide-y-4 overflow-auto scrollbar-thin'>
       <ViewCtrlPanel />
       <TagCtrlPanel />
+      <TextFilterCtrlPanel />
       <DateCtrlPanel />
       <MarkCtrlPanel />
     </div>
