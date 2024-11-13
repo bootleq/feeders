@@ -153,6 +153,9 @@ importers:
       '@types/better-sqlite3':
         specifier: ^7.6.11
         version: 7.6.11
+      '@types/geojson':
+        specifier: ^7946.0.14
+        version: 7946.0.14
       '@types/leaflet':
         specifier: ^1.9.12
         version: 1.9.12
