@@ -5,5 +5,6 @@ declare module 'leaflet' {
     resetViewControl?: any;
     locateControl?: any;
     helpControl?: any;
+    districtControl?: any;
   }
 }

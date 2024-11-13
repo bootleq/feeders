@@ -58,11 +58,22 @@ export const statusAtom = atom<string | null>(get => {
   return null;
 });
 
+export const districtsModeAtom = atom<number>(0);
+export const mapStatusAtom = atom<string | null>(null);
+
 export const showHelpAtom = atom(false);
 export const toggleHelpAtom = atom(
   get => get(showHelpAtom),
   (get, set) => {
     set(showHelpAtom, R.not);
+  }
+);
+
+export const loadingDistrictAtom = atom(false);
+export const advanceDistrictModeAtom = atom(
+  get => get(districtsModeAtom),
+  (get, set, update) => {
+    set(districtsModeAtom, R.pipe(R.inc, R.flip(R.modulo)(3)));
   }
 );
 

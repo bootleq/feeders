@@ -22,12 +22,15 @@ import {
   statusAtom,
   mergeTempMarkerAtom,
   loadingFollowupsAtom,
+  loadingDistrictAtom,
   toggleHelpAtom,
+  advanceDistrictModeAtom,
 } from '@/app/world/[[...path]]/store';
 import { jsonReviver } from '@/lib/utils';
 import { parsePath, updatePath, AREA_ZOOM_MAX, GEOHASH_PRECISION } from '@/app/world/[[...path]]/util';
 import { useHydrateAtoms } from 'jotai/utils';
 import Status from '@/app/world/[[...path]]/Status';
+import MapStatus from '@/app/world/[[...path]]/MapStatus';
 import { AREA_PICKER_MIN_ZOOM } from '@/app/world/[[...path]]/AreaPickerControl';
 
 import Spinner from '@/assets/spinner.svg';
@@ -36,11 +39,13 @@ import { StarIcon } from '@heroicons/react/24/outline';
 
 import SpotMarkers from '@/app/world/[[...path]]/SpotMarkers';
 import Help from '@/app/world/[[...path]]/Help';
+import Districts from '@/app/world/[[...path]]/Districts';
 
 import Leaflet from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
 import TempMarker from './TempMarker';
 import HelpControl from './HelpControl';
+import DistrictControl from './DistrictControl';
 import ResetViewControl from './ResetViewControl';
 import LocateControl from './LocateControl';
 import Alerts from './Alerts';
@@ -50,7 +55,7 @@ const D1_PARAM_LIMIT = 100;
 
 const loadingHashesAtom = atom<string[]>([]);
 const loadedHashesAtom = atom<string[]>([]);
-const loadingAtom = atom((get) => R.isNotEmpty(get(loadingHashesAtom)) || get(loadingFollowupsAtom));
+const loadingAtom = atom((get) => R.isNotEmpty(get(loadingHashesAtom)) || get(loadingFollowupsAtom) || get(loadingDistrictAtom));
 
 type ItemsGeoSpotsByGeohash = { items: GeoSpotsByGeohash }
 const fetchSpotsAtom = atom(
@@ -266,6 +271,7 @@ export default function Map({ preloadedAreas, helpContent, children, className, 
   ]);
 
   const toggleHelp = useSetAtom(toggleHelpAtom);
+  const advanceMode = useSetAtom(advanceDistrictModeAtom);
 
   const areaSpots = useAtomValue(spotsAtom);
   const [areaPicker, setAreaPicker] = useAtom(areaPickerAtom);
@@ -294,12 +300,15 @@ export default function Map({ preloadedAreas, helpContent, children, className, 
 
         <LocateControl className={mapStyles['reset-view-ctrl']} />;
         <ResetViewControl className={mapStyles['reset-view-ctrl']} title='整個台灣' position='bottomright' />
+        <DistrictControl className={mapStyles['reset-view-ctrl']} title='行政區界線' position='bottomright' onClick={advanceMode} />
         <HelpControl className={mapStyles['reset-view-ctrl']} title='說明' position='bottomright' onClick={toggleHelp} />
       </MapContainer>
 
       <Status />
+      <MapStatus />
       <Alerts itemsAtom={alertsAtom} dismissAtom={dismissAlertAtom} />
       <Help content={helpContent} />
+      <Districts />
       <LoadingIndicator />
     </>
   );
