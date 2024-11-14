@@ -9,7 +9,7 @@ import { getWorldUsers } from '@/models/users';
 import { getBlock } from '@/models/blocks';
 import { recentFollowups, geoSpots } from '@/models/spots';
 import type { RecentFollowupsResult } from '@/models/spots';
-import { subDays } from '@/lib/date-fp';
+import { formatISO } from '@/lib/date-fp';
 import { parsePath, GEOHASH_PRECISION } from './util';
 import { userAtom } from '@/components/store';
 import mapStyles from '@/components/map.module.scss';
@@ -32,13 +32,12 @@ const TW_BOUNDS = [
 const TW_CENTER = [23.9739, 120.9773];
 // const SAMPLE_CENTER = [24.987787927428965, 121.52125946066074];
 const SAMPLE_CENTER = [24.87493294850338,121.22191410433534];
-const trackDays = 5
 const fetchLimit = 200;
 const overwriteToday = new Date();
 const PRELOAD_AREA_SIZE = 3;
 
-async function getSpots(oldestDate: Date) {
-  const query = recentFollowups(oldestDate, fetchLimit + 1);
+async function getSpots() {
+  const query = recentFollowups(fetchLimit + 1);
   const items = await query;
   return items;
 }
@@ -109,13 +108,16 @@ export default async function Page({ params }: {
 }) {
   const path = params.path || [];
   const today = overwriteToday || new Date();
-  const oldestDate = subDays(trackDays, today);
   const pathname = `/world/${path.map(s => decodeURIComponent(s)).join('/')}`
   const { lat, lon, mode } = parsePath(pathname);
 
   const session = await auth();
   const user = await getUser(session?.userId);
-  const items = await getSpots(oldestDate);
+  const items = await getSpots();
+
+  const dates = R.uniq(
+    items.map(({ createdAt }) => formatISO({ representation: 'date' }, createdAt))
+  );
 
   let hashes = R.take(PRELOAD_AREA_SIZE, items).map(R.prop('geohash'));
   if (user && user.bounds) {
@@ -134,7 +136,7 @@ export default async function Page({ params }: {
   return (
     <main className="flex min-h-screen flex-row items-start justify-between">
       <Sidebar className={`max-h-screen scrollbar-thin flex flex-col pb-1 z-[810] bg-gradient-to-br from-stone-50 to-slate-200`}>
-        <RecentFollowups user={user} items={items} preloadedAreas={preloadedAreas} today={today} oldestDate={oldestDate} />
+        <RecentFollowups user={user} items={items} preloadedAreas={preloadedAreas} today={today} dates={dates} />
       </Sidebar>
 
       <LazyMap

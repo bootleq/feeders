@@ -112,13 +112,6 @@ function Areas({ areas }: {
   );
 }
 
-function recentDateStrings(today: Date, oldestDate: Date) {
-  const days = R.range(0, 5); // FIXME: 5 is magic
-  return days
-    .map(d => subDays(d, today))
-    .map(formatISO({ representation: 'date' }));
-}
-
 function mapPinCls(spotState: string) {
   switch (spotState) {
     case 'dirty':
@@ -134,10 +127,10 @@ function mapPinCls(spotState: string) {
   }
 }
 
-function Followups({ items, today, oldestDate }: {
+function Followups({ items, today, dates }: {
   items: RecentFollowupsItemProps[],
   today: Date,
-  oldestDate: Date
+  dates: string[]
 }) {
   const [viewItem, setViewItem] = useAtom(viewItemAtom);
   const inClient = useClientOnly();
@@ -179,7 +172,7 @@ function Followups({ items, today, oldestDate }: {
     )
   )(items);
 
-  const list = recentDateStrings(today, oldestDate).map((date, idx) => {
+  const list = dates.map((date, idx) => {
     const subItems = indexByDate[date];
     const isEmpty = !R.has(date, indexByDate);
     const shortDate = R.pipe( R.split('-'), R.tail, R.map(Number), R.join('/'))(date);
@@ -238,12 +231,12 @@ function Followups({ items, today, oldestDate }: {
 }
 
 
-export default function RecentFollowups({ user, items, preloadedAreas, today, oldestDate }: {
+export default function RecentFollowups({ user, items, preloadedAreas, today, dates }: {
   user: WorldUserResult | null,
   items: RecentFollowupsItemProps[],
   preloadedAreas: GeoSpotsByGeohash,
   today: Date,
-  oldestDate: Date
+  dates: string[]
 }) {
   useHydrateAtoms([
     [userAtom, user],
@@ -261,7 +254,7 @@ export default function RecentFollowups({ user, items, preloadedAreas, today, ol
       <SpotInfoPreview />
       <Areas areas={preloadedAreas} />
       <div className='mt-3 px-1'>最近更新</div>
-      <Followups items={items} today={today} oldestDate={oldestDate} />
+      <Followups items={items} today={today} dates={dates} />
     </div>
   );
 };

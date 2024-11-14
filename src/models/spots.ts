@@ -43,7 +43,7 @@ const xmlParser = new XMLParser();
 
 const PRELOAD_FOLLOWUPS_SIZE = 3;
 
-export const recentFollowups = (oldestDate: Date, fetchLimit: number) => {
+export const recentFollowups = (fetchLimit: number) => {
   // Rank latest created followup
   const ranked = db.select({
     id:          spotFollowups.id,
@@ -54,6 +54,12 @@ export const recentFollowups = (oldestDate: Date, fetchLimit: number) => {
     .as('ranked')
 
   const profiles = getQuickProfileQuery().as('profiles');
+
+  const oldestDate = db.selectDistinct({
+    createdDateBegin: sql`unixepoch(DATETIME(${spotFollowups.createdAt}, 'unixepoch'), 'start of day', '-8 hours')`.as('createdDateBegin')
+  }).from(spotFollowups)
+    .orderBy(desc(spotFollowups.createdAt))
+    .limit(1).offset(5);
 
   const query = db.select({
     spotId:       spots.id,

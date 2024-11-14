@@ -1,6 +1,5 @@
 import * as R from 'ramda';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
-import { recentFollowups } from '@/models/spots';
 import type {
   RecentFollowupsItemProps,
   GeoSpotsByGeohash,
