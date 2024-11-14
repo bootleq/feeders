@@ -100,7 +100,7 @@ export const recentFollowups = (fetchLimit: number) => {
       and(
         inArray(spots.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped]),
         inArray(spotFollowups.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped]),
-        gte(spotFollowups.createdAt, oldestDate),
+        gte(spotFollowups.createdAt, sql`IFNULL(${oldestDate}, 0)`),
       )
     )
     .orderBy(
