@@ -51,7 +51,7 @@ export const recentFollowups = (fetchLimit: number) => {
     rank:        sql<number>`RANK() OVER (PARTITION BY ${spots.id} ORDER BY ${spotFollowups.createdAt} DESC, ${spotFollowups.spawnedAt} DESC)`.as('rank'),
   }).from(spots)
     .innerJoin(spotFollowups, eq(spots.id, spotFollowups.spotId))
-    .as('ranked')
+    .as('ranked');
 
   const profiles = getQuickProfileQuery().as('profiles');
 
