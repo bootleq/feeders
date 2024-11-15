@@ -237,7 +237,7 @@ function FiltersCtrl() {
 
   return (
     <div className='py-3'>
-      <div className='font-bold cursor-pointer' onClick={toggle}>文字篩選</div>
+      <div className='font-bold cursor-pointer' onClick={toggle}>文字或日期篩選</div>
       <div className={`${panelOpen ? '' : 'hidden'}`}>
         <TextFilterCtrlPanel />
         <DateCtrlPanel />
@@ -266,7 +266,7 @@ function TextFilterCtrlPanel() {
   const defaultText = text;
 
   return (
-    <div className='pb-2'>
+    <div className=''>
       <form ref={formRef} onChange={debouncedChanged} className={`flex flex-wrap items-center gap-x-1 my-1 text-sm`}>
         <div className='whitespace-nowrap inline-flex items-center'>
           <TextInput label='包含' name='targetText' inputProps={{className: 'text-sm opacity-60 focus:opacity-100 placeholder-slate-800/50', placeholder: '輸入至少 3 個字', defaultValue: defaultText}} />
@@ -323,14 +323,13 @@ function DateCtrlPanel() {
   const defaultToDate = range[1];
 
   return (
-    <div className='pb-2'>
-      <div className='font-bold'>日期篩選</div>
+    <div className='pb-px'>
       <form ref={formRef} onSubmit={onApply} onChange={onChange} className={`flex flex-wrap items-center gap-x-1 my-1 text-sm ${tlStyles['ctrl-date-filter']}`}>
         <div className='whitespace-nowrap inline-flex items-center'>
-          <TextInput label='從' name='fromDate' type='date' inputProps={{required: true, className: inputCls, defaultValue: defaultFromDate, 'aria-label': '從'}} />
+          <TextInput label='從' name='fromDate' type='date' inputProps={{required: true, className: inputCls, defaultValue: defaultFromDate, 'aria-label': '日期從'}} />
         </div>
         <div className='whitespace-nowrap inline-flex items-center'>
-          <TextInput label='到' name='toDate' type='date' inputProps={{required: true, className: inputCls, defaultValue: defaultToDate}} />
+          <TextInput label='到' name='toDate' type='date' inputProps={{required: true, className: inputCls, defaultValue: defaultToDate, 'aria-label': '日期到'}} />
         </div>
 
         <button className='btn ml-1 px-px flex items-center hover:ring-1 hover:bg-white active:ring' disabled={!inputValid} aria-label='套用'>
