@@ -1,7 +1,7 @@
-import { tmpdir } from 'os';
-import { mkdtempSync, writeFileSync, unlinkSync, rmSync } from 'fs';
-import { join, dirname } from 'path';
+import { rmSync } from 'fs';
+import { dirname } from 'path';
 import { execSync } from 'child_process';
+import { makeTempSQL, unprepareStatement } from '@/lib/dev';
 import { UserStateEnum } from '@/lib/schema.ts';
 
 const args = process.argv.slice(2);
@@ -24,13 +24,6 @@ if (!UserStateEnum.options.includes(state)) {
   process.exit(1);
 }
 
-function makeTemp(text) {
-  const dir = mkdtempSync(join(tmpdir(), 'sql-'));
-  const file = join(dir, 'query.sql');
-  writeFileSync(file, text);
-  return file;
-}
-
 const sql = [
   `UPDATE users SET state = '${state}'`,
   state === 'inactive' ? ', lockedAt = (unixepoch())' : '', // TODO: remove lockedAt?
@@ -39,7 +32,7 @@ const sql = [
   ';',
 ].join(' ');
 
-const sqlFile = makeTemp(sql);
+const sqlFile = makeTempSQL(sql);
 
 const cmd = [
   'wrangler d1 execute feeders',
