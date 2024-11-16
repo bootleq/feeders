@@ -329,7 +329,7 @@ function DateCtrlPanel() {
           <TextInput label='從' name='fromDate' type='date' inputProps={{required: true, className: inputCls, defaultValue: defaultFromDate, 'aria-label': '日期從'}} />
         </div>
         <div className='whitespace-nowrap inline-flex items-center'>
-          <TextInput label='到' name='toDate' type='date' inputProps={{required: true, className: inputCls, defaultValue: defaultToDate, 'aria-label': '日期到'}} />
+          <TextInput label='到' name='toDate' type='date' inputProps={{required: true, className: `${inputCls} min-w-16`, defaultValue: defaultToDate, 'aria-label': '日期到'}} />
         </div>
 
         <button className='btn ml-1 px-px flex items-center hover:ring-1 hover:bg-white active:ring' disabled={!inputValid} aria-label='套用'>

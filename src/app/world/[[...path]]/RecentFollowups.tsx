@@ -250,7 +250,7 @@ export default function RecentFollowups({ user, items, preloadedAreas, today, da
   }, [items, setDefaultViewItem])
 
   return (
-    <div className=''>
+    <div className='overflow-y-auto'>
       <SpotInfoPreview />
       <Areas areas={preloadedAreas} />
       <div className='mt-3 px-1'>最近更新</div>
