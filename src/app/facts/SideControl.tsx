@@ -25,6 +25,7 @@ import {
 } from './store';
 import type { Tags, FactMark, DateRange } from './store';
 import type { AnyFunction } from '@/lib/utils';
+import useClientOnly from '@/lib/useClientOnly';
 import tlStyles from './timeline.module.scss';
 import { getTagColor } from './colors';
 import { TextInput } from '@/components/form/Inputs';
@@ -290,6 +291,7 @@ function DateCtrlPanel() {
   const [range, setRange] = useAtom(dateRangeAtom);
   const [inputValid, setInputValid] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const inClient = useClientOnly();
 
   const inputCls = 'text-xs bg-slate-300/50 focus:bg-transparent';
 
@@ -317,6 +319,7 @@ function DateCtrlPanel() {
 
   const onReset = () => {
     setRange(['', '']);
+    setInputValid(false);
   };
 
   const defaultFromDate = range[0] || '2016-05-05';
@@ -332,9 +335,11 @@ function DateCtrlPanel() {
           <TextInput label='到' name='toDate' type='date' inputProps={{required: true, className: `${inputCls} min-w-16`, defaultValue: defaultToDate, 'aria-label': '日期到'}} />
         </div>
 
-        <button className='btn ml-1 px-px flex items-center hover:ring-1 hover:bg-white active:ring' disabled={!inputValid} aria-label='套用'>
-          <CheckIcon className={`stroke-current ${inputValid ? '' : 'opacity-30'}`} height={20} />
-        </button>
+        {inClient &&
+          <button className='btn ml-1 px-px flex items-center hover:ring-1 hover:bg-white active:ring' disabled={!inputValid} aria-label='套用'>
+            <CheckIcon className={`stroke-current ${inputValid ? '' : 'opacity-30'}`} height={20} />
+          </button>
+        }
 
         <button type='reset' className='btn px-px hover:ring-1 hover:bg-white active:ring' onClick={onReset} aria-label='重設'>
           <XCircleIcon className='stroke-slate-600' height={20} />
