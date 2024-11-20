@@ -73,7 +73,7 @@ function Fact({ fact, isSubView }: {
         <div data-role='title' className='leading-tight text-balance text-center sm:text-start'>
           {title}
         </div>
-        <a href={`#${anchor}`} className={`ml-auto ${factHeaderIconCls}`} onClick={onSetZoom}>
+        <a href={`#${anchor.replace('fact-', 'zoom-')}`} className={`ml-auto ${factHeaderIconCls}`} onClick={onSetZoom}>
           <ArrowsPointingOutIcon className='stroke-slate-700 stroke-2' height={16} />
         </a>
         <a className={`mr-1 hover:-rotate-12 ${factHeaderIconCls}`} href={`#${anchor}`}>
