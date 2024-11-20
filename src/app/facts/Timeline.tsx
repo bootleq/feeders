@@ -14,10 +14,13 @@ import {
   markPickingAtom,
   addMarkAtom,
   timelineInterObserverAtom,
+  zoomedFactAtom,
 } from './store';
 import type { Tags } from './store';
+import FactTagList from './FactTagList';
 import { getTagColor } from './colors';
 import tlStyles from './timeline.module.scss';
+import { ArrowsPointingOutIcon } from '@heroicons/react/24/outline';
 
 function Html({ html, ...props }: {
   html: string,
@@ -25,24 +28,6 @@ function Html({ html, ...props }: {
 }) {
   return <div dangerouslySetInnerHTML={{ __html: html }} {...props} />;
 };
-
-function TagList({ tags }: {
-  tags: string[] | null
-}) {
-  if (!tags || tags.length === 0) {
-    return null;
-  }
-
-  return (
-    <ul data-role='tags' className='flex flex-wrap items-center justify-end gap-y-1 text-xs'>
-      {tags.map(tag => (
-        <li key={tag} className={`${getTagColor(tag).join(' ')} rounded-full px-1 p-px mx-px border text-nowrap`}>
-          {tag}
-        </li>
-      ))}
-    </ul>
-  );
-}
 
 const createTagsHiddenAtom = (tagNames: string[]) => {
   return atom(get => {
@@ -53,6 +38,8 @@ const createTagsHiddenAtom = (tagNames: string[]) => {
   });
 };
 
+const factHeaderIconCls = 'text-opacity-0 px-1 rounded-full opacity-0 group-hover/header:opacity-100 hover:bg-amber-300/50 hover:scale-125';
+
 function Fact({ fact, isSubView }: {
   fact: any,
   isSubView?: boolean,
@@ -62,6 +49,11 @@ function Fact({ fact, isSubView }: {
   const datePadEnd = date.length < 10 ? <span className=''>{'\u00A0'.repeat(10 - date.length)}</span> : '';
   const allTagsHiddenAtom = useMemo(() => createTagsHiddenAtom(tags || ['']), [tags]);
   const hidden = useAtomValue(allTagsHiddenAtom);
+  const setZoom = useSetAtom(zoomedFactAtom);
+
+  const onSetZoom = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    setZoom(fact);
+  }, [setZoom, fact]);
 
   if (hidden) {
     return null;
@@ -81,10 +73,13 @@ function Fact({ fact, isSubView }: {
         <div data-role='title' className='leading-tight text-balance text-center sm:text-start'>
           {title}
         </div>
-        <a className='text-opacity-0 ml-auto px-1 rounded-full opacity-0 group-hover/header:opacity-100 hover:bg-amber-300/50 hover:scale-125 hover:-rotate-12' href={`#${anchor}`}>
+        <a href={`#${anchor}`} className={`ml-auto ${factHeaderIconCls}`} onClick={onSetZoom}>
+          <ArrowsPointingOutIcon className='stroke-slate-700 stroke-2' height={16} />
+        </a>
+        <a className={`mr-1 hover:-rotate-12 ${factHeaderIconCls}`} href={`#${anchor}`}>
           <img src='/assets/paper-clip.svg' alt='連結' width={16} height={16} />
         </a>
-        <TagList tags={tags} />
+        <FactTagList tags={tags} />
       </div>
 
       <div data-role='desc' className={`text-opacity-90 pl-2 break-words ${tlStyles.mce}`}>

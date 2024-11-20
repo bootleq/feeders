@@ -5,6 +5,7 @@ import Sidebar from '@/components/Sidebar';
 import Alerts from '@/components/Alerts';
 import { alertsAtom, dismissAlertAtom } from '@/components/store';
 import TimelineContainer from './TimelineContainer';
+import ZoomArticle from './ZoomArticle';
 import SideControl from './SideControl';
 
 export const runtime = 'edge';
@@ -27,6 +28,7 @@ export default async function Page({ params }: {
 
       <TimelineContainer facts={facts} />
 
+      <ZoomArticle />
       <Alerts itemsAtom={alertsAtom} dismissAtom={dismissAlertAtom} />
     </main>
   );
