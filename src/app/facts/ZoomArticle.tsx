@@ -66,7 +66,7 @@ export default function ZoomArticle() {
         </button>
       </div>
 
-      <div ref={bodyRef} className='px-5 pb-4 max-h-[80vh] overflow-auto focus-visible:outline-none'>
+      <div ref={bodyRef} tabIndex={0} className='px-5 pb-4 max-h-[80vh] overflow-auto focus-visible:outline-none'>
         <div className={`text-opacity-90 -mt-2 break-words ${tlStyles.mce}`}>
           <Html html={desc} />
         </div>
