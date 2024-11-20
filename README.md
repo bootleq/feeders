@@ -127,6 +127,11 @@ pnpm cms-restart
     "classes": "feeders-mce-lengthy"
   },
   {
+    "title": "冗長清單",
+    "selector": "ol,ul",
+    "classes": "feeders-mce-lengthy"
+  },
+  {
     "title": "圖說",
     "block": "figure",
     "wrapper": true,

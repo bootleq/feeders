@@ -48,7 +48,7 @@ export default function ZoomArticle() {
           {title}
         </div>
 
-        <div className='font-mono text-sm mx-1 ml-2 px-1 whitespace-nowrap rounded-md ring-1 text-red-950 bg-gradient-to-br from-amber-200 to-amber-200/80'>
+        <div className='font-mono text-sm mx-1 ml-auto px-1 whitespace-nowrap rounded-md ring-1 text-red-950 bg-gradient-to-br from-amber-200 to-amber-200/80'>
           {date}
         </div>
 
@@ -59,7 +59,7 @@ export default function ZoomArticle() {
         </button>
       </div>
 
-      <div ref={bodyRef} className='px-5 pb-4 max-h-[80vh] overflow-auto'>
+      <div ref={bodyRef} className='px-5 pb-4 max-h-[80vh] overflow-auto focus-visible:outline-none'>
         <div className={`text-opacity-90 -mt-2 break-words ${tlStyles.mce}`}>
           <Html html={desc} />
         </div>
