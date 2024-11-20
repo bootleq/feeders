@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Provider } from 'jotai';
 import { SessionProvider } from 'next-auth/react';
-import NextTopLoader from 'nextjs-toploader';
+import ProgressBar from './ProgressBar';
 import "./globals.css";
 import { SITE_NAME, APP_URL } from '@/lib/utils';
 
@@ -25,7 +25,7 @@ export default async function RootLayout({
   return (
     <html lang="zh-TW">
       <body className={inter.className}>
-        <NextTopLoader color='#000' crawlSpeed={400} showForHashAnchor={false} />
+        <ProgressBar />
         <Provider>
           <SessionProvider>
             {children}

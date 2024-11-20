@@ -62,4 +62,6 @@ export const removeMarkAtom = atom(
 );
 export const peekingMarkAtom = atom<string | null>(null);
 
+export const zoomedFactAtom = atom<any>(null);
+
 export const timelineInterObserverAtom = atom<IntersectionObserver | null>(null);

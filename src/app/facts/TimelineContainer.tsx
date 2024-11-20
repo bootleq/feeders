@@ -8,7 +8,8 @@ import {
   textFilterAtom,
   dateRangeAtom,
   filterRejectedCountAtom,
-  columnsAtom
+  columnsAtom,
+  zoomedFactAtom,
 } from './store';
 
 import Timeline from './Timeline';
@@ -30,6 +31,7 @@ export default function TimelineContainer({ facts }: {
   const columns = useAtomValue(columnsAtom);
   const colsClass = columnClassMapping[columns.length];
   const dateRangeKey = dateRange.join(',');
+  const setZoomedFact = useSetAtom(zoomedFactAtom);
 
   const validFacts = useMemo(() => {
     if (dateRangeKey === ',' && blank(textFilter)) return facts;
@@ -60,6 +62,20 @@ export default function TimelineContainer({ facts }: {
     const diff = facts.length - validFacts.length;
     setRejectCount(diff);
   }, [facts, validFacts, textFilter, setRejectCount]);
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    const zoom = hash.match(/^#zoom-.+_(\d+)$/);
+    if (zoom) {
+      const factId = Number.parseInt(zoom.pop() || '');
+      if (factId) {
+        const fact = facts.find(f => f.id === factId);
+        if (fact) {
+          setZoomedFact(fact);
+        }
+      }
+    }
+  }, [facts, setZoomedFact]);
 
   return (
     <div className={`w-full mx-auto px-0 grid gap-2 ${colsClass}`}>
