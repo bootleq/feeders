@@ -26,6 +26,13 @@ export default function ZoomArticle() {
     setFact(null);
   };
 
+  const onClick = (e: React.MouseEvent<HTMLElement>) => {
+    const el = e.target;
+    if (el === ref.current) { // click outside the dialog
+      setFact(null);
+    }
+  };
+
   useEffect(() => {
     if (fact) {
       ref.current?.showModal();
@@ -42,7 +49,7 @@ export default function ZoomArticle() {
   const { id, date, title, desc, summary, origin, tags, weight } = fact;
 
   return (
-    <dialog ref={ref} className={dialogCls} onClose={onClose}>
+    <dialog ref={ref} className={dialogCls} onClose={onClose} onClick={onClick}>
       <div className='sticky top-0 flex items-center p-3 px-5 bg-gradient-to-br from-stone-50/80 to-slate-100/80'>
         <div className='leading-tight text-balance text-center text-lg sm:text-start '>
           {title}
