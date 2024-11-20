@@ -201,9 +201,10 @@ function Followups({ items, today, dates }: {
                     <TooltipTrigger className='break-keep w-min cursor-pointer'>
                       <Link
                         href={`/world/area/@${i.lat},${i.lon}`}
-                        onClick={(e) => { e.preventDefault(); e.nativeEvent.stopImmediatePropagation(); setViewItem(i); } }
+                        onClick={(e) => { e.preventDefault(); setViewItem(i); } }
                         className='break-keep w-min cursor-pointer'
                         prefetch={false}
+                        data-disable-nprogress={true}
                       >
                         <MapPinIcon className={`cursor-pointer ${mapPinCls(i.spotState)}`} height={24} />
                         {viewItem === i &&
