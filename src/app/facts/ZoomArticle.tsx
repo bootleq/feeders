@@ -12,7 +12,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 
 const dialogCls = [
   'min-w-[40vw] min-h-[40vh] pb-3 rounded drop-shadow-md',
-  'max-w-full xl:max-w-screen-xl',
+  'max-w-full lg:max-w-screen-lg xl:max-w-screen-xl',
   'bg-gradient-to-br from-stone-50 to-slate-200',
   'backdrop:bg-black/50 backdrop:backdrop-blur-[1px]',
 ].join(' ');
