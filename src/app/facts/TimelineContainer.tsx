@@ -72,6 +72,9 @@ export default function TimelineContainer({ facts }: {
         const fact = facts.find(f => f.id === factId);
         if (fact) {
           setZoomedFact(fact);
+          const anchor = hash.replace('#zoom-', '#fact-');
+          const target = document.querySelector(anchor);
+          target && target.scrollIntoView({ behavior: 'instant' });
         }
       }
     }

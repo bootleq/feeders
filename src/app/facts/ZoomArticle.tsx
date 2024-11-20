@@ -50,7 +50,7 @@ export default function ZoomArticle() {
 
   return (
     <dialog ref={ref} className={dialogCls} onClose={onClose} onClick={onClick}>
-      <div className='sticky top-0 flex items-center p-3 px-5 bg-gradient-to-br from-stone-50/80 to-slate-100/80'>
+      <div className='sticky top-0 flex items-center flex-wrap p-3 px-5 gap-y-2 bg-gradient-to-br from-stone-50/80 to-slate-100/80'>
         <div className='leading-tight text-balance text-center text-lg sm:text-start '>
           {title}
         </div>
