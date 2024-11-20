@@ -4,16 +4,10 @@ import * as R from 'ramda';
 import { useMemo } from 'react';
 import { atom, useAtomValue } from 'jotai';
 import Link from 'next/link';
+import Html from '@/components/Html';
 import { tagsAtom, ACT_ABBRS } from './store';
 import styles from './laws.module.scss';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
-
-function Html({ html, ...props }: {
-  html: string,
-  [key: string]: any,
-}) {
-  return <div dangerouslySetInnerHTML={{ __html: html }} {...props} />;
-};
 
 function TagList({ tags }: {
   tags: string[] | null

@@ -6,6 +6,7 @@ import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomFamily, splitAtom } from 'jotai/utils';
 import { present } from '@/lib/utils';
 import { addAlertAtom } from '@/components/store';
+import Html from '@/components/Html';
 import {
   VIEW_CTRL_KEYS,
   viewCtrlAtom,
@@ -21,13 +22,6 @@ import FactTagList from './FactTagList';
 import { getTagColor } from './colors';
 import tlStyles from './timeline.module.scss';
 import { ArrowsPointingOutIcon } from '@heroicons/react/24/outline';
-
-function Html({ html, ...props }: {
-  html: string,
-  [key: string]: any,
-}) {
-  return <div dangerouslySetInnerHTML={{ __html: html }} {...props} />;
-};
 
 const createTagsHiddenAtom = (tagNames: string[]) => {
   return atom(get => {
