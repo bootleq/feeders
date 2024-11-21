@@ -11,7 +11,8 @@ import Html from '@/components/Html';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 const dialogCls = [
-  'min-w-[40vw] min-h-[40vh] pb-3 rounded drop-shadow-md',
+  'flex flex-col',
+  'min-w-[40vw] min-h-[20vh] rounded drop-shadow-md',
   'max-w-full lg:max-w-screen-lg xl:max-w-screen-xl',
   'bg-gradient-to-br from-stone-50 to-slate-200',
   'backdrop:bg-black/50 backdrop:backdrop-blur-[1px]',
@@ -50,7 +51,7 @@ export default function ZoomArticle() {
 
   return (
     <dialog ref={ref} className={dialogCls} onClose={onClose} onClick={onClick}>
-      <div className='sticky top-0 flex items-center flex-wrap p-3 px-5 gap-y-2 bg-gradient-to-br from-stone-50/80 to-slate-100/80'>
+      <div className='sticky top-0 flex items-center flex-wrap p-3 px-2 sm:px-5 gap-y-2 bg-gradient-to-br from-stone-50/80 to-slate-100/80'>
         <div className='leading-tight text-balance text-center text-lg sm:text-start '>
           {title}
         </div>
@@ -66,12 +67,12 @@ export default function ZoomArticle() {
         </button>
       </div>
 
-      <div ref={bodyRef} tabIndex={0} className='px-5 pb-4 max-h-[80vh] overflow-auto focus-visible:outline-none'>
+      <div ref={bodyRef} tabIndex={0} className='px-2 sm:px-5 pb-2.5 mt-auto max-h-[80vh] overflow-auto focus-visible:outline-none'>
         <div className={`text-opacity-90 -mt-2 break-words ${tlStyles.mce}`}>
           <Html html={desc} />
         </div>
 
-        <div className='flex items-center flex-wrap'>
+        <div className='flex items-center flex-wrap gap-x-3'>
           {present(summary) &&
             <div className={`relative text-opacity-90 p-1 py-0 ml-px mt-5 w-fit ring-1 ${tlStyles.mce}`}>
               <div className={tlStyles['summary-mark']} title='摘要' aria-label='摘要'></div>
