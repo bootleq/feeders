@@ -36,8 +36,10 @@ export default function ZoomArticle() {
 
   useEffect(() => {
     if (fact) {
+      const body = bodyRef.current;
       ref.current?.showModal();
-      bodyRef.current?.focus();
+      body?.focus();
+      body?.querySelectorAll('details').forEach(dt => { dt.open = true });
     } else {
       ref.current?.close();
     }

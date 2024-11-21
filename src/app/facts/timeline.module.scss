@@ -169,6 +169,17 @@
       background-color: rgba(56, 189, 248, 0.19);
     }
   }
+
+  summary {
+    cursor: pointer;
+    padding-block: 0.25rem;
+    margin-bottom: 0.5rem;
+    color: #78350f;
+
+    &:hover {
+      box-shadow: 1px 1px 3px rgba(0,0,0,.3), -1px -1px 3px rgba(0,0,0,.3);
+    }
+  }
 }
 
 .summary-mark {
