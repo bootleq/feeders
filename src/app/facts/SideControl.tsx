@@ -362,8 +362,8 @@ const findFact = (anchor?: string) => {
   return target;
 };
 
-function Mark({ anchor, title, index }:
-  FactMark & { index: number }
+function Mark({ anchor, title, index, onMouseLeave }:
+  FactMark & { index: number, onMouseLeave: AnyFunction }
 ) {
   const addAlert = useSetAtom(addAlertAtom);
   const removeMark = useSetAtom(removeMarkAtom);
@@ -411,13 +411,6 @@ function Mark({ anchor, title, index }:
       interObserver?.observe(target);
     }
   }, [interObserver]);
-
-  const onMouseLeave = useCallback((e: React.MouseEvent<HTMLLIElement>) => {
-    const cls = tlStyles['peeking-target'];
-    const tl = document.querySelector('[data-role="timeline"]') as HTMLElement;
-    document.querySelectorAll(`[data-role="fact-date"].${cls}`).forEach(el => el.classList.remove(cls));
-    delete tl.dataset.markOffscreen;
-  }, []);
 
   const date = R.match(/fact-(.+)_\d+/, anchor)[1];
   const datePadEnd = date.length < 10 ? <span className=''>{'\u00A0'.repeat(10 - date.length)}</span> : '';
@@ -521,10 +514,17 @@ function MarkCtrlPanel() {
 
   const onSavedHintFaded = () => {
     setSavedHint(false);
-  }
+  };
+
+  const onMouseLeave = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    const cls = tlStyles['peeking-target'];
+    const tl = document.querySelector('[data-role="timeline"]') as HTMLElement;
+    document.querySelectorAll(`[data-role="fact-date"].${cls}`).forEach(el => el.classList.remove(cls));
+    delete tl.dataset.markOffscreen;
+  }, []);
 
   return (
-    <div className='py-3'>
+    <div className='py-3' onMouseLeave={onMouseLeave}>
       <div className='font-bold cursor-pointer' onClick={toggle}>記號</div>
       <div className={`flex flex-col items-start w-full pl-1 py-2 gap-y-2 text-sm ${panelOpen ? '' : 'hidden'}`}>
         <div className='w-full flex items-center'>
@@ -594,7 +594,7 @@ function MarkCtrlPanel() {
         <ul className='divide-y-2 divide-slate-300 w-full'>
           {marks.length ?
             marks.map(({ anchor, title }, idx) => (
-              <Mark key={anchor} index={idx} anchor={anchor} title={title} />
+              <Mark key={anchor} index={idx} anchor={anchor} title={title} onMouseLeave={onMouseLeave} />
             ))
           :
             <li className='text-slate-600'>（空）</li>
