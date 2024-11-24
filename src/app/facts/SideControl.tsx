@@ -26,7 +26,7 @@ import {
 import type { Tags, FactMark, DateRange } from './store';
 import type { AnyFunction } from '@/lib/utils';
 import useClientOnly from '@/lib/useClientOnly';
-import { findFact } from './utils';
+import { findFactElement } from './utils';
 import tlStyles from './timeline.module.scss';
 import { getTagColor } from './colors';
 import { TextInput } from '@/components/form/Inputs';
@@ -375,7 +375,7 @@ function Mark({ anchor, title, index, onMouseLeave }:
   const onMouseEnter = useCallback((e: React.MouseEvent<HTMLLIElement>) => {
     const el = e.currentTarget;
     const { anchor } = el.dataset;
-    const fact = findFact(anchor);
+    const fact = findFactElement(anchor);
     const target = fact?.querySelector('[data-role="fact-date"]');
     if (target) {
       target.classList.add(tlStyles['peeking-target']);

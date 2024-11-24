@@ -13,7 +13,7 @@ import {
 } from './store';
 import { addAlertAtom } from '@/components/store';
 
-import { findFact } from './utils';
+import { findFactElement } from './utils';
 import tlStyles from './timeline.module.scss';
 import Timeline from './Timeline';
 
@@ -88,7 +88,7 @@ export default function TimelineContainer({ facts }: {
     setZoomByHash(hash);
 
     if (hash.startsWith('#fact-')) {
-      const target = findFact(hash.slice(1));
+      const target = findFactElement(hash.slice(1));
       if (target) {
         target.classList.remove(tlStyles['animate-flash']);
         window.setTimeout(() =>
