@@ -4,7 +4,6 @@ import { AppProgressBar } from 'next-nprogress-bar';
 
 const targetPreprocessor = (url: URL) => {
   const currentURL = new URL(window.location.href);
-  console.log('tx', url);
 
   return currentURL;
 };

@@ -1,7 +1,7 @@
 "use client"
 
 import * as R from 'ramda';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useSetAtom, useAtomValue } from 'jotai';
 import { present, blank } from '@/lib/utils';
 import {
@@ -11,7 +11,10 @@ import {
   columnsAtom,
   zoomedFactAtom,
 } from './store';
+import { addAlertAtom } from '@/components/store';
 
+import { findFactElement, clearMarkIndicators } from './utils';
+import tlStyles from './timeline.module.scss';
 import Timeline from './Timeline';
 
 const columnClassMapping: Record<number, string> = {
@@ -32,6 +35,7 @@ export default function TimelineContainer({ facts }: {
   const colsClass = columnClassMapping[columns.length];
   const dateRangeKey = dateRange.join(',');
   const setZoomedFact = useSetAtom(zoomedFactAtom);
+  const addAlert = useSetAtom(addAlertAtom);
 
   const validFacts = useMemo(() => {
     if (dateRangeKey === ',' && blank(textFilter)) return facts;
@@ -58,6 +62,59 @@ export default function TimelineContainer({ facts }: {
     }, facts);
   }, [facts, textFilter, dateRangeKey]);
 
+  const onMouseEnter = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    setTimeout(() => {
+      clearMarkIndicators();
+    }, 500);
+  }, []);
+
+  const setZoomByHash = useCallback((hash: string) => {
+    if (hash.startsWith('#zoom-')) {
+      const zoom = hash.match(/^#zoom-.+_(\d+)$/);
+      if (zoom) {
+        const factId = Number.parseInt(zoom.pop() || '', 10);
+        if (factId) {
+          const fact = facts.find(f => f.id === factId);
+          if (fact) {
+            setZoomedFact(fact);
+            const anchor = hash.replace('#zoom-', '#fact-').slice(1);
+            const target = findFactElement(anchor);
+            target && target.scrollIntoView({ behavior: 'instant' });
+          }
+        }
+      }
+    } else {
+      setZoomedFact(null);
+    }
+  }, [facts, setZoomedFact]);
+
+  const followHash = useCallback((e: HashChangeEvent) => {
+    const hash = decodeURI(new URL(e.newURL).hash);
+
+    setZoomByHash(hash);
+
+    if (hash.startsWith('#fact-')) {
+      const target = findFactElement(hash.slice(1));
+      if (target) {
+        target.classList.remove(tlStyles['animate-flash']);
+        window.setTimeout(() => {
+          target.classList.add(tlStyles['animate-flash']);
+          clearMarkIndicators();
+        });
+        target.scrollIntoView();
+      } else {
+        addAlert('error', <>無法跳到選定日期（可能已被隱藏）</>);
+      }
+    }
+  }, [addAlert, setZoomByHash]);
+
+  useEffect(() => {
+    window.addEventListener('hashchange', followHash);
+    return () => {
+      window.removeEventListener('hashchange', followHash);
+    };
+  }, [followHash]);
+
   useEffect(() => {
     const diff = facts.length - validFacts.length;
     setRejectCount(diff);
@@ -65,23 +122,13 @@ export default function TimelineContainer({ facts }: {
 
   useEffect(() => {
     const hash = window.location.hash;
-    const zoom = hash.match(/^#zoom-.+_(\d+)$/);
-    if (zoom) {
-      const factId = Number.parseInt(zoom.pop() || '');
-      if (factId) {
-        const fact = facts.find(f => f.id === factId);
-        if (fact) {
-          setZoomedFact(fact);
-          const anchor = hash.replace('#zoom-', '#fact-');
-          const target = document.querySelector(anchor);
-          target && target.scrollIntoView({ behavior: 'instant' });
-        }
-      }
+    if (hash.startsWith('#zoom-')) {
+      setZoomByHash(hash);
     }
-  }, [facts, setZoomedFact]);
+  }, [setZoomByHash]);
 
   return (
-    <div className={`w-full mx-auto px-0 grid gap-2 ${colsClass}`}>
+    <div className={`w-full mx-auto px-0 grid gap-2 ${colsClass}`} onMouseEnter={onMouseEnter}>
       <Timeline facts={validFacts} />
       {
         columns.slice(1).map((visible, idx) => (
