@@ -13,7 +13,7 @@ import {
 } from './store';
 import { addAlertAtom } from '@/components/store';
 
-import { findFactElement } from './utils';
+import { findFactElement, clearMarkIndicators } from './utils';
 import tlStyles from './timeline.module.scss';
 import Timeline from './Timeline';
 
@@ -61,6 +61,12 @@ export default function TimelineContainer({ facts }: {
       return true;
     }, facts);
   }, [facts, textFilter, dateRangeKey]);
+
+  const onMouseEnter = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    setTimeout(() => {
+      clearMarkIndicators();
+    }, 500);
+  }, []);
 
   const setZoomByHash = useCallback((hash: string) => {
     if (hash.startsWith('#zoom-')) {
@@ -121,7 +127,7 @@ export default function TimelineContainer({ facts }: {
   }, [setZoomByHash]);
 
   return (
-    <div className={`w-full mx-auto px-0 grid gap-2 ${colsClass}`}>
+    <div className={`w-full mx-auto px-0 grid gap-2 ${colsClass}`} onMouseEnter={onMouseEnter}>
       <Timeline facts={validFacts} />
       {
         columns.slice(1).map((visible, idx) => (
