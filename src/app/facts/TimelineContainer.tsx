@@ -97,10 +97,11 @@ export default function TimelineContainer({ facts }: {
       const target = findFactElement(hash.slice(1));
       if (target) {
         target.classList.remove(tlStyles['animate-flash']);
-        window.setTimeout(() =>
-          target.classList.add(tlStyles['animate-flash'])
-        );
-        target && target.scrollIntoView();
+        window.setTimeout(() => {
+          target.classList.add(tlStyles['animate-flash']);
+          clearMarkIndicators();
+        });
+        target.scrollIntoView();
       } else {
         addAlert('error', <>無法跳到選定日期（可能已被隱藏）</>);
       }
