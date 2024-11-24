@@ -16,6 +16,7 @@ import {
   interObserverAtom,
 } from './store';
 import styles from './laws.module.scss';
+import { findLawElement, clearMarkIndicators } from './utils';
 import Law from './Law';
 
 function MarkOffscreenIndicators({ direct }: {
@@ -42,6 +43,33 @@ export default function Acts({ acts }: {
   const addAlert = useSetAtom(addAlertAtom);
   const setInterObserver = useSetAtom(interObserverAtom);
   const [markOffscreen, setMarkOffscreen] = useState<null | 'up' | 'down'>(null);
+
+  const followHash = useCallback((e: HashChangeEvent) => {
+    const hash = decodeURI(new URL(e.newURL).hash);
+    const match = hash.match(/_([\d\-]+)$/);
+
+    if (match) {
+      const anchor = hash.slice(1);
+      const target = findLawElement(anchor);
+      if (target) {
+        target.classList.remove(styles['animate-flash']);
+        window.setTimeout(() => {
+          target.classList.add(styles['animate-flash'])
+          clearMarkIndicators();
+        });
+        target.scrollIntoView();
+      } else {
+        addAlert('error', <>無法跳到選定法條（可能已被隱藏）</>);
+      }
+    }
+  }, [addAlert]);
+
+  useEffect(() => {
+    window.addEventListener('hashchange', followHash);
+    return () => {
+      window.removeEventListener('hashchange', followHash);
+    };
+  }, [followHash]);
 
   useEffect(() => {
     const root = ref.current;
@@ -113,6 +141,7 @@ export default function Acts({ acts }: {
       className={rootClassName}
       {...onClickProps}
       {...viewCtrlData}
+      onMouseEnter={clearMarkIndicators}
     >
       <MarkOffscreenIndicators direct='up' />
       <ul>

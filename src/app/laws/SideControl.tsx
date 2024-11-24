@@ -18,6 +18,7 @@ import {
 } from './store';
 import type { Tags, Mark } from './store';
 import styles from './laws.module.scss';
+import { findLawElement, clearMarkIndicators } from './utils';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { AnimateOnce } from '@/components/AnimateOnce';
 import { addAlertAtom } from '@/components/store';
@@ -150,40 +151,12 @@ const MarkArticleCls = [
   'hover:ring hover:text-black',
 ].join(' ');
 
-const findItem = (anchor?: string) => {
-  if (!anchor) return;
-  const acts = document.querySelector('[data-role="acts"]');
-  const target = acts?.querySelector(`[data-role='law'][data-anchor='${anchor}']`);
-  return target;
-};
-
 function Mark({ anchor, title, index }:
   Mark & { index: number }
 ) {
   const addAlert = useSetAtom(addAlertAtom);
   const removeMark = useSetAtom(removeMarkAtom);
   const interObserver = useAtomValue(interObserverAtom);
-
-  const onJump = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
-    const el = e.currentTarget;
-    const { anchor } = el.dataset;
-    const target = findItem(anchor);
-    if (!target) {
-      addAlert('error', <>無法跳到選定法條（可能已被隱藏）</>);
-      e.preventDefault();
-      return;
-    }
-
-    target.classList.remove(styles['animate-flash']);
-    window.setTimeout(() =>
-      target.classList.add(styles['animate-flash'])
-    );
-
-    const acts = target.closest('[data-role="acts"]') as HTMLElement;
-    if (acts) {
-      delete acts.dataset.markOffscreen;
-    }
-  }, [addAlert]);
 
   const onRemove = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     const el = e.currentTarget;
@@ -199,7 +172,7 @@ function Mark({ anchor, title, index }:
   const onMouseEnter = useCallback((e: React.MouseEvent<HTMLLIElement>) => {
     const el = e.currentTarget;
     const { anchor } = el.dataset;
-    const item = findItem(anchor);
+    const item = findLawElement(anchor);
     const target = item?.querySelector('[data-role="article"]');
     if (target) {
       target.classList.add(styles['peeking-target']);
@@ -207,18 +180,11 @@ function Mark({ anchor, title, index }:
     }
   }, [interObserver]);
 
-  const onMouseLeave = useCallback((e: React.MouseEvent<HTMLLIElement>) => {
-    const cls = styles['peeking-target'];
-    const acts = document.querySelector('[data-role="acts"]') as HTMLElement;
-    document.querySelectorAll(`[data-role="article"].${cls}`).forEach(el => el.classList.remove(cls));
-    delete acts.dataset.markOffscreen;
-  }, []);
-
   const [act, article] = anchor.split('_', 2);
 
   return (
-    <li className='flex items-center py-1' data-anchor={anchor} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
-      <a className={MarkArticleCls} data-anchor={anchor} href={`#${anchor}`} onClick={onJump}>
+    <li className='flex items-center py-1' data-anchor={anchor} onMouseEnter={onMouseEnter} onMouseLeave={clearMarkIndicators}>
+      <a className={MarkArticleCls} data-anchor={anchor} href={`#${anchor}`}>
         {act} {article}
       </a>
       <Tooltip placement='right'>
