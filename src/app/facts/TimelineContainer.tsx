@@ -1,7 +1,7 @@
 "use client"
 
 import * as R from 'ramda';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useSetAtom, useAtomValue } from 'jotai';
 import { present, blank } from '@/lib/utils';
 import {
@@ -11,7 +11,10 @@ import {
   columnsAtom,
   zoomedFactAtom,
 } from './store';
+import { addAlertAtom } from '@/components/store';
 
+import { findFact } from './utils';
+import tlStyles from './timeline.module.scss';
 import Timeline from './Timeline';
 
 const columnClassMapping: Record<number, string> = {
@@ -32,6 +35,7 @@ export default function TimelineContainer({ facts }: {
   const colsClass = columnClassMapping[columns.length];
   const dateRangeKey = dateRange.join(',');
   const setZoomedFact = useSetAtom(zoomedFactAtom);
+  const addAlert = useSetAtom(addAlertAtom);
 
   const validFacts = useMemo(() => {
     if (dateRangeKey === ',' && blank(textFilter)) return facts;
@@ -57,6 +61,48 @@ export default function TimelineContainer({ facts }: {
       return true;
     }, facts);
   }, [facts, textFilter, dateRangeKey]);
+
+  const followHash = useCallback((e: HashChangeEvent) => {
+    const { hash } = new URL(e.newURL);
+
+    if (hash.startsWith('#zoom-')) {
+      const zoom = hash.match(/^#zoom-.+_(\d+)$/);
+      if (zoom) {
+        const factId = Number.parseInt(zoom.pop() || '', 10);
+        if (factId) {
+          const fact = facts.find(f => f.id === factId);
+          if (fact) {
+            setZoomedFact(fact);
+            const anchor = hash.replace('#zoom-', '#fact-').slice(1);
+            const target = findFact(anchor);
+            target && target.scrollIntoView({ behavior: 'instant' });
+          }
+        }
+      }
+    } else {
+      setZoomedFact(null);
+    }
+
+    if (hash.startsWith('#fact-')) {
+      const target = findFact(hash.slice(1));
+      if (target) {
+        target.classList.remove(tlStyles['animate-flash']);
+        window.setTimeout(() =>
+          target.classList.add(tlStyles['animate-flash'])
+        );
+        target && target.scrollIntoView();
+      } else {
+        addAlert('error', <>無法跳到選定日期（可能已被隱藏）</>);
+      }
+    }
+  }, [facts, setZoomedFact, addAlert]);
+
+  useEffect(() => {
+    window.addEventListener('hashchange', followHash);
+    return () => {
+      window.removeEventListener('hashchange', followHash);
+    };
+  }, [followHash]);
 
   useEffect(() => {
     const diff = facts.length - validFacts.length;

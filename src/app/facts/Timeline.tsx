@@ -15,7 +15,6 @@ import {
   markPickingAtom,
   addMarkAtom,
   timelineInterObserverAtom,
-  zoomedFactAtom,
 } from './store';
 import type { Tags } from './store';
 import FactTagList from './FactTagList';
@@ -43,11 +42,6 @@ function Fact({ fact, isSubView }: {
   const datePadEnd = date.length < 10 ? <span className=''>{'\u00A0'.repeat(10 - date.length)}</span> : '';
   const allTagsHiddenAtom = useMemo(() => createTagsHiddenAtom(tags || ['']), [tags]);
   const hidden = useAtomValue(allTagsHiddenAtom);
-  const setZoom = useSetAtom(zoomedFactAtom);
-
-  const onSetZoom = useCallback((e: React.MouseEvent<HTMLElement>) => {
-    setZoom(fact);
-  }, [setZoom, fact]);
 
   if (hidden) {
     return null;
@@ -67,7 +61,7 @@ function Fact({ fact, isSubView }: {
         <div data-role='title' className='leading-tight text-balance text-center sm:text-start'>
           {title}
         </div>
-        <a href={`#${anchor.replace('fact-', 'zoom-')}`} className={`ml-auto ${factHeaderIconCls}`} onClick={onSetZoom}>
+        <a href={`#${anchor.replace('fact-', 'zoom-')}`} className={`ml-auto ${factHeaderIconCls}`}>
           <ArrowsPointingOutIcon className='stroke-slate-700 stroke-2' height={16} />
         </a>
         <a className={`mr-1 hover:-rotate-12 ${factHeaderIconCls}`} href={`#${anchor}`}>

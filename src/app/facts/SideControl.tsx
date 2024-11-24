@@ -26,12 +26,12 @@ import {
 import type { Tags, FactMark, DateRange } from './store';
 import type { AnyFunction } from '@/lib/utils';
 import useClientOnly from '@/lib/useClientOnly';
+import { findFact } from './utils';
 import tlStyles from './timeline.module.scss';
 import { getTagColor } from './colors';
 import { TextInput } from '@/components/form/Inputs';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { AnimateOnce } from '@/components/AnimateOnce';
-import { addAlertAtom } from '@/components/store';
 import { EyeIcon } from '@heroicons/react/24/outline';
 import { EyeSlashIcon } from '@heroicons/react/24/outline';
 import { CursorArrowRippleIcon } from '@heroicons/react/24/solid';
@@ -355,40 +355,11 @@ const markDateCls = [
   'hover:ring hover:text-black',
 ].join(' ');
 
-const findFact = (anchor?: string) => {
-  if (!anchor) return;
-  const timeline = document.querySelector('[data-role="timeline"]');
-  const target = timeline?.querySelector(`[data-role='fact'][data-anchor='${anchor}']`);
-  return target;
-};
-
 function Mark({ anchor, title, index, onMouseLeave }:
   FactMark & { index: number, onMouseLeave: AnyFunction }
 ) {
-  const addAlert = useSetAtom(addAlertAtom);
   const removeMark = useSetAtom(removeMarkAtom);
   const interObserver = useAtomValue(timelineInterObserverAtom);
-
-  const onJump = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
-    const el = e.currentTarget;
-    const { anchor } = el.dataset;
-    const target = findFact(anchor);
-    if (!target) {
-      addAlert('error', <>無法跳到選定日期（可能已被隱藏）</>);
-      e.preventDefault();
-      return;
-    }
-
-    target.classList.remove(tlStyles['animate-flash']);
-    window.setTimeout(() =>
-      target.classList.add(tlStyles['animate-flash'])
-    );
-
-    const tl = target.closest('[data-role="timeline"]') as HTMLElement;
-    if (tl) {
-      delete tl.dataset.markOffscreen;
-    }
-  }, [addAlert]);
 
   const onRemove = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     const el = e.currentTarget;
@@ -417,7 +388,7 @@ function Mark({ anchor, title, index, onMouseLeave }:
 
   return (
     <li className='flex items-center py-1' data-anchor={anchor} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
-      <a className={markDateCls} data-anchor={anchor} href={`#${anchor}`} onClick={onJump}>
+      <a className={markDateCls} data-anchor={anchor} href={`#${anchor}`}>
         {date}{datePadEnd}
       </a>
       <Tooltip placement='right'>
