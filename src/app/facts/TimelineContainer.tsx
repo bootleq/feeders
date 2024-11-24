@@ -62,9 +62,7 @@ export default function TimelineContainer({ facts }: {
     }, facts);
   }, [facts, textFilter, dateRangeKey]);
 
-  const followHash = useCallback((e: HashChangeEvent) => {
-    const { hash } = new URL(e.newURL);
-
+  const setZoomByHash = useCallback((hash: string) => {
     if (hash.startsWith('#zoom-')) {
       const zoom = hash.match(/^#zoom-.+_(\d+)$/);
       if (zoom) {
@@ -73,8 +71,8 @@ export default function TimelineContainer({ facts }: {
           const fact = facts.find(f => f.id === factId);
           if (fact) {
             setZoomedFact(fact);
-            const anchor = hash.replace('#zoom-', '#fact-').slice(1);
-            const target = findFact(anchor);
+            const anchor = hash.replace('#zoom-', '#fact-');
+            const target = document.querySelector(anchor);
             target && target.scrollIntoView({ behavior: 'instant' });
           }
         }
@@ -82,6 +80,12 @@ export default function TimelineContainer({ facts }: {
     } else {
       setZoomedFact(null);
     }
+  }, [facts, setZoomedFact]);
+
+  const followHash = useCallback((e: HashChangeEvent) => {
+    const { hash } = new URL(e.newURL);
+
+    setZoomByHash(hash);
 
     if (hash.startsWith('#fact-')) {
       const target = findFact(hash.slice(1));
@@ -95,7 +99,7 @@ export default function TimelineContainer({ facts }: {
         addAlert('error', <>無法跳到選定日期（可能已被隱藏）</>);
       }
     }
-  }, [facts, setZoomedFact, addAlert]);
+  }, [addAlert, setZoomByHash]);
 
   useEffect(() => {
     window.addEventListener('hashchange', followHash);
@@ -111,20 +115,10 @@ export default function TimelineContainer({ facts }: {
 
   useEffect(() => {
     const hash = window.location.hash;
-    const zoom = hash.match(/^#zoom-.+_(\d+)$/);
-    if (zoom) {
-      const factId = Number.parseInt(zoom.pop() || '');
-      if (factId) {
-        const fact = facts.find(f => f.id === factId);
-        if (fact) {
-          setZoomedFact(fact);
-          const anchor = hash.replace('#zoom-', '#fact-');
-          const target = document.querySelector(anchor);
-          target && target.scrollIntoView({ behavior: 'instant' });
-        }
-      }
+    if (hash.startsWith('#zoom-')) {
+      setZoomByHash(hash);
     }
-  }, [facts, setZoomedFact]);
+  }, [setZoomByHash]);
 
   return (
     <div className={`w-full mx-auto px-0 grid gap-2 ${colsClass}`}>
