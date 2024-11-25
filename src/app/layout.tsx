@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { Provider } from 'jotai';
 import { SessionProvider } from 'next-auth/react';
 import ProgressBar from './ProgressBar';
+import FollowHashRoute from './FollowHashRoute';
 import "./globals.css";
 import { SITE_NAME, APP_URL } from '@/lib/utils';
 
@@ -31,6 +32,7 @@ export default async function RootLayout({
             {children}
           </SessionProvider>
         </Provider>
+        <FollowHashRoute />
       </body>
     </html>
   );
