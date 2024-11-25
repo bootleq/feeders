@@ -5,11 +5,13 @@ import { SessionProvider } from 'next-auth/react';
 import ProgressBar from './ProgressBar';
 import FollowHashRoute from './FollowHashRoute';
 import "./globals.css";
-import { SITE_NAME, APP_URL } from '@/lib/utils';
+import { SITE_NAME, APP_URL, present } from '@/lib/utils';
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
+const googleVerificationCode = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFY;
+
+const metadata: Metadata = {
   title: {
     template: `%s - ${SITE_NAME}`,
     default: SITE_NAME,
@@ -17,6 +19,14 @@ export const metadata: Metadata = {
   description: '遊蕩犬餵食問題與對策',
   metadataBase: new URL(APP_URL),
 };
+
+if (present(googleVerificationCode)) {
+  metadata.verification = {
+    google: googleVerificationCode,
+  }
+}
+
+export { metadata };
 
 export default async function RootLayout({
   children,
