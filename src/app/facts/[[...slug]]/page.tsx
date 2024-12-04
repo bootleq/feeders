@@ -1,12 +1,12 @@
 import * as R from 'ramda';
 import type { Metadata } from "next";
-import { getFacts } from './getFacts';
+import { getFacts } from '@/app/facts/getFacts';
 import Sidebar from '@/components/Sidebar';
 import Alerts from '@/components/Alerts';
 import { alertsAtom, dismissAlertAtom } from '@/components/store';
-import TimelineContainer from './TimelineContainer';
-import ZoomArticle from './ZoomArticle';
-import SideControl from './SideControl';
+import TimelineContainer from '@/app/facts/TimelineContainer';
+import ZoomArticle from '@/app/facts/ZoomArticle';
+import SideControl from '@/app/facts/SideControl';
 
 export const runtime = 'edge';
 
