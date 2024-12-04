@@ -1,5 +1,13 @@
 import tlStyles from './timeline.module.scss';
 
+export const BASE_META = {
+  title: '事實記錄',
+  description: '台灣地區與遊蕩犬、流浪狗相關的歷史事件表列',
+  alternates: {
+    canonical: `/facts`
+  },
+};
+
 export const findFactElement = (anchor?: string) => {
   if (!anchor) return;
   const timeline = document.querySelector('[data-role="timeline"]');
