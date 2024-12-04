@@ -1,7 +1,7 @@
 "use client"
 
 import * as R from 'ramda';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { useSetAtom, useAtomValue } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
@@ -37,6 +37,7 @@ export default function TimelineContainer({ facts, slug }: {
     [slugAtom, slug],
   ]);
   const setSlug = useSetAtom(slugAtom);
+  const [firstRender, setFirstRender] = useState(false);
   const textFilter = useAtomValue(textFilterAtom);
   const dateRange = useAtomValue(dateRangeAtom);
   const setRejectCount = useSetAtom(filterRejectedCountAtom);
@@ -99,6 +100,11 @@ export default function TimelineContainer({ facts, slug }: {
   }, [facts, setZoomedFact]);
 
   const setZoomBySlug = useCallback((newSlug?: string) => {
+    if (!firstRender) {
+      setFirstRender(true);
+      return;
+    }
+
     const zoom = newSlug?.match(SLUG_PATTERN);
     if (zoom) {
       const factId = Number.parseInt(zoom.pop() || '', 10);
@@ -109,13 +115,18 @@ export default function TimelineContainer({ facts, slug }: {
           const target = findFactElement(`fact-${newSlug}`);
           target && target.scrollIntoView({ behavior: 'instant' });
         } else {
+          setZoomedFact(null);
           addAlert('error', <>無法跳到指定項目（<code>{JSON.stringify(newSlug)}</code> 可能已改名，或被移除）</>);
         }
       }
     } else {
+      if (present(newSlug)) {
+        setZoomedFact(null);
+        addAlert('error', <>網址不正確（<code>{JSON.stringify(newSlug)}</code> 無法辨識）</>);
+      }
       setZoomedFact(null);
     }
-  }, [facts, setZoomedFact, addAlert]);
+  }, [facts, setZoomedFact, addAlert, firstRender]);
 
   const followHash = useCallback((e: HashChangeEvent) => {
     const hash = decodeURI(new URL(e.newURL).hash);
