@@ -79,26 +79,6 @@ export default function TimelineContainer({ facts, slug }: {
     }, 500);
   }, []);
 
-  const setZoomByHash = useCallback((hash: string) => {
-    if (hash.startsWith('#zoom-')) {
-      const zoom = hash.match(/^#zoom-.+_(\d+)$/);
-      if (zoom) {
-        const factId = Number.parseInt(zoom.pop() || '', 10);
-        if (factId) {
-          const fact = facts.find(f => f.id === factId);
-          if (fact) {
-            setZoomedFact(fact);
-            const anchor = hash.replace('#zoom-', '#fact-').slice(1);
-            const target = findFactElement(anchor);
-            target && target.scrollIntoView({ behavior: 'instant' });
-          }
-        }
-      }
-    } else {
-      setZoomedFact(null);
-    }
-  }, [facts, setZoomedFact]);
-
   const setZoomBySlug = useCallback((newSlug?: string) => {
     if (!firstRender) {
       setFirstRender(true);
@@ -131,8 +111,6 @@ export default function TimelineContainer({ facts, slug }: {
   const followHash = useCallback((e: HashChangeEvent) => {
     const hash = decodeURI(new URL(e.newURL).hash);
 
-    // setZoomByHash(hash);
-
     if (hash.startsWith('#fact-')) {
       const target = findFactElement(hash.slice(1));
       if (target) {
@@ -159,13 +137,6 @@ export default function TimelineContainer({ facts, slug }: {
     const diff = facts.length - validFacts.length;
     setRejectCount(diff);
   }, [facts, validFacts, textFilter, setRejectCount]);
-
-  // useEffect(() => {
-  //   const hash = window.location.hash;
-  //   if (hash.startsWith('#zoom-')) {
-  //     setZoomByHash(hash);
-  //   }
-  // }, [setZoomByHash]);
 
   useEffect(() => {
     const newSlug = pathname.split('/')[2] || '';
