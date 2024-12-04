@@ -16,9 +16,12 @@ export const metadata: Metadata = {
 };
 
 export default async function Page({ params }: {
-  params: { path: string[] }
+  params: {
+    slug: string[],
+  }
 }) {
   const { facts, tags } = await getFacts();
+  const slug = params.slug?.[0] || '';
 
   return (
     <main className="flex min-h-screen flex-row items-start justify-between">
@@ -26,7 +29,7 @@ export default async function Page({ params }: {
         <SideControl tags={tags} />
       </Sidebar>
 
-      <TimelineContainer facts={facts} />
+      <TimelineContainer facts={facts} slug={slug} />
 
       <ZoomArticle />
       <Alerts itemsAtom={alertsAtom} dismissAtom={dismissAlertAtom} />

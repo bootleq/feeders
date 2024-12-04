@@ -4,11 +4,13 @@ import * as R from 'ramda';
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomFamily, splitAtom } from 'jotai/utils';
-import { present } from '@/lib/utils';
+import { AnyFunction, present } from '@/lib/utils';
 import { addAlertAtom } from '@/components/store';
 import Html from '@/components/Html';
 import {
+  slugAtom,
   VIEW_CTRL_KEYS,
+  SLUG_PATTERN,
   viewCtrlAtom,
   tagsAtom,
   marksAtom,
@@ -33,12 +35,14 @@ const createTagsHiddenAtom = (tagNames: string[]) => {
 
 const factHeaderIconCls = 'text-opacity-0 px-1 rounded-full opacity-0 group-hover/header:opacity-100 hover:bg-amber-300/50 hover:scale-125';
 
-function Fact({ fact, isSubView }: {
+function Fact({ fact, isSubView, onZoom }: {
   fact: any,
   isSubView?: boolean,
+  onZoom: AnyFunction,
 }) {
   const { id, date, title, desc, summary, origin, tags, weight } = fact;
   const anchor = `fact-${fact.date}_${fact.id}`;
+  const zoomPath = `/facts/${anchor.replace('fact-', '')}`;
   const datePadEnd = date.length < 10 ? <span className=''>{'\u00A0'.repeat(10 - date.length)}</span> : '';
   const allTagsHiddenAtom = useMemo(() => createTagsHiddenAtom(tags || ['']), [tags]);
   const hidden = useAtomValue(allTagsHiddenAtom);
@@ -61,7 +65,7 @@ function Fact({ fact, isSubView }: {
         <div data-role='title' className='leading-tight text-balance text-center sm:text-start'>
           {title}
         </div>
-        <a href={`#${anchor.replace('fact-', 'zoom-')}`} className={`ml-auto ${factHeaderIconCls}`}>
+        <a href={zoomPath} className={`ml-auto ${factHeaderIconCls}`} data-disable-nprogress={true} onClick={onZoom}>
           <ArrowsPointingOutIcon className='stroke-slate-700 stroke-2' height={16} />
         </a>
         <a className={`mr-1 hover:-rotate-12 ${factHeaderIconCls}`} href={`#${anchor}`}>
@@ -111,6 +115,7 @@ export default function Timeline({ facts, isSubView = false }: {
   isSubView?: boolean,
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const setSlug = useSetAtom(slugAtom);
   const viewCtrl = useAtomValue(viewCtrlAtom);
   const [markPicking, setMarkPicking] = useAtom(markPickingAtom);
   const marks = useAtomValue(marksAtom);
@@ -118,6 +123,23 @@ export default function Timeline({ facts, isSubView = false }: {
   const addAlert = useSetAtom(addAlertAtom);
   const setInterObserver = useSetAtom(timelineInterObserverAtom);
   const [markOffscreen, setMarkOffscreen] = useState<null | 'up' | 'down'>(null);
+
+  const onZoom = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const currentUrl = new URL(document.location.href);
+    const newUrl = new URL(e.currentTarget.href);
+    if (newUrl.pathname === currentUrl.pathname) return;
+
+    const slug = newUrl.pathname.split('/')[2];
+    const decodedSlug = decodeURI(slug);
+
+    if (slug && decodedSlug.match(SLUG_PATTERN)) {
+      setSlug(decodedSlug);
+      window.history.pushState(null, '', `/facts/${slug}`);
+    } else {
+      addAlert('error', <>網址不正確（<code>{JSON.stringify(decodedSlug)}</code>）</>);
+    }
+  }, [setSlug, addAlert]);
 
   useEffect(() => {
     if (isSubView) return;
@@ -170,8 +192,8 @@ export default function Timeline({ facts, isSubView = false }: {
   }, [marks, addMark, setMarkPicking, addAlert]);
 
   const Facts = useMemo(() => {
-    return facts.map(fact => <Fact key={fact.id} fact={fact} isSubView={isSubView} />);
-  }, [facts, isSubView]);
+    return facts.map(fact => <Fact key={fact.id} fact={fact} isSubView={isSubView} onZoom={onZoom} />);
+  }, [facts, isSubView, onZoom]);
 
   const viewCtrlData = VIEW_CTRL_KEYS.reduce((acc: Record<string, string>, key: string) => {
     if (!R.includes(key, viewCtrl)) {

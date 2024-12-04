@@ -2,9 +2,13 @@
 
 import * as R from 'ramda';
 import { useCallback, useEffect, useMemo } from 'react';
+import { usePathname } from 'next/navigation';
 import { useSetAtom, useAtomValue } from 'jotai';
+import { useHydrateAtoms } from 'jotai/utils';
 import { present, blank } from '@/lib/utils';
 import {
+  slugAtom,
+  SLUG_PATTERN,
   textFilterAtom,
   dateRangeAtom,
   filterRejectedCountAtom,
@@ -25,15 +29,21 @@ const columnClassMapping: Record<number, string> = {
   5: 'md:grid-cols-5',
 };
 
-export default function TimelineContainer({ facts }: {
+export default function TimelineContainer({ facts, slug }: {
   facts: any[],
+  slug: string,
 }) {
+  useHydrateAtoms([
+    [slugAtom, slug],
+  ]);
+  const setSlug = useSetAtom(slugAtom);
   const textFilter = useAtomValue(textFilterAtom);
   const dateRange = useAtomValue(dateRangeAtom);
   const setRejectCount = useSetAtom(filterRejectedCountAtom);
   const columns = useAtomValue(columnsAtom);
   const colsClass = columnClassMapping[columns.length];
   const dateRangeKey = dateRange.join(',');
+  const pathname = usePathname();
   const setZoomedFact = useSetAtom(zoomedFactAtom);
   const addAlert = useSetAtom(addAlertAtom);
 
@@ -88,10 +98,29 @@ export default function TimelineContainer({ facts }: {
     }
   }, [facts, setZoomedFact]);
 
+  const setZoomBySlug = useCallback((newSlug?: string) => {
+    const zoom = newSlug?.match(SLUG_PATTERN);
+    if (zoom) {
+      const factId = Number.parseInt(zoom.pop() || '', 10);
+      if (factId) {
+        const fact = facts.find(f => f.id === factId);
+        if (fact) {
+          setZoomedFact(fact);
+          const target = findFactElement(`fact-${newSlug}`);
+          target && target.scrollIntoView({ behavior: 'instant' });
+        } else {
+          addAlert('error', <>無法跳到指定項目（<code>{JSON.stringify(newSlug)}</code> 可能已改名，或被移除）</>);
+        }
+      }
+    } else {
+      setZoomedFact(null);
+    }
+  }, [facts, setZoomedFact, addAlert]);
+
   const followHash = useCallback((e: HashChangeEvent) => {
     const hash = decodeURI(new URL(e.newURL).hash);
 
-    setZoomByHash(hash);
+    // setZoomByHash(hash);
 
     if (hash.startsWith('#fact-')) {
       const target = findFactElement(hash.slice(1));
@@ -106,7 +135,7 @@ export default function TimelineContainer({ facts }: {
         addAlert('error', <>無法跳到選定日期（可能已被隱藏）</>);
       }
     }
-  }, [addAlert, setZoomByHash]);
+  }, [addAlert]);
 
   useEffect(() => {
     window.addEventListener('hashchange', followHash);
@@ -120,12 +149,19 @@ export default function TimelineContainer({ facts }: {
     setRejectCount(diff);
   }, [facts, validFacts, textFilter, setRejectCount]);
 
+  // useEffect(() => {
+  //   const hash = window.location.hash;
+  //   if (hash.startsWith('#zoom-')) {
+  //     setZoomByHash(hash);
+  //   }
+  // }, [setZoomByHash]);
+
   useEffect(() => {
-    const hash = window.location.hash;
-    if (hash.startsWith('#zoom-')) {
-      setZoomByHash(hash);
-    }
-  }, [setZoomByHash]);
+    const newSlug = pathname.split('/')[2] || '';
+    const decodedSlug = decodeURI(newSlug);
+    setSlug(decodedSlug);
+    setZoomBySlug(decodedSlug);
+  }, [pathname, slug, setSlug, setZoomBySlug]);
 
   return (
     <div className={`w-full mx-auto px-0 grid gap-2 ${colsClass}`} onMouseEnter={onMouseEnter}>
