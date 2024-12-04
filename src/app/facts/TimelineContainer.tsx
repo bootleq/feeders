@@ -5,7 +5,7 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { useSetAtom, useAtomValue } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
-import { present, blank } from '@/lib/utils';
+import { present, blank, scrollAnywhereFix } from '@/lib/utils';
 import {
   slugAtom,
   SLUG_PATTERN,
@@ -119,6 +119,7 @@ export default function TimelineContainer({ facts, slug }: {
           target.classList.add(tlStyles['animate-flash']);
           clearMarkIndicators();
         });
+        scrollAnywhereFix();
         target.scrollIntoView();
       } else {
         addAlert('error', <>無法跳到選定日期（可能已被隱藏）</>);

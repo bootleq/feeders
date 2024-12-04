@@ -109,3 +109,12 @@ export const ariaDatePickerValueFix = (formData: FormData, fieldNames: string[])
     }
   });
 };
+
+// Special fix for browser addon ScrollAnywhere
+export const scrollAnywhereFix = () => {
+  document.querySelectorAll<HTMLDivElement>('div[data-role][style^="scroll-behavior"]').forEach(el => {
+    if (el.style.scrollBehavior === 'auto') {
+      el.style.scrollBehavior = '';
+    }
+  });
+};

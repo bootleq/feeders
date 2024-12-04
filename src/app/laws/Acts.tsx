@@ -4,7 +4,7 @@ import * as R from 'ramda';
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import Link from 'next/link';
-import { present } from '@/lib/utils';
+import { present, scrollAnywhereFix } from '@/lib/utils';
 import { addAlertAtom } from '@/components/store';
 import type { Tags, LawItem } from './store';
 import {
@@ -57,6 +57,7 @@ export default function Acts({ acts }: {
           target.classList.add(styles['animate-flash'])
           clearMarkIndicators();
         });
+        scrollAnywhereFix();
         target.scrollIntoView();
       } else {
         addAlert('error', <>無法跳到選定法條（可能已被隱藏）</>);
