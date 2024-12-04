@@ -1,10 +1,11 @@
 "use client"
 
 import * as R from 'ramda';
-import { useEffect, useRef } from 'react';
-import { useAtom } from 'jotai';
-import { present } from '@/lib/utils';
-import { zoomedFactAtom } from './store';
+import { useEffect, useRef, useState } from 'react';
+import { useAtom, useSetAtom } from 'jotai';
+import { present, SITE_NAME } from '@/lib/utils';
+import { zoomedFactAtom, slugAtom, SLUG_PATTERN } from './store';
+import { BASE_META } from '@/app/facts/utils';
 import tlStyles from './timeline.module.scss';
 import FactTagList from './FactTagList';
 import Html from '@/components/Html';
@@ -22,15 +23,23 @@ export default function ZoomArticle() {
   const ref = useRef<HTMLDialogElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const [fact, setFact] = useAtom(zoomedFactAtom);
+  const setSlug = useSetAtom(slugAtom);
+  const [hasClosed, setHasClosed] = useState(false);
 
   const onClose = () => {
-    setFact(null);
+    setSlug('');
+    window.history.pushState(null, '', '/facts');
+
+    if (!hasClosed) {
+      window.document.title = `${BASE_META.title} - ${SITE_NAME}`;
+      setHasClosed(true);
+    }
   };
 
   const onClick = (e: React.MouseEvent<HTMLElement>) => {
     const el = e.target;
     if (el === ref.current) { // click outside the dialog
-      setFact(null);
+      onClose();
     }
   };
 

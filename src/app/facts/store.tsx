@@ -3,6 +3,9 @@ import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
 import { removeFirst } from '@/lib/utils';
 
 export const VIEW_CTRL_KEYS= ['desc', 'summary', 'origin', 'tags'];
+export const SLUG_PATTERN = /^[\d\- ~BC]+_(\d+)$/;
+
+export const slugAtom = atom('');
 
 export const viewCtrlAtom = atom(VIEW_CTRL_KEYS);
 export const toggleViewCtrlAtom = atom(
