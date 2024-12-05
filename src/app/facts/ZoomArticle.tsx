@@ -25,6 +25,7 @@ export default function ZoomArticle() {
   const [fact, setFact] = useAtom(zoomedFactAtom);
   const setSlug = useSetAtom(slugAtom);
   const [hasClosed, setHasClosed] = useState(false);
+  const [titleCollapsed, setTitleCollapsed] = useState(false);
 
   const onClose = () => {
     setSlug('');
@@ -34,6 +35,10 @@ export default function ZoomArticle() {
       window.document.title = `${BASE_META.title} - ${SITE_NAME}`;
       setHasClosed(true);
     }
+  };
+
+  const onResizeTitle = () => {
+    setTitleCollapsed(R.not);
   };
 
   const onClick = (e: React.MouseEvent<HTMLElement>) => {
@@ -63,15 +68,20 @@ export default function ZoomArticle() {
   return (
     <dialog ref={ref} className={dialogCls} onClose={onClose} onClick={onClick}>
       <div className='sticky top-0 flex items-center flex-wrap p-3 px-2 sm:px-5 gap-y-2 bg-gradient-to-br from-stone-50/80 to-slate-100/80'>
-        <div className='leading-tight text-balance text-center text-lg sm:text-start '>
+        <div className={`leading-tight text-center text-lg sm:text-start sm:text-balance ${titleCollapsed ? 'truncate sm:whitespace-normal' : 'text-balance'}`}>
           {title}
         </div>
 
-        <div className='font-mono text-sm mx-1 ml-auto px-1 whitespace-nowrap rounded-md ring-1 text-red-950 bg-gradient-to-br from-amber-200 to-amber-200/80'>
-          {date}
+        <div className='text-sm ml-auto flex items-center'>
+          <button className='sm:hidden flex items-center btn px-1 py-0 mx-1 text-slate-400 text-xs focus:ring-0 focus-visible:ring' onClick={onResizeTitle}>
+            <span className='text-base mr-1'>{titleCollapsed ? ' ⇳' : '↸'}</span> title
+          </button>
+          <div className='font-mono mx-1 px-1 whitespace-nowrap rounded-md ring-1 text-red-950 bg-gradient-to-br from-amber-200 to-amber-200/80'>
+            {date}
+          </div>
         </div>
 
-        <FactTagList tags={tags} className='mx-2' />
+        <FactTagList tags={tags} className={`mx-2 ${titleCollapsed ? 'hidden sm:flex' : ''}`} />
 
         <button className='btn p-px ml-auto hover:bg-white rounded-full hover:scale-125 hover:drop-shadow' aria-label='刪除' onClick={onClose}>
           <XMarkIcon className='stroke-slate-700 stroke-2' height={24} />
