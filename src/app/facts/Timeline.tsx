@@ -69,7 +69,7 @@ function Fact({ fact, isSubView, onZoom }: {
           <ArrowsPointingOutIcon className='stroke-slate-700 stroke-2' height={16} />
         </a>
         <a className={`mr-1 hover:-rotate-12 ${factHeaderIconCls}`} href={`#${anchor}`}>
-          <img src='/assets/paper-clip.svg' alt='連結' width={16} height={16} />
+          <img src='/assets/paper-clip.svg' alt='連結' width={16} height={16} className='max-w-none' />
         </a>
         <FactTagList tags={tags} />
       </div>
