@@ -34,7 +34,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-TW">
+    <html lang="zh-TW" className='overscroll-none'>
       <body className={inter.className}>
         <ProgressBar />
         <Provider>

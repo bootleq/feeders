@@ -12,7 +12,7 @@ import Html from '@/components/Html';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 const dialogCls = [
-  'flex flex-col',
+  'flex flex-col overscroll-y-contain',
   'min-w-[40vw] min-h-[20vh] rounded drop-shadow-md',
   'max-w-full lg:max-w-screen-lg xl:max-w-screen-xl',
   'bg-gradient-to-br from-stone-50 to-slate-200',
