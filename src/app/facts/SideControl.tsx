@@ -108,6 +108,15 @@ function ViewCtrlPanel() {
     }
   };
 
+  const onToggleDetails = useCallback((e: React.MouseEvent) => {
+    const details = e.currentTarget.parentElement as HTMLDetailsElement;
+    const open = R.not(details.open);
+
+    document.querySelectorAll('[data-role="desc"] details').forEach(el => {
+      (el as HTMLDetailsElement).open = open;
+    });
+  }, []);
+
   const colFilledCls = 'bg-[repeating-linear-gradient(-45deg,rgba(0,0,0,.2),rgba(0,0,0,.2)_2px,transparent_3px,transparent_6px)]';
 
   return (
@@ -173,6 +182,12 @@ function ViewCtrlPanel() {
             }
           </div>
         </div>
+
+        <details className='group text-amber-900'>
+          <summary className='cursor-pointer opacity-40 group-hover:opacity-100' onClick={onToggleDetails}>
+            細節元素
+          </summary>
+        </details>
       </div>
     </div>
   );
