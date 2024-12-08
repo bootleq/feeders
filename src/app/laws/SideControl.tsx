@@ -57,6 +57,16 @@ function ViewCtrlPanel() {
   const [panelOpen, setPanelOpen] = useState(true);
   const [viewCtrl, setViewCtrl] = useAtom(toggleViewCtrlAtom);
   const toggle = () => setPanelOpen(R.not);
+  const [openJudgements, setOpenJudgements] = useState(false);
+
+  const onToggleJudgements = useCallback((open: boolean) => {
+    document.querySelectorAll('[data-role="body"] details').forEach(el => {
+      (el as HTMLDetailsElement).open = open;
+    });
+    setOpenJudgements(open);
+  }, []);
+
+  const onToggleAll = (toggle: boolean) => () => onToggleJudgements(toggle);
 
   return (
     <div className='pb-3'>
@@ -69,6 +79,21 @@ function ViewCtrlPanel() {
           <ViewToggle section='penalty' current={viewCtrl} setter={setViewCtrl}>
             <span className="px-2 ms-3 text-sm text-zinc-700 text-nowrap">罰則</span>
           </ViewToggle>
+
+          <div className="inline-flex items-center justify-start text-sm mt-1">
+            <div className='flex items-center text-nowrap text-red-900/80'>
+              <img src='/assets/gavel.svg' alt='法槌' width={20} height={20} className='-scale-x-100' />
+              判例
+            </div>
+            <div className='inline-flex items-center gap-x-2 ml-2'>
+              <button type='button' className='btn bg-slate-100 py-px ring-1 text-slate-600 text-xs hover:bg-white' onClick={onToggleAll(true)}>
+                全展開
+              </button>
+              <button type='button' className='btn bg-slate-100 py-px ring-1 text-slate-600 text-xs hover:bg-white' onClick={onToggleAll(false)}>
+                全收合
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
