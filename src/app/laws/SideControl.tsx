@@ -85,12 +85,16 @@ function ViewCtrlPanel() {
               <img src='/assets/gavel.svg' alt='法槌' width={20} height={20} className='-scale-x-100' />
               判例
             </div>
-            <div className='inline-flex items-center gap-x-2 ml-2'>
-              <button type='button' className='btn bg-slate-100 py-px ring-1 text-slate-600 text-xs hover:bg-white' onClick={onToggleAll(true)}>
-                全展開
+            <div className='inline-flex items-center gap-x-px ml-2 text-xs text-slate-600'>
+              <span className='mr-1'>
+                全部
+              </span>
+              <button type='button' className='btn bg-slate-100 mx-0 px-px py-px ring-1 text-slate-600 text-xs hover:bg-white' onClick={onToggleAll(true)}>
+                展開
               </button>
-              <button type='button' className='btn bg-slate-100 py-px ring-1 text-slate-600 text-xs hover:bg-white' onClick={onToggleAll(false)}>
-                全收合
+              ／
+              <button type='button' className='btn bg-slate-100 mx-0 px-px py-px ring-1 text-slate-600 text-xs hover:bg-white' onClick={onToggleAll(false)}>
+                收合
               </button>
             </div>
           </div>
