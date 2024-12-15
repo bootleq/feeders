@@ -1,5 +1,10 @@
 # Feeders
 
+Source code of [feeders.pages.dev][].
+
+A website dedicated to ending the suffering of free-roaming / stray dogs.
+
+
 ## Getting Started
 
 Prepare env file by copy `.env.sample` to `.env.development`.
@@ -114,3 +119,7 @@ See [directus/README.md](directus/README.md) for more details.
 
     pnpm tsx scripts/admin_drop_spot.mjs {ID} dropped --remote
     pnpm tsx scripts/admin_drop_followup.mjs {ID} dropped --remote
+
+
+
+[feeders.pages.dev]: https://feeders.pages.dev
