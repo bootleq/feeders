@@ -1,6 +1,15 @@
 # Directus CMS
 
+CMS app is run in docker container, and can be accessed with:
+
 http://localhost:8044/admin
+
+NOTE some infrastructures are not published to public (currently), for example:
+
+- Collection schema
+- Extensions
+
+so you can't setup a local CMS directly. Will make it possible later.
 
 
 ## Asset management
