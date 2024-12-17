@@ -110,6 +110,11 @@ See [directus/README.md](directus/README.md) for more details.
     ANALYZE=true pnpm build
 
 
+## Test
+
+Still lacking.
+
+
 ## Admin Tasks
 
 - Inactive user
