@@ -9,22 +9,26 @@ NOTE some infrastructures are not published to public (currently), for example:
 - Collection schema
 - Extensions
 
-so you can't setup a local CMS directly. Will make it possible later.
+so you can't setup a local CMS directly.
+
+Will make it possible later.
 
 
 ## Asset management
 
-- Make a `public` folder for user upload instead of default to file library root.
-- Turn off storage asset transform, let's use other online service instead.
-- Expect storage is defined with Cloudflare R2 backend, see config in [docker-compose.yml](). Note the secret text files must not contain EOL character.
+- Make a `public` folder for user upload, instead of default uploading to file library root.
+- Turn off storage asset transform, let's use other online service instead (e.g., Cloudinary).
+- Expect storage is defined with Cloudflare R2 backend, see config in [docker-compose.yml](docker-compose.yml).
+  Note the secret text files must not contain EOL character.
+
 
 ## HTML sanitize extension
 
-- https://github.com/licitdev/directus-extension-sanitize-html
+We use a private modified version of [licitdev/directus-extension-sanitize-html](https://github.com/licitdev/directus-extension-sanitize-html).
 
-  Note the extension is not flexible configurable so I use a dirty customized
-  version instead. Need to build and install locally for every change. And it
-  is not published so far.
+Because the extension is not flexible configurable so I use a dirty customized one.
+Need to build and install locally for every change.
+
 
 ## General WYSIWYG field settings:
 

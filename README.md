@@ -53,38 +53,39 @@ When everything is ready, run the drizzle migrations on remote D1.
 
 - List tables, can also be used to establish local db first time
 
-    pnpm db:tables
+      pnpm db:tables
 
 - Migrations with drizzle-kit (locally)
 
-    pnpm db:migrate:gen
-    pnpm db:migrate:drop
-    pnpm db:migrate
+      pnpm db:migrate:gen
+      pnpm db:migrate:drop
+      pnpm db:migrate
 
 - Remove local db + drizzle meta, then reset with migrations (DANGER)
 
-    pnpm db:delete
-    pnpm db:delete && pnpm db:tables && pnpm db:migrate:gen && pnpm db:migrate
+      pnpm db:delete
+      pnpm db:delete && pnpm db:tables && pnpm db:migrate:gen && pnpm db:migrate
 
 - Directly execute commands on local D1
 
-    pnpm wrangler d1 execute feeders --command 'PRAGMA table_list'
-    pnpm wrangler d1 execute feeders --command 'INSERT INTO users (id, email) VALUES ("foo001", "foo@bar.com")'
-    PRAGMA table_xinfo(TABLE_NAME)
-    PRAGMA defer_foreign_keys = (on|off)
-    SELECT name, sql FROM sqlite_master
+      pnpm wrangler d1 execute feeders --command 'PRAGMA table_list'
+      pnpm wrangler d1 execute feeders --command 'INSERT INTO users (id, email) VALUES ("foo001", "foo@bar.com")'
+      PRAGMA table_xinfo(TABLE_NAME)
+      PRAGMA defer_foreign_keys = (on|off)
+      SELECT name, sql FROM sqlite_master
 
 - Run migrations on remote D1
 
-    pnpm wrangler d1 list
-    pnpm wrangler d1 migrations apply feeders --remote
+      pnpm wrangler d1 list
+      pnpm wrangler d1 migrations apply feeders --remote
 
 
 ## Authentication
 
 - Currently testing with Google OAuth provider
 
-- Review approved services (you can also revoke permission here)
+- Review approved services: (you can also revoke permission here)
+
   https://myaccount.google.com/permissions
 
 
@@ -113,12 +114,12 @@ See [directus/README.md](directus/README.md) for more details.
 
 - Inactive user
 
-    pnpm tsx scripts/admin_activate_user.mjs {USER_ID} inactive --remote
+      pnpm tsx scripts/admin_activate_user.mjs {USER_ID} inactive --remote
 
 - Drop spot, or followup
 
-    pnpm tsx scripts/admin_drop_spot.mjs {ID} dropped --remote
-    pnpm tsx scripts/admin_drop_followup.mjs {ID} dropped --remote
+      pnpm tsx scripts/admin_drop_spot.mjs {ID} dropped --remote
+      pnpm tsx scripts/admin_drop_followup.mjs {ID} dropped --remote
 
 
 
