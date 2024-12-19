@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState, ReactElement, useCallback } from 'react';
 import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
 import { useDebouncedCallback } from 'use-debounce';
-import mapStyles from '@/components/map.module.scss';
 import { navTitleAtom, alertsAtom, addAlertAtom, dismissAlertAtom } from '@/components/store';
 import type { keyedAlert } from '@/components/store';
 
@@ -46,6 +45,8 @@ import HelpControl from './map-controls/HelpControl';
 import DistrictControl from './map-controls/DistrictControl';
 import ResetViewControl from './map-controls/ResetViewControl';
 import LocateControl from './map-controls/LocateControl';
+
+import mapStyles from './map.module.scss';
 
 import Leaflet from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
