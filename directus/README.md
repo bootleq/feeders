@@ -14,6 +14,12 @@ so you can't setup a local CMS directly.
 Will make it possible later.
 
 
+## Setup
+
+Prepare secret files, you can copy `secrets/sample/*.txt` to `secrets/` as starting,
+but to make it work, they must have valid content of course.
+
+
 ## Asset management
 
 - Make a `public` folder for user upload, instead of default uploading to file library root.
