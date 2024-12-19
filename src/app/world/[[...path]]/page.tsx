@@ -20,7 +20,7 @@ import { MapPinIcon } from '@heroicons/react/24/solid';
 
 export const runtime = 'edge';
 
-const LazyMap = dynamic(() => import("@/components/Map"), {
+const LazyMap = dynamic(() => import("./Map"), {
   ssr: false,
   loading: () => <p>Loading...</p>,
 });
