@@ -38,6 +38,7 @@ import { MapIcon } from '@heroicons/react/24/solid';
 import { StarIcon } from '@heroicons/react/24/outline';
 
 import SpotMarkers from './SpotMarkers';
+import TempMarker from './TempMarker';
 import Help from './Help';
 import Districts from './Districts';
 
@@ -48,7 +49,6 @@ import LocateControl from './map-controls/LocateControl';
 
 import Leaflet from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
-import TempMarker from '@/components/TempMarker';
 import Alerts from '@/components/Alerts';
 import '@/components/leaflet/leaflet.css';
 
