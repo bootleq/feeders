@@ -41,13 +41,14 @@ import SpotMarkers from './SpotMarkers';
 import Help from './Help';
 import Districts from './Districts';
 
-import Leaflet from 'leaflet';
-import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
-import TempMarker from '@/components/TempMarker';
 import HelpControl from './map-controls/HelpControl';
 import DistrictControl from './map-controls/DistrictControl';
 import ResetViewControl from './map-controls/ResetViewControl';
 import LocateControl from './map-controls/LocateControl';
+
+import Leaflet from 'leaflet';
+import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
+import TempMarker from '@/components/TempMarker';
 import Alerts from '@/components/Alerts';
 import '@/components/leaflet/leaflet.css';
 
