@@ -3,7 +3,7 @@
 import { useAtom } from 'jotai';
 import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
 import { toggleHelpAtom } from './store';
-import mapStyles from '@/components/map.module.scss';
+import mapStyles from './map.module.scss';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 
 const motionProps = {

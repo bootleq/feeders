@@ -12,15 +12,15 @@ import type { RecentFollowupsResult } from '@/models/spots';
 import { formatISO } from '@/lib/date-fp';
 import { parsePath, GEOHASH_PRECISION } from './util';
 import { userAtom } from '@/components/store';
-import mapStyles from '@/components/map.module.scss';
 import Sidebar from '@/components/Sidebar';
 import LinkPreview from '@/components/LinkPreview';
 import RecentFollowups from './RecentFollowups';
+import mapStyles from './map.module.scss';
 import { MapPinIcon } from '@heroicons/react/24/solid';
 
 export const runtime = 'edge';
 
-const LazyMap = dynamic(() => import("@/components/Map"), {
+const LazyMap = dynamic(() => import("./Map"), {
   ssr: false,
   loading: () => <p>Loading...</p>,
 });

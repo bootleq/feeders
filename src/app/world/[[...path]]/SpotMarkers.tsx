@@ -27,7 +27,7 @@ import { addAlertAtom } from '@/components/store';
 import { present, jsonReviver, ACCESS_CTRL } from '@/lib/utils';
 import { format, formatDistance } from '@/lib/date-fp';
 import type { GeoSpotsResult, GeoSpotsResultFollowup } from '@/models/spots';
-import mapStyles from '@/components/map.module.scss';
+import mapStyles from './map.module.scss';
 
 const googleMapURL = (lat: number, lon: number) => {
   return `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;

@@ -6,9 +6,8 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState, ReactElement, useCallback } from 'react';
 import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
 import { useDebouncedCallback } from 'use-debounce';
-import mapStyles from './map.module.scss';
-import { navTitleAtom, alertsAtom, addAlertAtom, dismissAlertAtom } from './store';
-import type { keyedAlert } from './store';
+import { navTitleAtom, alertsAtom, addAlertAtom, dismissAlertAtom } from '@/components/store';
+import type { keyedAlert } from '@/components/store';
 
 import type { GeoSpotsResult, GeoSpotsByGeohash } from '@/models/spots';
 
@@ -25,30 +24,33 @@ import {
   loadingDistrictAtom,
   toggleHelpAtom,
   advanceDistrictModeAtom,
-} from '@/app/world/[[...path]]/store';
+} from './store';
 import { jsonReviver } from '@/lib/utils';
-import { parsePath, updatePath, AREA_ZOOM_MAX, GEOHASH_PRECISION } from '@/app/world/[[...path]]/util';
+import { parsePath, updatePath, AREA_ZOOM_MAX, GEOHASH_PRECISION } from './util';
 import { useHydrateAtoms } from 'jotai/utils';
-import Status from '@/app/world/[[...path]]/Status';
-import MapStatus from '@/app/world/[[...path]]/MapStatus';
-import { AREA_PICKER_MIN_ZOOM } from '@/app/world/[[...path]]/AreaPickerControl';
+import Status from './Status';
+import MapStatus from './MapStatus';
+import { AREA_PICKER_MIN_ZOOM } from './AreaPickerControl';
 
 import Spinner from '@/assets/spinner.svg';
 import { MapIcon } from '@heroicons/react/24/solid';
 import { StarIcon } from '@heroicons/react/24/outline';
 
-import SpotMarkers from '@/app/world/[[...path]]/SpotMarkers';
-import Help from '@/app/world/[[...path]]/Help';
-import Districts from '@/app/world/[[...path]]/Districts';
+import SpotMarkers from './SpotMarkers';
+import TempMarker from './TempMarker';
+import Help from './Help';
+import Districts from './Districts';
+
+import HelpControl from './map-controls/HelpControl';
+import DistrictControl from './map-controls/DistrictControl';
+import ResetViewControl from './map-controls/ResetViewControl';
+import LocateControl from './map-controls/LocateControl';
+
+import mapStyles from './map.module.scss';
 
 import Leaflet from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
-import TempMarker from './TempMarker';
-import HelpControl from './HelpControl';
-import DistrictControl from './DistrictControl';
-import ResetViewControl from './ResetViewControl';
-import LocateControl from './LocateControl';
-import Alerts from './Alerts';
+import Alerts from '@/components/Alerts';
 import '@/components/leaflet/leaflet.css';
 
 const D1_PARAM_LIMIT = 100;
