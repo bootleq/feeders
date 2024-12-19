@@ -44,10 +44,10 @@ import Districts from '@/app/world/[[...path]]/Districts';
 import Leaflet from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
 import TempMarker from '@/components/TempMarker';
-import HelpControl from '@/components/HelpControl';
-import DistrictControl from '@/components/DistrictControl';
-import ResetViewControl from '@/components/ResetViewControl';
-import LocateControl from '@/components/LocateControl';
+import HelpControl from '@/app/world/[[...path]]/map-controls/HelpControl';
+import DistrictControl from '@/app/world/[[...path]]/map-controls/DistrictControl';
+import ResetViewControl from '@/app/world/[[...path]]/map-controls/ResetViewControl';
+import LocateControl from '@/app/world/[[...path]]/map-controls/LocateControl';
 import Alerts from '@/components/Alerts';
 import '@/components/leaflet/leaflet.css';
 
