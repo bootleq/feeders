@@ -27,6 +27,7 @@
     "cms-stop": "cd ./directus && docker compose stop",
     "cms-restart": "cd ./directus && docker compose stop && docker compose up --detach && docker logs feeders-directus -f",
     "cms:build-local": "tsx --env-file=.env.development directus/scripts/build_to_r2.mjs",
+    "cms:snapshot": "cd ./directus && docker compose exec directus npx directus schema snapshot /directus/snapshots/$(date +'%Y%m%d').yml",
     "test": "vitest"
   },
   "dependencies": {

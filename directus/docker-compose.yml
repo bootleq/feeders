@@ -8,6 +8,7 @@ services:
       - ./database:/directus/database
       - ./uploads:/directus/uploads
       - ./extensions:/directus/extensions
+      - ./snapshots:/directus/snapshots
     environment:
       SECRET_FILE: /run/secrets/secret
       ADMIN_EMAIL: admin@feeders.com
