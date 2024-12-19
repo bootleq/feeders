@@ -6,9 +6,9 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState, ReactElement, useCallback } from 'react';
 import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
 import { useDebouncedCallback } from 'use-debounce';
-import mapStyles from './map.module.scss';
-import { navTitleAtom, alertsAtom, addAlertAtom, dismissAlertAtom } from './store';
-import type { keyedAlert } from './store';
+import mapStyles from '@/components/map.module.scss';
+import { navTitleAtom, alertsAtom, addAlertAtom, dismissAlertAtom } from '@/components/store';
+import type { keyedAlert } from '@/components/store';
 
 import type { GeoSpotsResult, GeoSpotsByGeohash } from '@/models/spots';
 
@@ -43,12 +43,12 @@ import Districts from '@/app/world/[[...path]]/Districts';
 
 import Leaflet from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
-import TempMarker from './TempMarker';
-import HelpControl from './HelpControl';
-import DistrictControl from './DistrictControl';
-import ResetViewControl from './ResetViewControl';
-import LocateControl from './LocateControl';
-import Alerts from './Alerts';
+import TempMarker from '@/components/TempMarker';
+import HelpControl from '@/components/HelpControl';
+import DistrictControl from '@/components/DistrictControl';
+import ResetViewControl from '@/components/ResetViewControl';
+import LocateControl from '@/components/LocateControl';
+import Alerts from '@/components/Alerts';
 import '@/components/leaflet/leaflet.css';
 
 const D1_PARAM_LIMIT = 100;
