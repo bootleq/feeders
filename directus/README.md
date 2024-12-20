@@ -19,6 +19,17 @@ Will make it possible later.
 Prepare secret files, you can copy `secrets/sample/*.txt` to `secrets/` as starting,
 but to make it work, they must have valid content of course.
 
+After starting CMS with `pnpm cms`, apply latest schema snapshot by:
+
+    docker compose exec directus npx directus schema apply /directus/snapshots/$(ls snapshots | sort | tail -n 1)
+
+Then restart (`pnpm cms-restart`) to finish applying.
+
+Open localhost:8044/admin and login with default user (see `ADMIN_EMAIL` in `docker-compose.yml`).
+
+You have to manage permission yourself.
+For example in directus UI `Settings` -> `Access Policies` -> `Public` -> `Permission`, open Read or other permissions for certain collections.
+
 
 ## Asset management
 
