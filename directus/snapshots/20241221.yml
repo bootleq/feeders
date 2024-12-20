@@ -1,0 +1,2795 @@
+version: 1
+directus: 11.3.5
+vendor: sqlite
+collections:
+  - collection: blocks
+    meta:
+      accountability: all
+      archive_app_filter: true
+      archive_field: status
+      archive_value: archived
+      collapse: open
+      collection: blocks
+      color: null
+      display_template: null
+      group: null
+      hidden: false
+      icon: null
+      item_duplication_fields: null
+      note: null
+      preview_url: null
+      singleton: false
+      sort: null
+      sort_field: null
+      translations: null
+      unarchive_value: draft
+      versioning: false
+    schema:
+      name: blocks
+  - collection: facts
+    meta:
+      accountability: all
+      archive_app_filter: true
+      archive_field: status
+      archive_value: archived
+      collapse: open
+      collection: facts
+      color: null
+      display_template: null
+      group: null
+      hidden: false
+      icon: null
+      item_duplication_fields: null
+      note: null
+      preview_url: null
+      singleton: false
+      sort: 1
+      sort_field: null
+      translations: null
+      unarchive_value: draft
+      versioning: false
+    schema:
+      name: facts
+  - collection: insights
+    meta:
+      accountability: all
+      archive_app_filter: true
+      archive_field: status
+      archive_value: archived
+      collapse: open
+      collection: insights
+      color: null
+      display_template: null
+      group: null
+      hidden: false
+      icon: null
+      item_duplication_fields: null
+      note: null
+      preview_url: null
+      singleton: false
+      sort: 2
+      sort_field: null
+      translations: null
+      unarchive_value: draft
+      versioning: false
+    schema:
+      name: insights
+  - collection: insights_facts
+    meta:
+      accountability: all
+      archive_app_filter: true
+      archive_field: null
+      archive_value: null
+      collapse: open
+      collection: insights_facts
+      color: null
+      display_template: null
+      group: null
+      hidden: true
+      icon: import_export
+      item_duplication_fields: null
+      note: null
+      preview_url: null
+      singleton: false
+      sort: null
+      sort_field: null
+      translations: null
+      unarchive_value: null
+      versioning: false
+    schema:
+      name: insights_facts
+  - collection: laws
+    meta:
+      accountability: all
+      archive_app_filter: true
+      archive_field: status
+      archive_value: archived
+      collapse: open
+      collection: laws
+      color: null
+      display_template: null
+      group: null
+      hidden: false
+      icon: null
+      item_duplication_fields: null
+      note: null
+      preview_url: null
+      singleton: false
+      sort: 3
+      sort_field: sort
+      translations: null
+      unarchive_value: draft
+      versioning: false
+    schema:
+      name: laws
+fields:
+  - collection: blocks
+    field: id
+    type: integer
+    meta:
+      collection: blocks
+      conditions: null
+      display: null
+      display_options: null
+      field: id
+      group: null
+      hidden: true
+      interface: input
+      note: null
+      options: null
+      readonly: true
+      required: false
+      sort: 1
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: id
+      table: blocks
+      data_type: integer
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: false
+      is_unique: false
+      is_indexed: false
+      is_primary_key: true
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: true
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: blocks
+    field: status
+    type: string
+    meta:
+      collection: blocks
+      conditions: null
+      display: labels
+      display_options:
+        choices:
+          - background: var(--theme--primary-background)
+            color: var(--theme--primary)
+            foreground: var(--theme--primary)
+            text: $t:published
+            value: published
+          - background: var(--theme--background-normal)
+            color: var(--theme--foreground)
+            foreground: var(--theme--foreground)
+            text: $t:draft
+            value: draft
+          - background: var(--theme--warning-background)
+            color: var(--theme--warning)
+            foreground: var(--theme--warning)
+            text: $t:archived
+            value: archived
+        showAsDot: true
+      field: status
+      group: null
+      hidden: false
+      interface: select-dropdown
+      note: null
+      options:
+        choices:
+          - color: var(--theme--primary)
+            text: $t:published
+            value: published
+          - color: var(--theme--foreground)
+            text: $t:draft
+            value: draft
+          - color: var(--theme--warning)
+            text: $t:archived
+            value: archived
+      readonly: false
+      required: false
+      sort: 2
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: status
+      table: blocks
+      data_type: varchar
+      default_value: draft
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: false
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: blocks
+    field: slug
+    type: string
+    meta:
+      collection: blocks
+      conditions: null
+      display: null
+      display_options: null
+      field: slug
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: true
+      sort: 3
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: slug
+      table: blocks
+      data_type: varchar
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: true
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: blocks
+    field: content
+    type: text
+    meta:
+      collection: blocks
+      conditions: null
+      display: null
+      display_options: null
+      field: content
+      group: null
+      hidden: false
+      interface: input-rich-text-html
+      note: null
+      options:
+        customFormats:
+          - classes: font-mono
+            inline: span
+            title: 等寬字
+          - classes: feeders-mce-lengthy
+            selector: a[href]
+            title: 冗長網址
+        folder: 457bc942-5b51-4266-b02f-86a4849257e2
+        tinymceOverrides:
+          content_css: /tinymce/general.css
+          fix_list_elements: true
+          formats:
+            bold:
+              inline: strong
+            italic:
+              classes: italic
+              inline: span
+            strikethrough:
+              classes: line-through
+              exact: true
+              inline: span
+            underline:
+              classes: underline
+              exact: true
+              inline: span
+          invalid_elements: img,h1,h2,h3,h4,h5,h6
+          preview_styles: color font-size font-family font-weight
+        toolbar:
+          - bold
+          - italic
+          - underline
+          - strikethrough
+          - numlist
+          - bullist
+          - removeformat
+          - customLink
+          - code
+          - fullscreen
+      readonly: false
+      required: false
+      sort: 4
+      special: null
+      translations:
+        - language: zh-TW
+          translation: 內容敘述
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: content
+      table: blocks
+      data_type: text
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: facts
+    field: id
+    type: integer
+    meta:
+      collection: facts
+      conditions: null
+      display: null
+      display_options: null
+      field: id
+      group: null
+      hidden: true
+      interface: input
+      note: null
+      options: null
+      readonly: true
+      required: false
+      sort: 1
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: id
+      table: facts
+      data_type: integer
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: false
+      is_unique: false
+      is_indexed: false
+      is_primary_key: true
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: true
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: facts
+    field: status
+    type: string
+    meta:
+      collection: facts
+      conditions: null
+      display: labels
+      display_options:
+        choices:
+          - background: var(--theme--primary-background)
+            color: var(--theme--primary)
+            foreground: var(--theme--primary)
+            text: $t:published
+            value: published
+          - background: var(--theme--background-normal)
+            color: var(--theme--foreground)
+            foreground: var(--theme--foreground)
+            text: $t:draft
+            value: draft
+          - background: var(--theme--warning-background)
+            color: var(--theme--warning)
+            foreground: var(--theme--warning)
+            text: $t:archived
+            value: archived
+        showAsDot: true
+      field: status
+      group: null
+      hidden: false
+      interface: select-dropdown
+      note: null
+      options:
+        choices:
+          - color: var(--theme--primary)
+            text: $t:published
+            value: published
+          - color: var(--theme--foreground)
+            text: $t:draft
+            value: draft
+          - color: var(--theme--warning)
+            text: $t:archived
+            value: archived
+      readonly: false
+      required: false
+      sort: 2
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: status
+      table: facts
+      data_type: varchar
+      default_value: draft
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: false
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: facts
+    field: user_created
+    type: string
+    meta:
+      collection: facts
+      conditions: null
+      display: user
+      display_options: null
+      field: user_created
+      group: null
+      hidden: true
+      interface: select-dropdown-m2o
+      note: null
+      options:
+        template: '{{avatar.$thumbnail}} {{first_name}} {{last_name}}'
+      readonly: true
+      required: false
+      sort: 3
+      special:
+        - user-created
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: user_created
+      table: facts
+      data_type: char
+      default_value: null
+      max_length: 36
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: directus_users
+      foreign_key_column: id
+  - collection: facts
+    field: date_created
+    type: timestamp
+    meta:
+      collection: facts
+      conditions: null
+      display: datetime
+      display_options:
+        relative: true
+      field: date_created
+      group: null
+      hidden: true
+      interface: datetime
+      note: null
+      options: null
+      readonly: true
+      required: false
+      sort: 4
+      special:
+        - date-created
+        - cast-timestamp
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: date_created
+      table: facts
+      data_type: datetime
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: facts
+    field: user_updated
+    type: string
+    meta:
+      collection: facts
+      conditions: null
+      display: user
+      display_options: null
+      field: user_updated
+      group: null
+      hidden: true
+      interface: select-dropdown-m2o
+      note: null
+      options:
+        template: '{{avatar.$thumbnail}} {{first_name}} {{last_name}}'
+      readonly: true
+      required: false
+      sort: 5
+      special:
+        - user-updated
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: user_updated
+      table: facts
+      data_type: char
+      default_value: null
+      max_length: 36
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: directus_users
+      foreign_key_column: id
+  - collection: facts
+    field: date_updated
+    type: timestamp
+    meta:
+      collection: facts
+      conditions: null
+      display: datetime
+      display_options:
+        relative: true
+      field: date_updated
+      group: null
+      hidden: true
+      interface: datetime
+      note: null
+      options: null
+      readonly: true
+      required: false
+      sort: 6
+      special:
+        - date-updated
+        - cast-timestamp
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: date_updated
+      table: facts
+      data_type: datetime
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: facts
+    field: date
+    type: string
+    meta:
+      collection: facts
+      conditions: null
+      display: null
+      display_options: null
+      field: date
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options:
+        placeholder: '1998-11-04'
+      readonly: false
+      required: false
+      sort: 7
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: date
+      table: facts
+      data_type: varchar
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: facts
+    field: title
+    type: string
+    meta:
+      collection: facts
+      conditions: null
+      display: null
+      display_options: null
+      field: title
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: true
+      sort: 8
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: title
+      table: facts
+      data_type: varchar
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: facts
+    field: desc
+    type: text
+    meta:
+      collection: facts
+      conditions: null
+      display: null
+      display_options: null
+      field: desc
+      group: null
+      hidden: false
+      interface: input-rich-text-html
+      note: null
+      options:
+        customFormats:
+          - classes: font-mono
+            inline: span
+            title: 等寬字
+          - classes: feeders-mce-lengthy
+            selector: a[href]
+            title: 冗長網址
+          - classes: feeders-mce-lengthy
+            selector: ol,ul
+            title: 冗長清單
+        folder: 457bc942-5b51-4266-b02f-86a4849257e2
+        tinymceOverrides:
+          content_css: /tinymce/general.css
+          fix_list_elements: true
+          formats:
+            bold:
+              inline: strong
+            italic:
+              classes: italic
+              inline: span
+            strikethrough:
+              classes: line-through
+              exact: true
+              inline: span
+            underline:
+              classes: underline
+              exact: true
+              inline: span
+          invalid_elements: img,h1,h2,h3,h4,h5,h6
+          link_rel_list:
+            - title: nofollow
+              value: nofollow
+          preview_styles: color font-size font-family font-weight
+        toolbar:
+          - bold
+          - italic
+          - underline
+          - strikethrough
+          - numlist
+          - bullist
+          - removeformat
+          - customLink
+          - code
+          - fullscreen
+      readonly: false
+      required: false
+      sort: 9
+      special: null
+      translations:
+        - language: zh-TW
+          translation: 內容敘述
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: desc
+      table: facts
+      data_type: text
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: facts
+    field: summary
+    type: text
+    meta:
+      collection: facts
+      conditions: null
+      display: null
+      display_options: null
+      field: summary
+      group: null
+      hidden: false
+      interface: input-rich-text-html
+      note: null
+      options:
+        customFormats:
+          - classes: font-mono
+            inline: span
+            title: 等寬字
+          - classes: feeders-mce-lengthy
+            selector: a[href]
+            title: 冗長網址
+        folder: 457bc942-5b51-4266-b02f-86a4849257e2
+        tinymceOverrides:
+          content_css: /tinymce/general.css
+          fix_list_elements: true
+          formats:
+            bold:
+              inline: strong
+            italic:
+              classes: italic
+              inline: span
+            strikethrough:
+              classes: line-through
+              exact: true
+              inline: span
+            underline:
+              classes: underline
+              exact: true
+              inline: span
+          invalid_elements: img,h1,h2,h3,h4,h5,h6
+          preview_styles: color font-size font-family font-weight
+        toolbar:
+          - bold
+          - italic
+          - underline
+          - strikethrough
+          - numlist
+          - bullist
+          - removeformat
+          - customLink
+          - code
+          - fullscreen
+      readonly: false
+      required: false
+      sort: 10
+      special: null
+      translations:
+        - language: zh-TW
+          translation: 摘要
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: summary
+      table: facts
+      data_type: text
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: facts
+    field: origin
+    type: text
+    meta:
+      collection: facts
+      conditions: null
+      display: null
+      display_options: null
+      field: origin
+      group: null
+      hidden: false
+      interface: input-rich-text-html
+      note: null
+      options:
+        customFormats:
+          - classes: font-mono
+            inline: span
+            title: 等寬字
+          - classes: feeders-mce-lengthy
+            selector: a[href]
+            title: 冗長網址
+        folder: 457bc942-5b51-4266-b02f-86a4849257e2
+        tinymceOverrides:
+          content_css: /tinymce/general.css
+          fix_list_elements: true
+          formats:
+            bold:
+              inline: strong
+            italic:
+              classes: italic
+              inline: span
+            strikethrough:
+              classes: line-through
+              exact: true
+              inline: span
+            underline:
+              classes: underline
+              exact: true
+              inline: span
+          invalid_elements: img,h1,h2,h3,h4,h5,h6
+          link_rel_list:
+            - title: nofollow
+              value: nofollow
+          preview_styles: color font-size font-family font-weight
+          rel_list:
+            - title: nofollow
+              value: nofollow
+        toolbar:
+          - bold
+          - italic
+          - underline
+          - strikethrough
+          - numlist
+          - bullist
+          - removeformat
+          - customLink
+          - code
+          - fullscreen
+      readonly: false
+      required: false
+      sort: 11
+      special: null
+      translations:
+        - language: zh-TW
+          translation: 出處
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: origin
+      table: facts
+      data_type: text
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: facts
+    field: tags
+    type: json
+    meta:
+      collection: facts
+      conditions: null
+      display: null
+      display_options: null
+      field: tags
+      group: null
+      hidden: false
+      interface: tags
+      note: null
+      options:
+        presets:
+          - 立法
+          - 餵食
+          - 收容
+          - 安樂死
+          - 報導
+          - 人犬衝突
+          - 犬獸衝突
+          - 犬殺
+          - 毒殺
+          - 施政
+          - 監察院
+          - 動團
+          - 社運
+          - 狂犬病
+          - 相信動物
+          - 台北市
+          - 新北市
+          - 台南市
+          - 高雄市
+          - 捕犬
+          - 台中市
+          - TNR
+          - 源頭管理
+          - 人身
+          - 統計
+          - 南投縣
+          - 虐待
+          - 狗肉
+          - 教育
+          - 民間狗場
+          - 苗栗縣
+          - 彰化縣
+      readonly: false
+      required: false
+      sort: 12
+      special:
+        - cast-json
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: tags
+      table: facts
+      data_type: json
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: facts
+    field: insights
+    type: alias
+    meta:
+      collection: facts
+      conditions: null
+      display: null
+      display_options: null
+      field: insights
+      group: null
+      hidden: false
+      interface: list-m2m
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 13
+      special:
+        - m2m
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+  - collection: insights
+    field: id
+    type: integer
+    meta:
+      collection: insights
+      conditions: null
+      display: null
+      display_options: null
+      field: id
+      group: null
+      hidden: true
+      interface: input
+      note: null
+      options: null
+      readonly: true
+      required: false
+      sort: 1
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: id
+      table: insights
+      data_type: integer
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: false
+      is_unique: false
+      is_indexed: false
+      is_primary_key: true
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: true
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: insights
+    field: status
+    type: string
+    meta:
+      collection: insights
+      conditions: null
+      display: labels
+      display_options:
+        choices:
+          - background: var(--theme--primary-background)
+            color: var(--theme--primary)
+            foreground: var(--theme--primary)
+            text: $t:published
+            value: published
+          - background: var(--theme--background-normal)
+            color: var(--theme--foreground)
+            foreground: var(--theme--foreground)
+            text: $t:draft
+            value: draft
+          - background: var(--theme--warning-background)
+            color: var(--theme--warning)
+            foreground: var(--theme--warning)
+            text: $t:archived
+            value: archived
+        showAsDot: true
+      field: status
+      group: null
+      hidden: false
+      interface: select-dropdown
+      note: null
+      options:
+        choices:
+          - color: var(--theme--primary)
+            text: $t:published
+            value: published
+          - color: var(--theme--foreground)
+            text: $t:draft
+            value: draft
+          - color: var(--theme--warning)
+            text: $t:archived
+            value: archived
+      readonly: false
+      required: false
+      sort: 2
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: status
+      table: insights
+      data_type: varchar
+      default_value: draft
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: false
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: insights
+    field: user_created
+    type: string
+    meta:
+      collection: insights
+      conditions: null
+      display: user
+      display_options: null
+      field: user_created
+      group: null
+      hidden: true
+      interface: select-dropdown-m2o
+      note: null
+      options:
+        template: '{{avatar.$thumbnail}} {{first_name}} {{last_name}}'
+      readonly: true
+      required: false
+      sort: 3
+      special:
+        - user-created
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: user_created
+      table: insights
+      data_type: char
+      default_value: null
+      max_length: 36
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: directus_users
+      foreign_key_column: id
+  - collection: insights
+    field: date_created
+    type: timestamp
+    meta:
+      collection: insights
+      conditions: null
+      display: datetime
+      display_options:
+        relative: true
+      field: date_created
+      group: null
+      hidden: true
+      interface: datetime
+      note: null
+      options: null
+      readonly: true
+      required: false
+      sort: 4
+      special:
+        - date-created
+        - cast-timestamp
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: date_created
+      table: insights
+      data_type: datetime
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: insights
+    field: user_updated
+    type: string
+    meta:
+      collection: insights
+      conditions: null
+      display: user
+      display_options: null
+      field: user_updated
+      group: null
+      hidden: true
+      interface: select-dropdown-m2o
+      note: null
+      options:
+        template: '{{avatar.$thumbnail}} {{first_name}} {{last_name}}'
+      readonly: true
+      required: false
+      sort: 5
+      special:
+        - user-updated
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: user_updated
+      table: insights
+      data_type: char
+      default_value: null
+      max_length: 36
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: directus_users
+      foreign_key_column: id
+  - collection: insights
+    field: date_updated
+    type: timestamp
+    meta:
+      collection: insights
+      conditions: null
+      display: datetime
+      display_options:
+        relative: true
+      field: date_updated
+      group: null
+      hidden: true
+      interface: datetime
+      note: null
+      options: null
+      readonly: true
+      required: false
+      sort: 6
+      special:
+        - date-updated
+        - cast-timestamp
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: date_updated
+      table: insights
+      data_type: datetime
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: insights
+    field: title
+    type: string
+    meta:
+      collection: insights
+      conditions: null
+      display: null
+      display_options: null
+      field: title
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: true
+      sort: 7
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: title
+      table: insights
+      data_type: varchar
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: insights
+    field: content
+    type: text
+    meta:
+      collection: insights
+      conditions: null
+      display: null
+      display_options: null
+      field: content
+      group: null
+      hidden: false
+      interface: input-rich-text-html
+      note: null
+      options:
+        customFormats:
+          - classes: font-mono
+            inline: span
+            title: 等寬字
+          - classes: feeders-mce-lengthy
+            selector: a[href]
+            title: 冗長網址
+          - block: figure
+            classes: feeders-mce-figure
+            title: 圖說
+            wrapper: true
+          - block: p
+            classes: feeders-mce-iframe
+            title: 內嵌容器
+          - block: table
+            classes: feeders-mce-digit
+            selector: table
+            title: 數值表格
+        folder: 457bc942-5b51-4266-b02f-86a4849257e2
+        tinymceOverrides:
+          content_css: /tinymce/article.css
+          content_style: 'p { padding-block: 0.25rem; } .font-mono { font-family: monospace; }'
+          fix_list_elements: true
+          invalid_elements: h5,h6
+          preview_styles: color font-size font-family font-weight
+          sandbox_iframes_exclusions:
+            - bootleq.github.io
+        toolbar:
+          - bold
+          - italic
+          - underline
+          - strikethrough
+          - h2
+          - h3
+          - h4
+          - numlist
+          - bullist
+          - removeformat
+          - blockquote
+          - customLink
+          - customImage
+          - table
+          - hr
+          - code
+          - fullscreen
+      readonly: false
+      required: false
+      sort: 8
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: content
+      table: insights
+      data_type: text
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: insights
+    field: publishedAt
+    type: dateTime
+    meta:
+      collection: insights
+      conditions: null
+      display: null
+      display_options: null
+      field: publishedAt
+      group: null
+      hidden: false
+      interface: datetime
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 9
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: publishedAt
+      table: insights
+      data_type: datetime
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: insights
+    field: tags
+    type: json
+    meta:
+      collection: insights
+      conditions: null
+      display: null
+      display_options: null
+      field: tags
+      group: null
+      hidden: false
+      interface: tags
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 13
+      special:
+        - cast-json
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: tags
+      table: insights
+      data_type: json
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: insights
+    field: keywords
+    type: json
+    meta:
+      collection: insights
+      conditions: null
+      display: null
+      display_options: null
+      field: keywords
+      group: null
+      hidden: false
+      interface: tags
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 14
+      special:
+        - cast-json
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: keywords
+      table: insights
+      data_type: json
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: insights
+    field: slug
+    type: string
+    meta:
+      collection: insights
+      conditions: null
+      display: null
+      display_options: null
+      field: slug
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options:
+        slug: true
+      readonly: false
+      required: false
+      sort: 15
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: slug
+      table: insights
+      data_type: varchar
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: true
+      is_indexed: true
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: insights
+    field: modifiedAt
+    type: dateTime
+    meta:
+      collection: insights
+      conditions: null
+      display: null
+      display_options: null
+      field: modifiedAt
+      group: null
+      hidden: false
+      interface: datetime
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 10
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: modifiedAt
+      table: insights
+      data_type: datetime
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: insights
+    field: cms_file_ids
+    type: string
+    meta:
+      collection: insights
+      conditions: null
+      display: null
+      display_options: null
+      field: cms_file_ids
+      group: null
+      hidden: true
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 16
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: cms_file_ids
+      table: insights
+      data_type: varchar
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: insights
+    field: editors
+    type: text
+    meta:
+      collection: insights
+      conditions: null
+      display: null
+      display_options: null
+      field: editors
+      group: null
+      hidden: false
+      interface: input-multiline
+      note: null
+      options:
+        placeholder: 編輯：你的名稱
+      readonly: false
+      required: true
+      sort: 11
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: editors
+      table: insights
+      data_type: text
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: insights
+    field: facts
+    type: alias
+    meta:
+      collection: insights
+      conditions: null
+      display: related-values
+      display_options: null
+      field: facts
+      group: null
+      hidden: false
+      interface: list-m2m
+      note: null
+      options:
+        limit: 20
+      readonly: false
+      required: false
+      sort: 17
+      special:
+        - m2m
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+  - collection: insights_facts
+    field: id
+    type: integer
+    meta:
+      collection: insights_facts
+      conditions: null
+      display: null
+      display_options: null
+      field: id
+      group: null
+      hidden: true
+      interface: null
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 1
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: id
+      table: insights_facts
+      data_type: integer
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: false
+      is_unique: false
+      is_indexed: false
+      is_primary_key: true
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: true
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: insights_facts
+    field: insights_id
+    type: integer
+    meta:
+      collection: insights_facts
+      conditions: null
+      display: null
+      display_options: null
+      field: insights_id
+      group: null
+      hidden: true
+      interface: null
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 2
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: insights_id
+      table: insights_facts
+      data_type: integer
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: insights
+      foreign_key_column: id
+  - collection: insights_facts
+    field: facts_id
+    type: integer
+    meta:
+      collection: insights_facts
+      conditions: null
+      display: null
+      display_options: null
+      field: facts_id
+      group: null
+      hidden: true
+      interface: null
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 3
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: facts_id
+      table: insights_facts
+      data_type: integer
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: facts
+      foreign_key_column: id
+  - collection: laws
+    field: id
+    type: integer
+    meta:
+      collection: laws
+      conditions: null
+      display: null
+      display_options: null
+      field: id
+      group: null
+      hidden: true
+      interface: input
+      note: null
+      options: null
+      readonly: true
+      required: false
+      sort: 1
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: id
+      table: laws
+      data_type: integer
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: false
+      is_unique: false
+      is_indexed: false
+      is_primary_key: true
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: true
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: laws
+    field: status
+    type: string
+    meta:
+      collection: laws
+      conditions: null
+      display: labels
+      display_options:
+        choices:
+          - background: var(--theme--primary-background)
+            color: var(--theme--primary)
+            foreground: var(--theme--primary)
+            text: $t:published
+            value: published
+          - background: var(--theme--background-normal)
+            color: var(--theme--foreground)
+            foreground: var(--theme--foreground)
+            text: $t:draft
+            value: draft
+          - background: var(--theme--warning-background)
+            color: var(--theme--warning)
+            foreground: var(--theme--warning)
+            text: $t:archived
+            value: archived
+        showAsDot: true
+      field: status
+      group: null
+      hidden: false
+      interface: select-dropdown
+      note: null
+      options:
+        choices:
+          - color: var(--theme--primary)
+            text: $t:published
+            value: published
+          - color: var(--theme--foreground)
+            text: $t:draft
+            value: draft
+          - color: var(--theme--warning)
+            text: $t:archived
+            value: archived
+      readonly: false
+      required: false
+      sort: 2
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: status
+      table: laws
+      data_type: varchar
+      default_value: draft
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: false
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: laws
+    field: sort
+    type: integer
+    meta:
+      collection: laws
+      conditions: null
+      display: null
+      display_options: null
+      field: sort
+      group: null
+      hidden: true
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 3
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: sort
+      table: laws
+      data_type: integer
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: laws
+    field: user_created
+    type: string
+    meta:
+      collection: laws
+      conditions: null
+      display: user
+      display_options: null
+      field: user_created
+      group: null
+      hidden: true
+      interface: select-dropdown-m2o
+      note: null
+      options:
+        template: '{{avatar.$thumbnail}} {{first_name}} {{last_name}}'
+      readonly: true
+      required: false
+      sort: 4
+      special:
+        - user-created
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: user_created
+      table: laws
+      data_type: char
+      default_value: null
+      max_length: 36
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: directus_users
+      foreign_key_column: id
+  - collection: laws
+    field: date_created
+    type: timestamp
+    meta:
+      collection: laws
+      conditions: null
+      display: datetime
+      display_options:
+        relative: true
+      field: date_created
+      group: null
+      hidden: true
+      interface: datetime
+      note: null
+      options: null
+      readonly: true
+      required: false
+      sort: 5
+      special:
+        - date-created
+        - cast-timestamp
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: date_created
+      table: laws
+      data_type: datetime
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: laws
+    field: user_updated
+    type: string
+    meta:
+      collection: laws
+      conditions: null
+      display: user
+      display_options: null
+      field: user_updated
+      group: null
+      hidden: true
+      interface: select-dropdown-m2o
+      note: null
+      options:
+        template: '{{avatar.$thumbnail}} {{first_name}} {{last_name}}'
+      readonly: true
+      required: false
+      sort: 6
+      special:
+        - user-updated
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: user_updated
+      table: laws
+      data_type: char
+      default_value: null
+      max_length: 36
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: directus_users
+      foreign_key_column: id
+  - collection: laws
+    field: date_updated
+    type: timestamp
+    meta:
+      collection: laws
+      conditions: null
+      display: datetime
+      display_options:
+        relative: true
+      field: date_updated
+      group: null
+      hidden: true
+      interface: datetime
+      note: null
+      options: null
+      readonly: true
+      required: false
+      sort: 7
+      special:
+        - date-updated
+        - cast-timestamp
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: date_updated
+      table: laws
+      data_type: datetime
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: laws
+    field: act
+    type: string
+    meta:
+      collection: laws
+      conditions: null
+      display: null
+      display_options: null
+      field: act
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: true
+      sort: 8
+      special: null
+      translations:
+        - language: zh-TW
+          translation: 法律或條例名稱
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: act
+      table: laws
+      data_type: varchar
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: false
+      is_unique: false
+      is_indexed: true
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: laws
+    field: article
+    type: string
+    meta:
+      collection: laws
+      conditions: null
+      display: null
+      display_options: null
+      field: article
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options:
+        placeholder: 14-3 （14 條 3）
+      readonly: false
+      required: true
+      sort: 9
+      special: null
+      translations:
+        - language: zh-TW
+          translation: 條目編號
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: article
+      table: laws
+      data_type: varchar
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: laws
+    field: title
+    type: string
+    meta:
+      collection: laws
+      conditions: null
+      display: null
+      display_options: null
+      field: title
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: true
+      sort: 10
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: title
+      table: laws
+      data_type: varchar
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: laws
+    field: tags
+    type: json
+    meta:
+      collection: laws
+      conditions: null
+      display: null
+      display_options: null
+      field: tags
+      group: null
+      hidden: false
+      interface: tags
+      note: null
+      options:
+        presets:
+          - 環境髒亂
+          - 餵食
+          - 狗大便
+          - 咬人
+          - 車禍
+          - 噪音
+          - 虐狗
+          - 人身傷亡
+          - 收容
+          - 寵物登記
+          - 棄養
+          - 絕育
+          - 疏縱
+          - 繁殖
+          - 放養
+          - 對人衝突
+          - 娛樂
+          - 捕犬
+      readonly: false
+      required: false
+      sort: 15
+      special:
+        - cast-json
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: tags
+      table: laws
+      data_type: json
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: laws
+    field: effectiveAt
+    type: date
+    meta:
+      collection: laws
+      conditions: null
+      display: null
+      display_options: null
+      field: effectiveAt
+      group: null
+      hidden: false
+      interface: datetime
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 16
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: effectiveAt
+      table: laws
+      data_type: date
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: laws
+    field: summary
+    type: text
+    meta:
+      collection: laws
+      conditions: null
+      display: null
+      display_options: null
+      field: summary
+      group: null
+      hidden: false
+      interface: input-rich-text-html
+      note: null
+      options:
+        customFormats:
+          - classes: font-mono
+            inline: span
+            title: 等寬字
+          - classes: feeders-mce-lengthy
+            selector: a[href]
+            title: 冗長網址
+        folder: null
+        tinymceOverrides:
+          content_css: /tinymce/general.css
+          content_style: 'p { padding-block: 0.25rem; } .font-mono { font-family: monospace; }'
+          fix_list_elements: true
+          invalid_elements: img,h1,h2,h3,h4,h5,h6
+        toolbar:
+          - bold
+          - italic
+          - underline
+          - numlist
+          - bullist
+          - removeformat
+          - blockquote
+          - customLink
+          - hr
+          - code
+          - fullscreen
+      readonly: false
+      required: false
+      sort: 12
+      special: null
+      translations:
+        - language: zh-TW
+          translation: 簡介
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: summary
+      table: laws
+      data_type: text
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: laws
+    field: judgements
+    type: text
+    meta:
+      collection: laws
+      conditions: null
+      display: null
+      display_options: null
+      field: judgements
+      group: null
+      hidden: false
+      interface: input-rich-text-html
+      note: null
+      options:
+        customFormats:
+          - classes: font-mono
+            inline: span
+            title: 等寬字
+          - classes: feeders-mce-lengthy
+            selector: a[href]
+            title: 冗長網址
+        folder: null
+        tinymceOverrides:
+          content_css: /tinymce/general.css
+          content_style: 'p { padding-block: 0.25rem; } .font-mono { font-family: monospace; }'
+          fix_list_elements: true
+          invalid_elements: img,h1,h2,h3,h4,h5,h6
+          preview_styles: color font-size font-family font-weight
+        toolbar:
+          - bold
+          - italic
+          - underline
+          - numlist
+          - bullist
+          - removeformat
+          - blockquote
+          - customLink
+          - hr
+          - code
+          - fullscreen
+      readonly: false
+      required: false
+      sort: 13
+      special: null
+      translations:
+        - language: zh-TW
+          translation: 判例
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: judgements
+      table: laws
+      data_type: text
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: laws
+    field: link
+    type: string
+    meta:
+      collection: laws
+      conditions: null
+      display: null
+      display_options: null
+      field: link
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 11
+      special: null
+      translations:
+        - language: zh-TW
+          translation: 法條連結
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: link
+      table: laws
+      data_type: varchar
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: laws
+    field: penalty
+    type: text
+    meta:
+      collection: laws
+      conditions: null
+      display: null
+      display_options: null
+      field: penalty
+      group: null
+      hidden: false
+      interface: input-rich-text-html
+      note: null
+      options:
+        customFormats:
+          - classes: font-mono
+            inline: span
+            title: 等寬字
+          - classes: feeders-mce-lengthy
+            selector: a[href]
+            title: 冗長網址
+        folder: null
+        tinymceOverrides:
+          content_css: /tinymce/general.css
+          content_style: 'p { padding-block: 0.25rem; } .font-mono { font-family: monospace; }'
+          fix_list_elements: true
+          invalid_elements: img,h1,h2,h3,h4,h5,h6
+          preview_styles: color font-size font-family font-weight
+        toolbar:
+          - bold
+          - italic
+          - underline
+          - numlist
+          - bullist
+          - removeformat
+          - blockquote
+          - customLink
+          - hr
+          - code
+          - fullscreen
+      readonly: false
+      required: false
+      sort: 14
+      special: null
+      translations:
+        - language: zh-TW
+          translation: 罰則
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: penalty
+      table: laws
+      data_type: text
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+relations:
+  - collection: facts
+    field: user_created
+    related_collection: directus_users
+    meta:
+      junction_field: null
+      many_collection: facts
+      many_field: user_created
+      one_allowed_collections: null
+      one_collection: directus_users
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: null
+      sort_field: null
+    schema:
+      table: facts
+      column: user_created
+      foreign_key_table: directus_users
+      foreign_key_column: id
+      constraint_name: null
+      on_update: NO ACTION
+      on_delete: NO ACTION
+  - collection: facts
+    field: user_updated
+    related_collection: directus_users
+    meta:
+      junction_field: null
+      many_collection: facts
+      many_field: user_updated
+      one_allowed_collections: null
+      one_collection: directus_users
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: null
+      sort_field: null
+    schema:
+      table: facts
+      column: user_updated
+      foreign_key_table: directus_users
+      foreign_key_column: id
+      constraint_name: null
+      on_update: NO ACTION
+      on_delete: NO ACTION
+  - collection: insights
+    field: user_created
+    related_collection: directus_users
+    meta:
+      junction_field: null
+      many_collection: insights
+      many_field: user_created
+      one_allowed_collections: null
+      one_collection: directus_users
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: null
+      sort_field: null
+    schema:
+      table: insights
+      column: user_created
+      foreign_key_table: directus_users
+      foreign_key_column: id
+      constraint_name: null
+      on_update: NO ACTION
+      on_delete: NO ACTION
+  - collection: insights
+    field: user_updated
+    related_collection: directus_users
+    meta:
+      junction_field: null
+      many_collection: insights
+      many_field: user_updated
+      one_allowed_collections: null
+      one_collection: directus_users
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: null
+      sort_field: null
+    schema:
+      table: insights
+      column: user_updated
+      foreign_key_table: directus_users
+      foreign_key_column: id
+      constraint_name: null
+      on_update: NO ACTION
+      on_delete: NO ACTION
+  - collection: insights_facts
+    field: facts_id
+    related_collection: facts
+    meta:
+      junction_field: insights_id
+      many_collection: insights_facts
+      many_field: facts_id
+      one_allowed_collections: null
+      one_collection: facts
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: insights
+      sort_field: null
+    schema:
+      table: insights_facts
+      column: facts_id
+      foreign_key_table: facts
+      foreign_key_column: id
+      constraint_name: null
+      on_update: NO ACTION
+      on_delete: SET NULL
+  - collection: insights_facts
+    field: insights_id
+    related_collection: insights
+    meta:
+      junction_field: facts_id
+      many_collection: insights_facts
+      many_field: insights_id
+      one_allowed_collections: null
+      one_collection: insights
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: facts
+      sort_field: null
+    schema:
+      table: insights_facts
+      column: insights_id
+      foreign_key_table: insights
+      foreign_key_column: id
+      constraint_name: null
+      on_update: NO ACTION
+      on_delete: SET NULL
+  - collection: laws
+    field: user_created
+    related_collection: directus_users
+    meta:
+      junction_field: null
+      many_collection: laws
+      many_field: user_created
+      one_allowed_collections: null
+      one_collection: directus_users
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: null
+      sort_field: null
+    schema:
+      table: laws
+      column: user_created
+      foreign_key_table: directus_users
+      foreign_key_column: id
+      constraint_name: null
+      on_update: NO ACTION
+      on_delete: NO ACTION
+  - collection: laws
+    field: user_updated
+    related_collection: directus_users
+    meta:
+      junction_field: null
+      many_collection: laws
+      many_field: user_updated
+      one_allowed_collections: null
+      one_collection: directus_users
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: null
+      sort_field: null
+    schema:
+      table: laws
+      column: user_updated
+      foreign_key_table: directus_users
+      foreign_key_column: id
+      constraint_name: null
+      on_update: NO ACTION
+      on_delete: NO ACTION
