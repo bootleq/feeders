@@ -20,6 +20,7 @@ import SpotInfoPreview from './SpotInfoPreview';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { StarIcon } from '@heroicons/react/24/outline';
 import { MapPinIcon } from '@heroicons/react/24/solid';
+import { ArrowRightIcon } from '@heroicons/react/24/outline';
 
 const setDefaultViewItemAtom = atom(
   null,
@@ -214,6 +215,15 @@ function Followups({ items, today, dates }: {
                     </TooltipTrigger>
                     <TooltipContent className="p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1">
                       {i.city} {i.town}
+                      <Link
+                        href={`/world/area/@${i.lat},${i.lon}`}
+                        className='break-keep w-min cursor-pointer text-slate-600'
+                        prefetch={false}
+                        data-disable-nprogress={true}
+                      >
+                        <ArrowRightIcon className='inline ml-2' height={16} />
+                        去
+                      </Link>
                     </TooltipContent>
                   </Tooltip>
                 </li>
