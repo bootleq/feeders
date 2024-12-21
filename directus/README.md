@@ -1,17 +1,33 @@
 # Directus CMS
 
-CMS app is run in docker container, and can be accessed with:
+CMS app is run in docker container, and can be accessed locally:
 
 http://localhost:8044/admin
 
-NOTE some infrastructures are not published to public (currently), for example:
+Note some infrastructures are not published to public (currently), for example:
 
-- Collection schema
-- Extensions
+- Directus extensions
 
-so you can't setup a local CMS directly.
+so you can't setup a completed local CMS directly.
 
 Will make it possible later.
+
+
+## Setup
+
+Prepare secret files, you can copy `secrets/sample/*.txt` to `secrets/` as starting,
+but to make it work, they must have valid content of course.
+
+After starting CMS with `pnpm cms`, apply latest schema snapshot with:
+
+    docker compose exec directus npx directus schema apply /directus/snapshots/$(ls snapshots | sort | tail -n 1)
+
+Then restart (`pnpm cms-restart`) to finish applying.
+
+Open admin page and login with default user (see `ADMIN_EMAIL` in `docker-compose.yml`).
+
+You have to manage permission yourself.
+For example in directus UI `Settings` -> `Access Policies` -> `Public` -> `Permission`, open Read or other permissions for certain collections.
 
 
 ## Asset management

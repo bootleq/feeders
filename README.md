@@ -7,9 +7,15 @@ A website dedicated to ending the suffering of free-roaming / stray dogs.
 
 ## Getting Started
 
+Initial `pnpm install`.
+
 Prepare env file by copy `.env.sample` to `.env.development`.
 
-First, run the development server:
+Prepare database, run `pnpm db:tables && pnpm db:migrate`.
+
+Prepare CMS, see Setup section in [directus/README.md](directus/README.md#setup).
+
+Then run the development server:
 
 ```bash
 pnpm dev
