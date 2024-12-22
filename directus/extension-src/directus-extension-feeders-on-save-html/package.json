@@ -21,7 +21,8 @@
 	"scripts": {
 		"build": "directus-extension build",
 		"dev": "directus-extension build -w --no-minify",
-		"link": "directus-extension link"
+		"link": "directus-extension link",
+    "install": "cp -rf dist package.json ../../extensions/directus-extension-feeders-on-save-html/"
 	},
 	"devDependencies": {
 		"@directus/extensions-sdk": "12.1.4",

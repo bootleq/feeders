@@ -47,5 +47,13 @@ located follow below pattern:
               PUBLIC_URL                         file id
 
 
+## Setup
+
+To update and install:
+
+    npm run build
+    npm run install
+
+
 
 [apostrophecms/sanitize-html]: https://github.com/apostrophecms/sanitize-html
