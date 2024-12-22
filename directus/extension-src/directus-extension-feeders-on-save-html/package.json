@@ -1,8 +1,9 @@
 {
 	"name": "directus-extension-feeders-on-save-html",
-	"description": "Please enter a description for your extension",
+	"description": "Trigger sanitize and file-id extraction when saving",
 	"icon": "extension",
 	"version": "1.0.0",
+  "private": true,
 	"keywords": [
 		"directus",
 		"directus-extension",

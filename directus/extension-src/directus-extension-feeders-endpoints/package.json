@@ -3,6 +3,7 @@
 	"description": "Custom endpoints for Feeders",
 	"icon": "extension",
 	"version": "1.0.0",
+  "private": true,
 	"keywords": [
 		"directus",
 		"directus-extension",
