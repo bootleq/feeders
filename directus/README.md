@@ -4,13 +4,7 @@ CMS app is run in docker container, and can be accessed locally:
 
 http://localhost:8044/admin
 
-Note some infrastructures are not published to public (currently), for example:
-
-- Directus extensions
-
-so you can't setup a completed local CMS directly.
-
-Will make it possible later.
+Please note the content will be empty, we don't share production data currently.
 
 
 ## Setup
@@ -29,6 +23,8 @@ Open admin page and login with default user (see `ADMIN_EMAIL` in `docker-compos
 You have to manage permission yourself.
 For example in directus UI `Settings` -> `Access Policies` -> `Public` -> `Permission`, open Read or other permissions for certain collections.
 
+For full functionalities, you have to build and install some in-house extensions, see READMEs in [extensions-src](extension-src) folders.
+
 
 ## Asset management
 
@@ -38,12 +34,15 @@ For example in directus UI `Settings` -> `Access Policies` -> `Public` -> `Permi
   Note the secret text files must not contain EOL character.
 
 
-## HTML sanitize extension
+## In-house extensions
 
-We use a private modified version of [licitdev/directus-extension-sanitize-html](https://github.com/licitdev/directus-extension-sanitize-html).
+We have custom extensions in [extensions-src](extension-src) folders.
 
-Because the extension is not flexible configurable so I use a dirty customized one.
-Need to build and install locally for every change.
+- WYSIWYG HTML sanitize
+- WYSIWYG image file id extraction
+- WYSIWYG interface custom CSS
+
+See READMEs in subfolders.
 
 
 ## General WYSIWYG field settings:
