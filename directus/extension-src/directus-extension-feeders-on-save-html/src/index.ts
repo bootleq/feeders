@@ -106,7 +106,7 @@ export default defineHook(({ filter }, { env }) => {
       const html = sanitize(input[field], collection);
       input[field] = html;
 
-      if (fileSelector) {
+      if (fileSelector && html) {
         const dom = htmlparser2.parseDOM(html);
         const files = selectAll(fileSelector, dom).filter(node => node.type === 'tag');
         files.forEach(file => {
@@ -119,6 +119,7 @@ export default defineHook(({ filter }, { env }) => {
     }
     if (fileIds.length) {
       input[FILE_ID_FIELD_NAME] = fileIds;
+      // TODO: determine how to handle image removal (no ids while the files still exist)
     }
 
 		return input;
