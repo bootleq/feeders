@@ -129,6 +129,8 @@ export default defineHook(({ filter }, { env }) => {
 			case 'string':
         const allowedTags = modelTagsMapping[collection] || tagsSimple;
 				return sanitizeHtml(val, { allowedTags, disallowedTagsMode, allowedAttributes, allowedClasses, allowedIframeHostnames });
+			case 'undefined':
+        return val;
 			default:
         throw new Error(`Unexpect value type (${typeof val}) during sanitize.`);
 		}
