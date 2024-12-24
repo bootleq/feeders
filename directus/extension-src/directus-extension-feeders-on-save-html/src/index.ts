@@ -14,6 +14,20 @@ const targetFields: Record<string, string[]> = {
 
 const allowedAttributes = {
   ...sanitizeHtml.defaults.allowedAttributes,
+  'a': [
+    'href',
+    'name',
+    'target',
+    {
+      name: 'rel',
+      multiple: true,
+      values: [
+        'nofollow',
+        'noopener',
+        'noreferrer',
+      ],
+    }
+  ],
   'iframe': [
     'src',
     'loading',
