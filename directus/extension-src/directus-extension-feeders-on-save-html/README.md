@@ -51,8 +51,7 @@ located follow below pattern:
 
 To update and install:
 
-    npm run build
-    npm run install
+    npm run build && npm run install
 
 
 

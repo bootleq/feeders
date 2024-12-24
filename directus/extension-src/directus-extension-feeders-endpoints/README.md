@@ -28,8 +28,7 @@ Example `Options Override` for WYSIWYG field interface:
 
 To update and install:
 
-    npm run build
-    npm run install
+    npm run build && npm run install
 
 
 
