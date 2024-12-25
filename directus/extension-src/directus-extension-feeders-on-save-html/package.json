@@ -1,0 +1,39 @@
+{
+	"name": "directus-extension-feeders-on-save-html",
+	"description": "Trigger sanitize and file-id extraction when saving",
+	"icon": "extension",
+	"version": "1.0.0",
+  "private": true,
+	"keywords": [
+		"directus",
+		"directus-extension",
+		"directus-extension-hook"
+	],
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"directus:extension": {
+		"type": "hook",
+		"path": "dist/index.js",
+		"source": "src/index.ts",
+		"host": "^10.10.0"
+	},
+	"scripts": {
+		"build": "directus-extension build",
+		"dev": "directus-extension build -w --no-minify",
+		"link": "directus-extension link",
+    "install": "cp -rf dist package.json ../../extensions/directus-extension-feeders-on-save-html/"
+	},
+	"devDependencies": {
+		"@directus/extensions-sdk": "12.1.4",
+		"@types/node": "^22.10.2",
+		"@types/sanitize-html": "^2.13.0",
+		"typescript": "^5.7.2"
+	},
+	"dependencies": {
+		"css-select": "^5.1.0",
+		"htmlparser2": "^9.1.0",
+		"sanitize-html": "^2.14.0"
+	}
+}
