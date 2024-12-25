@@ -304,11 +304,19 @@ function TextFilterCtrlPanel() {
     }
   }, 360);
 
+  const fakeSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e && e.preventDefault();
+
+    const form = formRef.current;
+    if (!form) return;
+    form.submit(); // dual submit to noop
+  };
+
   const defaultText = text;
 
   return (
     <div className=''>
-      <form ref={formRef} onChange={debouncedChanged} className={`flex flex-wrap items-center gap-x-1 my-1 text-sm`}>
+      <form ref={formRef} onChange={debouncedChanged} className={`flex flex-wrap items-center gap-x-1 my-1 text-sm`} target='noop-trap' onSubmit={fakeSubmit}>
         <div className='whitespace-nowrap inline-flex items-center'>
           <TextInput label='包含' name='targetText' inputProps={{className: 'text-sm opacity-60 focus:opacity-100 placeholder-slate-800/50', placeholder: '輸入至少 2 個字', defaultValue: defaultText}} />
         </div>
@@ -625,6 +633,7 @@ export default function SideControl({ tags }: {
       <TagCtrlPanel />
       <FiltersCtrl />
       <MarkCtrlPanel />
+      <iframe name='noop-trap' className='hidden' />
     </div>
   );
 }
