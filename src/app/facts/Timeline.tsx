@@ -3,7 +3,6 @@
 import * as R from 'ramda';
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { atomFamily, splitAtom } from 'jotai/utils';
 import { AnyFunction, present } from '@/lib/utils';
 import { addAlertAtom } from '@/components/store';
 import Html from '@/components/Html';
