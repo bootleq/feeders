@@ -43,11 +43,31 @@ if (enableImgOptimize) {
   }
 }
 
+const rewritesFn = async function rewrites() {
+  return [
+    {
+      source: '/charts/',
+      destination: '/charts/index.html',
+    },
+    {
+      source: '/charts/:path*.txt',
+      destination: '/charts/:path*/index.txt',
+    },
+    {
+      source: '/charts/:path*/',
+      destination: '/charts/:path*/index.html',
+    },
+  ]
+};
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // distDir: 'build', // next-on-pages doesn't support, can cause problems
 
   images: imagesConfig,
+
+  trailingSlash: true,
+  rewrites: rewritesFn,
 
   webpack(config) {
     const fileLoaderRule = config.module.rules.find((rule) => rule.test?.test?.(".svg"));
