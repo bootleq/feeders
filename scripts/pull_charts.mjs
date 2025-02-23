@@ -41,7 +41,7 @@ function main() {
 
   const result = spawnSync(
     'rsync',
-    ['-az', '--info=stats2', '--delete', `${CHARTS_REPO}/charts`, 'public/'],
+    ['-az', '--info=stats2', '--delete', '--delete-excluded', '--prune-empty-dirs', `${CHARTS_REPO}/charts`, 'public/'],
     { encoding: 'utf8',  stdio: 'inherit' }
   );
   if (result.status !== 0) {

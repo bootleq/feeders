@@ -29,8 +29,8 @@ Prepare to preview:
 
 ```bash
 pnpm lint
-pnpm pages:build
 pnpm cms:build-local
+pnpm pages:build
 pnpm preview
 ```
 
@@ -41,6 +41,7 @@ our built application fetches them instead of hitting CMS again.
 Production deployment:
 
 ```bash
+pnpm cms:build-local
 pnpm pages:build:prod
 pnpm env:push:prod
 pnpm run deploy

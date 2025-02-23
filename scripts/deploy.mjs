@@ -35,7 +35,6 @@ function main() {
     return;
   }
 
-
   execSync('wrangler pages deploy dist', { stdio: 'inherit' });
 }
 
