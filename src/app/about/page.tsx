@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import Image from 'next/image';
-import Link from 'next/link';
 import { SITE_NAME, SITE_CONTACT_EMAIL } from '@/lib/utils';
 import Sidebar from '@/components/Sidebar';
+import RepoLink from './RepoLink';
 
 export const runtime = 'edge';
 
@@ -55,11 +54,18 @@ export default async function Page() {
 
         <Hr />
 
-        <h2 className='text-2xl'>聯絡信箱</h2>
-        <address>{SITE_CONTACT_EMAIL}</address>
-        <p>
-          歡迎指教，不用拘謹
-        </p>
+        <div className='grid sm:grid-cols-[auto_1fr] items-center gap-x-5 gap-y-3'>
+          <span>原始碼</span>
+          <RepoLink />
+
+          <span>聯絡信箱</span>
+          <div className='flex items-center justify-start px-2 gap-x-5'>
+            <address className='hover:underline px-1'>{SITE_CONTACT_EMAIL}</address>
+            <p className='text-slate-600'>
+              歡迎指教，不用拘謹
+            </p>
+          </div>
+        </div>
 
         <Hr />
 
