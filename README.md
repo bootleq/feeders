@@ -116,6 +116,11 @@ See [directus/README.md](directus/README.md) for more details.
     ANALYZE=true pnpm build
 
 
+## Charts
+
+Content under `/charts` path is provided by a sub project `feeders-charts`.
+
+
 ## Test
 
 Still lacking.
