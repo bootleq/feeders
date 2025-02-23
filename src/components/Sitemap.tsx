@@ -8,13 +8,10 @@ import TaiwanIcon from '@/assets/main-island.svg';
 import JudgeIcon from '/public/assets/gavel.svg';
 import ThinkIcon from '@/assets/brain-and-head.svg';
 import HumanIcon from '@/assets/man-walk.svg';
-import LightingIcon from '@/assets/lightning.svg';
+import BarChartIcon from '@/assets/bar-chart.svg';
 import { ListBulletIcon } from '@heroicons/react/24/solid';
 
 const iconSize = 32;
-
-const disableCls = 'grayscale fill-gray-300';
-
 
 export default function Sitemap({ className, userDisplay, userLink }: {
   className?: string,
@@ -54,10 +51,10 @@ export default function Sitemap({ className, userDisplay, userLink }: {
             </Link>
           </div>
 
-          <div className={styles.actions}>
-            <Link href='' className={`${styles.unreleased}`}>
-              <LightingIcon className={ disableCls } width={iconSize} height={iconSize} />
-              <span className='text-gray-300'>行動</span>
+          <div className={styles.charts}>
+            <Link href='/charts'>
+              <BarChartIcon className='scale-[75%] fill-[#5d77c9] -translate-y-px' width={iconSize} height={iconSize} />
+              <span className=''>圖表</span>
             </Link>
           </div>
 
