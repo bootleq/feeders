@@ -50,6 +50,10 @@ export default async function Page() {
             <time className='font-mono mr-2'>2024-11-04</time>
             初期測試
           </li>
+          <li>
+            <time className='font-mono mr-2'>2025-02-24</time>
+            圖表頁上線
+          </li>
         </ol>
 
         <Hr />
