@@ -13,6 +13,9 @@
 /.next/
 /out/
 
+# sub repo
+/public/charts/
+
 # production
 /build
 /dist
