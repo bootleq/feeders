@@ -11,7 +11,7 @@ export default function RepoLink() {
       target='_blank'
       title='bootleq/feeders: Source code of feeders.pages.dev'
     >
-      <HubIcon className='w-6 h-6' viewBox='0 0 96 96' />
+      <HubIcon className='w-6 h-6' viewBox='0 0 98 98' />
       github.com/bootleq/feeders
     </Link>
   );
