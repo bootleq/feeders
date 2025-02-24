@@ -11,7 +11,7 @@
     "tsc": "tsc --noErrorTruncation",
     "pages:build": "NEXT_PUBLIC_CMS_BUILD_KEY=$(cat directus/build/BUILD_KEY) pnpm next-on-pages --outdir=dist",
     "pages:build:prod": "NODE_ENV=production NEXT_PUBLIC_CMS_BUILD_KEY=$(cat directus/build/BUILD_KEY) pnpm next-on-pages --outdir=dist",
-    "charts:pull": "tsx --env-file=.env.development scripts/pull_charts.mjs",
+    "pull:charts": "tsx --env-file=.env.development scripts/pull_charts.mjs",
     "preview": "pnpm wrangler pages dev dist --port 3000",
     "env:push:preview": "tsx scripts/push_env_as_secrets.mjs preview",
     "env:push:prod": "tsx scripts/push_env_as_secrets.mjs production",

@@ -119,7 +119,10 @@ See [directus/README.md](directus/README.md) for more details.
 
 ## Charts
 
-Content under `/charts` path is provided by a sub project `feeders-charts`.
+Content under `/charts` path is provided by a sub project [feeders-charts][].
+
+Setup it by `pnpm pull:charts`, but currently the intermediate repo is not
+public available, you have to prepare it first.
 
 
 ## Test
@@ -141,3 +144,4 @@ Still lacking.
 
 
 [feeders.pages.dev]: https://feeders.pages.dev
+[feeders-charts]: https://github.com/bootleq/feeders-charts
