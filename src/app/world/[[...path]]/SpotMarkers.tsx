@@ -76,7 +76,7 @@ const fetchFollowupsAtom = atom(
   async (get, set, spotId: number) => {
     try {
       set(loadingFollowupsAtom, true);
-      const response = await fetch(`/api/followups/${spotId}`);
+      const response = await fetch(`/api/followups/${spotId}/`);
       const json = await response.text();
       const fetched: ItemsFollowups = JSON.parse(json, jsonReviver);
       if (response.ok) {
