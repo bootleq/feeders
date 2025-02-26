@@ -18,8 +18,8 @@ const openapi = fromHono(app, {
   openapi_url: null,
 });
 
-openapi.get('/spots/:geohash', getSpots);
-openapi.get('/followups/:spotId', getFollowups);
+openapi.get('/spots/:geohash/', getSpots);
+openapi.get('/followups/:spotId/', getFollowups);
 
 export const GET = handle(app)
 export const POST = handle(app)

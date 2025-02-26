@@ -77,7 +77,7 @@ const fetchSpotsAtom = atom(
     set(loadingHashesAtom, R.union(loadingHashes, staleHashes));
 
     try {
-      const response = await fetch(`/api/spots/${staleHashes.sort()}`);
+      const response = await fetch(`/api/spots/${staleHashes.sort()}/`);
       const json = await response.text();
       const fetched: ItemsGeoSpotsByGeohash = JSON.parse(json, jsonReviver);
       if (response.ok) {
