@@ -127,7 +127,9 @@ public available, you have to prepare it first.
 
 ## Test
 
-Still lacking.
+Prepare env by copy `.env.sample` to `.env.test`.
+
+Run `pnpm test`.
 
 
 ## Admin Tasks

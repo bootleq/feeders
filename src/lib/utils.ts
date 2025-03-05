@@ -4,9 +4,11 @@ import { parseZonedDateTime } from '@internationalized/date';
 
 export type AnyFunction = (...args: any[]) => any;
 
+const appURLCfg = process.env.NEXT_PUBLIC_APP_URL;
+
 export const SITE_NAME = 'Feeders（暫名）';
 export const SITE_CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL;
-export const APP_URL = new URL(process.env.NEXT_PUBLIC_APP_URL!);
+export const APP_URL = appURLCfg && new URL(appURLCfg);
 export const ACCESS_CTRL = process.env.NEXT_PUBLIC_ACCESS_CTRL || 'close';
 export const ENABLE_ACTIVATE = process.env.NEXT_PUBLIC_ENABLE_ACTIVATE || 'off';
 

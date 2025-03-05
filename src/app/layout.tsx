@@ -7,6 +7,10 @@ import FollowHashRoute from './FollowHashRoute';
 import "./globals.css";
 import { SITE_NAME, APP_URL, present } from '@/lib/utils';
 
+if (!APP_URL) {
+  throw new Error('Missing APP_URL.');
+}
+
 const inter = Inter({ subsets: ["latin"] });
 
 const googleVerificationCode = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFY;
