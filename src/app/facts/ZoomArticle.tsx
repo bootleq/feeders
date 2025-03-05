@@ -29,7 +29,7 @@ export default function ZoomArticle() {
 
   const onClose = () => {
     setSlug('');
-    window.history.pushState(null, '', '/facts');
+    window.history.pushState(null, '', '/facts/');
 
     if (!hasClosed) {
       window.document.title = `${BASE_META.title} - ${SITE_NAME}`;
