@@ -86,6 +86,7 @@ export default function SpotInfo() {
               href={`/world/area/@${spot.lat},${spot.lon}`}
               onClick={visitArea(spot.lat, spot.lon)}
               className='break-keep whitespace-nowrap w-min cursor-pointer text-sm opacity-60 mr-2 hover:bg-yellow-300'
+              data-disable-progress={true}
               prefetch={false}
             >
               {spot.city}{spot.town}

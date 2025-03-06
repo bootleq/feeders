@@ -101,6 +101,7 @@ function Areas({ areas }: {
                 href={`/world/area/@${lat},${lon}`}
                 onClick={visitArea(lat, lon)}
                 className='break-keep w-min cursor-pointer'
+                data-disable-progress={true}
                 prefetch={false}
               >
                 {city} {town}
