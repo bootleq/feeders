@@ -127,18 +127,20 @@ public available, you have to prepare it first.
 
 ## Test
 
+Currently we only have very limited tests, and the setup for E2E test *are missing*.
+
 Prepare env by copy `.env.sample` to `.env.test`.
 
 - Unit test
 
-  Only very poor coverage, run with `pnpm test`.
+  Only very poor coverage, run with `pnpm test:unit`.
 
 - E2E test
 
   Sorry this currently have to run on dev server, and requires local CMS and
   db setup WITH data (which doesn't available for public now).
 
-  The command is `pnpm e2e`.
+  The command is `pnpm test:e2e`.
 
 
 ## Admin Tasks
