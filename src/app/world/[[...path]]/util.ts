@@ -53,8 +53,15 @@ export function updatePath(params: {
   window.history.replaceState(null, '', newPath + search);
 }
 
-export function visitArea(lat: number, lon: number) {
-  return () => {
+export function visitArea(e: React.MouseEvent<HTMLAnchorElement>) {
+  e.preventDefault();
+
+  const href = e.currentTarget.href;
+  const matches = href.match(/area\/@([\d\.]+),([\d\.]+)\/?/);
+  if (matches && matches.length === 3) {
+    const [, lat, lon] = matches;
     window.history.pushState(null, '', `/world/area/@${lat},${lon}`);
+  } else {
+    console.error('無法由連結解析位址');
   }
 }
