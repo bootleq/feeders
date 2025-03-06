@@ -99,7 +99,7 @@ function Areas({ areas }: {
             <li key={geohash} className={areaItemCls}>
               <Link
                 href={`/world/area/@${lat},${lon}`}
-                onClick={visitArea(lat, lon)}
+                onClick={visitArea}
                 className='break-keep w-min cursor-pointer'
                 data-disable-progress={true}
                 prefetch={false}
