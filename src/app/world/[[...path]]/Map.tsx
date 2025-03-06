@@ -300,7 +300,7 @@ export default function Map({ preloadedAreas, helpContent, children, className, 
 
         <TempMarker />
 
-        <LocateControl className={mapStyles['reset-view-ctrl']} />;
+        <LocateControl className={mapStyles['reset-view-ctrl']} />
         <ResetViewControl className={mapStyles['reset-view-ctrl']} title='整個台灣' position='bottomright' />
         <DistrictControl className={mapStyles['reset-view-ctrl']} title='行政區界線' position='bottomright' onClick={advanceMode} />
         <HelpControl className={mapStyles['reset-view-ctrl']} title='說明' position='bottomright' onClick={toggleHelp} />
