@@ -205,7 +205,7 @@ function Followups({ items, today, dates }: {
                         onClick={(e) => { e.preventDefault(); setViewItem(i); } }
                         className='break-keep w-min cursor-pointer'
                         prefetch={false}
-                        data-disable-nprogress={true}
+                        data-disable-progress={true}
                       >
                         <MapPinIcon className={`cursor-pointer ${mapPinCls(i.spotState)}`} height={24} />
                         {viewItem === i &&
@@ -219,7 +219,7 @@ function Followups({ items, today, dates }: {
                         href={`/world/area/@${i.lat},${i.lon}`}
                         className='break-keep w-min cursor-pointer text-slate-600'
                         prefetch={false}
-                        data-disable-nprogress={true}
+                        data-disable-progress={true}
                       >
                         <ArrowRightIcon className='inline ml-2' height={16} />
                         去

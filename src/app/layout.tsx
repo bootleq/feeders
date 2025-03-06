@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Provider } from 'jotai';
 import { SessionProvider } from 'next-auth/react';
-import ProgressBar from './ProgressBar';
+import ProgressProvider from './ProgressBar';
 import FollowHashRoute from './FollowHashRoute';
 import "./globals.css";
 import { SITE_NAME, APP_URL, present } from '@/lib/utils';
@@ -40,10 +40,11 @@ export default async function RootLayout({
   return (
     <html lang="zh-TW" className='overscroll-none'>
       <body className={inter.className}>
-        <ProgressBar />
         <Provider>
           <SessionProvider>
-            {children}
+            <ProgressProvider>
+              {children}
+            </ProgressProvider>
           </SessionProvider>
         </Provider>
         <FollowHashRoute />

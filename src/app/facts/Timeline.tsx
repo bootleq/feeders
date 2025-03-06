@@ -64,7 +64,7 @@ function Fact({ fact, isSubView, onZoom }: {
         <div data-role='title' className='leading-tight text-balance text-center sm:text-start'>
           {title}
         </div>
-        <a href={zoomPath} className={`ml-auto ${factHeaderIconCls}`} data-disable-nprogress={true} onClick={onZoom} title='獨占顯示'>
+        <a href={zoomPath} className={`ml-auto ${factHeaderIconCls}`} data-disable-progress={true} onClick={onZoom} title='獨占顯示'>
           <ArrowsPointingOutIcon className='stroke-slate-700 stroke-2' height={16} />
           <span className='sr-only'>獨占顯示</span>
         </a>
