@@ -114,7 +114,7 @@ export async function generateMetadata(
   return {
     title: insight.title,
     alternates: {
-      canonical: `/insights/${id}-${insight.slug}`
+      canonical: `/insights/${id}-${insight.slug}/`,
     },
   };
 }

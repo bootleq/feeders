@@ -30,7 +30,7 @@ const tooltipCls = [
   'bg-gradient-to-br from-stone-50 to-slate-100 ring-2 ring-offset-1 ring-slate-300',
 ].join(' ')
 const dialogCls = [ // NOTE: the -translate-x must take care of Sidebar position / width
-  'fixed top-1/2 left-1/2 transform -translate-x-1/2 sm:-translate-x-full -translate-y-1/2',
+  'open:fixed top-1/2 left-1/2 transform -translate-x-1/2 sm:-translate-x-full -translate-y-1/2',
   'z-[2000] w-max p-4 mt-2 sm:mt-auto rounded-lg md:shadow-lg',
   'bg-gradient-to-br from-stone-50 to-slate-200 backdrop:bg-black/50',
 ].join(' ');
