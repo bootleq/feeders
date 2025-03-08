@@ -27,7 +27,7 @@ test('事實記錄', async ({ page }) => {
   await expect(
     page.getByRole('dialog').filter({ has: page.getByText('動物保護法（動保法）立法通過') })
   ).toBeVisible();
-  await expect(page).toHaveURL('/facts/1998-11-04_1');
+  await expect(page).toHaveURL('/facts/1998-11-04_1/');
   await expect(fact1).not.toBeInViewport();
 
   // 上一頁，捲動回 Fact 1
@@ -39,4 +39,30 @@ test('事實記錄', async ({ page }) => {
   await page.goBack();
   await page.goBack();
   await expect(page).toHaveTitle(SITE_NAME);
+});
+
+test.describe('由網址進入獨占顯示：錯誤', () => {
+  test('項目找不到', async ({ page }) => {
+    const badSlug = '2010-01-27_120548213';
+    await page.goto(`/facts/${badSlug}/`);
+    await expect(page).toHaveTitle(/^事實記錄 - /);
+
+    const alert = page.getByRole('alert').filter({ has: page.getByText(/無法跳到指定項目/) });
+    await expect(alert).toBeVisible();
+    await expect(alert).toHaveText(new RegExp(`"${badSlug}" 可能已改名`));
+
+    await alert.getByRole('button', { name: '關閉' }).click();
+  });
+
+  test('格式錯誤', async ({ page }) => {
+    const badSlug = '623RP';
+    await page.goto(`/facts/${badSlug}/`);
+    await expect(page).toHaveTitle(/^事實記錄 - /);
+
+    const alert = page.getByRole('alert').filter({ has: page.getByText(/網址不正確/) });
+    await expect(alert).toBeVisible();
+    await expect(alert).toHaveText(new RegExp(`"${badSlug}" 無法辨識`));
+
+    await alert.getByRole('button', { name: '關閉' }).click();
+  });
 });

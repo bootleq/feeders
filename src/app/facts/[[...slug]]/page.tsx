@@ -12,27 +12,30 @@ import SideControl from '@/app/facts/SideControl';
 
 export const runtime = 'edge';
 
+async function findZoomedFact(slug: string) {
+  const zoom = slug.match(SLUG_PATTERN);
+
+  if (zoom) {
+    const { facts } = await getFacts();
+    const factId = Number.parseInt(zoom.pop() || '', 10);
+    return facts.find(f => f.id === factId);
+  }
+}
+
 export async function generateMetadata(
   { params }: { params: Promise<{ slug: string[] }> },
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
-  const slug = (await params).slug?.[0] || '';
-  const zoom = slug.match(SLUG_PATTERN);
-  let fact = null;
   let meta = { ...BASE_META };
 
-  if (zoom) {
-    const { facts, tags } = await getFacts();
-    const factId = Number.parseInt(zoom.pop() || '', 10);
-    fact = facts.find(f => f.id === factId);
+  const slug = (await params).slug?.[0] || '';
+  const fact = await findZoomedFact(slug);
+  if (fact) {
+    meta.title = `${fact.date}: ${fact.title.trim()} - ${meta.title}`;
 
-    if (fact) {
-      meta.title = `${fact.date}: ${fact.title.trim()} - ${meta.title}`;
-
-      const anchor = `fact-${fact.date}_${fact.id}`;
-      const zoomPath = `/facts/${anchor.replace('fact-', '')}`;
-      meta.alternates.canonical = zoomPath;
-    }
+    const anchor = `fact-${fact.date}_${fact.id}`;
+    const zoomPath = `/facts/${anchor.replace('fact-', '')}/`;
+    meta.alternates.canonical = zoomPath;
   }
 
   return meta;
@@ -43,16 +46,18 @@ export default async function Page({ params }: {
 }) {
   const { facts, tags } = await getFacts();
   const slug = params.slug?.[0] || '';
+  const zoomedFact = await findZoomedFact(slug);
 
   return (
     <main className="flex min-h-screen flex-row items-start justify-between">
+      <ZoomArticle initialFact={zoomedFact} />
+
       <Sidebar navTitle='事實記錄' fixed={false} className={`max-h-screen scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
         <SideControl tags={tags} />
       </Sidebar>
 
-      <TimelineContainer facts={facts} slug={slug} />
+      <TimelineContainer facts={facts} initialSlug={slug} />
 
-      <ZoomArticle />
       <Alerts itemsAtom={alertsAtom} dismissAtom={dismissAlertAtom} />
     </main>
   );

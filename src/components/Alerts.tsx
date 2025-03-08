@@ -27,10 +27,10 @@ const motionProps = {
 
 function ErrorItem(key: string, content: ReactElement, dismiss: (key: string) => void ) {
   return (
-    <m.div key={key} className={`${itemWrapperCls} bg-red ring-red-900/75 my-3 py-9 px-9`} {...motionProps}>
+    <m.div key={key} role='alert' className={`${itemWrapperCls} bg-red ring-red-900/75 my-3 py-9 px-9`} {...motionProps}>
       <ExclamationCircleIcon className='mr-1 fill-white stroke-red-800 stroke-2' height={32} />
       錯誤：{content}
-      <XMarkIcon className='absolute right-1 top-1 ml-auto cursor-pointer fill-slate-500' onClick={() => dismiss(key)} height={24} />
+      <XMarkIcon role='button' aria-label='關閉' aria-hidden={false} className='absolute right-1 top-1 ml-auto cursor-pointer fill-slate-500' onClick={() => dismiss(key)} height={24} />
     </m.div>
   );
 }
@@ -39,7 +39,7 @@ function InfoItem(key: string, content: ReactElement, dismiss: (key: string) => 
   return (
     <m.div key={key} className={`${itemWrapperCls} bg-white/50 ring-yellow my-3 py-9 px-9`} {...motionProps}>
       {content}
-      <XMarkIcon className='absolute right-1 top-1 ml-auto cursor-pointer fill-slate-500' onClick={() => dismiss(key)} height={24} />
+      <XMarkIcon role='button' aria-label='關閉' aria-hidden={false} className='absolute right-1 top-1 ml-auto cursor-pointer fill-slate-500' onClick={() => dismiss(key)} height={24} />
     </m.div>
   );
 }
