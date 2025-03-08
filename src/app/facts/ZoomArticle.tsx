@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import { present, SITE_NAME } from '@/lib/utils';
 import { zoomedFactAtom, slugAtom, SLUG_PATTERN } from './store';
+import { useHydrateAtoms } from 'jotai/utils';
 import { BASE_META } from '@/app/facts/utils';
 import tlStyles from './timeline.module.scss';
 import FactTagList from './FactTagList';
@@ -13,22 +14,27 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 
 const dialogCls = [
   'flex flex-col overscroll-y-contain',
+  '[&:not(:open)]:top-[50%] [&:not(:open)]:-translate-y-1/2 z-40',
   'min-w-[40vw] min-h-[20vh] rounded drop-shadow-md',
   'max-w-full lg:max-w-screen-lg xl:max-w-screen-xl',
   'bg-gradient-to-br from-stone-50 to-slate-200',
   'backdrop:bg-black/50 backdrop:backdrop-blur-[1px]',
 ].join(' ');
 
-export default function ZoomArticle() {
+export default function ZoomArticle({ initialFact }: {
+  initialFact: any,
+}) {
+  useHydrateAtoms([
+    [zoomedFactAtom, initialFact],
+  ]);
   const ref = useRef<HTMLDialogElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const [fact, setFact] = useAtom(zoomedFactAtom);
-  const setSlug = useSetAtom(slugAtom);
   const [hasClosed, setHasClosed] = useState(false);
   const [titleCollapsed, setTitleCollapsed] = useState(false);
 
   const onClose = () => {
-    setSlug('');
+    setFact(null);
     window.history.pushState(null, '', '/facts/');
 
     if (!hasClosed) {

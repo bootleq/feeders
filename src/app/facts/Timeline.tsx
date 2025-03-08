@@ -136,7 +136,7 @@ export default function Timeline({ facts, isSubView = false }: {
 
     if (slug && decodedSlug.match(SLUG_PATTERN)) {
       setSlug(decodedSlug);
-      window.history.pushState(null, '', `/facts/${slug}`);
+      window.history.pushState(null, '', `/facts/${slug}/`);
     } else {
       addAlert('error', <>網址不正確（<code>{JSON.stringify(decodedSlug)}</code>）</>);
     }

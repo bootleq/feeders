@@ -1,7 +1,7 @@
 "use client"
 
 import * as R from 'ramda';
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { useSetAtom, useAtomValue } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
@@ -29,15 +29,12 @@ const columnClassMapping: Record<number, string> = {
   5: 'md:grid-cols-5',
 };
 
-export default function TimelineContainer({ facts, slug }: {
+export default function TimelineContainer({ facts, initialSlug }: {
   facts: any[],
-  slug: string,
+  initialSlug: string,
 }) {
-  useHydrateAtoms([
-    [slugAtom, slug],
-  ]);
   const setSlug = useSetAtom(slugAtom);
-  const [firstRender, setFirstRender] = useState(false);
+  const [isInitialZoom, setIsInitialZoom] = useState(present(initialSlug));
   const textFilter = useAtomValue(textFilterAtom);
   const dateRange = useAtomValue(dateRangeAtom);
   const setRejectCount = useSetAtom(filterRejectedCountAtom);
@@ -46,6 +43,7 @@ export default function TimelineContainer({ facts, slug }: {
   const dateRangeKey = dateRange.join(',');
   const pathname = usePathname();
   const setZoomedFact = useSetAtom(zoomedFactAtom);
+  const lastAlertSlug = useRef('');
   const addAlert = useSetAtom(addAlertAtom);
 
   const validFacts = useMemo(() => {
@@ -80,33 +78,38 @@ export default function TimelineContainer({ facts, slug }: {
   }, []);
 
   const setZoomBySlug = useCallback((newSlug?: string) => {
-    if (!firstRender) {
-      setFirstRender(true);
-      return;
-    }
-
     const zoom = newSlug?.match(SLUG_PATTERN);
     if (zoom) {
       const factId = Number.parseInt(zoom.pop() || '', 10);
       if (factId) {
         const fact = facts.find(f => f.id === factId);
         if (fact) {
-          setZoomedFact(fact);
+          if (!isInitialZoom) {
+            setZoomedFact(fact);
+          }
           const target = findFactElement(`fact-${newSlug}`);
           target && target.scrollIntoView({ behavior: 'instant' });
         } else {
           setZoomedFact(null);
-          addAlert('error', <>無法跳到指定項目（<code>{JSON.stringify(newSlug)}</code> 可能已改名，或被移除）</>);
+          const slugString = JSON.stringify(newSlug);
+          if (lastAlertSlug.current !== slugString) {
+            addAlert('error', <>無法跳到指定項目（<code>{slugString}</code> 可能已改名，或被移除）</>);
+            lastAlertSlug.current = slugString;
+          }
         }
       }
     } else {
       if (present(newSlug)) {
         setZoomedFact(null);
-        addAlert('error', <>網址不正確（<code>{JSON.stringify(newSlug)}</code> 無法辨識）</>);
+        const slugString = JSON.stringify(newSlug);
+        if (lastAlertSlug.current !== slugString) {
+          addAlert('error', <>網址不正確（<code>{slugString}</code> 無法辨識）</>);
+          lastAlertSlug.current = slugString;
+        }
       }
       setZoomedFact(null);
     }
-  }, [facts, setZoomedFact, addAlert, firstRender]);
+  }, [facts, setZoomedFact, addAlert, isInitialZoom, lastAlertSlug]);
 
   const followHash = useCallback((e: HashChangeEvent) => {
     const hash = decodeURI(new URL(e.newURL).hash);
@@ -142,9 +145,13 @@ export default function TimelineContainer({ facts, slug }: {
   useEffect(() => {
     const newSlug = pathname.split('/')[2] || '';
     const decodedSlug = decodeURI(newSlug);
+
+    if (decodedSlug !== initialSlug) {
+      setIsInitialZoom(false);
+    }
     setSlug(decodedSlug);
     setZoomBySlug(decodedSlug);
-  }, [pathname, slug, setSlug, setZoomBySlug]);
+  }, [pathname, initialSlug, setIsInitialZoom, setSlug, setZoomBySlug]);
 
   return (
     <div className={`w-full mx-auto px-0 grid gap-2 ${colsClass}`} onMouseEnter={onMouseEnter}>
