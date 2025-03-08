@@ -31,7 +31,7 @@
     "cms:snapshot": "cd ./directus && docker compose exec directus npx directus schema snapshot /directus/snapshots/$(date +'%Y%m%d').yml",
     "test:unit": "vitest",
     "test:e2e": "playwright test",
-    "test:e2e:shots": "playwright test --update-snapshots",
+    "test:shots": "playwright test --update-snapshots",
     "test": "pnpm run test:e2e"
   },
   "dependencies": {
