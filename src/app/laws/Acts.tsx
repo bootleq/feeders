@@ -128,6 +128,29 @@ export default function Acts({ acts }: {
   }, {});
   // Make dataset like { data-view-ctrl-body="hide" }
 
+  const List = useMemo(() => (
+    <ul>
+      {
+        Object.entries(acts).map(([act, laws]) => (
+          <li key={act}>
+            <div className='flex items-center text-lg p-1 pr-5 my-1 mb-2 ring ring-slate-800'>
+              <Link href={`#act-${act}`} className='hover:scale-125'>
+                <img src='/assets/dictionary.svg' alt='法律' width={18} height={18} className='mr-1' />
+              </Link>
+              <strong id={`act-${act}`}>{act}</strong>
+            </div>
+
+            <ul className='pb-2 px-1.5'>
+              {laws.map((law: any) => (
+                <Law key={law.id} item={law} />
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ul>
+  ), [acts]);
+
   const onClickProps = markPicking ? { onClick: onPickItem } : {};
   const rootClassName = [
     'relative p-1 max-w-screen-2xl overflow-y-scroll scroll-smooth scroll-py-8 h-screen',
@@ -145,26 +168,7 @@ export default function Acts({ acts }: {
       onMouseEnter={clearMarkIndicators}
     >
       <MarkOffscreenIndicators direct='up' />
-      <ul>
-        {
-          Object.entries(acts).map(([act, laws]) => (
-            <li key={act}>
-              <div className='flex items-center text-lg p-1 pr-5 my-1 mb-2 ring ring-slate-800'>
-                <Link href={`#act-${act}`} className='hover:scale-125'>
-                  <img src='/assets/dictionary.svg' alt='法律' width={18} height={18} className='mr-1' />
-                </Link>
-                <strong id={`act-${act}`}>{act}</strong>
-              </div>
-
-              <ul className='pb-2 px-1.5'>
-                {laws.map((law: any) => (
-                  <Law key={law.id} item={law} />
-                ))}
-              </ul>
-            </li>
-          ))
-        }
-      </ul>
+      {List}
       <MarkOffscreenIndicators direct='down' />
     </div>
   );
