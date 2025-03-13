@@ -11,8 +11,7 @@ export default async function Home() {
   return (
     <main className="container flex flex-col min-h-screen items-center justify-between p-4 mx-auto">
       <h1 className='flex justify-start text-4xl py-6 relative'>
-        {SITE_NAME.replace('（暫名）', '')}
-        <small className='text-base opacity-60 absolute -right-[50%]'>（暫名）</small>
+        {SITE_NAME}
       </h1>
 
       <p className='text-xl sm:text-2xl text-balance text-center my-2'>
