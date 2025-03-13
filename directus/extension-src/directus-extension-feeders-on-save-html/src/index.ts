@@ -18,6 +18,7 @@ const allowedAttributes = {
     'href',
     'name',
     'target',
+    'title',
     {
       name: 'rel',
       multiple: true,
