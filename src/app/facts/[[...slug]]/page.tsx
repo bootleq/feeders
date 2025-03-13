@@ -1,5 +1,6 @@
 import * as R from 'ramda';
 import type { Metadata, ResolvingMetadata } from "next";
+import { preload } from 'react-dom';
 import { getFacts } from '@/app/facts/getFacts';
 import { BASE_META } from '@/app/facts/utils';
 import { slugAtom, SLUG_PATTERN } from '@/app/facts/store';
@@ -47,6 +48,9 @@ export default async function Page({ params }: {
   const { facts, tags } = await getFacts();
   const slug = params.slug?.[0] || '';
   const zoomedFact = await findZoomedFact(slug);
+
+  preload('/assets/GeistMonoDigits.woff2', { as: 'font' });
+  preload('/assets/BootleqSpace.woff2', { as: 'font' });
 
   return (
     <main className="flex min-h-screen flex-row items-start justify-between">

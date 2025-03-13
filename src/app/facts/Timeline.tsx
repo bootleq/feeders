@@ -87,7 +87,7 @@ function Fact({ fact, isSubView, onZoom }: {
           </div>
         }
         {present(origin) &&
-          <div data-role='origin' className={`text-xs p-1 ml-1.5 w-fit text-zinc-700 ${tlStyles.origin}`}>
+          <div data-role='origin' className={`text-xs font-mixed p-1 ml-1.5 w-fit text-zinc-700 ${tlStyles.origin}`}>
             <Html html={origin} />
           </div>
         }
