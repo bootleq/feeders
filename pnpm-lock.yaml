@@ -133,8 +133,8 @@ importers:
         specifier: ^3.666.0
         version: 3.666.0
       '@cloudflare/next-on-pages':
-        specifier: ^1.13.6
-        version: 1.13.6(vercel@34.4.0(@swc/core@1.7.6(@swc/helpers@0.5.5)))(wrangler@4.2.0)
+        specifier: ^1.13.10
+        version: 1.13.10(vercel@34.4.0(@swc/core@1.7.6(@swc/helpers@0.5.5)))(wrangler@4.2.0)
       '@faker-js/faker':
         specifier: ^8.4.1
         version: 8.4.1
@@ -1120,13 +1120,13 @@ packages:
     resolution: {integrity: sha512-+tv3z+SPp+gqTIcImN9o0hqE9xyfQjI1XD9pL6NuKjua9B1y7mNYv0S9cP+QEbA4ppVgGZEmKOvHX5G5Ei1CVA==}
     engines: {node: '>=18.0.0'}
 
-  '@cloudflare/next-on-pages@1.13.6':
-    resolution: {integrity: sha512-7SrvJ5x5+gKYXRGaKqJU8uE205snzQ07mzYLoauL0+yUQo5AJ6ZdRuwg4OVa+duKdDsoGbaD7pMEn7SDK7XAxg==}
+  '@cloudflare/next-on-pages@1.13.10':
+    resolution: {integrity: sha512-miboFA675/RzpHNe3nri1XO5cwtJCPfEZbL7mdlwwXqYw6DMlrppPaBNNjgbgXdLylHBV7h1+zfKdVDaQ20B8w==}
     hasBin: true
     peerDependencies:
       '@cloudflare/workers-types': ^4.20240208.0
       vercel: '>=30.0.0'
-      wrangler: ^3.28.2
+      wrangler: ^3.28.2 || ^4.0.0
     peerDependenciesMeta:
       '@cloudflare/workers-types':
         optional: true
@@ -8315,9 +8315,9 @@ snapshots:
     dependencies:
       mime: 3.0.0
 
-  '@cloudflare/next-on-pages@1.13.6(vercel@34.4.0(@swc/core@1.7.6(@swc/helpers@0.5.5)))(wrangler@4.2.0)':
+  '@cloudflare/next-on-pages@1.13.10(vercel@34.4.0(@swc/core@1.7.6(@swc/helpers@0.5.5)))(wrangler@4.2.0)':
     dependencies:
-      acorn: 8.12.1
+      acorn: 8.14.0
       ast-types: 0.14.2
       chalk: 5.3.0
       chokidar: 3.6.0
@@ -12998,13 +12998,13 @@ snapshots:
   miniflare@3.20241106.1:
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
-      acorn: 8.12.1
+      acorn: 8.14.0
       acorn-walk: 8.3.3
       capnp-ts: 0.7.0
       exit-hook: 2.2.1
       glob-to-regexp: 0.4.1
       stoppable: 1.1.0
-      undici: 5.28.4
+      undici: 5.29.0
       workerd: 1.20241106.1
       ws: 8.18.0
       youch: 3.3.3
