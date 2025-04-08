@@ -155,7 +155,7 @@ export default function TimelineContainer({ facts, initialSlug }: {
 
   return (
     <div className={`w-full mx-auto px-0 grid gap-2 ${colsClass}`} onMouseEnter={onMouseEnter}>
-      <Timeline facts={validFacts} />
+      <Timeline facts={validFacts} isOnly={columns.length === 1} />
       {
         columns.slice(1).map((visible, idx) => (
           visible ?

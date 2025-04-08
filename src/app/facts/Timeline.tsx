@@ -111,9 +111,10 @@ function MarkOffscreenIndicators({ direct }: {
   );
 }
 
-export default function Timeline({ facts, isSubView = false }: {
+export default function Timeline({ facts, isSubView = false, isOnly = false }: {
   facts: any[],
   isSubView?: boolean,
+  isOnly?: boolean,
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const setSlug = useSetAtom(slugAtom);
@@ -208,7 +209,7 @@ export default function Timeline({ facts, isSubView = false }: {
   const onClickProps = markPickingInMainView ? { onClick: onPickFact } : {};
 
   const rootClassName = [
-    'relative p-1 overflow-auto scroll-smooth scroll-py-8 scrollbar-thin h-screen',
+    'relative p-1 overflow-auto scroll-smooth scroll-py-8 h-screen',
     tlStyles.timeline,
     markPickingInMainView ? tlStyles['mark-picking'] : '',
     isSubView ? 'hidden md:block' : '',
@@ -218,7 +219,7 @@ export default function Timeline({ facts, isSubView = false }: {
     <div
       ref={ref}
       data-role='timeline'
-      className={rootClassName}
+      className={`${rootClassName} ${isOnly ? '' : 'scrollbar-thin'}`}
       {...onClickProps}
       {...viewCtrlData}
     >
