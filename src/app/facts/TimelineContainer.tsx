@@ -22,7 +22,7 @@ import tlStyles from './timeline.module.scss';
 import Timeline from './Timeline';
 
 const columnClassMapping: Record<number, string> = {
-  1: '',
+  1: 'md:max-w-3xl lg:max-w-5xl md:ml-3',
   2: 'md:grid-cols-2',
   3: 'md:grid-cols-3',
   4: 'md:grid-cols-4',
@@ -155,7 +155,7 @@ export default function TimelineContainer({ facts, initialSlug }: {
 
   return (
     <div className={`w-full mx-auto px-0 grid gap-2 ${colsClass}`} onMouseEnter={onMouseEnter}>
-      <Timeline facts={validFacts} />
+      <Timeline facts={validFacts} isOnly={columns.length === 1} />
       {
         columns.slice(1).map((visible, idx) => (
           visible ?

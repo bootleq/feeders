@@ -111,9 +111,10 @@ function MarkOffscreenIndicators({ direct }: {
   );
 }
 
-export default function Timeline({ facts, isSubView = false }: {
+export default function Timeline({ facts, isSubView = false, isOnly = false }: {
   facts: any[],
   isSubView?: boolean,
+  isOnly?: boolean,
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const setSlug = useSetAtom(slugAtom);
@@ -171,6 +172,19 @@ export default function Timeline({ facts, isSubView = false }: {
     };
   }, [setInterObserver, isSubView]);
 
+  useEffect(() => {
+    if (isSubView) return;
+    const root = ref.current;
+    if (!root) return;
+    if (root.scrollTop > 0) return;
+
+    const activeEl = document.activeElement;
+    if (activeEl?.tagName === 'BODY') {
+      const el = root.querySelector('a[href]') as HTMLAnchorElement;
+      el?.focus();
+    }
+  }, [isSubView]);
+
   const onPickFact = useCallback((e: React.MouseEvent<HTMLElement>) => {
     const el = e.target as HTMLElement;
     const fact = el.closest('[data-role="fact"]') as HTMLElement;
@@ -208,7 +222,7 @@ export default function Timeline({ facts, isSubView = false }: {
   const onClickProps = markPickingInMainView ? { onClick: onPickFact } : {};
 
   const rootClassName = [
-    'relative p-1 overflow-auto scroll-smooth scroll-py-8 scrollbar-thin h-screen',
+    'relative p-1 overflow-auto scroll-smooth scroll-py-8 h-screen',
     tlStyles.timeline,
     markPickingInMainView ? tlStyles['mark-picking'] : '',
     isSubView ? 'hidden md:block' : '',
@@ -218,10 +232,11 @@ export default function Timeline({ facts, isSubView = false }: {
     <div
       ref={ref}
       data-role='timeline'
-      className={rootClassName}
+      className={`${rootClassName} ${isOnly ? '' : 'scrollbar-thin'}`}
       {...onClickProps}
       {...viewCtrlData}
     >
+      {!isSubView && <a href='#head' className='absolute -top-2'></a>}
       {!isSubView && <MarkOffscreenIndicators direct='up' />}
       {Facts}
       {!isSubView && <MarkOffscreenIndicators direct='down' />}

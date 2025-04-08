@@ -99,6 +99,18 @@ export default function Acts({ acts }: {
     };
   }, [setInterObserver]);
 
+  useEffect(() => {
+    const root = ref.current;
+    if (!root) return;
+    if (root.scrollTop > 0) return;
+
+    const activeEl = document.activeElement;
+    if (activeEl?.tagName === 'BODY') {
+      const el = root.querySelector('a[href]') as HTMLAnchorElement;
+      el?.focus();
+    }
+  }, []);
+
   const onPickItem = useCallback((e: React.MouseEvent<HTMLElement>) => {
     const el = e.target as HTMLElement;
     const law = el.closest('[data-role="law"]') as HTMLElement;
@@ -167,6 +179,7 @@ export default function Acts({ acts }: {
       {...viewCtrlData}
       onMouseEnter={clearMarkIndicators}
     >
+      <a href='#head' className='absolute -top-2'></a>
       <MarkOffscreenIndicators direct='up' />
       {List}
       <MarkOffscreenIndicators direct='down' />
