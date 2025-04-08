@@ -20,7 +20,7 @@ export const toggleViewCtrlAtom = atom(
   }
 );
 
-export const columnsAtom = atom<boolean[]>([true, false]);
+export const columnsAtom = atom<boolean[]>([true]);
 
 export type Tags = Record<string, boolean>;
 export const tagsAtom = atom<Tags>({});
