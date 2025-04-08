@@ -101,9 +101,12 @@ export default function Acts({ acts }: {
 
   useEffect(() => {
     const root = ref.current;
+    if (!root) return;
+    if (root.scrollTop > 0) return;
+
     const activeEl = document.activeElement;
     if (activeEl?.tagName === 'BODY') {
-      const el = root?.querySelector('a[href]') as HTMLAnchorElement;
+      const el = root.querySelector('a[href]') as HTMLAnchorElement;
       el?.focus();
     }
   }, []);
