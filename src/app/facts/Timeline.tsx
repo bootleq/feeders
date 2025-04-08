@@ -172,6 +172,16 @@ export default function Timeline({ facts, isSubView = false, isOnly = false }: {
     };
   }, [setInterObserver, isSubView]);
 
+  useEffect(() => {
+    if (isSubView) return;
+    const root = ref.current;
+    const activeEl = document.activeElement;
+    if (activeEl?.tagName === 'BODY') {
+      const el = root?.querySelector('a[href]') as HTMLAnchorElement;
+      el?.focus();
+    }
+  }, [isSubView]);
+
   const onPickFact = useCallback((e: React.MouseEvent<HTMLElement>) => {
     const el = e.target as HTMLElement;
     const fact = el.closest('[data-role="fact"]') as HTMLElement;
@@ -223,6 +233,7 @@ export default function Timeline({ facts, isSubView = false, isOnly = false }: {
       {...onClickProps}
       {...viewCtrlData}
     >
+      {!isSubView && <a href='#head' className='absolute -top-2'></a>}
       {!isSubView && <MarkOffscreenIndicators direct='up' />}
       {Facts}
       {!isSubView && <MarkOffscreenIndicators direct='down' />}
