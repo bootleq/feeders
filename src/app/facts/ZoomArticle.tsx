@@ -34,6 +34,8 @@ export default function ZoomArticle({ initialFact }: {
   const [titleCollapsed, setTitleCollapsed] = useState(false);
 
   const onClose = () => {
+    const anchor = `fact-${fact.date}_${fact.id}`;
+
     setFact(null);
     window.history.pushState(null, '', '/facts/');
 
@@ -41,6 +43,9 @@ export default function ZoomArticle({ initialFact }: {
       window.document.title = `${BASE_META.title} - ${SITE_NAME}`;
       setHasClosed(true);
     }
+
+    const factDot = document.querySelector(`[data-role="timeline"] a[href="#${anchor}"]`) as HTMLAnchorElement;
+    factDot && setTimeout(() => factDot.focus(), 0);
   };
 
   const onResizeTitle = () => {
