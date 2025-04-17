@@ -1,3 +1,5 @@
+name: feeders
+
 services:
   directus:
     image: directus/directus:11.6.1
