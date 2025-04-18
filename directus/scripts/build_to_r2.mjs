@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import chalk from 'chalk';
+import { spawnSync } from 'child_process';
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getFacts } from '@/app/facts/getFacts';
 import { getInsights } from '@/app/insights/getInsights';
@@ -80,6 +81,25 @@ const saveToDisk = (data, name) => {
   fs.writeFileSync(`${localDir}/${key}`, json);
 };
 
+const rcloneSync = async () => {
+  const cmd = 'pnpm';
+  const cmdArgs = [
+    'tsx',
+    '--env-file=.env.development',
+    'directus/scripts/sync_to_r2.mjs',
+  ];
+  const result = spawnSync(cmd, cmdArgs, { stdio: 'inherit' });
+
+  if (result.error) {
+    console.error(`Failed to start sync script: ${result.error.message}`);
+    process.exit(1);
+  }
+  if (result.status !== 0) {
+    console.error(`Sync failed with exit code ${result.status}`);
+    process.exit(1);
+  }
+}
+
 const facts = await getFacts(true);
 const insights = await getInsights(true);
 const laws = await getLaws(true);
@@ -105,14 +125,6 @@ fs.writeFileSync(buildKeyPath, buildKey);
 
 console.log(`\nDone, BUILD_KEY:`, buildKey);
 
-console.log("\nPlease upload files to R2, example:");
-console.log([
-  '  rclone sync',
-  fs.realpathSync('directus/build/cms'),
-  'r2:feeders/cms',
-  '--metadata-set content-type=application/json',
-  '--metadata-set cache-control="public, max-age=10368000"',
-  '-v'
-].join(' '));
+await rcloneSync();
 
 process.exit();
