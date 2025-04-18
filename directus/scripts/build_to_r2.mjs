@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import chalk from 'chalk';
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getFacts } from '@/app/facts/getFacts';
 import { getInsights } from '@/app/insights/getInsights';
@@ -70,12 +71,12 @@ const saveToDisk = (data, name) => {
   if (fs.existsSync(destPath)) {
     const extFile = fs.readFileSync(destPath, 'utf8');
     if (extFile === json) {
-      console.log(`  skip ${key} (unchanged).`);
+      console.log(chalk.gray(`  skip ${key} (unchanged).`));
       return;
     }
   }
 
-  console.log('Write to disk', key);
+  console.log(chalk.green('Write to disk', key));
   fs.writeFileSync(`${localDir}/${key}`, json);
 };
 
