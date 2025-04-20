@@ -57,14 +57,12 @@ function ViewCtrlPanel() {
   const [panelOpen, setPanelOpen] = useState(true);
   const [viewCtrl, setViewCtrl] = useAtom(toggleViewCtrlAtom);
   const toggle = () => setPanelOpen(R.not);
-  const [openJudgements, setOpenJudgements] = useState(false);
   const [latestHash, setLatestHash] = useState('');
 
   const onToggleJudgements = useCallback((open: boolean) => {
     document.querySelectorAll('[data-role="body"] details').forEach(el => {
       (el as HTMLDetailsElement).open = open;
     });
-    setOpenJudgements(open);
   }, []);
 
   const onToggleAll = (toggle: boolean) => () => onToggleJudgements(toggle);
