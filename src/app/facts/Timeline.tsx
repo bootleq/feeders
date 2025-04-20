@@ -41,7 +41,7 @@ function Fact({ fact, isSubView, onZoom }: {
 }) {
   const { id, date, title, desc, summary, origin, tags, weight } = fact;
   const anchor = `fact-${fact.date}_${fact.id}`;
-  const zoomPath = `/facts/${anchor.replace('fact-', '')}`;
+  const zoomPath = `/facts/${anchor.replace('fact-', '')}/`;
   const datePadEnd = date.length < 10 ? <span className=''>{'\u00A0'.repeat(10 - date.length)}</span> : '';
   const allTagsHiddenAtom = useMemo(() => createTagsHiddenAtom(tags || ['']), [tags]);
   const hidden = useAtomValue(allTagsHiddenAtom);
