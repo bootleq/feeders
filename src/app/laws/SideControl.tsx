@@ -58,6 +58,7 @@ function ViewCtrlPanel() {
   const [viewCtrl, setViewCtrl] = useAtom(toggleViewCtrlAtom);
   const toggle = () => setPanelOpen(R.not);
   const [openJudgements, setOpenJudgements] = useState(false);
+  const [latestHash, setLatestHash] = useState('');
 
   const onToggleJudgements = useCallback((open: boolean) => {
     document.querySelectorAll('[data-role="body"] details').forEach(el => {
@@ -67,6 +68,19 @@ function ViewCtrlPanel() {
   }, []);
 
   const onToggleAll = (toggle: boolean) => () => onToggleJudgements(toggle);
+
+  const onHashChange = useCallback(() => {
+    const hash = new URL(document.location.href).hash;
+    setLatestHash(hash);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('hashchange', onHashChange);
+
+    return () => {
+      window.removeEventListener('hashchange', onHashChange);
+    };
+  }, [onHashChange]);
 
   return (
     <div className='pb-3'>
@@ -89,13 +103,13 @@ function ViewCtrlPanel() {
               <span className='mr-1'>
                 全部
               </span>
-              <button type='button' className='btn bg-slate-100 mx-0 px-px py-px ring-1 text-slate-600 text-xs hover:bg-white' onClick={onToggleAll(true)}>
+              <Link href={`/laws/?judge=1${latestHash}`} className='btn bg-slate-100 mx-0 px-px py-px ring-1 text-slate-600 text-xs hover:bg-white' onClick={onToggleAll(true)}>
                 展開
-              </button>
+              </Link>
               ／
-              <button type='button' className='btn bg-slate-100 mx-0 px-px py-px ring-1 text-slate-600 text-xs hover:bg-white' onClick={onToggleAll(false)}>
+              <Link href={`/laws/${latestHash}`} className='btn bg-slate-100 mx-0 px-px py-px ring-1 text-slate-600 text-xs hover:bg-white' onClick={onToggleAll(false)}>
                 收合
-              </button>
+              </Link>
             </div>
           </div>
         </div>
