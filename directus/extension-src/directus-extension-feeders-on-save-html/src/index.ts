@@ -118,6 +118,10 @@ export default defineHook(({ filter }, { env }) => {
     const fileIds: string[] = [];
 
     for (const field of targetFields[collection] || []) {
+      if (input[field] === null) {
+        continue;
+      }
+
       const html = sanitize(input[field], collection);
       input[field] = html;
 
