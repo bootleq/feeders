@@ -61,9 +61,11 @@ export default function Law({ item }: {
 
         <div data-role='title' className='flex items-center leading-tight sm:text-start'>
           <strong className='mr-2 text-lg'>{title}</strong>
-          <Link href={link} target='_blank' className='hover:bg-amber-300/50 hover:scale-125'>
-            <ArrowTopRightOnSquareIcon className='stroke-current' height={16} />
-          </Link>
+          {link &&
+            <Link href={link} target='_blank' className='hover:bg-amber-300/50 hover:scale-125'>
+              <ArrowTopRightOnSquareIcon className='stroke-current' height={16} />
+            </Link>
+          }
         </div>
 
         <a className='text-opacity-0 ml-auto sm:ml-1 mr-1 px-1 rounded-full opacity-90 group-hover/header:opacity-100 hover:bg-amber-300/50 hover:scale-125 hover:-rotate-12' href={`#${anchor}`}>
