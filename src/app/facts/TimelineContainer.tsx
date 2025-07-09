@@ -4,6 +4,7 @@ import * as R from 'ramda';
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { useSetAtom, useAtomValue } from 'jotai';
+import striptags from 'striptags';
 import { useHydrateAtoms } from 'jotai/utils';
 import { present, blank, scrollAnywhereFix } from '@/lib/utils';
 import {
@@ -60,11 +61,9 @@ export default function TimelineContainer({ facts, initialSlug }: {
 
       if (present(textFilter)) {
         const t = textFilter.toLowerCase();
-        if (title?.toLowerCase().includes(t) || desc?.toLowerCase().includes(t)) {
-          return true;
-        } else {
-          return false;
-        }
+        if (title?.toLowerCase().includes(t)) return true;
+        if (desc && striptags(desc).toLowerCase().includes(t)) return true;
+        return false;
       }
 
       return true;
