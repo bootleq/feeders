@@ -122,6 +122,9 @@ importers:
       react-leaflet-cluster:
         specifier: ^2.1.0
         version: 2.1.0(leaflet@1.9.4)(react-dom@18.3.1(react@18.3.1))(react-leaflet@4.2.1(leaflet@1.9.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+      striptags:
+        specifier: 4.0.0-alpha.4
+        version: 4.0.0-alpha.4
       use-debounce:
         specifier: ^10.0.2
         version: 10.0.2(react@18.3.1)
@@ -6368,6 +6371,9 @@ packages:
   strip-json-comments@3.1.1:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
+
+  striptags@4.0.0-alpha.4:
+    resolution: {integrity: sha512-/0jWyVWhpg9ciRHfjKYBpMHXct/HrFRfsR2HU77nGPbc8SPcVSIHZlZR/0TG3MyPq2C+HiHuwx8BlbcdI/cNbw==}
 
   strnum@1.0.5:
     resolution: {integrity: sha512-J8bbNyKKXl5qYcR36TIO8W3mVGVHrmmxsd5PAItGkmyzwJvybiw2IVq5nqd0i4LSNSkB/sx9VHllbfFdr9k1JA==}
@@ -14092,6 +14098,8 @@ snapshots:
   strip-json-comments@2.0.1: {}
 
   strip-json-comments@3.1.1: {}
+
+  striptags@4.0.0-alpha.4: {}
 
   strnum@1.0.5: {}
 
