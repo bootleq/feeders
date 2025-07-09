@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 import directus from '@/lib/directus';
 import { readItems } from '@directus/sdk';
-import { cmsBuiltURL } from '@/lib/utils';
+import { cmsBuiltURL, blank } from '@/lib/utils';
 import type { Tags } from '@/app/facts/store';
 
 export const runtime = 'edge';
@@ -73,6 +73,12 @@ export async function getFacts(build = false) {
     limit: -1,
     sort: ['date'],
   }));
+
+  facts.forEach(f => {
+    if (blank(f.tags)) {
+      f['tags'] = null;
+    }
+  });
 
   const tags = R.pipe(
     R.flatten,
