@@ -1,5 +1,4 @@
 import os from 'os';
-import fs from "fs";
 import path from "path";
 import { execSync, spawnSync } from "child_process";
 
