@@ -69,6 +69,7 @@ export const KeywordHighlighter: React.FC<KeywordHighlighterProps> = ({
       if (CSS.highlights.has(highlightName)) {
         CSS.highlights.delete(highlightName);
       }
+      prevKeywordRef.current = '';
       return;
     }
 
