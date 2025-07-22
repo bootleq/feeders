@@ -1,21 +1,26 @@
 import React, { useEffect, useCallback, useRef } from 'react';
+import type { Atom } from 'jotai';
+import type { PrimitiveAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { findRanges } from '@/lib/findRanges';
 
 interface KeywordHighlighterProps {
-  keyword: string;
+  keywordAtom: Atom<string>;
+  rangesAtom: PrimitiveAtom<Range[]>;
   container: HTMLElement | null;
   segmentSelector: string;
-  highlightName?: string;
   debounceTime?: number;
 }
 
 export const KeywordHighlighter: React.FC<KeywordHighlighterProps> = ({
-  keyword,
+  keywordAtom,
+  rangesAtom,
   container,
   segmentSelector,
-  highlightName = 'text-filter',
-  debounceTime = 400,
+  debounceTime = 100,
 }) => {
+  const keyword = useAtomValue(keywordAtom);
+  const setRanges = useSetAtom(rangesAtom);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const prevKeywordRef = useRef<string>('');
   const prevSegmentsInViewRef = useRef<Element[] | null>(null);
@@ -66,9 +71,6 @@ export const KeywordHighlighter: React.FC<KeywordHighlighterProps> = ({
 
   const applyHighlights = useCallback(() => {
     if (!container || !keyword || !window.CSS || !('highlights' in window.CSS)) {
-      if (CSS.highlights.has(highlightName)) {
-        CSS.highlights.delete(highlightName);
-      }
       prevKeywordRef.current = '';
       return;
     }
@@ -88,18 +90,11 @@ export const KeywordHighlighter: React.FC<KeywordHighlighterProps> = ({
       const ranges = findRanges(segment, keyword);
       visibleRanges.push(...ranges);
     }
-
-    if (CSS.highlights.has(highlightName)) {
-      CSS.highlights.delete(highlightName);
-    }
-
-    if (visibleRanges.length > 0 && typeof (window as any).Highlight === 'function') {
-      CSS.highlights.set(highlightName, new (window as any).Highlight(...visibleRanges));
-    }
+    setRanges(visibleRanges);
 
     prevKeywordRef.current = keyword;
     prevSegmentsInViewRef.current = segmentsInView;
-  }, [container, keyword, highlightName, getVisibleSegments]);
+  }, [container, keyword, getVisibleSegments, setRanges]);
 
   const debouncedApplyHighlights = useCallback(() => {
     if (debounceTimeoutRef.current) {
@@ -122,12 +117,9 @@ export const KeywordHighlighter: React.FC<KeywordHighlighterProps> = ({
       if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current);
       container.removeEventListener('scroll', debouncedApplyHighlights);
       window.removeEventListener('resize', debouncedApplyHighlights);
-
-      if (CSS.highlights.has(highlightName)) {
-        CSS.highlights.delete(highlightName);
-      }
+      setRanges([]);
     };
-  }, [keyword, container, applyHighlights, debouncedApplyHighlights, highlightName]);
+  }, [keyword, container, applyHighlights, debouncedApplyHighlights, setRanges]);
 
   return null;
 };

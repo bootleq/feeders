@@ -6,12 +6,15 @@ import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { AnyFunction, present } from '@/lib/utils';
 import { addAlertAtom } from '@/components/store';
 import Html from '@/components/Html';
+import { KeywordHighlighter } from '@/components/KeywordHighlighter';
 import {
   slugAtom,
   VIEW_CTRL_KEYS,
   SLUG_PATTERN,
   viewCtrlAtom,
   tagsAtom,
+  textFilterAtom,
+  highlightRangesAtomFamily,
   marksAtom,
   markPickingAtom,
   addMarkAtom,
@@ -114,10 +117,12 @@ function MarkOffscreenIndicators({ direct }: {
 type TimelineProps = {
   facts: any[],
   isSubView?: boolean,
+  col: number,
   isOnly?: boolean,
 }
-const Timeline = forwardRef<HTMLDivElement, TimelineProps>(function InnerTimeline({ facts, isSubView = false, isOnly = false }: TimelineProps, ref) {
+const Timeline = forwardRef<HTMLDivElement, TimelineProps>(function InnerTimeline({ facts, isSubView = false, col, isOnly = false }: TimelineProps, ref) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const [, setHasRef] = useState(false);
   const setSlug = useSetAtom(slugAtom);
   const viewCtrl = useAtomValue(viewCtrlAtom);
   const [markPicking, setMarkPicking] = useAtom(markPickingAtom);
@@ -126,6 +131,10 @@ const Timeline = forwardRef<HTMLDivElement, TimelineProps>(function InnerTimelin
   const addAlert = useSetAtom(addAlertAtom);
   const setInterObserver = useSetAtom(timelineInterObserverAtom);
   const [markOffscreen, setMarkOffscreen] = useState<null | 'up' | 'down'>(null);
+
+  const rangesAtom = useMemo(() => {
+    return highlightRangesAtomFamily(col);
+  }, [col]);
 
   useImperativeHandle(ref, () => rootRef.current!);
 
@@ -213,6 +222,12 @@ const Timeline = forwardRef<HTMLDivElement, TimelineProps>(function InnerTimelin
     return facts.map(fact => <Fact key={fact.id} fact={fact} isSubView={isSubView} onZoom={onZoom} />);
   }, [facts, isSubView, onZoom]);
 
+  useEffect(() => {
+    if (rootRef.current) {
+      setHasRef(true);
+    }
+  }, []);
+
   const viewCtrlData = VIEW_CTRL_KEYS.reduce((acc: Record<string, string>, key: string) => {
     if (!R.includes(key, viewCtrl)) {
       acc[`data-view-ctrl-${key}`] = 'hide';
@@ -243,6 +258,13 @@ const Timeline = forwardRef<HTMLDivElement, TimelineProps>(function InnerTimelin
       {!isSubView && <MarkOffscreenIndicators direct='up' />}
       {Facts}
       {!isSubView && <MarkOffscreenIndicators direct='down' />}
+
+      <KeywordHighlighter
+        keywordAtom={textFilterAtom}
+        rangesAtom={rangesAtom}
+        container={rootRef.current}
+        segmentSelector='[data-role="fact"]'
+      />
     </div>
   );
 });

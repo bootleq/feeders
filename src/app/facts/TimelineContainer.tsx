@@ -17,11 +17,11 @@ import {
   zoomedFactAtom,
 } from './store';
 import { addAlertAtom } from '@/components/store';
-import { KeywordHighlighter } from '@/components/KeywordHighlighter';
 
 import { findFactElement, clearMarkIndicators } from './utils';
 import tlStyles from './timeline.module.scss';
 import Timeline from './Timeline';
+import Highlighter from './Highlighter';
 
 const columnClassMapping: Record<number, string> = {
   1: 'md:max-w-3xl lg:max-w-5xl md:ml-3',
@@ -156,20 +156,17 @@ export default function TimelineContainer({ facts, initialSlug }: {
 
   return (
     <div className={`w-full mx-auto px-0 grid gap-2 ${colsClass}`} onMouseEnter={onMouseEnter}>
-      <Timeline ref={timelineRef} facts={validFacts} isOnly={columns.length === 1} />
+      <Timeline ref={timelineRef} col={1} facts={validFacts} isOnly={columns.length === 1} />
+
       {
         columns.slice(1).map((visible, idx) => (
           visible ?
-            <Timeline key={idx} facts={validFacts} isSubView={true} />
+            <Timeline key={idx} col={idx + 2} facts={validFacts} isSubView={true} />
             :
             <div key={idx}></div>
         ))
       }
-      <KeywordHighlighter
-        keyword={textFilter}
-        container={timelineRef.current}
-        segmentSelector='[data-role="fact"]'
-      />
+      <Highlighter />
     </div>
   );
 }

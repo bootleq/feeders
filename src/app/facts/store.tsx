@@ -1,5 +1,6 @@
 import * as R from 'ramda';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
+import { atomFamily } from 'jotai/utils';
 import { removeFirst } from '@/lib/utils';
 
 export const VIEW_CTRL_KEYS= ['desc', 'summary', 'origin', 'tags'];
@@ -41,6 +42,19 @@ export const textFilterAtom = atom('');
 export type DateRange = [string, string];
 export const dateRangeAtom = atom<DateRange>(['', '']);
 export const filterRejectedCountAtom = atom(0);
+
+export const highlightRangesAtomFamily = atomFamily((col: number) =>
+  atom<Range[]>([])
+);
+export const allHighlighRangesAtom = atom((get) => {
+  const cols = [1, 2, 3, 4, 5];
+  let allRanges: Range[] = [];
+  cols.forEach((col) => {
+    const ranges = get(highlightRangesAtomFamily(col));
+    allRanges = allRanges.concat(ranges);
+  });
+  return allRanges;
+});
 
 export type FactMark = {
   anchor: string,
