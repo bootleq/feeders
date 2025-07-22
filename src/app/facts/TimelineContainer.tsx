@@ -17,6 +17,7 @@ import {
   zoomedFactAtom,
 } from './store';
 import { addAlertAtom } from '@/components/store';
+import { KeywordHighlighter } from '@/components/KeywordHighlighter';
 
 import { findFactElement, clearMarkIndicators } from './utils';
 import tlStyles from './timeline.module.scss';
@@ -34,6 +35,7 @@ export default function TimelineContainer({ facts, initialSlug }: {
   facts: any[],
   initialSlug: string,
 }) {
+  const timelineRef = useRef<HTMLDivElement>(null);
   const setSlug = useSetAtom(slugAtom);
   const [isInitialZoom, setIsInitialZoom] = useState(present(initialSlug));
   const textFilter = useAtomValue(textFilterAtom);
@@ -154,7 +156,7 @@ export default function TimelineContainer({ facts, initialSlug }: {
 
   return (
     <div className={`w-full mx-auto px-0 grid gap-2 ${colsClass}`} onMouseEnter={onMouseEnter}>
-      <Timeline facts={validFacts} isOnly={columns.length === 1} />
+      <Timeline ref={timelineRef} facts={validFacts} isOnly={columns.length === 1} />
       {
         columns.slice(1).map((visible, idx) => (
           visible ?
@@ -163,6 +165,11 @@ export default function TimelineContainer({ facts, initialSlug }: {
             <div key={idx}></div>
         ))
       }
+      <KeywordHighlighter
+        keyword={textFilter}
+        container={timelineRef.current}
+        segmentSelector='[data-role="fact"]'
+      />
     </div>
   );
 }

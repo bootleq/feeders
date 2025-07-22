@@ -1,7 +1,7 @@
 "use client"
 
 import * as R from 'ramda';
-import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { useState, useCallback, useMemo, useRef, forwardRef, useImperativeHandle, useEffect } from 'react';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { AnyFunction, present } from '@/lib/utils';
 import { addAlertAtom } from '@/components/store';
@@ -111,12 +111,13 @@ function MarkOffscreenIndicators({ direct }: {
   );
 }
 
-export default function Timeline({ facts, isSubView = false, isOnly = false }: {
+type TimelineProps = {
   facts: any[],
   isSubView?: boolean,
   isOnly?: boolean,
-}) {
-  const ref = useRef<HTMLDivElement>(null);
+}
+const Timeline = forwardRef<HTMLDivElement, TimelineProps>(function InnerTimeline({ facts, isSubView = false, isOnly = false }: TimelineProps, ref) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const setSlug = useSetAtom(slugAtom);
   const viewCtrl = useAtomValue(viewCtrlAtom);
   const [markPicking, setMarkPicking] = useAtom(markPickingAtom);
@@ -125,6 +126,8 @@ export default function Timeline({ facts, isSubView = false, isOnly = false }: {
   const addAlert = useSetAtom(addAlertAtom);
   const setInterObserver = useSetAtom(timelineInterObserverAtom);
   const [markOffscreen, setMarkOffscreen] = useState<null | 'up' | 'down'>(null);
+
+  useImperativeHandle(ref, () => rootRef.current!);
 
   const onZoom = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -146,7 +149,7 @@ export default function Timeline({ facts, isSubView = false, isOnly = false }: {
   useEffect(() => {
     if (isSubView) return;
 
-    const root = ref.current;
+    const root = rootRef.current;
     const observer = new IntersectionObserver((entries) => {
       if (!root) return;
       entries.forEach((e) => {
@@ -174,7 +177,7 @@ export default function Timeline({ facts, isSubView = false, isOnly = false }: {
 
   useEffect(() => {
     if (isSubView) return;
-    const root = ref.current;
+    const root = rootRef.current;
     if (!root) return;
     if (root.scrollTop > 0) return;
 
@@ -230,7 +233,7 @@ export default function Timeline({ facts, isSubView = false, isOnly = false }: {
 
   return (
     <div
-      ref={ref}
+      ref={rootRef}
       data-role='timeline'
       className={`${rootClassName} ${isOnly ? '' : 'scrollbar-thin'}`}
       {...onClickProps}
@@ -242,4 +245,6 @@ export default function Timeline({ facts, isSubView = false, isOnly = false }: {
       {!isSubView && <MarkOffscreenIndicators direct='down' />}
     </div>
   );
-}
+});
+
+export default Timeline;

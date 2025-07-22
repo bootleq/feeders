@@ -42,6 +42,10 @@ body {
   .btn {
     @apply py-1 px-2 rounded cursor-pointer focus:outline-none focus:ring disabled:cursor-not-allowed disabled:opacity-75;
   }
+
+  ::highlight(text-filter) {
+    @apply bg-pink-200 underline decoration-wavy decoration-red-500;
+  }
 }
 
 @layer utilities {
