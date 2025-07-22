@@ -44,7 +44,7 @@ body {
   }
 
   ::highlight(text-filter) {
-    @apply bg-pink-200 underline decoration-wavy decoration-red-500;
+    @apply bg-pink-200/95 underline decoration-wavy decoration-rose-300 decoration-1;
   }
 }
 
