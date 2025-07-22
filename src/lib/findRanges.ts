@@ -29,11 +29,13 @@ export function findRanges(container: Node, keyword: string): Range[] {
   if (!keyword) return [];
   const textNodes = getAllTextNodes(container);
   const nodeMap = buildNodeMap(textNodes);
-  const fullText = textNodes.map(n => n.textContent).join('');
+  const fullText = textNodes.map(n => n.textContent).join('').toLowerCase();
   const ranges: Range[] = [];
 
+  const keywordLowerCase = keyword.toLowerCase();
+
   let index = 0;
-  while ((index = fullText.indexOf(keyword, index)) !== -1) {
+  while ((index = fullText.indexOf(keywordLowerCase, index)) !== -1) {
     let startInfo: TextNodePosition | undefined, endInfo: TextNodePosition | undefined;
     for (const entry of nodeMap) {
       if (!startInfo && index >= entry.start && index < entry.end) {
