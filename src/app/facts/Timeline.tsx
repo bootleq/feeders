@@ -222,7 +222,7 @@ export default function Timeline({ facts, isSubView = false, col, isOnly = false
 
   useEffect(() => {
     if (ref.current) {
-      setHasRef(true);
+      setHasRef(true); // ensure child components can receive ref change
     }
   }, []);
 
