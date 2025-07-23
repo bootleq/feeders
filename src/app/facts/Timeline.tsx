@@ -6,7 +6,7 @@ import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { AnyFunction, present } from '@/lib/utils';
 import { addAlertAtom } from '@/components/store';
 import Html from '@/components/Html';
-import { KeywordHighlighter } from '@/components/KeywordHighlighter';
+import { KeywordRangeCollector } from '@/components/KeywordRangeCollector';
 import {
   slugAtom,
   VIEW_CTRL_KEYS,
@@ -259,7 +259,7 @@ const Timeline = forwardRef<HTMLDivElement, TimelineProps>(function InnerTimelin
       {Facts}
       {!isSubView && <MarkOffscreenIndicators direct='down' />}
 
-      <KeywordHighlighter
+      <KeywordRangeCollector
         keywordAtom={textFilterAtom}
         rangesAtom={rangesAtom}
         container={rootRef.current}

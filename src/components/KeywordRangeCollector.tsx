@@ -12,7 +12,7 @@ interface KeywordHighlighterProps {
   debounceTime?: number;
 }
 
-export const KeywordHighlighter: React.FC<KeywordHighlighterProps> = ({
+export const KeywordRangeCollector: React.FC<KeywordHighlighterProps> = ({
   keywordAtom,
   rangesAtom,
   container,
