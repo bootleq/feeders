@@ -4,7 +4,7 @@ import type { PrimitiveAtom } from 'jotai';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { findRanges } from '@/lib/findRanges';
 
-interface KeywordHighlighterProps {
+interface Props {
   keywordAtom: Atom<string>;
   rangesAtom: PrimitiveAtom<Range[]>;
   container: HTMLElement | null;
@@ -12,7 +12,7 @@ interface KeywordHighlighterProps {
   debounceTime?: number;
 }
 
-export const KeywordRangeCollector: React.FC<KeywordHighlighterProps> = ({
+export const KeywordRangeCollector: React.FC<Props> = ({
   keywordAtom,
   rangesAtom,
   container,
@@ -69,8 +69,8 @@ export const KeywordRangeCollector: React.FC<KeywordHighlighterProps> = ({
     return inViewSegments;
   }, [container, segmentSelector, getViewportRect, isElementInViewport]);
 
-  const applyHighlights = useCallback(() => {
-    if (!container || !keyword || !window.CSS || !('highlights' in window.CSS)) {
+  const collect = useCallback(() => {
+    if (!container || !keyword) {
       prevKeywordRef.current = '';
       return;
     }
@@ -96,30 +96,30 @@ export const KeywordRangeCollector: React.FC<KeywordHighlighterProps> = ({
     prevSegmentsInViewRef.current = segmentsInView;
   }, [container, keyword, getVisibleSegments, setRanges]);
 
-  const debouncedApplyHighlights = useCallback(() => {
+  const debouncedCollect = useCallback(() => {
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
     }
     debounceTimeoutRef.current = setTimeout(() => {
-      applyHighlights();
+      collect();
     }, debounceTime);
-  }, [applyHighlights, debounceTime]);
+  }, [collect, debounceTime]);
 
   useEffect(() => {
-    applyHighlights();
+    collect();
 
     if (!container) return;
 
-    container.addEventListener('scroll', debouncedApplyHighlights);
-    window.addEventListener('resize', debouncedApplyHighlights);
+    container.addEventListener('scroll', debouncedCollect);
+    window.addEventListener('resize', debouncedCollect);
 
     return () => {
       if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current);
-      container.removeEventListener('scroll', debouncedApplyHighlights);
-      window.removeEventListener('resize', debouncedApplyHighlights);
+      container.removeEventListener('scroll', debouncedCollect);
+      window.removeEventListener('resize', debouncedCollect);
       setRanges([]);
     };
-  }, [keyword, container, applyHighlights, debouncedApplyHighlights, setRanges]);
+  }, [keyword, container, collect, debouncedCollect, setRanges]);
 
   return null;
 };
