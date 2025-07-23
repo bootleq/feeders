@@ -41,6 +41,26 @@ test('事實記錄', async ({ page }) => {
   await expect(page).toHaveTitle(SITE_NAME);
 });
 
+test('事實記錄 篩選', async ({ page }) => {
+  await page.goto('/facts');
+  await expect(page).toHaveTitle(/^事實記錄 - /);
+
+  const sidebar = page.locator("div[data-role='sidebar']");
+  const input = sidebar.getByLabel('包含');
+  await input.fill('7 天'); // where `7` is in <span> for testing findRanges across nodes
+
+  // Fact 1, 預期會被隱藏
+  const fact1 = page.locator('[data-role="fact"]')
+    .filter({ has: page.getByText('北縣流浪狗降幅全國第一') });
+  await expect(fact1).toHaveCount(0);
+
+  const fact2 = page.locator('[data-role="fact"]')
+    .filter({ has: page.getByText('動保法第 7 次修法') });
+  await expect(fact2).toBeInViewport();
+
+  await expect(fact2).toHaveScreenshot('facts/text-filter-w-highlight.png');
+});
+
 test.describe('由網址進入獨占顯示：錯誤', () => {
   test('項目找不到', async ({ page }) => {
     const badSlug = '2010-01-27_120548213';

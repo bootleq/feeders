@@ -312,6 +312,10 @@ function TextFilterCtrlPanel() {
     form.submit(); // dual submit to noop
   };
 
+  const onReset = () => {
+    setText('');
+  };
+
   const defaultText = text;
 
   return (
@@ -320,6 +324,9 @@ function TextFilterCtrlPanel() {
         <div className='whitespace-nowrap inline-flex items-center'>
           <TextInput label='包含' name='targetText' inputProps={{className: 'text-sm opacity-60 focus:opacity-100 placeholder-slate-800/50', placeholder: '輸入至少 2 個字', defaultValue: defaultText}} />
         </div>
+        <button type='reset' className='btn px-px hover:ring-1 hover:bg-white active:ring' onClick={onReset} aria-label='重設'>
+          <XCircleIcon className='stroke-slate-600' height={20} />
+        </button>
       </form>
     </div>
   );
