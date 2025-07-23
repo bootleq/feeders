@@ -35,7 +35,6 @@ export default function TimelineContainer({ facts, initialSlug }: {
   facts: any[],
   initialSlug: string,
 }) {
-  const timelineRef = useRef<HTMLDivElement>(null);
   const setSlug = useSetAtom(slugAtom);
   const [isInitialZoom, setIsInitialZoom] = useState(present(initialSlug));
   const textFilter = useAtomValue(textFilterAtom);
@@ -156,7 +155,7 @@ export default function TimelineContainer({ facts, initialSlug }: {
 
   return (
     <div className={`w-full mx-auto px-0 grid gap-2 ${colsClass}`} onMouseEnter={onMouseEnter}>
-      <Timeline ref={timelineRef} col={1} facts={validFacts} isOnly={columns.length === 1} />
+      <Timeline col={1} facts={validFacts} isOnly={columns.length === 1} />
 
       {
         columns.slice(1).map((visible, idx) => (

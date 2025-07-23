@@ -1,7 +1,7 @@
 "use client"
 
 import * as R from 'ramda';
-import { useState, useCallback, useMemo, useRef, forwardRef, useImperativeHandle, useEffect } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { AnyFunction, present } from '@/lib/utils';
 import { addAlertAtom } from '@/components/store';
@@ -120,8 +120,8 @@ type TimelineProps = {
   col: number,
   isOnly?: boolean,
 }
-const Timeline = forwardRef<HTMLDivElement, TimelineProps>(function InnerTimeline({ facts, isSubView = false, col, isOnly = false }: TimelineProps, ref) {
-  const rootRef = useRef<HTMLDivElement>(null);
+export default function Timeline({ facts, isSubView = false, col, isOnly = false }: TimelineProps) {
+  const ref = useRef<HTMLDivElement>(null);
   const [, setHasRef] = useState(false);
   const setSlug = useSetAtom(slugAtom);
   const viewCtrl = useAtomValue(viewCtrlAtom);
@@ -135,8 +135,6 @@ const Timeline = forwardRef<HTMLDivElement, TimelineProps>(function InnerTimelin
   const rangesAtom = useMemo(() => {
     return highlightRangesAtomFamily(col);
   }, [col]);
-
-  useImperativeHandle(ref, () => rootRef.current!);
 
   const onZoom = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -158,7 +156,7 @@ const Timeline = forwardRef<HTMLDivElement, TimelineProps>(function InnerTimelin
   useEffect(() => {
     if (isSubView) return;
 
-    const root = rootRef.current;
+    const root = ref.current;
     const observer = new IntersectionObserver((entries) => {
       if (!root) return;
       entries.forEach((e) => {
@@ -186,7 +184,7 @@ const Timeline = forwardRef<HTMLDivElement, TimelineProps>(function InnerTimelin
 
   useEffect(() => {
     if (isSubView) return;
-    const root = rootRef.current;
+    const root = ref.current;
     if (!root) return;
     if (root.scrollTop > 0) return;
 
@@ -223,7 +221,7 @@ const Timeline = forwardRef<HTMLDivElement, TimelineProps>(function InnerTimelin
   }, [facts, isSubView, onZoom]);
 
   useEffect(() => {
-    if (rootRef.current) {
+    if (ref.current) {
       setHasRef(true);
     }
   }, []);
@@ -248,7 +246,7 @@ const Timeline = forwardRef<HTMLDivElement, TimelineProps>(function InnerTimelin
 
   return (
     <div
-      ref={rootRef}
+      ref={ref}
       data-role='timeline'
       className={`${rootClassName} ${isOnly ? '' : 'scrollbar-thin'}`}
       {...onClickProps}
@@ -262,11 +260,9 @@ const Timeline = forwardRef<HTMLDivElement, TimelineProps>(function InnerTimelin
       <KeywordRangeCollector
         keywordAtom={textFilterAtom}
         rangesAtom={rangesAtom}
-        container={rootRef.current}
+        container={ref.current}
         segmentSelector='[data-role="fact"]'
       />
     </div>
   );
-});
-
-export default Timeline;
+};
