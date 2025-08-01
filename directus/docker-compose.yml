@@ -2,7 +2,7 @@ name: feeders
 
 services:
   directus:
-    image: directus/directus:11.9.3
+    image: directus/directus:11.10.0
     container_name: feeders-directus
     ports:
       - 8044:8055
