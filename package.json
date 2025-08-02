@@ -80,7 +80,7 @@
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.666.0",
-    "@cloudflare/next-on-pages": "^1.13.10",
+    "@cloudflare/next-on-pages": "^1.13.13",
     "@faker-js/faker": "^8.4.1",
     "@inquirer/confirm": "^5.1.9",
     "@playwright/test": "^1.50.1",
