@@ -162,14 +162,22 @@ const articleCSS = `
 
 
 export default {
-  id: 'tinymce',
+  id: '',
   handler: (router: Router) => {
-    router.get('/general.css', (_req, res) => {
+    router.get('/favicon.ico', (_req, res) => {
+      return res.sendFile('/directus/public/favicon.ico', (err) => {
+        if (err) {
+          res.status(404).send('Favicon not found');
+        }
+      });
+    });
+
+    router.get('/tinymce/general.css', (_req, res) => {
       res.setHeader('Content-Type', 'text/css');
       return res.send(commonCSS);
     });
 
-    router.get('/article.css', (_req, res) => {
+    router.get('/tinymce/article.css', (_req, res) => {
       res.setHeader('Content-Type', 'text/css');
       return res.send(commonCSS + articleCSS);
     });

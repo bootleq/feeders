@@ -11,6 +11,7 @@ services:
       - ./uploads:/directus/uploads
       - ./extensions:/directus/extensions
       - ./snapshots:/directus/snapshots
+      - ./favicon.ico:/directus/public/favicon.ico
     environment:
       SECRET_FILE: /run/secrets/secret
       ADMIN_EMAIL: admin@feeders.com

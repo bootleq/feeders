@@ -3,6 +3,13 @@
 Provide custom endpoints.
 
 
+## Favicon default path
+
+Provide `/favicon.ico` on root path (requires real file at `/directus/public/favicon.ico`).
+
+Without this default icon, directus might lose favicon if browser has fetched it before the JS app set its new icon location.
+
+
 ## TinyMCE interface CSS
 
 To be loaded with default [WYSIWYG][] interface's `content_css` Options Override.
