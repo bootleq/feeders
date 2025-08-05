@@ -14,6 +14,7 @@ import {
   viewCtrlAtom,
   tagsAtom,
   textFilterAtom,
+  textHighlightAtom,
   highlightRangesAtomFamily,
   marksAtom,
   markPickingAtom,
@@ -259,6 +260,7 @@ export default function Timeline({ facts, isSubView = false, col, isOnly = false
 
       <KeywordRangeCollector
         keywordAtom={textFilterAtom}
+        highlightAtom={textHighlightAtom}
         rangesAtom={rangesAtom}
         container={ref.current}
         segmentSelector='[data-role="fact"]'
