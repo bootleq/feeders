@@ -12,6 +12,7 @@ import {
   VIEW_CTRL_KEYS,
   columnsAtom,
   textFilterAtom,
+  textHighlightAtom,
   dateRangeAtom,
   filterRejectedCountAtom,
   tagsAtom,
@@ -41,6 +42,7 @@ import { XCircleIcon } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { ArrowLeftEndOnRectangleIcon } from '@heroicons/react/24/outline';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import HighlighterIcon from '@/assets/highlighter.svg';
 
 const currentMarkSlotAtom = atomWithStorage('feeders.factMarks.slot', 0);
 const markSlotAtoms = R.range(0, 4).map(n => atomWithStorage<FactMark[]>(`feeders.factMarks.${n}`, []));
@@ -292,6 +294,7 @@ function FiltersCtrl() {
 
 function TextFilterCtrlPanel() {
   const [text, setText] = useAtom(textFilterAtom);
+  const [textHighlight, setTextHighlight] = useAtom(textHighlightAtom);
   const formRef = useRef<HTMLFormElement>(null);
 
   const debouncedChanged = useDebouncedCallback((event: React.FormEvent) => {
@@ -316,6 +319,10 @@ function TextFilterCtrlPanel() {
     setText('');
   };
 
+  const onToggleHighlight = (e: React.MouseEvent) => {
+    setTextHighlight(R.not);
+  };
+
   const defaultText = text;
 
   return (
@@ -327,6 +334,16 @@ function TextFilterCtrlPanel() {
         <button type='reset' className='btn px-px hover:ring-1 hover:bg-white active:ring' onClick={onReset} aria-label='重設'>
           <XCircleIcon className='stroke-slate-600' height={20} />
         </button>
+        <Tooltip>
+          <TooltipTrigger className='mb-1 block truncate'>
+            <button type='button' className={`btn px-px hover:ring-1 hover:bg-white active:ring ${textHighlight ? '' : 'opacity-40'}`} onClick={onToggleHighlight} aria-label='著色強調'>
+              <HighlighterIcon className={`stroke-slate-600 ${textHighlight ? 'fill-pink-200/95' : ''}`} width={20} height={20} />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent className="p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1">
+            關鍵字著色：{textHighlight ? '已開啟' : '已關閉'}
+          </TooltipContent>
+        </Tooltip>
       </form>
     </div>
   );

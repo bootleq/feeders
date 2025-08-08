@@ -39,6 +39,7 @@ export const togglaAllTagsAtom = atom(
 );
 
 export const textFilterAtom = atom('');
+export const textHighlightAtom = atom(true);
 export type DateRange = [string, string];
 export const dateRangeAtom = atom<DateRange>(['', '']);
 export const filterRejectedCountAtom = atom(0);

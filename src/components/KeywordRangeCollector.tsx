@@ -6,6 +6,7 @@ import { findRanges } from '@/lib/findRanges';
 
 interface Props {
   keywordAtom: Atom<string>;
+  highlightAtom: Atom<boolean>;
   rangesAtom: PrimitiveAtom<Range[]>;
   container: HTMLElement | null;
   segmentSelector: string;
@@ -14,12 +15,14 @@ interface Props {
 
 export const KeywordRangeCollector: React.FC<Props> = ({
   keywordAtom,
+  highlightAtom,
   rangesAtom,
   container,
   segmentSelector,
   debounceTime = 100,
 }) => {
   const keyword = useAtomValue(keywordAtom);
+  const highlight = useAtomValue(highlightAtom);
   const setRanges = useSetAtom(rangesAtom);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const prevKeywordRef = useRef<string>('');
@@ -70,7 +73,7 @@ export const KeywordRangeCollector: React.FC<Props> = ({
   }, [container, segmentSelector, getViewportRect, isElementInViewport]);
 
   const collect = useCallback(() => {
-    if (!container || !keyword) {
+    if (!container || !keyword || !highlight) {
       prevKeywordRef.current = '';
       return;
     }
@@ -94,7 +97,7 @@ export const KeywordRangeCollector: React.FC<Props> = ({
 
     prevKeywordRef.current = keyword;
     prevSegmentsInViewRef.current = segmentsInView;
-  }, [container, keyword, getVisibleSegments, setRanges]);
+  }, [container, keyword, highlight, getVisibleSegments, setRanges]);
 
   const debouncedCollect = useCallback(() => {
     if (debounceTimeoutRef.current) {
