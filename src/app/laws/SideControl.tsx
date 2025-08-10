@@ -343,7 +343,7 @@ export default function SideControl({ tags }: {
   ]);
 
   return (
-    <div className='p-2 pb-7 sm:pb-2 divide-y-4 overflow-auto scrollbar-thin'>
+    <div className='p-2 pb-7 sm:pb-2 divide-y-4 overflow-auto scrollbar-thin' data-nosnippet>
       <ViewCtrlPanel />
       <ActCtrlPanel />
       <TagCtrlPanel />
