@@ -154,7 +154,7 @@ export default function TimelineContainer({ facts, initialSlug }: {
   }, [pathname, initialSlug, setIsInitialZoom, setSlug, setZoomBySlug]);
 
   return (
-    <div className={`w-full mx-auto px-0 grid gap-2 ${colsClass}`} onMouseEnter={onMouseEnter}>
+    <div className={`w-full mx-auto px-0 grid gap-2 ${colsClass}`} onMouseEnter={onMouseEnter} data-nosnippet={isInitialZoom ? '' : undefined}>
       <Timeline col={1} facts={validFacts} isOnly={columns.length === 1} />
 
       {
