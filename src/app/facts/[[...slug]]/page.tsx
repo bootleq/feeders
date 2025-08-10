@@ -1,6 +1,7 @@
 import * as R from 'ramda';
 import type { Metadata, ResolvingMetadata } from "next";
 import { preload } from 'react-dom';
+import striptags from 'striptags';
 import { getFacts } from '@/app/facts/getFacts';
 import { BASE_META } from '@/app/facts/utils';
 import { slugAtom, SLUG_PATTERN } from '@/app/facts/store';
@@ -37,6 +38,12 @@ export async function generateMetadata(
     const anchor = `fact-${fact.date}_${fact.id}`;
     const zoomPath = `/facts/${anchor.replace('fact-', '')}/`;
     meta.alternates.canonical = zoomPath;
+
+    if (fact.summary) {
+      meta.description = striptags(fact.summary);
+    } else {
+      meta.description = ''; // will be removed
+    }
   }
 
   return meta;
