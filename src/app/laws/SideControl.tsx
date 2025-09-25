@@ -95,7 +95,7 @@ function ViewCtrlPanel() {
           <div className="inline-flex items-center justify-start text-sm mt-1">
             <div className='flex items-center text-nowrap text-red-900/80'>
               <img src='/assets/gavel.svg' alt='法槌' width={20} height={20} className='-scale-x-100' />
-              判例
+              案例
             </div>
             <div className='inline-flex items-center gap-x-px ml-2 text-xs text-slate-600'>
               <span className='mr-1'>
