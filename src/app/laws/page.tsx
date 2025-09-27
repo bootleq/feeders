@@ -9,8 +9,6 @@ import type { Tags, LawItem } from './store';
 import SideControl from './SideControl';
 import Acts from './Acts';
 
-export const runtime = 'edge';
-
 export const metadata: Metadata = {
   title: '法規',
   description: '遊蕩犬不當餵食問題的相關法規整理',

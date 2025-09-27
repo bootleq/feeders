@@ -7,8 +7,6 @@ import { getSpots } from "./endpoints/getSpots";
 import { getFollowups } from './endpoints/getFollowups';
 // import { createSpot } from "./endpoints/createSpot";
 
-export const runtime = 'edge'
-
 const app = new Hono().basePath('/api')
 
 const openapi = fromHono(app, {

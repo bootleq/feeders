@@ -23,8 +23,6 @@ declare module "next-auth" {
   }
 }
 
-export const runtime = 'edge';
-
 const providers = [
   GoogleProvider({
     authorization: {

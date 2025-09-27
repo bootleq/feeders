@@ -3,8 +3,6 @@ import directus from '@/lib/directus';
 import { readItems } from '@directus/sdk';
 import { cmsBuiltURL } from '@/lib/utils';
 
-export const runtime = 'edge';
-
 async function fromR2() {
   const url = cmsBuiltURL('insights.json');
 

@@ -3,8 +3,6 @@ import directus from '@/lib/directus';
 import { readItem, readFiles } from '@directus/sdk';
 import { cmsBuiltURL } from '@/lib/utils';
 
-export const runtime = 'edge';
-
 export type File = {
   [key: string]: any,
 };

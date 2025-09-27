@@ -23,8 +23,6 @@ import {
   getTableName,
 } from 'drizzle-orm';
 
-export const runtime = 'edge';
-
 async function getItems(id: string) {
   const items = await db.select({
     id:        changes.id,

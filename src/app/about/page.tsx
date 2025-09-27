@@ -3,8 +3,6 @@ import { SITE_NAME, SITE_CONTACT_EMAIL } from '@/lib/utils';
 import Sidebar from '@/components/Sidebar';
 import RepoLink from './RepoLink';
 
-export const runtime = 'edge';
-
 export const metadata: Metadata = {
   title: '關於本站',
 };

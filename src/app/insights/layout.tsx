@@ -7,8 +7,6 @@ import Sidebar from '@/components/Sidebar';
 import Alerts from '@/components/Alerts';
 import { alertsAtom, dismissAlertAtom } from '@/components/store';
 
-export const runtime = 'edge';
-
 export default async function Layout({
   children,
 }: {

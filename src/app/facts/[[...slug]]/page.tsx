@@ -12,8 +12,6 @@ import TimelineContainer from '@/app/facts/TimelineContainer';
 import ZoomArticle from '@/app/facts/ZoomArticle';
 import SideControl from '@/app/facts/SideControl';
 
-export const runtime = 'edge';
-
 async function findZoomedFact(slug: string) {
   const zoom = slug.match(SLUG_PATTERN);
 

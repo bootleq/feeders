@@ -1,8 +1,6 @@
 import NotFoundHelper from './NotFoundHelper';
 import Link from 'next/link';
 
-export const runtime = 'edge';
-
 export default function NotFound() {
   return (
     <html lang="zh-TW">

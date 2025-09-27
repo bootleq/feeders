@@ -35,8 +35,6 @@ import type { Schema as AmendSpotSchema } from '@/app/world/[[...path]]/amend-sp
 
 import { db } from '@/lib/db';
 
-export const runtime = 'edge';
-
 // https://data.gov.tw/dataset/152915
 const districtApiURL = 'https://api.nlsc.gov.tw/other/TownVillagePointQuery1/';
 const xmlParser = new XMLParser();

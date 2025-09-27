@@ -14,8 +14,6 @@ import { MapIcon } from '@heroicons/react/24/solid';
 import { TrophyIcon } from '@heroicons/react/24/solid';
 import { PencilIcon } from '@heroicons/react/24/outline';
 
-export const runtime = 'edge';
-
 async function getUser(id: string | undefined) {
   if (id) {
     const users = await getWorldUsers(id);

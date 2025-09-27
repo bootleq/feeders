@@ -3,8 +3,6 @@ import directus from '@/lib/directus';
 import { readItems } from '@directus/sdk';
 import { cmsBuiltURL } from '@/lib/utils';
 
-export const runtime = 'edge';
-
 export async function getAllBlocks() {
   const items = await directus.request(readItems('blocks', {
     limit: -1,

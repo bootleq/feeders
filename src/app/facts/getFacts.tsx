@@ -4,8 +4,6 @@ import { readItems } from '@directus/sdk';
 import { cmsBuiltURL, blank } from '@/lib/utils';
 import type { Tags } from '@/app/facts/store';
 
-export const runtime = 'edge';
-
 const tagOrder = [
   '餵食',
   '源頭管理',

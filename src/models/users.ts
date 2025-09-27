@@ -12,8 +12,6 @@ import type { LatLngBounds } from '@/lib/schema';
 
 import { db } from '@/lib/db';
 
-export const runtime = 'edge';
-
 export const RENAME_COOL_OFF_DAYS = 30;
 
 export const getWorldUsers = (userId: string) => {

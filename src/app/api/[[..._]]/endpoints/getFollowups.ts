@@ -12,8 +12,6 @@ import { db } from '@/lib/db';
 import { spots, spotFollowups, PubStateEnum, SpotActionEnum } from '@/lib/schema';
 import { getFollowups as dbGetFollowups } from '@/models/spots';
 
-export const runtime = 'edge';
-
 export class getFollowups extends ApiRoute {
   schema = {
     request: {
