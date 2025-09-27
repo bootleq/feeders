@@ -1,0 +1,22 @@
+{
+  "compatibility_date": "2024-11-11",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_id": "8dc8ae83-03b2-4c66-8259-4456facef8ce",
+      "database_name": "feeders",
+      "migrations_dir": "drizzle"
+    }
+  ],
+  "name": "feeders",
+  "pages_build_output_dir": "./dist",
+  "r2_buckets": [
+    {
+      "binding": "R2",
+      "bucket_name": "feeders"
+    }
+  ]
+}
