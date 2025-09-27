@@ -46,6 +46,7 @@
     "@heroicons/react": "^2.1.5",
     "@internationalized/date": "^3.5.5",
     "@next/bundle-analyzer": "^14.2.5",
+    "@opennextjs/cloudflare": "^1.9.0",
     "@react-leaflet/core": "^2.1.0",
     "chanfana": "^2.1.0",
     "change-case": "^5.4.4",
@@ -117,7 +118,7 @@
     "typescript": "^5",
     "vercel": "^34.3.0",
     "vitest": "^2.0.3",
-    "wrangler": "^4.2.0"
+    "wrangler": "^4.40.2"
   },
   "packageManager": "pnpm@9.15.1+sha512.1acb565e6193efbebda772702950469150cf12bcc764262e7587e71d19dc98a423dff9536e57ea44c49bdf790ff694e83c27be5faa23d67e0c033b583be4bfcf"
 }
