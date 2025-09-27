@@ -9,7 +9,6 @@ import {
   GetSpotsResult,
   GetSpotsByGeohash,
 } from '@/app/api/schema/api';
-import { getRequestContext } from '@cloudflare/next-on-pages';
 import { db } from '@/lib/db';
 import { spots, users, PubStateEnum } from '@/lib/schema';
 import { geoSpots } from '@/models/spots';

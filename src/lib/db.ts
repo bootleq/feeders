@@ -1,5 +1,4 @@
 import { drizzle } from 'drizzle-orm/d1';
-import { getRequestContext } from '@cloudflare/next-on-pages';
 import * as schema from '@/lib/schema';
 
 // "any" workaround, can't build otherwise
