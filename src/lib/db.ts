@@ -1,6 +1,15 @@
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { drizzle } from 'drizzle-orm/d1';
+import { cache } from 'react';
 import * as schema from '@/lib/schema';
 
-// "any" workaround, can't build otherwise
-// https://github.com/cloudflare/next-on-pages/issues/675#issuecomment-1959334672
-export const db = drizzle((process.env as any).DB as D1Database, { schema });
+export const getDb = cache(() => {
+  const { env } = getCloudflareContext();
+  return drizzle(env.DB, { schema });
+});
+
+// This is the one to use for static routes (i.e. ISR/SSG)
+export const getDbAsync = cache(async () => {
+  const { env } = await getCloudflareContext({ async: true });
+  return drizzle(env.DB, { schema });
+});
