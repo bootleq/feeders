@@ -6,7 +6,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 
 import { users, accounts, sessions, verificationTokens } from '@/lib/schema';
-import { db } from '@/lib/db';
+import { getDb } from '@/lib/db';
 import * as R from 'ramda';
 
 // https://authjs.dev/getting-started/typescript#module-augmentation
@@ -47,33 +47,37 @@ const providers = [
   })
 ]
 
-export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
-  providers,
-  adapter: DrizzleAdapter(db, {
-    usersTable: users,
-    accountsTable: accounts,
-    sessionsTable: sessions,
-    verificationTokensTable: verificationTokens,
-  }),
-  pages: {
-    signIn: '/user/login',
-  },
-  callbacks: {
-    async signIn({ account, profile }) {
-      // Only allow users with verified email (Google)
-      // ref: https://authjs.dev/reference/core#signin
-      if (account?.provider === "google" && profile?.email_verified) {
-        return true;
-      }
-      return false;
+export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth(async (req) => {
+  const db = getDb();
+
+  return {
+    providers,
+    adapter: DrizzleAdapter(db, {
+      usersTable: users,
+      accountsTable: accounts,
+      sessionsTable: sessions,
+      verificationTokensTable: verificationTokens,
+    }),
+    pages: {
+      signIn: '/user/login',
     },
-    async session({ session, user }) {
-      // Only leave wanted props (could also achieve it by custom getSessionAndUser)
-      session.user = R.pick(['id', 'name', 'state'] as (keyof AdapterUser)[], user);
-      return session;
+    callbacks: {
+      async signIn({ account, profile }) {
+        // Only allow users with verified email (Google)
+        // ref: https://authjs.dev/reference/core#signin
+        if (account?.provider === "google" && profile?.email_verified) {
+          return true;
+        }
+        return false;
+      },
+      async session({ session, user }) {
+        // Only leave wanted props (could also achieve it by custom getSessionAndUser)
+        session.user = R.pick(['id', 'name', 'state'] as (keyof AdapterUser)[], user);
+        return session;
+      },
     },
-  },
-  session: { strategy: 'database'},
-  debug: false,
-  // debug: process.env.NODE_ENV === 'development'
+    session: { strategy: 'database'},
+    debug: false,
+    // debug: process.env.NODE_ENV === 'development'
+  };
 })
