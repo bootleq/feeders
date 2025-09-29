@@ -4,7 +4,7 @@ import * as R from 'ramda';
 import { z } from 'zod';
 import geohash from 'ngeohash';
 import { auth } from '@/lib/auth';
-import { db } from '@/lib/db';
+import { getDb } from '@/lib/db';
 import { diffForm } from '@/lib/diff';
 import { spots, changes } from '@/lib/schema';
 import { PubStateEnum } from '@/lib/schema';
@@ -52,6 +52,8 @@ export async function amendSpot(formData: FormData) {
     if (!errors[key]) errors[key] = [];
     errors[key].push(msg);
   }
+
+  const db = getDb();
 
   const spot = await db.select({
     title: spots.title,

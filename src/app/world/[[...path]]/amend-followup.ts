@@ -3,7 +3,7 @@
 import * as R from 'ramda';
 import { z } from 'zod';
 import { auth } from '@/lib/auth';
-import { db } from '@/lib/db';
+import { getDb } from '@/lib/db';
 import { diffForm } from '@/lib/diff';
 import { spotFollowups, changes } from '@/lib/schema';
 import { PubStateEnum, SpotActionEnum } from '@/lib/schema';
@@ -70,6 +70,8 @@ export async function amendFollowup(formData: FormData) {
   if (data.removedAt && data.removedAt > now) {
     addError('removedAt', '不能是未來時間');
   }
+
+  const db = getDb();
 
   const followup = await db.select({
     action: spotFollowups.action,

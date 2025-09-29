@@ -8,7 +8,6 @@ import {
   inArray,
   desc,
 } from 'drizzle-orm';
-import { db } from '@/lib/db';
 import { spots, spotFollowups, PubStateEnum, SpotActionEnum } from '@/lib/schema';
 import { getFollowups as dbGetFollowups } from '@/models/spots';
 
