@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import NotFoundHelper from './NotFoundHelper';
 import Link from 'next/link';
 
@@ -19,7 +20,9 @@ export default function NotFound() {
               </span>
             </h1>
 
-            <NotFoundHelper />
+            <Suspense fallback={<div>...</div>}>
+              <NotFoundHelper />
+            </Suspense>
 
             <hr className='w-full h-px mx-auto my-5 bg-slate-400/75 border-0' />
 
