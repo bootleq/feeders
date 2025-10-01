@@ -1,10 +1,14 @@
 {
   "name": "feeders",
+  "main": ".open-next/worker.js",
   "compatibility_date": "2024-11-11",
   "compatibility_flags": [
     "nodejs_compat"
   ],
-  "pages_build_output_dir": "./dist",
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
   "d1_databases": [
     {
       "binding": "DB",
@@ -22,5 +26,6 @@
       "binding": "NEXT_INC_CACHE_R2_BUCKET",
       "bucket_name": "feeders-next-inc-cache"
     }
-  ]
+  ],
+  "preview_urls": true
 }
