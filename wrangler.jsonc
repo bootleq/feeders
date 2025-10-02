@@ -27,5 +27,9 @@
       "bucket_name": "feeders-next-inc-cache"
     }
   ],
-  "preview_urls": true
+  "preview_urls": true,
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
 }
