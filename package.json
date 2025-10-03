@@ -17,6 +17,7 @@
     "preview": "opennextjs-cloudflare preview",
     "env:push:preview": "tsx scripts/push_env_as_secrets.mjs preview",
     "env:push:prod": "tsx scripts/push_env_as_secrets.mjs production",
+    "upload:preview": "wrangler versions upload --preview-alias preview",
     "deploy": "tsx --env-file=.env.development scripts/deploy.mjs",
     "db:tables": "pnpm wrangler d1 execute feeders --command 'PRAGMA table_list'",
     "db:delete": "rm -rf .wrangler/state/v3/d1/miniflare-D1DatabaseObject drizzle",
