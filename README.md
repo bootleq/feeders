@@ -1,6 +1,6 @@
 # Feeders
 
-Source code of [feeders.pages.dev][].
+Source code of [feeders.fyi][].
 
 A website dedicated to ending the suffering of free-roaming / stray dogs.
 
@@ -156,5 +156,5 @@ Prepare env by copy `.env.sample` to `.env.test`.
 
 
 
-[feeders.pages.dev]: https://feeders.pages.dev
+[feeders.fyi]: https://feeders.fyi
 [feeders-charts]: https://github.com/bootleq/feeders-charts
