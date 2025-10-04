@@ -53,6 +53,10 @@ export default async function Page() {
               <time className='font-mono mr-2'>2025-02-24</time>
               圖表頁上線
             </li>
+            <li>
+              <time className='font-mono mr-2'>2025-10-04</time>
+              啟用網址 <code>feeders.fyi</code>
+            </li>
           </ol>
 
           <Hr />
