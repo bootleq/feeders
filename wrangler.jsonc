@@ -27,6 +27,12 @@
       "bucket_name": "feeders-next-inc-cache"
     }
   ],
+  "routes": [
+    {
+      "pattern": "feeders.fyi",
+      "custom_domain": true
+    }
+  ],
   "preview_urls": true,
   "observability": {
     "enabled": true,
