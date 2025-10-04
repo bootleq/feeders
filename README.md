@@ -30,9 +30,11 @@ Prepare to preview:
 ```bash
 pnpm lint
 pnpm cms:build-local
-pnpm pages:build
+pnpm worker:build
 pnpm preview
 ```
+
+To add a preview deployment, use `pnpm upload:preview`.
 
 `cms:build-local` prepares local CMS data to be uploaded to external storage,
 our built application fetches them instead of hitting CMS again.
@@ -42,13 +44,9 @@ Production deployment:
 
 ```bash
 pnpm cms:build-local
-pnpm pages:build:prod
-pnpm env:push:prod
+pnpm worker:build
 pnpm run deploy
 ```
-
-The `env:push:prod` loads variables in `.env.production` and uploads them as
-Pages secrets. This is to avoid exposing them in `wrangler.toml`.
 
 
 ## Database
