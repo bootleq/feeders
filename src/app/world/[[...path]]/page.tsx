@@ -18,8 +18,6 @@ import RecentFollowups from './RecentFollowups';
 import mapStyles from './map.module.scss';
 import { MapPinIcon } from '@heroicons/react/24/solid';
 
-export const runtime = 'edge';
-
 const LazyMap = dynamic(() => import("./Map"), {
   ssr: false,
   loading: () => <p>Loading...</p>,

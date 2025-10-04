@@ -10,13 +10,12 @@ import {
 import { SpotActionEnum } from '@/lib/schema';
 import type { LatLngBounds } from '@/lib/schema';
 
-import { db } from '@/lib/db';
-
-export const runtime = 'edge';
+import { getDb } from '@/lib/db';
 
 export const RENAME_COOL_OFF_DAYS = 30;
 
 export const getWorldUsers = (userId: string) => {
+  const db = getDb();
   const query = db.select({
     id:       users.id,
     name:     users.name,
@@ -52,6 +51,7 @@ type ProfileRenames = {
 }[] | null;
 
 const renameHistoryQuery = (limit: number) => {
+  const db = getDb();
   const query = db.$with('rename_history').as(
     db.select({
       docId: changes.docId,
@@ -104,6 +104,7 @@ const expandActionCounts = (v: { action: string, count: number }[]) => {
 
 export const getQuickProfileQuery = () => {
   const recentRenames = renameHistoryQuery(3);
+  const db = getDb();
   const query = db.with(recentRenames).select({
     id:        users.id,
     name:      users.name,
@@ -118,6 +119,7 @@ export const getQuickProfileQuery = () => {
 };
 
 export const getProfile = async (userId: string) => {
+  const db = getDb();
   const actionCounts = db.$with('actionCounts').as(
     db.select({
       items: sql<string>`json_group_array(json_object('action', action, 'count', count))`.as('ac_items')
@@ -154,6 +156,7 @@ type ProfileQuery = ReturnType<typeof getProfile>;
 export type ProfileResult = NonNullable<Awaited<ProfileQuery>> | null;
 
 export const saveArea = async (userId: string, areaId: number | null, bounds: LatLngBounds) => {
+  const db = getDb();
   if (areaId) {
     const items = await db.update(areas).set({
       bounds: bounds

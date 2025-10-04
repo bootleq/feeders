@@ -29,7 +29,6 @@
     }
   },
   "include": [
-    "worker-configuration.d.ts",
     "next-env.d.ts",
     "feeders.d.ts",
     "**/*.ts",

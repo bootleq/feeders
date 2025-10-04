@@ -1,12 +1,12 @@
 "use client"
 
 import * as R from 'ramda';
-import { useMemo } from 'react';
+import { useMemo, Suspense } from 'react';
 import { atom, useAtomValue } from 'jotai';
-import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Html from '@/components/Html';
 import { tagsAtom, ACT_ABBRS } from './store';
+import Judgements from './Judgements';
 import styles from './laws.module.scss';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 
@@ -40,8 +40,6 @@ const createTagsHiddenAtom = (tagNames: string[]) => {
 export default function Law({ item }: {
   item: any,
 }) {
-  const searchParams = useSearchParams();
-  const openJudges = searchParams.has('judge') ? !!searchParams.get('judge') : false;
   const { id, act, article, title, link, summary, judgements, penalty, tags, effectiveAt } = item;
   const actAbbr = ACT_ABBRS[act] || '';
   const anchor = `${actAbbr}_${article}`;
@@ -83,15 +81,9 @@ export default function Law({ item }: {
           <TagList tags={tags} />
         </div>
 
-        { judgements &&
-          <details className={`ml-2 clear-both break-words ${styles.judgements}`} open={openJudges}>
-            <summary className='flex items-center cursor-pointer text-red-900/80'>
-              <img src='/assets/gavel.svg' alt='法槌' width={20} height={20} className='-scale-x-100' />
-              案例
-            </summary>
-            <Html html={judgements} className='p-1 mb-2 text-sm' />
-          </details>
-        }
+        <Suspense fallback={<div>...</div>}>
+          <Judgements judgements={judgements} />
+        </Suspense>
       </div>
     </li>
   );

@@ -9,7 +9,7 @@ export default function RepoLink() {
       className='flex items-center gap-x-2 p-2 rounded-md w-fit hover:bg-amber-300/50'
       href='https://github.com/bootleq/feeders'
       target='_blank'
-      title='bootleq/feeders: Source code of feeders.pages.dev'
+      title='bootleq/feeders: Source code of feeders.fyi'
     >
       <HubIcon className='w-6 h-6' viewBox='0 0 98 98' />
       github.com/bootleq/feeders

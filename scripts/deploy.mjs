@@ -2,7 +2,7 @@ import os from 'os';
 import path from "path";
 import { execSync, spawnSync } from "child_process";
 
-const OUT_DIR = 'dist';
+const OUT_DIR = '.open-next/assets';
 const CHARTS_REPO = expandHome(process.env.CHARTS_REPO);
 
 function expandHome(aPath) {
@@ -29,12 +29,12 @@ function main() {
 
   result = spawnSync('diff', ['-qr', 'public/charts', `${OUT_DIR}/charts`], { encoding: 'utf8' });
   if (result.status !== 0) {
-    console.error('dist/charts has difference to public/charts, aborted.');
+    console.error(`${OUT_DIR}/charts has difference to public/charts, aborted.`);
     console.log(result.output);
     return;
   }
 
-  execSync('wrangler pages deploy dist', { stdio: 'inherit' });
+  execSync('wrangler deploy', { stdio: 'inherit' });
 }
 
 main();

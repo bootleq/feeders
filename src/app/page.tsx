@@ -5,8 +5,6 @@ import { SITE_NAME } from '@/lib/utils';
 import HomeNav from './HomeNav';
 import siteIcon from './icon.svg'
 
-export const runtime = 'edge';
-
 export default async function Home() {
   return (
     <main className="container flex flex-col min-h-screen items-center justify-between p-4 mx-auto">

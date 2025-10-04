@@ -4,8 +4,6 @@ import { cmsBuiltURL } from '@/lib/utils';
 import { ACTS } from './store';
 import type { LawItem } from './store';
 
-export const runtime = 'edge';
-
 async function fromR2() {
   const url = cmsBuiltURL('laws.json');
 

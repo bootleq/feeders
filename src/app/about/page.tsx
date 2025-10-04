@@ -3,8 +3,6 @@ import { SITE_NAME, SITE_CONTACT_EMAIL } from '@/lib/utils';
 import Sidebar from '@/components/Sidebar';
 import RepoLink from './RepoLink';
 
-export const runtime = 'edge';
-
 export const metadata: Metadata = {
   title: '關於本站',
 };
@@ -54,6 +52,10 @@ export default async function Page() {
             <li>
               <time className='font-mono mr-2'>2025-02-24</time>
               圖表頁上線
+            </li>
+            <li>
+              <time className='font-mono mr-2'>2025-10-04</time>
+              啟用網址 <code>feeders.fyi</code>
             </li>
           </ol>
 

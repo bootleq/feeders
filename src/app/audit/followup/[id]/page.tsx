@@ -7,7 +7,7 @@ import ClientDate from '@/components/ClientDate';
 import { format, formatISO } from '@/lib/date-fp';
 import { UserIcon } from '@heroicons/react/24/outline';
 
-import { db } from '@/lib/db';
+import { getDb } from '@/lib/db';
 import {
   spotFollowups,
   users,
@@ -22,9 +22,8 @@ import {
   getTableName,
 } from 'drizzle-orm';
 
-export const runtime = 'edge';
-
 async function getItems(id: string) {
+  const db = getDb();
   const items = await db.select({
     id:        changes.id,
     scope:     changes.scope,

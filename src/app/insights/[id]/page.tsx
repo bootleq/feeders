@@ -10,8 +10,6 @@ import { getInsightById } from './getInsightById';
 import type { File } from './getInsightById';
 import Article from './Article';
 
-export const runtime = 'edge';
-
 type Insight = {
   content: ReturnType<typeof parse>,
   [key: string]: any,

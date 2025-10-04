@@ -5,7 +5,7 @@ import { differenceInDays } from 'date-fns';
 import { format } from '@/lib/date-fp';
 import { auth } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
-import { db } from '@/lib/db';
+import { getDb } from '@/lib/db';
 import { parseFormData, ACCESS_CTRL } from '@/lib/utils';
 import { eq, and, getTableName } from 'drizzle-orm';
 import { users, changes, UserStateEnum } from '@/lib/schema';
@@ -34,6 +34,8 @@ export default async function updateUser(formData: FormData) {
 
   if (user.state !== UserStateEnum.enum.active) return { error: '帳號不可用' };
   if (!user.id) throw new Error('no user id');
+
+  const db = getDb();
 
   if (data.field === 'name') {
     if (!data.value || data.value.trim() === '') {

@@ -3,7 +3,7 @@
 import { auth } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import { ENABLE_ACTIVATE } from '@/lib/utils';
-import { db } from '@/lib/db';
+import { getDb } from '@/lib/db';
 import { eq, and, getTableName } from 'drizzle-orm';
 import { users, changes, UserStateEnum } from '@/lib/schema';
 
@@ -30,6 +30,8 @@ export default async function saveUserArea() {
     }
   }
   if (!user.id) throw new Error('no user id');
+
+  const db = getDb();
 
   try {
     await db.batch([

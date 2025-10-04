@@ -9,12 +9,10 @@
     "start": "next start",
     "lint": "next lint",
     "tsc": "tsc --noErrorTruncation",
-    "pages:build": "NEXT_PUBLIC_CMS_BUILD_KEY=$(cat directus/build/BUILD_KEY) pnpm next-on-pages --outdir=dist",
-    "pages:build:prod": "NODE_ENV=production NEXT_PUBLIC_CMS_BUILD_KEY=$(cat directus/build/BUILD_KEY) pnpm next-on-pages --outdir=dist",
+    "worker:build": "NEXT_PUBLIC_CMS_BUILD_KEY=$(cat directus/build/BUILD_KEY) pnpm opennextjs-cloudflare build",
     "pull:charts": "tsx --env-file=.env.development scripts/pull_charts.mjs",
-    "preview": "pnpm wrangler pages dev dist --port 3000",
-    "env:push:preview": "tsx scripts/push_env_as_secrets.mjs preview",
-    "env:push:prod": "tsx scripts/push_env_as_secrets.mjs production",
+    "preview": "opennextjs-cloudflare preview",
+    "upload:preview": "wrangler versions upload --preview-alias preview",
     "deploy": "tsx --env-file=.env.development scripts/deploy.mjs",
     "db:tables": "pnpm wrangler d1 execute feeders --command 'PRAGMA table_list'",
     "db:delete": "rm -rf .wrangler/state/v3/d1/miniflare-D1DatabaseObject drizzle",
@@ -22,7 +20,7 @@
     "db:migrate:gen": "LOCAL_DB_PATH=$(find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit) drizzle-kit generate",
     "db:migrate:drop": "LOCAL_DB_PATH=$(find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit) drizzle-kit drop",
     "db:migrate": "LOCAL_DB_PATH=$(find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit) drizzle-kit migrate",
-    "cf-typegen": "wrangler types",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "cms": "cd ./directus && docker compose up --detach",
     "cms-log": "docker logs feeders-directus -f",
     "cms-stop": "cd ./directus && docker compose stop",
@@ -46,6 +44,7 @@
     "@heroicons/react": "^2.1.5",
     "@internationalized/date": "^3.5.5",
     "@next/bundle-analyzer": "^14.2.5",
+    "@opennextjs/cloudflare": "^1.9.0",
     "@react-leaflet/core": "^2.1.0",
     "chanfana": "^2.1.0",
     "change-case": "^5.4.4",
@@ -80,7 +79,6 @@
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.666.0",
-    "@cloudflare/next-on-pages": "^1.13.14",
     "@faker-js/faker": "^8.4.1",
     "@inquirer/confirm": "^5.1.9",
     "@playwright/test": "^1.50.1",
@@ -107,7 +105,6 @@
     "esbuild-register": "^3.5.0",
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
-    "eslint-plugin-next-on-pages": "^1.12.0",
     "jsdom": "^24.1.1",
     "postcss": "^8",
     "sass": "^1.77.8",
@@ -117,7 +114,7 @@
     "typescript": "^5",
     "vercel": "^34.3.0",
     "vitest": "^2.0.3",
-    "wrangler": "^4.2.0"
+    "wrangler": "^4.40.2"
   },
   "packageManager": "pnpm@9.15.1+sha512.1acb565e6193efbebda772702950469150cf12bcc764262e7587e71d19dc98a423dff9536e57ea44c49bdf790ff694e83c27be5faa23d67e0c033b583be4bfcf"
 }

@@ -5,8 +5,6 @@ import UserAgreement from '@/app/user/UserAgreement';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-export const runtime = 'edge';
-
 async function onSubmit() {
   "use server"
 

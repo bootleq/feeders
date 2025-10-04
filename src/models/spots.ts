@@ -33,9 +33,7 @@ import type { Schema as CreateSpotSchema } from '@/app/world/[[...path]]/create-
 import type { Schema as CreateFollowupSchema } from '@/app/world/[[...path]]/create-followup';
 import type { Schema as AmendSpotSchema } from '@/app/world/[[...path]]/amend-spot';
 
-import { db } from '@/lib/db';
-
-export const runtime = 'edge';
+import { getDb } from '@/lib/db';
 
 // https://data.gov.tw/dataset/152915
 const districtApiURL = 'https://api.nlsc.gov.tw/other/TownVillagePointQuery1/';
@@ -44,6 +42,8 @@ const xmlParser = new XMLParser();
 const PRELOAD_FOLLOWUPS_SIZE = 3;
 
 export const recentFollowups = (fetchLimit: number) => {
+  const db = getDb();
+
   // Rank latest created followup
   const ranked = db.select({
     id:          spotFollowups.id,
@@ -136,6 +136,7 @@ export async function queryDistrict(lat: number, lon: number) {
 };
 
 const getFollowupsQuery = () => {
+  const db = getDb();
   const followupProfiles = getQuickProfileQuery().as('followupProfiles');
   const followupChanges = db.select({
     docId: changes.docId,
@@ -172,6 +173,7 @@ const getFollowupsQuery = () => {
 }
 
 export const geoSpotsQuery = (geohashes: string[]) => {
+  const db = getDb();
   const latestSpawnInner = db.select({
       spotId:    spotFollowups.spotId,
       material:  spotFollowups.material,
@@ -335,6 +337,8 @@ export async function createSpot(data: CreateSpotSchema) {
     followup: InferSelectModel<typeof spotFollowups>,
   } | undefined;
 
+  const db = getDb();
+
   // await db.transaction(async (tx) => { // NOTE: D1 doesn't support transaction
   const newSpot = await db.insert(spots).values({
     title:   data.spotTitle,
@@ -372,6 +376,7 @@ export async function createSpot(data: CreateSpotSchema) {
 }
 
 export async function createFollowup(data: CreateFollowupSchema) {
+  const db = getDb();
   const followup = await db.insert(spotFollowups).values({
     action:      data.action,
     spotState:   ['remove', 'resolve'].includes(data.action) ? SpotStateEnum.enum.clean : SpotStateEnum.enum.dirty,
@@ -389,8 +394,8 @@ export async function createFollowup(data: CreateFollowupSchema) {
 }
 
 export const getFollowups = async (spotId: number) => {
+  const db = getDb();
   const followups = getFollowupsQuery().as('followups');
-
   const items = await db.select({
     id:          followups.id,
     userId:      followups.userId,
@@ -421,8 +426,8 @@ export const getFollowups = async (spotId: number) => {
 };
 
 export function spotsMissingDistrict(ids = []) {
+  const db = getDb();
   const idWhere = R.isNotEmpty(ids) ? inArray(spots.id, ids) : sql`1 = 1`;
-
   const query = db.select({
     id: spots.id,
     lat: spots.lat,

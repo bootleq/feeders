@@ -3,6 +3,8 @@ import path from 'node:path';
 import { execSync } from 'child_process';
 import dotenv from 'dotenv';
 
+// NOTE: this script is no longer used since migrated off of cloudflare pages.
+
 let env;
 const args = process.argv.slice(2);
 

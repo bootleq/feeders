@@ -5,8 +5,6 @@ import { format } from '@/lib/date-fp';
 import ClientDate from '@/components/ClientDate';
 import { getInsights } from './getInsights';
 
-export const runtime = 'edge';
-
 export const metadata: Metadata = {
   title: '見解列表',
   description: '遊蕩犬餵食問題與對策',
