@@ -12,7 +12,7 @@ const directus = createDirectus(CMS_URL).with(
       return {
         ...options,
         // credentials: 'omit',
-        // cache: 'no-store',
+        cache: 'no-cache',
       };
     },
   })
