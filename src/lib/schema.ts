@@ -143,6 +143,16 @@ export const spotFollowupsRelations = relations(spotFollowups, ({ one }) => ({
   })
 }));
 
+export const factPicks = sqliteTable("factPicks", {
+  id: incrementIdCol(),
+  state: pubStateCol().notNull(),
+  factIds: text('factIds', { mode: 'json' }).$type<number[]>(),
+  title: text('title'),
+  desc: text('desc'),
+  createdAt: createdAtCol(),
+  userId: text('userId').references(() => users.id)
+});
+
 export const changes = sqliteTable("changes", {
   id: incrementIdCol(),
   docType: text('docType').notNull(),
