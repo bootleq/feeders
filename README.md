@@ -61,14 +61,13 @@ When everything is ready, run the drizzle migrations on remote D1.
 
 - Migrations with drizzle-kit (locally)
 
-      pnpm db:migrate:gen
-      pnpm db:migrate:drop
+      pnpm drizzle-kit generate --name=your-migration-name
       pnpm db:migrate
 
 - Remove local db + drizzle meta, then reset with migrations (DANGER)
 
       pnpm db:delete
-      pnpm db:delete && pnpm db:tables && pnpm db:migrate:gen && pnpm db:migrate
+      pnpm db:delete && pnpm db:tables && pnpm drizzle-kit generate && pnpm db:migrate
 
 - Directly execute commands on local D1
 
