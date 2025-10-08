@@ -51,8 +51,7 @@ pnpm run deploy
 
 ## Database
 
-Currently, local Pages dev doesn't support `--remote` D1, so we use local
-sqlite db during development.
+During development, we use local D1 in .wrangler directory.
 
 When everything is ready, run the drizzle migrations on remote D1.
 
