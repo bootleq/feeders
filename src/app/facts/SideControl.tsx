@@ -26,12 +26,13 @@ import {
 } from './store';
 import type { Tags, FactMark, DateRange } from './store';
 import type { AnyFunction } from '@/lib/utils';
+import { tooltipClass, tooltipMenuCls } from '@/lib/utils';
 import useClientOnly from '@/lib/useClientOnly';
 import { findFactElement, clearMarkIndicators } from './utils';
 import tlStyles from './timeline.module.scss';
 import { getTagColor } from './colors';
 import { TextInput } from '@/components/form/Inputs';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipContentMenu, menuHoverProps } from '@/components/Tooltip';
 import { AnimateOnce } from '@/components/AnimateOnce';
 import { EyeIcon } from '@heroicons/react/24/outline';
 import { EyeSlashIcon } from '@heroicons/react/24/outline';
@@ -40,8 +41,12 @@ import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import { CheckIcon } from '@heroicons/react/24/outline';
 import { XCircleIcon } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { ArrowLeftEndOnRectangleIcon } from '@heroicons/react/24/outline';
-import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { GlobeAltIcon, BookOpenIcon } from '@heroicons/react/24/outline';
+import {
+  ArrowLeftEndOnRectangleIcon,
+  ArrowUpTrayIcon,
+  ArrowDownTrayIcon
+} from '@heroicons/react/24/outline';
 import HighlighterIcon from '@/assets/highlighter.svg';
 
 const currentMarkSlotAtom = atomWithStorage('feeders.factMarks.slot', 0);
@@ -586,7 +591,7 @@ function MarkCtrlPanel() {
               </AnimateOnce>
             }
 
-            <Tooltip placement='bottom-end'>
+            <Tooltip placement='top-start'>
               <TooltipTrigger className=''>
                 <button
                   type='button' className='btn bg-slate-100 text-slate-600 hover:text-black hover:ring-1 hover:bg-white disabled:opacity-30'
@@ -600,7 +605,37 @@ function MarkCtrlPanel() {
               </TooltipContent>
             </Tooltip>
 
-            <Tooltip placement='bottom-end'>
+            <Tooltip placement='top-start' hoverProps={menuHoverProps} role='menu'>
+              <TooltipTrigger className=''>
+                <button type='button' className='btn bg-slate-100 text-slate-600 hover:text-black hover:ring-1 hover:bg-white' aria-label='閱讀選集'>
+                  <GlobeAltIcon height={20} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContentMenu className={tooltipClass('text-sm drop-shadow-md')}>
+                <div className={tooltipMenuCls()}>
+                  <Tooltip placement='right' offset={6} hoverProps={menuHoverProps}>
+                    <TooltipTrigger className='p-2 w-full cursor-pointer flex items-center gap-1 rounded hover:bg-amber-200'>
+                      <BookOpenIcon className='stroke-current' height={20} />
+                      閱讀選集
+                    </TooltipTrigger>
+                    <TooltipContent className='p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1 text-balance'>
+                      顯示由使用者分享的記號清單
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip placement='right' offset={6} hoverProps={menuHoverProps}>
+                    <TooltipTrigger className='p-2 w-full cursor-pointer flex items-center gap-1 rounded hover:bg-amber-200'>
+                      <ArrowUpTrayIcon className='stroke-current' height={20} />
+                      編輯與上傳
+                    </TooltipTrigger>
+                    <TooltipContent className='p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1 text-balance'>
+                      編寫題目與說明，上傳分享目前清單
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              </TooltipContentMenu>
+            </Tooltip>
+
+            <Tooltip placement='top-start'>
               <TooltipTrigger className=''>
                 <button type='button' className='btn bg-slate-100 text-slate-600 hover:text-black hover:ring-1 hover:bg-white' aria-label='儲存目前清單到本機' onClick={onDownload}>
                   <ArrowDownTrayIcon className='stroke-current' height={20} />

@@ -58,6 +58,18 @@ export const removeFirst = (pred: (a: any) => boolean) => R.converge(
   ]
 );
 
+
+export function tooltipClass(className?: string) {
+  return `rounded box-border w-max z-[1002] bg-slate-100 ${className || ''}`;
+};
+export function tooltipMenuCls(className?: string) {
+  return [
+    'flex flex-col divide-y w-full items-center justify-between',
+    'rounded bg-gradient-to-br from-stone-50 to-slate-100 ring-2 ring-offset-1 ring-slate-300',
+    className || '',
+  ].join(' ');
+};
+
 // 在中英文之間增加空白
 let wordWordRegexp = new RegExp([
   /(?<![\s\p{P}\p{Emoji_Presentation}])/u, // not begin with space, punctuation, or emoji

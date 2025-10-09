@@ -38,7 +38,7 @@ export const menuHoverProps = {
 export function useTooltip({
   initialOpen = false,
   placement = "top",
-  offset,
+  offset = 5,
   transform = true,
   hoverProps = {
     delay: { open: 0, close: 240 },
