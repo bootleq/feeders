@@ -39,7 +39,12 @@ export function useFieldError(field: string) {
   return errors;
 }
 
-const fieldName = R.partial(t, ['spotFields']);
+export function useFieldNameTranslate(field: string) {
+  const meta = useAtomValue(metaAtom);
+  const nameScope = meta['fieldNameScope'];
+  const translate = useMemo(() => R.partial(t, [nameScope]), [nameScope]);
+  return translate;
+}
 
 export function TextInput({ label, name, tooltip, type = 'text', inputProps = {} }: {
   label?: string,
@@ -50,6 +55,7 @@ export function TextInput({ label, name, tooltip, type = 'text', inputProps = {}
 }) {
   const id = useId();
   const errors = useFieldError(name);
+  const fieldName = useFieldNameTranslate(name);
 
   const invalid = errors?.length > 0;
   const { className = '', name: _name, type: _type, ...restProps } = inputProps;
@@ -97,6 +103,8 @@ export function Textarea({ label, name, children, tooltip, inputProps = {} }: {
   const id = useId();
   const { className = '', name: _name, ...restProps } = inputProps;
   const errors = useFieldError(name);
+  const fieldName = useFieldNameTranslate(name);
+
   const invalid = errors?.length > 0;
   const labelProps: LabelProps = {
     htmlFor: id,
@@ -126,6 +134,8 @@ export function Select({ label, name, children, tooltip, inputProps = {} }: {
   const { className = '', name: _name, ...restProps } = inputProps;
   const tag = <select id={id} name={name} className={`${inputCls} cursor-pointer ${className}`} {...restProps}>{children}</select>
   const errors = useFieldError(name);
+  const fieldName = useFieldNameTranslate(name);
+
   const invalid = errors?.length > 0;
   const labelProps: LabelProps = {
     htmlFor: id,

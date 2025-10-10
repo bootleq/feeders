@@ -20,6 +20,11 @@ const translations = {
     'lon': '經度',
   },
 
+  factFields: { // NOTE: used in PickForm
+    'title': '標題',
+    'desc':  '說明',
+  },
+
   spotAction: {
     'see':      '看見',
     'remove':   '移除',
