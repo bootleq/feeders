@@ -1,6 +1,9 @@
 import { join } from 'path';
 import { tmpdir } from 'os';
-import { mkdtempSync, writeFileSync } from 'fs';
+import { readdirSync, mkdtempSync, writeFileSync } from 'fs';
+import Database from 'better-sqlite3';
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+import * as schema from '@/lib/schema';
 
 export function makeTempSQL(text: string) {
   const dir = mkdtempSync(join(tmpdir(), 'sql-'));
@@ -35,3 +38,16 @@ export function unprepareStatement(querySQL: any) {
     throw new Error(`Unsupported parameter type: ${typeof param}`);
   });
 }
+
+export const getLocalDB = () => {
+  const dbDir = '.wrangler/state/v3/d1/miniflare-D1DatabaseObject';
+  const files = readdirSync(dbDir);
+  const basename = files.find(f => f.endsWith('.sqlite'));
+
+  if (!basename) {
+    throw new Error(`Can find sqlite db in dir:\n  ${dbDir}`);
+  }
+  const file = join(dbDir, basename);
+  const sqlite = new Database(file, { fileMustExist: true });
+  return drizzle(sqlite, { schema });
+};
