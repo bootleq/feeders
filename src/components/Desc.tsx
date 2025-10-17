@@ -76,6 +76,7 @@ const defaultOptions: Opts = {
   rel: relFn,
   validate: validateFn,
   render: renderFn,
+  nl2br: true, // has to enable to avoid SSR bad <!-- --> marks
 };
 
 type Props = {
