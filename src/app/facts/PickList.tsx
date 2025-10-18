@@ -1,0 +1,79 @@
+'use client'
+
+import { useCallback, useEffect } from 'react';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { picksAtom, pickAtom, picksModeAtom, loadingPicksAtom } from './store';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
+import picksStyles from './picks.module.scss';
+import PickRow from './PickRow';
+import PicksLoading from '@/app/facts/PicksLoading';
+import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
+
+export default function PickList() {
+  const picks = useAtomValue(picksAtom);
+  const [readingPick, setPick] = useAtom(pickAtom);
+  const setPicksMode = useSetAtom(picksModeAtom);
+  const setLoading = useSetAtom(loadingPicksAtom);
+
+  const onTake = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    const id = Number(e.currentTarget?.dataset?.id);
+    if (id > 0) {
+      const pick = picks.find(aPick => aPick.id === id);
+      if (pick) {
+        const { title, desc, factIds, state, userId, userName, createdAt, changes, changedAt } = pick;
+        setPick({
+          id,
+          title: title || '',
+          desc: desc || '',
+          factIds: factIds || [],
+          state: state || 'draft',
+          userId: userId!,
+          userName: userName!,
+          createdAt: createdAt,
+          changes: changes || 0,
+          changedAt: changedAt,
+        });
+        // setPicksMode('item');  // Stay in index mode, leave more info to user
+      }
+    }
+  }, [picks, setPick]);
+
+  const onItemMode = useCallback(() => {
+    setPicksMode('item');
+  }, [setPicksMode]);
+
+  useEffect(() => {
+    if (picks.length <= 1) { // "1" to assume first time goes from 'item' to 'index', show loading before load other items
+      setLoading(true);
+    }
+  }, [picks, setLoading]);
+
+  return (
+    <>
+      <header className='flex items-center px-3 pb-1'>
+        <h2 className='text-slate-600'>
+          公開選集
+        </h2>
+        <Tooltip placement='top'>
+          <TooltipTrigger className='truncate'>
+            <QuestionMarkCircleIcon className='ml-1 stroke-slate-700/75 cursor-help' height={20} />
+          </TooltipTrigger>
+          <TooltipContent className="p-2 text-sm rounded box-border w-max z-[1002] bg-slate-100 ring-1 leading-relaxed shadow-lg">
+            這裡是由眾人分享的「記號」清單，
+            <br />
+            請注意其個人意見不一定正確。
+          </TooltipContent>
+        </Tooltip>
+      </header>
+
+      <div className='text-base pt-2 pb-8 pr-3 ml-3 ring-red-500 overflow-y-scroll scrollbar-thin'>
+        <PicksLoading />
+        <ol className={`flex flex-col ${picksStyles['pick-list']}`}>
+          {picks.map(pick =>
+            <PickRow key={pick.id} readingPickId={readingPick?.id || null} pick={pick} onTake={onTake} onItemMode={onItemMode} />
+          )}
+        </ol>
+      </div>
+    </>
+  );
+}

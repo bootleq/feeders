@@ -99,6 +99,8 @@ export const markIdsAtom = atom((get) => {
 export const peekingMarkAtom = atom<string | null>(null);
 
 export type PicksMode = 'index' | 'item' | 'edit' | '';
+export const picksAtom = atom<RecentPicksItemProps[]>([]);
+export const loadingPicksAtom = atom(false);
 export const picksModeAtom = atom<PicksMode>('');
 export const pickAtom = atom<RecentPicksItemProps | null>(null);
 export const removePickMarkAtom = atom(
