@@ -135,3 +135,6 @@ export const recentPicks = (fetchLimit: number) => {
 
   return query;
 };
+
+type RecentPicksQuery = ReturnType<typeof recentPicks>;
+export type RecentPicksItemProps = Awaited<RecentPicksQuery>[number];

@@ -2,6 +2,7 @@ import * as R from 'ramda';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
 import { atomFamily } from 'jotai/utils';
 import { removeFirst } from '@/lib/utils';
+import type { RecentPicksItemProps } from '@/models/facts';
 
 export const VIEW_CTRL_KEYS= ['desc', 'summary', 'origin', 'tags'];
 export const SLUG_PATTERN = /^[\d\- ~BC]+_(\d+)$/;
@@ -22,6 +23,18 @@ export const toggleViewCtrlAtom = atom(
 );
 
 export const columnsAtom = atom<boolean[]>([true]);
+
+export type Fact = {
+  id: number,
+  status: string,
+  date: string,
+  title: string,
+  desc: string,
+  summary: string,
+  origin: string,
+  tags: string,
+  insights: number[],
+}
 
 export type Tags = Record<string, boolean>;
 export const tagsAtom = atom<Tags>({});
@@ -58,6 +71,7 @@ export const allHighlighRangesAtom = atom((get) => {
 });
 
 export type FactMark = {
+  id: number,
   anchor: string,
   title: string,
 };
@@ -78,8 +92,33 @@ export const removeMarkAtom = atom(
     set(marksAtom, removeFirst(R.propEq(anchor, 'anchor')));
   }
 );
+export const markIdsAtom = atom((get) => {
+  const anchors = R.pluck('anchor', get(marksAtom));
+  return anchors.map(a => Number(a.split('_').pop()));
+});
 export const peekingMarkAtom = atom<string | null>(null);
 
+export type PicksMode = 'index' | 'item' | 'edit' | '';
+export const picksModeAtom = atom<PicksMode>('');
+export const pickAtom = atom<RecentPicksItemProps | null>(null);
+export const removePickMarkAtom = atom(
+  null,
+  (get, set, factId: number) => {
+    const oldIds = get(pickAtom)?.factIds;
+    if (oldIds) {
+      const newIds = removeFirst(R.equals(factId))(oldIds);
+      set(pickAtom, R.assoc('factIds', newIds));
+    }
+  }
+);
+export const addPickMarkAtom = atom(
+  null,
+  (get, set, factId: number) => {
+    const oldIds = get(pickAtom)?.factIds || [];
+    const newIds = R.append(factId, oldIds);
+    set(pickAtom, R.assoc('factIds', newIds));
+  }
+);
 export const zoomedFactAtom = atom<any>(null);
 
 export const timelineInterObserverAtom = atom<IntersectionObserver | null>(null);

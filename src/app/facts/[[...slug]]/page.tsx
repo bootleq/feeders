@@ -62,7 +62,7 @@ export default async function Page({ params }: {
       <ZoomArticle initialFact={zoomedFact} />
 
       <Sidebar navTitle='事實記錄' fixed={false} className={`max-h-screen scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
-        <SideControl tags={tags} />
+        <SideControl tags={tags} facts={facts} />
       </Sidebar>
 
       <TimelineContainer facts={facts} initialSlug={slug} />

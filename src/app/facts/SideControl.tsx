@@ -3,6 +3,7 @@
 import * as R from 'ramda';
 import { z } from 'zod';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useSession } from 'next-auth/react';
 import { useDebouncedCallback } from 'use-debounce';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useHydrateAtoms, atomWithStorage } from 'jotai/utils';
@@ -20,17 +21,22 @@ import {
   togglaAllTagsAtom,
   markPickingAtom,
   marksAtom,
+  markIdsAtom,
   removeMarkAtom,
   peekingMarkAtom,
+  picksModeAtom,
+  pickAtom,
   timelineInterObserverAtom,
 } from './store';
-import type { Tags, FactMark, DateRange } from './store';
+import type { Tags, Fact, FactMark, DateRange } from './store';
 import type { AnyFunction } from '@/lib/utils';
 import { tooltipClass, tooltipMenuCls } from '@/lib/utils';
 import useClientOnly from '@/lib/useClientOnly';
 import { findFactElement, clearMarkIndicators } from './utils';
 import tlStyles from './timeline.module.scss';
 import { getTagColor } from './colors';
+import PickMarks from './PickMarks';
+import { addAlertAtom } from '@/components/store';
 import { TextInput } from '@/components/form/Inputs';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipContentMenu, menuHoverProps } from '@/components/Tooltip';
 import { AnimateOnce } from '@/components/AnimateOnce';
@@ -500,15 +506,25 @@ const createStorageAtom = (slot: number) => {
   );
 };
 
-function MarkCtrlPanel() {
+function MarkCtrlPanel({ facts }: {
+  facts: Fact[]
+}) {
   const [panelOpen, setPanelOpen] = useState(true);
   const [slot, setSlot] = useAtom(currentMarkSlotAtom);
   const [markPicking, setMarkPicking] = useAtom(markPickingAtom);
   const [marks, setMarks] = useAtom(marksAtom);
+  const markIds = useAtomValue(markIdsAtom);
   const [savedHint, setSavedHint] = useState(false);
   const initialLoad = useRef(true);
   const slotAtom = useMemo(() => createStorageAtom(slot), [slot]);
   const [localMarks, setLocalMarks] = useAtom(slotAtom);
+  const [picksMode, setPicksMode] = useAtom(picksModeAtom);
+  const [pick, setPick] = useAtom(pickAtom);
+  const addAlert = useSetAtom(addAlertAtom);
+  const { data: session, status } = useSession();
+
+  const canEdit = status === 'authenticated' && session.user.state === 'active';
+  const userId = session?.user.id;
 
   const toggle = () => {
     setPanelOpen(R.not);
@@ -522,7 +538,20 @@ function MarkCtrlPanel() {
     }
   }, [setMarks, localMarks]);
 
+  useEffect(() => {
+    // Quit /picks/ path started from server side
+    if (!['index', 'item'].includes(picksMode)) {
+      const path = window.location.pathname;
+      if (path.startsWith('/facts/picks/')) {
+        window.history.replaceState(window.history.state, '', '/facts/');
+      }
+    }
+  }, [picksMode]);
+
   const isSlotDirty = useMemo(() => {
+    if (pick) {
+      return true;
+    }
     if (marks.length !== localMarks.length) {
       return true;
     }
@@ -531,7 +560,7 @@ function MarkCtrlPanel() {
     }
     const makeKey = (items: FactMark[]) => items.map(R.prop('anchor')).join();
     return makeKey(marks) !== makeKey(localMarks);
-  }, [marks, localMarks]);
+  }, [marks, localMarks, pick]);
 
   const onTogglePicker = (e: React.MouseEvent) => {
     setMarkPicking(R.not);
@@ -544,8 +573,14 @@ function MarkCtrlPanel() {
   };
 
   const onSave = () => {
-    setLocalMarks(marks);
-    setSavedHint(true);
+    if (localMarks.length) {
+      addAlert('error', <>儲存槽 <var className='font-mono font-bold'>{slot + 1}</var> 已經有內容，請先清空或換一個儲存槽</>);
+    } else {
+      // TODO: save pick marks
+      addAlert('error', <>未支援</>);
+      // setLocalMarks(marks);
+      // setSavedHint(true);
+    }
   };
 
   const onDownload = () => {
@@ -560,14 +595,57 @@ function MarkCtrlPanel() {
     URL.revokeObjectURL(url);
   };
 
+  const onListPicks = useCallback(() => {
+    setPicksMode('index');
+  }, [setPicksMode]);
+
+  const onEditPick = useCallback(() => {
+    if (!userId) {
+      throw new Error('未登入');
+    }
+
+    if (pick) {
+      if (userId === pick.userId) {
+        setPick(pick);
+      } else {
+        setPick({
+          ...pick,
+          title: `（複製自）${pick.title}`,
+          userId: userId,
+        });
+      }
+      setPicksMode('edit');
+      return;
+    }
+
+    if (markIds.length) {
+      const dummyDate = new Date();
+      setPick({
+        title: '未命名',
+        desc:  '',
+        factIds: markIds,
+        state: 'draft',
+        id: 0,
+        userId: '',
+        userName: '',
+        createdAt: dummyDate,
+        changes: 0,
+        changedAt: dummyDate,
+      });
+      setPicksMode('edit');
+    } else {
+      addAlert('error', <>請先建立至少一個記號，按「選取<CursorArrowRippleIcon className='stroke-slate-700 stroke-0 ml-1' height={20} />」開始</>);
+    }
+  }, [markIds, pick, userId, setPick, setPicksMode, addAlert]);
+
   const onSavedHintFaded = () => {
     setSavedHint(false);
   };
 
   return (
-    <div className='py-3'>
+    <div className='py-3 flex-grow flex flex-col'>
       <div className='font-bold cursor-pointer' onClick={toggle}>記號</div>
-      <div className={`flex flex-col items-start w-full pl-1 py-2 gap-y-2 text-sm ${panelOpen ? '' : 'hidden'}`}>
+      <div className={`flex flex-col flex-grow items-start w-full pl-1 py-2 gap-y-2 text-sm ${panelOpen ? '' : 'hidden'}`}>
         <div className='w-full flex items-center'>
           <ul className='flex items-center font-mono text-xs gap-x-1'>
             {markSlotAtoms.map((a, idx) => {
@@ -607,14 +685,14 @@ function MarkCtrlPanel() {
 
             <Tooltip placement='top-start' hoverProps={menuHoverProps} role='menu'>
               <TooltipTrigger className=''>
-                <button type='button' className='btn bg-slate-100 text-slate-600 hover:text-black hover:ring-1 hover:bg-white' aria-label='閱讀選集'>
+                <button type='button' className={`btn hover:text-black hover:ring-1 ${pick ? 'bg-rose-100 text-slate-800 ring-1' : 'text-slate-600 bg-slate-100'} hover:bg-white`} aria-label='閱讀選集'>
                   <GlobeAltIcon height={20} />
                 </button>
               </TooltipTrigger>
               <TooltipContentMenu className={tooltipClass('text-sm drop-shadow-md')}>
                 <div className={tooltipMenuCls()}>
                   <Tooltip placement='right' offset={6} hoverProps={menuHoverProps}>
-                    <TooltipTrigger className='p-2 w-full cursor-pointer flex items-center gap-1 rounded hover:bg-amber-200'>
+                    <TooltipTrigger className='p-2 w-full cursor-pointer flex items-center gap-1 rounded hover:bg-amber-200' onClick={onListPicks}>
                       <BookOpenIcon className='stroke-current' height={20} />
                       閱讀選集
                     </TooltipTrigger>
@@ -623,14 +701,18 @@ function MarkCtrlPanel() {
                     </TooltipContent>
                   </Tooltip>
                   <Tooltip placement='right' offset={6} hoverProps={menuHoverProps}>
-                    <TooltipTrigger className='p-2 w-full cursor-pointer flex items-center gap-1 rounded hover:bg-amber-200'>
+                    <TooltipTrigger
+                      className={`p-2 w-full ${canEdit ? 'cursor-pointer' : 'cursor-not-allowed opacity-45'} flex items-center gap-1 rounded hover:bg-amber-200`}
+                      {...(canEdit ? {onClick: onEditPick} : {})}
+                    >
                       <ArrowUpTrayIcon className='stroke-current' height={20} />
                       編輯與上傳
                     </TooltipTrigger>
                     <TooltipContent className='p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1 text-balance'>
-                      編寫題目與說明，上傳分享目前清單
+                      { canEdit ? '編寫題目與說明，上傳分享目前清單' : '登入後才可以上傳清單' }
                     </TooltipContent>
                   </Tooltip>
+
                 </div>
               </TooltipContentMenu>
             </Tooltip>
@@ -662,15 +744,20 @@ function MarkCtrlPanel() {
           </div>
         </div>
 
-        <ul className='divide-y-2 divide-slate-300 w-full'>
-          {marks.length ?
-            marks.map(({ anchor, title }, idx) => (
-              <Mark key={anchor} index={idx} anchor={anchor} title={title} />
-            ))
+        {
+          pick ?
+            <PickMarks pick={pick} facts={facts} />
           :
-            <li className='text-slate-600'>（空）</li>
-          }
-        </ul>
+            <ul className='divide-y-2 divide-slate-300 w-full'>
+              {marks.length ?
+                marks.map(({ id, anchor, title }, idx) => (
+                  <Mark id={id} key={anchor} index={idx} anchor={anchor} title={title} />
+                ))
+              :
+                <li className='text-slate-600'>（空）</li>
+              }
+            </ul>
+        }
 
         <div className="inline-flex items-center justify-start text-sm mt-1 ml-auto">
         </div>
@@ -679,19 +766,20 @@ function MarkCtrlPanel() {
   );
 }
 
-export default function SideControl({ tags }: {
+export default function SideControl({ tags, facts }: {
   tags: Tags,
+  facts: Fact[],
 }) {
   useHydrateAtoms([
     [tagsAtom, tags],
   ]);
 
   return (
-    <div className='p-2 pb-7 sm:pb-2 divide-y-4 overflow-auto scrollbar-thin' data-nosnippet>
+    <div className='p-2 pb-7 sm:pb-2 divide-y-4 overflow-auto scrollbar-thin flex flex-col flex-grow' data-nosnippet>
       <ViewCtrlPanel />
       <TagCtrlPanel />
       <FiltersCtrl />
-      <MarkCtrlPanel />
+      <MarkCtrlPanel facts={facts} />
       <iframe name='noop-trap' className='hidden' />
     </div>
   );

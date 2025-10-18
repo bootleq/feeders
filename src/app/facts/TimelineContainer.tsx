@@ -5,7 +5,6 @@ import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { useSetAtom, useAtomValue } from 'jotai';
 import striptags from 'striptags';
-import { useHydrateAtoms } from 'jotai/utils';
 import { present, blank, scrollAnywhereFix } from '@/lib/utils';
 import {
   slugAtom,
@@ -102,6 +101,9 @@ export default function TimelineContainer({ facts, initialSlug }: {
       if (present(newSlug)) {
         setZoomedFact(null);
         const slugString = JSON.stringify(newSlug);
+        if (newSlug === 'picks') {
+          return;
+        }
         if (lastAlertSlug.current !== slugString) {
           addAlert('error', <>網址不正確（<code>{slugString}</code> 無法辨識）</>);
           lastAlertSlug.current = slugString;
