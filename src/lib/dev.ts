@@ -3,6 +3,7 @@ import { tmpdir } from 'os';
 import { readdirSync, mkdtempSync, writeFileSync } from 'fs';
 import Database from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { sql } from 'drizzle-orm';
 import * as schema from '@/lib/schema';
 
 export function makeTempSQL(text: string) {
@@ -35,8 +36,15 @@ export function unprepareStatement(querySQL: any) {
     if (typeof param === "number" || typeof param === "boolean") {
       return param.toString();
     }
+    if (typeof param === "object" && param instanceof Date) {
+      return param.getTime() / 1000;
+    }
     throw new Error(`Unsupported parameter type: ${typeof param}`);
   });
+}
+
+export function selectTimeForHuman(col: any, alias: string) {
+  return sql`strftime('%Y %m/%d %H:%M', ${col}, 'unixepoch')`.as(alias);
 }
 
 export const getLocalDB = () => {
