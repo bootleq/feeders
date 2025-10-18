@@ -147,6 +147,10 @@ function UnscopedForm() {
 
     const formData = new FormData(e.currentTarget);
 
+    if (formData.get('id') === '0') {
+      formData.delete('id');  // dirty work due to our schema shortage
+    }
+
     setSending(true);
     const res = await savePick(formData);
     const item = res.item as RecentPicksItemProps;

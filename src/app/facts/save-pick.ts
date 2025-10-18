@@ -43,8 +43,7 @@ export async function savePick(formData: FormData) {
   const idsJSON = params['factIds']?.toString() || '[]';
   params['factIds'] = JSON.parse(idsJSON);
 
-  const schema = params['id'] ? formSchema : createSchema;
-  const validated = schema.safeParse(params);
+  const validated = formSchema.safeParse(params);
   if (!validated.success) {
     return {
       errors: validated.error.flatten().fieldErrors,
