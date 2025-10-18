@@ -23,6 +23,7 @@ const translations = {
   factFields: { // NOTE: used in PickForm
     'title': '標題',
     'desc':  '說明',
+    'state': '狀態',
   },
 
   spotAction: {
@@ -54,6 +55,11 @@ const translations = {
     'coop':     'bg-red-400',
     'downvote': 'bg-red-700',
     'resolve':  'bg-green-900',
+  },
+
+  pickState: {
+    'draft':     '草稿',
+    'published': '公開',
   },
 
   changeScope: {

@@ -121,6 +121,21 @@ export const addPickMarkAtom = atom(
     set(pickAtom, R.assoc('factIds', newIds));
   }
 );
+export const refreshPickAtom = atom(
+  null,
+  (get, set, pick: RecentPicksItemProps) => {
+    const picks = get(picksAtom);
+    set(picksAtom, R.map((item) => {
+      if (item.id === pick.id) {
+        return pick;
+      } else {
+        return item;
+      }
+    }));
+  }
+);
+export const pickSavedAtom = atom(false);
+
 export const zoomedFactAtom = atom<any>(null);
 
 export const timelineInterObserverAtom = atom<IntersectionObserver | null>(null);

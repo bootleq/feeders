@@ -13,6 +13,7 @@ import { alertsAtom, dismissAlertAtom } from '@/components/store';
 import TimelineContainer from '@/app/facts/TimelineContainer';
 import ZoomArticle from '@/app/facts/ZoomArticle';
 import PicksView from '@/app/facts/PicksView';
+import PickFormPanel from '@/app/facts/PickFormPanel';
 import SideControl from '@/app/facts/SideControl';
 
 async function findZoomedFact(slug: string) {
@@ -86,6 +87,7 @@ export default async function Page({ params }: {
   return (
     <main className="flex min-h-screen flex-row items-start justify-between">
       <PicksView id={pickId} picks={picks} mode={picksMode} />
+      <PickFormPanel mode={picksMode} />
 
       <ZoomArticle initialFact={zoomedFact} />
 

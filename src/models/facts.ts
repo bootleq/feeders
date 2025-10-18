@@ -18,6 +18,10 @@ import {
   sqlDateMapper,
 } from '@/lib/schema';
 
+import type {
+  CreateSchema as CreatePickSchema,
+} from '@/app/facts/save-pick';
+
 import { getDb } from '@/lib/db';
 
 function profileQuery() {
@@ -138,3 +142,16 @@ export const recentPicks = (fetchLimit: number) => {
 
 type RecentPicksQuery = ReturnType<typeof recentPicks>;
 export type RecentPicksItemProps = Awaited<RecentPicksQuery>[number];
+
+export async function createPick(data: CreatePickSchema) {
+  const db = getDb();
+  const pick = await db.insert(factPicks).values({
+    title:   data.title,
+    desc:    data.desc,
+    factIds: data.factIds,
+    state:   data.state,
+    userId:  data.userId,
+  }).returning().get();
+
+  return pick;
+}

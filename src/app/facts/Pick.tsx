@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
-import { pickAtom, picksModeAtom } from './store';
+import { pickAtom, picksModeAtom, pickSavedAtom } from './store';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import PickRow from '@/app/facts/PickRow';
 import PicksLoading from '@/app/facts/PicksLoading';
@@ -13,6 +13,7 @@ export default function Pick({ initialPick }: {
   initialPick: RecentPicksItemProps;  // pick from server side
 }) {
   const [pick, setPick] = useAtom(pickAtom);
+  const [saved, setSaved] = useAtom(pickSavedAtom);
   const setPicksMode = useSetAtom(picksModeAtom);
 
   const onTake = useCallback(() => {
@@ -36,6 +37,10 @@ export default function Pick({ initialPick }: {
   const onUp = useCallback(() => {
     setPicksMode('index');
   }, [setPicksMode]);
+
+  const onDismissSaved = useCallback(() => {
+    setSaved(false);
+  }, [setSaved])
 
   useEffect(() => {
     if (!pick && initialPick) {
@@ -79,6 +84,14 @@ export default function Pick({ initialPick }: {
       </header>
 
       <div className='text-base pt-2 pb-8 pr-3 ml-3 ring-red-500 overflow-y-scroll scrollbar-thin'>
+
+        {saved &&
+          <div className='w-fit flex items-center mx-auto gap-x-3 bg-lime-300/75 ring ring-lime-500 p-1 px-4 my-2 rounded'>
+            儲存成功
+            <XMarkIcon className='ml-auto cursor-pointer fill-slate-500 hover:scale-125' height={20} onClick={onDismissSaved} />
+          </div>
+        }
+
         <PicksLoading />
         <ol className=''>
           <PickRow pick={currentPick} readingPickId={currentPick.id} onTake={onTake} />
