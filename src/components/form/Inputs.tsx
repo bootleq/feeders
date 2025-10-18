@@ -129,10 +129,11 @@ export function Textarea({ label, name, children, tooltip, labelOpts = {}, input
   );
 }
 
-export function Select({ label, name, children, tooltip, inputProps = {} }: {
+export function Select({ label, name, children, tooltip, inputProps = {}, after }: {
   label?: string,
   name: string,
   children?: React.ReactNode,
+  after?: React.ReactNode,
   tooltip?: React.ReactNode,
   inputProps?: React.InputHTMLAttributes<HTMLSelectElement>,
 }) {
@@ -162,6 +163,7 @@ export function Select({ label, name, children, tooltip, inputProps = {} }: {
               {tooltip}
             </TooltipContent>
           </Tooltip>
+          {after}
         </div>
       </>
     );
@@ -170,7 +172,10 @@ export function Select({ label, name, children, tooltip, inputProps = {} }: {
   return (
     <>
       <label {...labelProps} />
-      {tag}
+      <div className='flex items-center'>
+        {tag}
+        {after}
+      </div>
     </>
   );
 }
