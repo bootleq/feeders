@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect } from 'react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { picksAtom, pickAtom, picksModeAtom, loadingPicksAtom, pickSavedAtom } from './store';
+import { picksAtom, pickAtom, picksModeAtom, loadingPicksAtom, initialPickLoadedAtom, pickSavedAtom } from './store';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import picksStyles from './picks.module.scss';
 import PickRow from './PickRow';
@@ -14,6 +14,7 @@ export default function PickList() {
   const [readingPick, setPick] = useAtom(pickAtom);
   const setPicksMode = useSetAtom(picksModeAtom);
   const setLoading = useSetAtom(loadingPicksAtom);
+  const [initLoad, setInitLoad] = useAtom(initialPickLoadedAtom);
   const setSaved = useSetAtom(pickSavedAtom);
 
   const onTake = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
@@ -45,10 +46,11 @@ export default function PickList() {
   }, [setPicksMode]);
 
   useEffect(() => {
-    if (picks.length <= 1) { // "1" to assume first time goes from 'item' to 'index', show loading before load other items
+    if (!initLoad.includes('index')) {
       setLoading(true);
+      setInitLoad([...initLoad, 'index']);
     }
-  }, [picks, setLoading]);
+  }, [initLoad, setInitLoad, setLoading]);
 
   useEffect(() => {
     setSaved(false);

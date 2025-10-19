@@ -4,7 +4,7 @@ import { useCallback, useEffect } from 'react';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useThrottledCallback } from 'use-debounce';
 import { jsonReviver } from '@/lib/utils';
-import { myPicksAtom, pickAtom, loadingPicksAtom } from './store';
+import { myPicksAtom, pickAtom, loadingPicksAtom, initialPickLoadedAtom } from './store';
 import { nowAtom, addAlertAtom } from '@/components/store';
 import type { RecentPicksItemProps } from '@/models/facts';
 import picksStyles from './picks.module.scss';
@@ -69,6 +69,7 @@ export default function MyPickList() {
   const setNow = useSetAtom(nowAtom);
   const [readingPick, setPick] = useAtom(pickAtom);
   const [loading, setLoading] = useAtom(loadingPicksAtom);
+  const [initLoad, setInitLoad] = useAtom(initialPickLoadedAtom);
 
   const throttledSetNow = useThrottledCallback(() => {
     setNow(new Date());
@@ -107,8 +108,11 @@ export default function MyPickList() {
   }, [setNow]);
 
   useEffect(() => {
-    setLoading(true);
-  }, [setLoading]);
+    if (!initLoad.includes('my')) {
+      setLoading(true);
+      setInitLoad([...initLoad, 'my']);
+    }
+  }, [initLoad, setInitLoad, setLoading]);
 
   return (
     <>

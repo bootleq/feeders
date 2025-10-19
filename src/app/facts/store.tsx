@@ -101,6 +101,7 @@ export const peekingMarkAtom = atom<string | null>(null);
 export type PicksMode = 'index' | 'item' | 'my' | 'edit' | '';
 export const picksAtom = atom<RecentPicksItemProps[]>([]);
 export const loadingPicksAtom = atom(false);
+export const initialPickLoadedAtom = atom<string[]>([]);
 export const picksModeAtom = atom<PicksMode>('');
 export const myPicksAtom = atom<RecentPicksItemProps[]>([]);
 export const pickAtom = atom<RecentPicksItemProps | null>(null);
