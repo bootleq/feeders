@@ -120,11 +120,13 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode }: {
                 已編輯：
                 <Tooltip placement='top-start'>
                   <TooltipTrigger className='cursor-text'>
-                    <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
-                      <time dateTime={formatISO({}, changedAt)}>
-                        {shortenDate(changedAt, now)}
-                      </time>
-                    </ClientDate>
+                    <div>
+                      <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
+                        <time dateTime={formatISO({}, changedAt)}>
+                          {shortenDate(changedAt, now)}
+                        </time>
+                      </ClientDate>
+                    </div>
                   </TooltipTrigger>
                   <TooltipContent className={`${tooltipCls}`}>
                     編輯日期：{ format({}, 'yyyy/MM/dd HH:mm', changedAt) }
