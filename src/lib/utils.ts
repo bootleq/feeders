@@ -1,6 +1,8 @@
 import * as R from 'ramda';
 import { z } from 'zod';
+import { differenceInDays } from 'date-fns';
 import { parseZonedDateTime } from '@internationalized/date';
+import { format, formatDistanceToNow } from '@/lib/date-fp';
 
 export type AnyFunction = (...args: any[]) => any;
 
@@ -123,6 +125,21 @@ export const ariaDatePickerValueFix = (formData: FormData, fieldNames: string[])
     }
   });
 };
+
+export function shortenDate(date: Date, now?: Date) {
+  if (!now || !date) return '----/-/-';
+
+  if (now.getFullYear() === date.getFullYear()) {
+    const diff = differenceInDays(now, date);
+    if (diff > 18) {
+      return format({}, 'M/d', date);
+    } else {
+      return formatDistanceToNow(date).replace('大約', '');
+    }
+  }
+
+  return format({}, 'yyyy/MM/dd', date);
+}
 
 // Special fix for browser addon ScrollAnywhere
 export const scrollAnywhereFix = () => {

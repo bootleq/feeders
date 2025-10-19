@@ -20,15 +20,16 @@ export default function PickList() {
     if (id > 0) {
       const pick = picks.find(aPick => aPick.id === id);
       if (pick) {
-        const { title, desc, factIds, state, userId, userName, createdAt, changes, changedAt } = pick;
+        const { title, desc, factIds, state, userId, userName, publishedAt, createdAt, changes, changedAt } = pick;
         setPick({
           id,
           title: title || '',
           desc: desc || '',
-          factIds: factIds || [],
+          factIds: factIds,
           state: state || 'draft',
           userId: userId!,
           userName: userName!,
+          publishedAt: publishedAt,
           createdAt: createdAt,
           changes: changes || 0,
           changedAt: changedAt,

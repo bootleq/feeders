@@ -2,9 +2,8 @@ import Link from 'next/link';
 import { useAtomValue } from 'jotai';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import type { RecentPicksItemProps } from '@/models/facts';
-import { present } from '@/lib/utils';
-import { format, formatISO, formatDistanceToNow } from '@/lib/date-fp';
-import { differenceInDays } from 'date-fns';
+import { present, shortenDate } from '@/lib/utils';
+import { format, formatISO } from '@/lib/date-fp';
 import { nowAtom } from '@/components/store';
 import ClientDate from '@/components/ClientDate';
 import { Desc } from '@/components/Desc';
@@ -16,21 +15,6 @@ const tooltipCls = [
   'bg-gradient-to-br from-stone-50 to-slate-100 ring-2 ring-offset-1 ring-slate-300 shadow-lg',
 ].join(' ')
 
-function shortenDate(date: Date, now?: Date) {
-  if (!now || !date) return '----/-/-';
-
-  if (now.getFullYear() === date.getFullYear()) {
-    const diff = differenceInDays(now, date);
-    if (diff > 18) {
-      return format({}, 'M/d', date);
-    } else {
-      return formatDistanceToNow(date).replace('大約', '');
-    }
-  }
-
-  return format({}, 'yyyy/MM/dd', date);
-}
-
 export default function PickRow({ pick, readingPickId, onTake, onItemMode }: {
   pick: RecentPicksItemProps,
   readingPickId: number | null,
@@ -39,7 +23,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode }: {
 }) {
   const now = useAtomValue(nowAtom);
 
-  const { id, title, desc, factIds, state, userId, userName, createdAt, changes, changedAt } = pick;
+  const { id, title, desc, factIds, state, userId, userName, publishedAt, createdAt, changes, changedAt } = pick;
   const bookRead = readingPickId === id;
 
   return (
@@ -98,6 +82,24 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode }: {
               {userName}
             </Link>
 
+            {
+              publishedAt &&
+                <Tooltip placement='top'>
+                  <TooltipTrigger className='cursor-auto'>
+                    <Link href={`/facts/picks/${id}`} className='break-keep hover:bg-yellow-300/50 text-inherit rounded'>
+                      <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
+                        <time dateTime={formatISO({}, publishedAt)}>
+                          {shortenDate(publishedAt, now)}
+                        </time>
+                      </ClientDate>
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent className={`${tooltipCls}`}>
+                    發表日期：{ format({}, 'yyyy/MM/dd HH:mm', publishedAt) }
+                  </TooltipContent>
+                </Tooltip>
+            }
+
             <Tooltip placement='top'>
               <TooltipTrigger className='cursor-auto'>
                 <Link href={`/facts/picks/${id}`} className='break-keep hover:bg-yellow-300/50 text-inherit rounded'>
@@ -107,10 +109,10 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode }: {
                     </time>
                   </ClientDate>
                 </Link>
-                <TooltipContent className={`${tooltipCls}`}>
-                  建立日期：{ format({}, 'yyyy/MM/dd HH:mm', createdAt) }
-                </TooltipContent>
               </TooltipTrigger>
+              <TooltipContent className={`${tooltipCls}`}>
+                建立日期：{ format({}, 'yyyy/MM/dd HH:mm', createdAt) }
+              </TooltipContent>
             </Tooltip>
 
             {changes > 0 ?
@@ -123,10 +125,10 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode }: {
                         {shortenDate(changedAt, now)}
                       </time>
                     </ClientDate>
-                    <TooltipContent className={`${tooltipCls}`}>
-                      編輯日期：{ format({}, 'yyyy/MM/dd HH:mm', changedAt) }
-                    </TooltipContent>
                   </TooltipTrigger>
+                  <TooltipContent className={`${tooltipCls}`}>
+                    編輯日期：{ format({}, 'yyyy/MM/dd HH:mm', changedAt) }
+                  </TooltipContent>
                 </Tooltip>
                 <Tooltip placement='top-start'>
                   <TooltipTrigger className='flex items-center'>
@@ -134,8 +136,8 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode }: {
                       <Square3Stack3DIcon className='stroke-current mr-px' height={18} />
                       {changes}
                     </Link>
-                    <TooltipContent className={`${tooltipCls}`}>調閱編修記錄（在新分頁開啟）</TooltipContent>
                   </TooltipTrigger>
+                  <TooltipContent className={`${tooltipCls}`}>調閱編修記錄（在新分頁開啟）</TooltipContent>
                 </Tooltip>
               </div>
               : ''

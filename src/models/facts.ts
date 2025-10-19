@@ -57,16 +57,17 @@ export const getPickById = (id: number) => {
   const pickChanges = changesQuery();
 
   const query = db.select({
-    id:        factPicks.id,
-    title:     factPicks.title,
-    desc:      factPicks.desc,
-    factIds:   factPicks.factIds,
-    state:     factPicks.state,
-    userId:    factPicks.userId,
-    createdAt: factPicks.createdAt,
-    userName:  profiles.name,
-    changes:   pickChanges.count,
-    changedAt: pickChanges.changedAt,
+    id:          factPicks.id,
+    title:       factPicks.title,
+    desc:        factPicks.desc,
+    factIds:     factPicks.factIds,
+    state:       factPicks.state,
+    userId:      factPicks.userId,
+    publishedAt: factPicks.publishedAt,
+    createdAt:   factPicks.createdAt,
+    userName:    profiles.name,
+    changes:     pickChanges.count,
+    changedAt:   pickChanges.changedAt,
   }).from(factPicks)
     .innerJoin(profiles, eq(profiles.id, factPicks.userId))
     .leftJoin(pickChanges, eq(pickChanges.docId, factPicks.id))
@@ -84,9 +85,9 @@ export const recentPicks = (fetchLimit: number) => {
   const db = getDb();
 
   const oldestDate = db.selectDistinct({
-    createdDateBegin: sql`unixepoch(DATETIME(${factPicks.createdAt}, 'unixepoch'), 'start of day', '-8 hours')`.as('createdDateBegin')
+    dateBegin: sql`unixepoch(DATETIME(${factPicks.publishedAt}, 'unixepoch'), 'start of day', '-8 hours')`.as('dateBegin')
   }).from(factPicks)
-    .orderBy(desc(factPicks.createdAt))
+    .orderBy(desc(factPicks.publishedAt))
     .limit(1).offset(5);
 
   const profiles = db.select({
@@ -107,18 +108,17 @@ export const recentPicks = (fetchLimit: number) => {
     )).as('pickChanges');
 
   const query = db.select({
-    id:        factPicks.id,
-    title:     factPicks.title,
-    desc:      factPicks.desc,
-    factIds:   factPicks.factIds,
-    state:     factPicks.state,
-    userId:    factPicks.userId,
-    createdAt: factPicks.createdAt,
-    // createdAt: sql<Date | null>`${factPicks.createdAt}`,
-    userName:  profiles.name,
-    changes:   pickChanges.count,
-    changedAt: pickChanges.changedAt,
-    // changedAt: sql<Date | null>`${pickChanges.changedAt}`,
+    id:          factPicks.id,
+    title:       factPicks.title,
+    desc:        factPicks.desc,
+    factIds:     factPicks.factIds,
+    state:       factPicks.state,
+    userId:      factPicks.userId,
+    publishedAt: factPicks.publishedAt,
+    createdAt:   factPicks.createdAt,
+    userName:    profiles.name,
+    changes:     pickChanges.count,
+    changedAt:   pickChanges.changedAt,
   }).from(factPicks)
     .innerJoin(profiles, eq(profiles.id, factPicks.userId))
     .leftJoin(pickChanges, eq(pickChanges.docId, factPicks.id))
@@ -126,14 +126,16 @@ export const recentPicks = (fetchLimit: number) => {
       and(
         // inArray(factPicks.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped]),
         or(
+          gte(factPicks.publishedAt, sql`IFNULL(${oldestDate}, 0)`),
           gte(factPicks.createdAt, sql`IFNULL(${oldestDate}, 0)`),
           gte(pickChanges.changedAt, sql`IFNULL(${oldestDate}, 0)`),
         )
       )
     )
     .orderBy(
-      desc(factPicks.createdAt),
+      desc(factPicks.publishedAt),
       desc(pickChanges.changedAt),
+      desc(factPicks.createdAt),
     )
     .limit(fetchLimit);
 
@@ -145,12 +147,15 @@ export type RecentPicksItemProps = Awaited<RecentPicksQuery>[number];
 
 export async function createPick(data: CreatePickSchema) {
   const db = getDb();
+
+  const pubAt = data.state === PubStateEnum.enum.published ? new Date() : null;
   const pick = await db.insert(factPicks).values({
-    title:   data.title,
-    desc:    data.desc,
-    factIds: data.factIds,
-    state:   data.state,
-    userId:  data.userId,
+    title:       data.title,
+    desc:        data.desc,
+    factIds:     data.factIds,
+    state:       data.state,
+    userId:      data.userId,
+    publishedAt: pubAt,
   }).returning().get();
 
   return pick;
