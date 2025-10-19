@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect } from 'react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { picksAtom, pickAtom, picksModeAtom, loadingPicksAtom } from './store';
+import { picksAtom, pickAtom, picksModeAtom, loadingPicksAtom, pickSavedAtom } from './store';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import picksStyles from './picks.module.scss';
 import PickRow from './PickRow';
@@ -14,21 +14,23 @@ export default function PickList() {
   const [readingPick, setPick] = useAtom(pickAtom);
   const setPicksMode = useSetAtom(picksModeAtom);
   const setLoading = useSetAtom(loadingPicksAtom);
+  const setSaved = useSetAtom(pickSavedAtom);
 
   const onTake = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     const id = Number(e.currentTarget?.dataset?.id);
     if (id > 0) {
       const pick = picks.find(aPick => aPick.id === id);
       if (pick) {
-        const { title, desc, factIds, state, userId, userName, createdAt, changes, changedAt } = pick;
+        const { title, desc, factIds, state, userId, userName, publishedAt, createdAt, changes, changedAt } = pick;
         setPick({
           id,
           title: title || '',
           desc: desc || '',
-          factIds: factIds || [],
+          factIds: factIds,
           state: state || 'draft',
           userId: userId!,
           userName: userName!,
+          publishedAt: publishedAt,
           createdAt: createdAt,
           changes: changes || 0,
           changedAt: changedAt,
@@ -47,6 +49,10 @@ export default function PickList() {
       setLoading(true);
     }
   }, [picks, setLoading]);
+
+  useEffect(() => {
+    setSaved(false);
+  }, [setSaved]);
 
   return (
     <>

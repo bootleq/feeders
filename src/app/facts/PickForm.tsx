@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import ClientDate from '@/components/ClientDate';
 import { format, formatDistanceToNow } from '@/lib/date-fp';
-import { ACCESS_CTRL } from '@/lib/utils';
+import { present, shortenDate, ACCESS_CTRL } from '@/lib/utils';
 import { t } from '@/lib/i18n';
 import type { RecentPicksItemProps } from '@/models/facts';
 import {
@@ -79,8 +79,9 @@ function CancelButton({ onCancel }: {
   );
 }
 
-function DateInfo({ id, createdAt, changes, changedAt }: {
+function DateInfo({ id, publishedAt, createdAt, changes, changedAt }: {
   id?: number,
+  publishedAt?: Date | null,
   createdAt?: Date | null,
   changes?: number,
   changedAt?: Date | null,
@@ -90,36 +91,63 @@ function DateInfo({ id, createdAt, changes, changedAt }: {
     setNow(new Date());
   }, []);
 
-  if (!id || !changes || !changedAt) return;
+  if (!id) return;
 
-  // TODO: show published date
+  const displayDate = publishedAt || createdAt;
 
   return (
-    <div className='ml-auto flex items-center'>
-      已編輯：
-      <Tooltip placement='bottom'>
-        <TooltipTrigger className='mr-2 whitespace-nowrap cursor-text'>
-          <ClientDate>
-            {formatDistanceToNow(changedAt).replace('大約', '').trim()}
-          </ClientDate>
-          <TooltipContent className={`${tooltipCls} font-mono`}>
-            <ClientDate>
-              編輯日期：{ format({}, 'yyyy/MM/dd HH:mm', changedAt) }
-            </ClientDate>
-          </TooltipContent>
-        </TooltipTrigger>
-      </Tooltip>
+    <>
+      {
+        displayDate &&
+          <div className='flex items-center'>
+            <Tooltip placement='bottom-start'>
+              <TooltipTrigger className=''>
+                <div className='mr-auto ml-3 whitespace-nowrap cursor-text'>
+                  <ClientDate>
+                    {shortenDate(displayDate, now)}
+                  </ClientDate>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className={`${tooltipCls} flex flex-col gap-y-1`}>
+                <ClientDate>
+                  { publishedAt && <div>發表日期：{ format({}, 'yyyy/MM/dd HH:mm', publishedAt) }</div> }
+                  { createdAt   && <div>建立日期：{ format({}, 'yyyy/MM/dd HH:mm', createdAt ) }</div> }
+                </ClientDate>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+      }
+      {
+        (present(changes) && changedAt) &&
+          <div className='ml-auto flex items-center'>
+            已編輯：
+            <Tooltip placement='bottom-start'>
+              <TooltipTrigger className='mr-2 whitespace-nowrap cursor-text'>
+                <div>
+                  <ClientDate>
+                    {formatDistanceToNow(changedAt).replace('大約', '').trim()}
+                  </ClientDate>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className={`${tooltipCls} font-mono`}>
+                <ClientDate>
+                  編輯日期：{ format({}, 'yyyy/MM/dd HH:mm', changedAt) }
+                </ClientDate>
+              </TooltipContent>
+            </Tooltip>
 
-      <Tooltip placement='bottom'>
-        <TooltipTrigger className='flex items-center ml-auto'>
-          <Link href={`/audit/picks/${id}`} className='inline-flex items-center justify-center p-1 ml-1 text-slate-500/75 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
-            <Square3Stack3DIcon className='stroke-current' height={18} />
-            {changes}
-          </Link>
-          <TooltipContent className={`${tooltipCls}`}>調閱編修記錄（在新分頁開啟）</TooltipContent>
-        </TooltipTrigger>
-      </Tooltip>
-    </div>
+            <Tooltip placement='bottom-start'>
+              <TooltipTrigger className='flex items-center ml-auto'>
+                <Link href={`/audit/picks/${id}`} className='inline-flex items-center justify-center p-1 ml-1 text-slate-500/75 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
+                  <Square3Stack3DIcon className='stroke-current' height={18} />
+                  {changes}
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent className={`${tooltipCls}`}>調閱編修記錄（在新分頁開啟）</TooltipContent>
+            </Tooltip>
+          </div>
+      }
+    </>
   );
 }
 
@@ -146,6 +174,10 @@ function UnscopedForm() {
     }
 
     const formData = new FormData(e.currentTarget);
+
+    if (formData.get('id') === '0') {
+      formData.delete('id');  // dirty work due to our schema shortage
+    }
 
     setSending(true);
     const res = await savePick(formData);
@@ -210,7 +242,7 @@ function UnscopedForm() {
           <Select name='state'
             inputProps={{ className: 'max-w-24', defaultValue: pick.state }}
             tooltip={<StateTooltip />}
-            after={<DateInfo id={pick.id} createdAt={pick.createdAt} changes={pick.changes} changedAt={pick.changedAt} />} >
+            after={<DateInfo id={pick.id} publishedAt={pick.publishedAt} createdAt={pick.createdAt} changes={pick.changes} changedAt={pick.changedAt} />} >
             {
               ['draft', 'published'].map(o => (
                 <option key={o} value={o}>

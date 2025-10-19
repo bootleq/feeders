@@ -146,10 +146,11 @@ export const spotFollowupsRelations = relations(spotFollowups, ({ one }) => ({
 export const factPicks = sqliteTable("factPicks", {
   id: incrementIdCol(),
   state: pubStateCol().notNull(),
-  factIds: text('factIds', { mode: 'json' }).$type<number[]>(),
+  factIds: text('factIds', { mode: 'json' }).$type<number[]>().notNull().default(sql`'[]'`),
   title: text('title'),
   desc: text('desc'),
   createdAt: createdAtCol(),
+  publishedAt: timestampCol('publishedAt'),
   userId: text('userId').references(() => users.id)
 });
 

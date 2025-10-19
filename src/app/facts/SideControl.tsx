@@ -628,6 +628,7 @@ function MarkCtrlPanel({ facts }: {
         id: 0,
         userId: '',
         userName: '',
+        publishedAt: null,
         createdAt: dummyDate,
         changes: 0,
         changedAt: dummyDate,

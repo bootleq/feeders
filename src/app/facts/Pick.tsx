@@ -18,7 +18,7 @@ export default function Pick({ initialPick }: {
 
   const onTake = useCallback(() => {
     if (pick) {
-      const { id, title, desc, factIds, state, userId, userName, createdAt, changes, changedAt } = pick;
+      const { id, title, desc, factIds, state, userId, userName, publishedAt, createdAt, changes, changedAt } = pick;
       setPick({
         id,
         title: title || '',
@@ -27,6 +27,7 @@ export default function Pick({ initialPick }: {
         state: state || 'draft',
         userId: userId!,
         userName: userName!,
+        publishedAt: publishedAt,
         createdAt: createdAt,
         changes: changes || 0,
         changedAt: changedAt,

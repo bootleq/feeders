@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { auth } from '@/lib/auth';
 import { getDb } from '@/lib/db';
 import { and, eq, inArray, getTableName } from 'drizzle-orm';
-import { parseFormData, ACCESS_CTRL } from '@/lib/utils';
+import { parseFormData, blank, ACCESS_CTRL } from '@/lib/utils';
 import { diffForm } from '@/lib/diff';
 import { factPicks, changes } from '@/lib/schema';
 import { createPick as save, getPickById } from '@/models/facts';
@@ -43,8 +43,7 @@ export async function savePick(formData: FormData) {
   const idsJSON = params['factIds']?.toString() || '[]';
   params['factIds'] = JSON.parse(idsJSON);
 
-  const schema = params['id'] ? formSchema : createSchema;
-  const validated = schema.safeParse(params);
+  const validated = formSchema.safeParse(params);
   if (!validated.success) {
     return {
       errors: validated.error.flatten().fieldErrors,
@@ -53,6 +52,7 @@ export async function savePick(formData: FormData) {
 
   const { data } = validated;
   let errors: FieldErrors = {};
+  let hardProps: Record<string, any> = {};
 
   const addError = (key: string, msg: string) => {
     if (!errors[key]) errors[key] = [];
@@ -68,6 +68,7 @@ export async function savePick(formData: FormData) {
       desc: factPicks.desc,
       factIds: factPicks.factIds,
       state: factPicks.state,
+      publishedAt: factPicks.publishedAt,
     }).from(factPicks)
       .where(and(
         eq(factPicks.id, data.id),
@@ -97,9 +98,16 @@ export async function savePick(formData: FormData) {
                 .set(changeset.new)
                 .where(eq(factPicks.id, data.id))
       } else {
+        if (
+          blank(pick.publishedAt) &&
+          R.pathEq(PickStateEnum.enum.published, ['new', 'state'], changeset)
+        ) {
+          hardProps['publishedAt'] = new Date();
+        }
+
         await db.batch([
           db.update(factPicks)
-            .set(changeset.new)
+            .set({ ...hardProps, ...changeset.new })
             .where(eq(factPicks.id, data.id)),
 
           db.insert(changes).values({
@@ -130,8 +138,13 @@ export async function savePick(formData: FormData) {
   } else {
     // Create new record
     try {
+      if (data.state === PickStateEnum.enum.published) {
+        hardProps['publishedAt'] = new Date();
+      }
+
       const newPick = await save({
         ...data,
+        ...hardProps,
         userId: session.userId,
       });
 
