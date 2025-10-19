@@ -31,7 +31,7 @@ if (args.length > 0) {
 
 const TZ = tz("Asia/Taipei");
 const now = new Date();
-const minCreatedAt = startOfDay(
+const minUpdatedAt = startOfDay(
   subDays(inDays, now, { in: TZ }),
   { in: TZ }
 );
@@ -56,14 +56,15 @@ function queryPicks() {
     )).as('pickChanges');
 
   const query = db.select({
-    id:        factPicks.id,
-    title:     factPicks.title,
-    factIds:   factPicks.factIds,
-    state:     factPicks.state,
-    userName:  profiles.name,
-    createdAt: selectTimeForHuman(factPicks.createdAt, 'createdAt'),
-    changes:   pickChanges.count,
-    changedAt: selectTimeForHuman(pickChanges.changedAt, 'changedAt'),
+    id:          factPicks.id,
+    title:       factPicks.title,
+    factIds:     factPicks.factIds,
+    state:       factPicks.state,
+    userName:    profiles.name,
+    publishedAt: selectTimeForHuman(factPicks.publishedAt, 'publishedAt'),
+    createdAt:   selectTimeForHuman(factPicks.createdAt, 'createdAt'),
+    changes:     pickChanges.count,
+    changedAt:   selectTimeForHuman(pickChanges.changedAt, 'changedAt'),
   }).from(factPicks)
     .innerJoin(
       profiles, eq(profiles.id, factPicks.userId)
@@ -71,11 +72,14 @@ function queryPicks() {
     .leftJoin(pickChanges, eq(pickChanges.docId, factPicks.id))
     .where(
       or(
-        gte(factPicks.createdAt, minCreatedAt),
-        gte(pickChanges.changedAt, minCreatedAt),
+        gte(factPicks.publishedAt, minUpdatedAt),
+        gte(factPicks.createdAt, minUpdatedAt),
+        gte(pickChanges.changedAt, minUpdatedAt),
       )
     )
     .orderBy(
+      desc(pickChanges.changedAt),
+      desc(factPicks.publishedAt),
       desc(factPicks.createdAt),
     )
     .limit(100);

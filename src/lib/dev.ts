@@ -44,7 +44,8 @@ export function unprepareStatement(querySQL: any) {
 }
 
 export function selectTimeForHuman(col: any, alias: string) {
-  return sql`strftime('%Y %m/%d %H:%M', ${col}, 'unixepoch')`.as(alias);
+  const offset = 8 * 60 * 60; // UTC+8
+  return sql`strftime('%Y %m/%d %H:%M', ${col} + ${offset}, 'unixepoch')`.as(alias);
 }
 
 export const getLocalDB = () => {
