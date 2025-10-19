@@ -12,6 +12,7 @@ import type { PicksMode } from '@/app/facts/store';
 import PicksPanel from '@/app/facts/PicksPanel';
 import Pick from '@/app/facts/Pick';
 import PickList from '@/app/facts/PickList';
+import MyPickList from '@/app/facts/MyPickList';
 import LinkPreview from '@/components/LinkPreview';
 
 const fetchPicksAtom = atom(
@@ -74,19 +75,16 @@ export default function PicksView({ id, picks, mode }: {
     throttledSetNow();
   }, [id, currentMode, fetchPicks, throttledSetNow]);
 
-  if (!['index', 'item'].includes(currentMode)) {
+  if (!['index', 'item', 'my'].includes(currentMode)) {
     return;
   }
 
   return (
     <>
       <PicksPanel mode={currentMode}>
-        {
-          currentMode === 'index' ?
-            <PickList />
-            :
-            <Pick initialPick={picks[0]} />
-        }
+        { currentMode === 'index' && <PickList /> }
+        { currentMode === 'item'  && <Pick initialPick={picks[0]} /> }
+        { currentMode === 'my'    && <MyPickList /> }
       </PicksPanel>
 
       <LinkPreview />

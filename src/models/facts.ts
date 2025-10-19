@@ -17,6 +17,7 @@ import {
   PubStateEnum,
   sqlDateMapper,
 } from '@/lib/schema';
+import { present } from '@/lib/utils';
 
 import type {
   CreateSchema as CreatePickSchema,
@@ -73,7 +74,7 @@ export const getPickById = (id: number) => {
     .leftJoin(pickChanges, eq(pickChanges.docId, factPicks.id))
     .where(
       and(
-        // inArray(factPicks.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped]),
+        inArray(factPicks.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped]),
         eq(factPicks.id, id),
       )
     );
@@ -81,8 +82,16 @@ export const getPickById = (id: number) => {
   return query;
 }
 
-export const recentPicks = (fetchLimit: number) => {
+export const recentPicks = (fetchLimit: number, userId?: string) => {
   const db = getDb();
+
+  const isPrivate = present(userId);
+  const userIdCond = isPrivate ? eq(factPicks.userId, userId!) : undefined;
+  const stateCond = [
+    PubStateEnum.enum.published,
+    PubStateEnum.enum.dropped,
+    ...(isPrivate ? [PubStateEnum.enum.draft] : []),
+  ];
 
   const oldestDate = db.selectDistinct({
     dateBegin: sql`unixepoch(DATETIME(${factPicks.publishedAt}, 'unixepoch'), 'start of day', '-8 hours')`.as('dateBegin')
@@ -124,12 +133,13 @@ export const recentPicks = (fetchLimit: number) => {
     .leftJoin(pickChanges, eq(pickChanges.docId, factPicks.id))
     .where(
       and(
-        // inArray(factPicks.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped]),
+        inArray(factPicks.state, stateCond),
+        userIdCond,
         or(
           gte(factPicks.publishedAt, sql`IFNULL(${oldestDate}, 0)`),
           gte(factPicks.createdAt, sql`IFNULL(${oldestDate}, 0)`),
           gte(pickChanges.changedAt, sql`IFNULL(${oldestDate}, 0)`),
-        )
+        ),
       )
     )
     .orderBy(

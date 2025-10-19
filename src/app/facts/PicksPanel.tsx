@@ -21,7 +21,7 @@ export default function PicksPanel({ mode, children }: {
     [picksModeAtom, mode],
   ]);
   const [picksMode, setPicksMode] = useAtom(picksModeAtom);
-  const opened = ['index', 'item'].includes(picksMode);
+  const opened = ['index', 'item', 'my'].includes(picksMode);
 
   const onClose = useCallback(() => {
     setPicksMode('');
@@ -31,10 +31,12 @@ export default function PicksPanel({ mode, children }: {
     return null;
   }
 
+  const privateRingStyle = mode === 'my' ? 'ring-purple-600/50 ring-offset-1' : '';
+
   return (
     <div className='fixed z-[900] inset-x-1/2 top-1 md:top-[4vh] -translate-x-1/2 w-max h-max max-w-[98vw] lg:min-w-[30vw] max-h-[88vh] flex flex-col-reverse items-center gap-y-1'>
       <XMarkIcon className='absolute z-[901] right-2 top-1.5 ml-auto cursor-pointer fill-slate-500 hover:fill-black' onClick={onClose} height={24} />
-      <section className={sectionCls}>
+      <section className={`${sectionCls} ${privateRingStyle}`}>
         {children}
       </section>
     </div>
