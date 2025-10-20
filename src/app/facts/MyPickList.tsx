@@ -99,20 +99,16 @@ export default function MyPickList() {
   }, [picks, setPick]);
 
   useEffect(() => {
-    fetchPicks();
     throttledSetNow();
-  }, [fetchPicks, throttledSetNow]);
-
-  useEffect(() => {
-    setNow(new Date());
-  }, [setNow]);
+  }, [throttledSetNow]);
 
   useEffect(() => {
     if (!initLoad.includes('my')) {
       setLoading(true);
+      fetchPicks();
       setInitLoad([...initLoad, 'my']);
     }
-  }, [initLoad, setInitLoad, setLoading]);
+  }, [initLoad, setInitLoad, setLoading, fetchPicks]);
 
   return (
     <>

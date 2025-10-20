@@ -1,15 +1,48 @@
 'use client'
 
 import { useCallback, useEffect } from 'react';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { jsonReviver } from '@/lib/utils';
 import { picksAtom, pickAtom, picksModeAtom, loadingPicksAtom, initialPickLoadedAtom, pickSavedAtom } from './store';
+import { addAlertAtom } from '@/components/store';
+import type { RecentPicksItemProps } from '@/models/facts';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import picksStyles from './picks.module.scss';
 import PickRow from './PickRow';
 import PicksLoading from '@/app/facts/PicksLoading';
 import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 
+const fetchPicksAtom = atom(
+  null,
+  async (get, set) => {
+    try {
+      const url = '/api/picks/';
+      const response = await fetch(url);
+      const json = await response.text();
+      const fetched: {items: RecentPicksItemProps[]} = JSON.parse(json, jsonReviver);
+      if (response.ok) {
+        set(picksAtom, fetched.items);
+      } else {
+        const errorNode = <><code className='font-mono mr-1'>{response.status}</code>無法取得資料</>;
+        set(addAlertAtom, 'error', errorNode);
+      }
+    } catch (e) {
+      let errorNode;
+      if (e instanceof SyntaxError) {
+        errorNode = <span>非預期的回應內文</span>;
+        console.log({SyntaxError: String(e)});
+      } else {
+        errorNode = <span>{String(e)}</span>;
+      }
+      set(addAlertAtom, 'error', errorNode);
+    } finally {
+      set(loadingPicksAtom, false);
+    }
+  }
+);
+
 export default function PickList() {
+  const fetchPicks = useSetAtom(fetchPicksAtom);
   const picks = useAtomValue(picksAtom);
   const [readingPick, setPick] = useAtom(pickAtom);
   const setPicksMode = useSetAtom(picksModeAtom);
@@ -48,9 +81,10 @@ export default function PickList() {
   useEffect(() => {
     if (!initLoad.includes('index')) {
       setLoading(true);
+      fetchPicks();
       setInitLoad([...initLoad, 'index']);
     }
-  }, [initLoad, setInitLoad, setLoading]);
+  }, [initLoad, setInitLoad, setLoading, fetchPicks]);
 
   useEffect(() => {
     setSaved(false);
