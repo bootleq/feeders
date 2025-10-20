@@ -3,7 +3,7 @@ import type { Metadata, ResolvingMetadata } from "next";
 import { preload } from 'react-dom';
 import striptags from 'striptags';
 import { getFacts } from '@/app/facts/getFacts';
-import { getPickById, recentPicks } from '@/models/facts';
+import { getPickById, recentPicks, buildMasker } from '@/models/facts';
 import type { RecentPicksItemProps } from '@/models/facts';
 import { BASE_META } from '@/app/facts/utils';
 import { slugAtom, SLUG_PATTERN } from '@/app/facts/store';
@@ -15,6 +15,8 @@ import ZoomArticle from '@/app/facts/ZoomArticle';
 import PicksView from '@/app/facts/PicksView';
 import PickFormPanel from '@/app/facts/PickFormPanel';
 import SideControl from '@/app/facts/SideControl';
+
+const pickMasker = buildMasker({ isPublic: true });
 
 async function findZoomedFact(slug: string) {
   const zoom = slug.match(SLUG_PATTERN);
@@ -30,12 +32,12 @@ async function getPicks() {
   // TODO: pagination
   const pageSize = 300;
   const items = await recentPicks(pageSize);
-  return items;
+  return items.map(pickMasker);
 }
 
 async function getPicksById(id: number) {
   const items = await getPickById(id);
-  return items;
+  return items.map(pickMasker);
 }
 
 export async function generateMetadata(

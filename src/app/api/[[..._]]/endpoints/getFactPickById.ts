@@ -1,7 +1,9 @@
 import { ApiRoute } from './ApiRoute';
 import type { Context } from 'hono';
 import { z } from 'zod';
-import { getPickById } from '@/models/facts';
+import { getPickById, buildMasker } from '@/models/facts';
+
+const masker = buildMasker({ isPublic: true });
 
 export class getFactPickById extends ApiRoute {
   schema = {
@@ -18,7 +20,7 @@ export class getFactPickById extends ApiRoute {
 
     return c.json({
       success: true,
-      items
+      items: items.map(masker),
     })
   }
 }

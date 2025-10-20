@@ -9,6 +9,8 @@ export const SLUG_PATTERN = /^[\d\- ~BC]+_(\d+)$/;
 
 export const slugAtom = atom('');
 
+const invalidDate = new Date(NaN);
+
 export const viewCtrlAtom = atom(VIEW_CTRL_KEYS);
 export const toggleViewCtrlAtom = atom(
   get => get(viewCtrlAtom),
@@ -143,10 +145,12 @@ const refreshPickById = (newItem: RecentPicksItemProps, oldItems: RecentPicksIte
 export const refreshPickAtom = atom(
   null,
   (get, set, pick: RecentPicksItemProps) => {
-    const picks = get(picksAtom);
-    set(picksAtom, refreshPickById(pick, picks));
     const myPicks = get(myPicksAtom);
     set(myPicksAtom, refreshPickById(pick, myPicks));
+
+    const picks = get(picksAtom);
+    const masked = R.assoc('createdAt', invalidDate, pick);
+    set(picksAtom, refreshPickById(masked, picks));
   }
 );
 export const pickSavedAtom = atom(false);

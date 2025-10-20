@@ -10,7 +10,7 @@ import { nowAtom } from '@/components/store';
 import ClientDate from '@/components/ClientDate';
 import { Desc } from '@/components/Desc';
 import { UserCircleIcon, Square3Stack3DIcon } from '@heroicons/react/24/solid';
-import { GlobeAltIcon, BookOpenIcon, MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { GlobeAltIcon, BookOpenIcon, MagnifyingGlassIcon, XMarkIcon, NoSymbolIcon } from '@heroicons/react/24/outline';
 import CircleDashedIcon from '@/assets/circle-dashed.svg';
 
 const draftTextColor = 'text-purple-700';
@@ -19,6 +19,60 @@ const tooltipCls = [
   'text-xs p-1 px-2 rounded box-border w-max max-w-[calc(100vw_-_10px)] z-[1002]',
   'bg-gradient-to-br from-stone-50 to-slate-100 ring-2 ring-offset-1 ring-slate-300 shadow-lg',
 ].join(' ')
+
+function Dropped({ pick }: {
+  pick: RecentPicksItemProps,
+}) {
+  const now = useAtomValue(nowAtom);
+  const { publishedAt } = pick;
+  return (
+    <li className='pt-4 first:pt-0'>
+      <article>
+        <header className='flex flex-col mb-1'>
+          <div className='flex items-center my-px mb-0'>
+            <Tooltip placement='top'>
+              <TooltipTrigger className='text-red-950/75 cursor-help font-bold'>
+                已隱藏
+              </TooltipTrigger>
+              <TooltipContent className={`${tooltipCls}`}>
+                這個項目受到網站管理處分，只有作者能看見內容
+              </TooltipContent>
+            </Tooltip>
+            <div className='ml-auto flex items-center'>
+              <NoSymbolIcon className='ml-1 rounded stroke-slate-700/75 cursor-not-allowed' height={18} aria-label='禁止' />
+            </div>
+          </div>
+
+          <div className='mb-1 flex flex-wrap justify-start gap-x-1 text-slate-600 text-sm items-center opacity-50'>
+            <div className='break-keep mr-1 flex items-center text-inherit'>
+              <UserCircleIcon className='fill-current' height={18} />
+            </div>
+
+            {publishedAt &&
+              <Tooltip placement='top'>
+                <TooltipTrigger className='text-black cursor-auto'>
+                  <div className={`break-keep text-inherit rounded flex items-center`}>
+                    <NoSymbolIcon className='mr-1' height={18} aria-label='禁止' />
+                    <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
+                      <time dateTime={formatISO({}, publishedAt)}>
+                        {shortenDate(publishedAt, now)}
+                      </time>
+                    </ClientDate>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className={`${tooltipCls}`}>
+                  原始發表日期：{ format({}, 'yyyy/MM/dd HH:mm', publishedAt) }
+                </TooltipContent>
+              </Tooltip>
+            }
+          </div>
+        </header>
+
+        <Desc value='（內容已隱藏）' className='opacity-50 max-h-96 overflow-auto md:max-w-xl mb-1 mx-px rounded' />
+      </article>
+    </li>
+  );
+}
 
 export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEditMode }: {
   pick: RecentPicksItemProps,
@@ -38,11 +92,22 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
   const { id, title, desc, factIds, state, userId, userName, publishedAt, createdAt, changes, changedAt } = pick;
   const bookRead = readingPickId === id;
   const inPrivate = picksMode === 'my';
+  const isBanned = state === 'dropped';
+  const canEdit = !isBanned;
   const idProp = present(id) ? { id: `pick-${id}` } : {};
 
+  if (!inPrivate && isBanned) {
+    return <Dropped pick={pick} />;
+  }
+
   return (
-    <li className='pt-4 first:pt-0'>
-      <article {...idProp}>
+    <li className={`pt-4 first:pt-0 ${inPrivate && isBanned ? 'bg-slate-300' : ''}`}>
+      <article {...idProp} className=''>
+        {inPrivate && isBanned &&
+          <div className='w-fit flex items-center mx-auto gap-x-3 bg-red-300/75 ring-[4px] ring-red-500 p-2 px-5 my-2 translate-y-4 shadow-xl rounded'>
+            受到管制處分
+          </div>
+        }
         {saved && bookRead &&
           <div className='w-fit flex items-center mx-auto gap-x-3 bg-lime-300/75 ring-[4px] ring-lime-500 p-2 px-5 my-2 translate-y-4 shadow-xl rounded'>
             🎉 儲存成功
@@ -53,7 +118,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
           <div className='flex items-center my-px mb-0'>
             <h2 className={`font-bold ${state === 'published' ? '' : draftTextColor}`}>
               {title}
-              { state !== 'published' && <span className='text-slate-500 font-normal'>（草稿）</span> }
+              { state === 'draft' && <span className='text-slate-500 font-normal'>（草稿）</span> }
             </h2>
             <div className='ml-auto flex items-center'>
               <Tooltip placement='top'>
@@ -82,7 +147,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
                           只顯示本篇
                         </button>
                       }
-                      {onEditMode &&
+                      {canEdit && onEditMode &&
                         <button type='button' data-id={id} className='flex items-center gap-x-1 ml-auto mt-2 mb-1 btn bg-slate-100 text-slate-600 ring-1 hover:text-black hover:ring-2 hover:bg-white' onClick={onEditMode}>
                           <MagnifyingGlassIcon className='' height={18} aria-label='編輯' />
                           編輯

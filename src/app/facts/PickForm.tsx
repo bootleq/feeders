@@ -21,7 +21,7 @@ import {
 import { errorsAtom, metaAtom } from '@/components/form/store';
 import type { FieldErrors } from '@/components/form/store';
 import { TextInput, Textarea, Select } from '@/components/form/Inputs';
-import { ExclamationCircleIcon, CheckIcon, XMarkIcon, Square3Stack3DIcon } from '@heroicons/react/24/outline';
+import { ExclamationCircleIcon, CheckIcon, XMarkIcon, Square3Stack3DIcon, NoSymbolIcon } from '@heroicons/react/24/outline';
 
 import { savePick } from '@/app/facts/save-pick';
 
@@ -210,13 +210,14 @@ function UnscopedForm() {
     setSaved(false);
   }, [setPicksMode, setErrors, setSaved]);
 
-  const canSave = !sending;
-  const canEdit = status === 'authenticated' && session.user.state === 'active';
-  const userName = session?.user?.name;
-
   if (!pick) {
     return;
   }
+
+  const canSave = !sending;
+  const canEdit = status === 'authenticated' && session.user.state === 'active';
+  const userName = session?.user?.name;
+  const isBanned = pick.state === 'dropped';
 
   if (ACCESS_CTRL !== 'open') {
     return (
@@ -239,20 +240,35 @@ function UnscopedForm() {
       </h2>
       <form onSubmit={onSubmit} className='flex flex-col items-center gap-y-1 mt-3'>
         <div className='grid grid-cols-[min-content_2fr] gap-y-2 mb-1'>
-          <TextInput name='title' inputProps={{ required: true, defaultValue: pick.title || '' }} />
-          <Textarea name='desc' inputProps={{ rows: 8, className: 'md:min-w-[500px]', defaultValue: pick.desc || '' }} labelOpts={{ align: 'start' }} />
-          <Select name='state'
-            inputProps={{ className: 'max-w-24', defaultValue: pick.state }}
-            tooltip={<StateTooltip />}
-            after={<DateInfo id={pick.id} publishedAt={pick.publishedAt} createdAt={pick.createdAt} changes={pick.changes} changedAt={pick.changedAt} />} >
-            {
-              ['draft', 'published'].map(o => (
-                <option key={o} value={o}>
-                  {t('pickState', o)}
-                </option>
-              ))
-            }
-          </Select>
+          <TextInput name='title' inputProps={{ required: true, className: 'cursor-text', defaultValue: pick.title || '', disabled: isBanned }} />
+          <Textarea name='desc' inputProps={{ rows: 8, className: 'md:min-w-[500px] cursor-text', defaultValue: pick.desc || '', disabled: isBanned }} labelOpts={{ align: 'start' }} />
+          {
+            pick.state === 'dropped' ?
+            <>
+              <div>
+                狀態
+              </div>
+              <div className='flex items-center'>
+                <div className='mr-auto ml-3 whitespace-nowrap cursor-text'>
+                  受網站管理處分
+                </div>
+                <DateInfo id={pick.id} publishedAt={pick.publishedAt} createdAt={pick.createdAt} changes={pick.changes} changedAt={pick.changedAt} />
+              </div>
+            </>
+            :
+            <Select name='state'
+              inputProps={{ className: 'max-w-24', defaultValue: pick.state }}
+              tooltip={<StateTooltip />}
+              after={<DateInfo id={pick.id} publishedAt={pick.publishedAt} createdAt={pick.createdAt} changes={pick.changes} changedAt={pick.changedAt} />} >
+              {
+                ['draft', 'published'].map(o => (
+                  <option key={o} value={o}>
+                    {t('pickState', o)}
+                  </option>
+                ))
+              }
+            </Select>
+          }
           <div className='text-nowrap'>作者</div>
           <div className='ml-2 p-1 py-px flex-1'>
             {userName || '--'}
@@ -286,15 +302,23 @@ function UnscopedForm() {
           </div>
         }
 
-        <div className='flex items-center justify-center w-full gap-x-2 mt-2 mb-1 text-sm'>
-          <button className='btn bg-slate-100 ring-1 flex items-center hover:bg-white' disabled={!canSave}>
-            <CheckIcon className='stroke-green-700' height={20} />
-            {sending ? '處理中……' :
-              confirming ? '確認送出' : '儲存'
-            }
-          </button>
-          <CancelButton onCancel={cancel} />
-        </div>
+        {
+          isBanned ?
+            <div className='flex items-center justify-center w-full gap-x-2 mt-2 mb-1 font-bold'>
+              <NoSymbolIcon className='' height={18} />
+              此項目管制中，不能編輯
+            </div>
+          :
+            <div className='flex items-center justify-center w-full gap-x-2 mt-2 mb-1 text-sm'>
+              <button className='btn bg-slate-100 ring-1 flex items-center hover:bg-white' disabled={!canSave}>
+                <CheckIcon className='stroke-green-700' height={20} />
+                {sending ? '處理中……' :
+                  confirming ? '確認送出' : '儲存'
+                }
+              </button>
+              <CancelButton onCancel={cancel} />
+            </div>
+        }
       </form>
     </>
   );

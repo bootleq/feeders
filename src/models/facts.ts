@@ -25,6 +25,43 @@ import type {
 
 import { getDb } from '@/lib/db';
 
+const maskedText = '--';
+const maskedDate = new Date(NaN);
+
+function maskResult(isPublic: boolean, item: RecentPicksItemProps) {
+  if (typeof isPublic !== 'boolean') {
+    throw new Error('invalid argument');
+  }
+
+  const { state } = item;
+
+  // NOTE: should be synced with client side masking (facts/store: refreshPickAtom)
+  if (isPublic) {
+    item = {
+      ...item,
+      createdAt: maskedDate,
+    };
+  }
+
+  if (state === PubStateEnum.enum.dropped) {
+    item = {
+      ...item,
+      title: maskedText,
+      desc: maskedText,
+      factIds: [],
+      userId: maskedText,
+      createdAt: maskedDate,
+      userName: maskedText,
+      changes: 0,
+      changedAt: maskedDate,
+    };
+  }
+
+  return item;
+}
+
+export const buildMasker = ({ isPublic }: { isPublic: boolean}) => R.partial(maskResult, [isPublic]);
+
 function profileQuery() {
   const db = getDb();
   const query = db.select({

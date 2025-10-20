@@ -2,7 +2,9 @@ import * as R from 'ramda';
 import { ApiRoute } from './ApiRoute';
 import type { Context } from 'hono';
 import { z } from 'zod';
-import { recentPicks } from '@/models/facts';
+import { recentPicks, buildMasker } from '@/models/facts';
+
+const masker = buildMasker({ isPublic: true });
 
 // TODO: pagination
 const fetchLimit = 300;
@@ -13,7 +15,7 @@ export class getFactPicks extends ApiRoute {
 
     return c.json({
       success: true,
-      items
+      items: items.map(masker),
     })
   }
 }
