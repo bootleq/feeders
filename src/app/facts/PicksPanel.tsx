@@ -1,9 +1,9 @@
 "use client"
 
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
-import { useCallback } from 'react';
-import { picksModeAtom } from './store';
+import { useEffect, useCallback } from 'react';
+import { picksModeAtom, pickSavedAtom } from './store';
 import type { PicksMode } from '@/app/facts/store';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 
@@ -22,10 +22,17 @@ export default function PicksPanel({ mode, children }: {
   ]);
   const [picksMode, setPicksMode] = useAtom(picksModeAtom);
   const opened = ['index', 'item', 'my'].includes(picksMode);
+  const setSaved = useSetAtom(pickSavedAtom);
 
   const onClose = useCallback(() => {
     setPicksMode('');
   }, [setPicksMode]);
+
+  useEffect(() => {
+    if (picksMode !== 'my') {
+      setSaved(false);
+    }
+  }, [picksMode, setSaved]);
 
   if (!opened) {
     return null;
@@ -42,4 +49,3 @@ export default function PicksPanel({ mode, children }: {
     </div>
   );
 };
-
