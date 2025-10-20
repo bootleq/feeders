@@ -145,10 +145,11 @@ Prepare env by copy `.env.sample` to `.env.test`.
 
       pnpm tsx scripts/admin_activate_user.mjs {USER_ID} inactive --remote
 
-- Drop spot, or followup
+- Drop spot, followup, or pick
 
       pnpm tsx scripts/admin_drop_spot.mjs {ID} dropped --remote
       pnpm tsx scripts/admin_drop_followup.mjs {ID} dropped --remote
+      pnpm tsx scripts/admin_drop_pick.mjs {ID} dropped --remote
 
 
 
