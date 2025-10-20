@@ -53,6 +53,7 @@ import {
   ArrowUpTrayIcon,
   ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
+import UserPenIcon from '@/assets/user-pen.svg';
 import HighlighterIcon from '@/assets/highlighter.svg';
 
 const currentMarkSlotAtom = atomWithStorage('feeders.factMarks.slot', 0);
@@ -599,6 +600,10 @@ function MarkCtrlPanel({ facts }: {
     setPicksMode('index');
   }, [setPicksMode]);
 
+  const onListMyPicks = useCallback(() => {
+    setPicksMode('my');
+  }, [setPicksMode]);
+
   const onEditPick = useCallback(() => {
     if (!userId) {
       throw new Error('未登入');
@@ -695,10 +700,23 @@ function MarkCtrlPanel({ facts }: {
                   <Tooltip placement='right' offset={6} hoverProps={menuHoverProps}>
                     <TooltipTrigger className='p-2 w-full cursor-pointer flex items-center gap-1 rounded hover:bg-amber-200' onClick={onListPicks}>
                       <BookOpenIcon className='stroke-current' height={20} />
-                      閱讀選集
+                      閱讀公開選集
                     </TooltipTrigger>
-                    <TooltipContent className='p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1 text-balance'>
-                      顯示由使用者分享的記號清單
+                    <TooltipContent className='p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1 text-balance shadow-lg'>
+                      顯示由使用者分享的選集
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip placement='right' offset={6} hoverProps={menuHoverProps}>
+                    <TooltipTrigger
+                      className={`p-2 w-full ${canEdit ? 'cursor-pointer' : 'cursor-not-allowed opacity-45'} flex items-center gap-1 rounded hover:bg-amber-200`}
+                      {...(canEdit ? {onClick: onListMyPicks} : {})}
+                    >
+                      <UserPenIcon className='stroke-current' height={20} />
+                      我的選集
+                    </TooltipTrigger>
+                    <TooltipContent className='p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1 text-balance shadow-lg'>
+                      { canEdit ? '查看我編寫的選集，包括草稿' : '登入後才可以使用' }
                     </TooltipContent>
                   </Tooltip>
                   <Tooltip placement='right' offset={6} hoverProps={menuHoverProps}>
@@ -709,8 +727,8 @@ function MarkCtrlPanel({ facts }: {
                       <ArrowUpTrayIcon className='stroke-current' height={20} />
                       編輯與上傳
                     </TooltipTrigger>
-                    <TooltipContent className='p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1 text-balance'>
-                      { canEdit ? '編寫題目與說明，上傳分享目前清單' : '登入後才可以上傳清單' }
+                    <TooltipContent className='p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1 text-balance shadow-lg'>
+                      { canEdit ? '編寫題目與說明，上傳分享目前清單' : '登入後才可以使用' }
                     </TooltipContent>
                   </Tooltip>
 

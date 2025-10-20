@@ -1,37 +1,125 @@
+import { useCallback } from 'react';
 import Link from 'next/link';
-import { useAtomValue } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import type { RecentPicksItemProps } from '@/models/facts';
 import { present, shortenDate } from '@/lib/utils';
 import { format, formatISO } from '@/lib/date-fp';
+import { pickSavedAtom, picksModeAtom } from './store';
 import { nowAtom } from '@/components/store';
 import ClientDate from '@/components/ClientDate';
 import { Desc } from '@/components/Desc';
 import { UserCircleIcon, Square3Stack3DIcon } from '@heroicons/react/24/solid';
-import { BookOpenIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { GlobeAltIcon, BookOpenIcon, MagnifyingGlassIcon, XMarkIcon, NoSymbolIcon } from '@heroicons/react/24/outline';
+import CircleDashedIcon from '@/assets/circle-dashed.svg';
+
+const draftTextColor = 'text-purple-700';
 
 const tooltipCls = [
   'text-xs p-1 px-2 rounded box-border w-max max-w-[calc(100vw_-_10px)] z-[1002]',
   'bg-gradient-to-br from-stone-50 to-slate-100 ring-2 ring-offset-1 ring-slate-300 shadow-lg',
 ].join(' ')
 
-export default function PickRow({ pick, readingPickId, onTake, onItemMode }: {
+function Dropped({ pick }: {
   pick: RecentPicksItemProps,
-  readingPickId: number | null,
-  onTake: (e: React.MouseEvent<HTMLButtonElement>) => void,
-  onItemMode?: () => void,
 }) {
   const now = useAtomValue(nowAtom);
-
-  const { id, title, desc, factIds, state, userId, userName, publishedAt, createdAt, changes, changedAt } = pick;
-  const bookRead = readingPickId === id;
-
+  const { publishedAt } = pick;
   return (
     <li className='pt-4 first:pt-0'>
       <article>
         <header className='flex flex-col mb-1'>
           <div className='flex items-center my-px mb-0'>
-            <h2 className='font-bold'>{title}</h2>
+            <Tooltip placement='top'>
+              <TooltipTrigger className='text-red-950/75 cursor-help font-bold'>
+                已隱藏
+              </TooltipTrigger>
+              <TooltipContent className={`${tooltipCls}`}>
+                這個項目受到網站管理處分，只有作者能看見內容
+              </TooltipContent>
+            </Tooltip>
+            <div className='ml-auto flex items-center'>
+              <NoSymbolIcon className='ml-1 rounded stroke-slate-700/75 cursor-not-allowed' height={18} aria-label='禁止' />
+            </div>
+          </div>
+
+          <div className='mb-1 flex flex-wrap justify-start gap-x-1 text-slate-600 text-sm items-center opacity-50'>
+            <div className='break-keep mr-1 flex items-center text-inherit'>
+              <UserCircleIcon className='fill-current' height={18} />
+            </div>
+
+            {publishedAt &&
+              <Tooltip placement='top'>
+                <TooltipTrigger className='text-black cursor-auto'>
+                  <div className={`break-keep text-inherit rounded flex items-center`}>
+                    <NoSymbolIcon className='mr-1' height={18} aria-label='禁止' />
+                    <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
+                      <time dateTime={formatISO({}, publishedAt)}>
+                        {shortenDate(publishedAt, now)}
+                      </time>
+                    </ClientDate>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className={`${tooltipCls}`}>
+                  原始發表日期：{ format({}, 'yyyy/MM/dd HH:mm', publishedAt) }
+                </TooltipContent>
+              </Tooltip>
+            }
+          </div>
+        </header>
+
+        <Desc value='（內容已隱藏）' className='opacity-50 max-h-96 overflow-auto md:max-w-xl mb-1 mx-px rounded' />
+      </article>
+    </li>
+  );
+}
+
+export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEditMode }: {
+  pick: RecentPicksItemProps,
+  readingPickId: number | null,
+  onTake: (e: React.MouseEvent<HTMLButtonElement>) => void,
+  onItemMode?: () => void,
+  onEditMode?: () => void,
+}) {
+  const now = useAtomValue(nowAtom);
+  const [saved, setSaved] = useAtom(pickSavedAtom);
+  const picksMode = useAtomValue(picksModeAtom);
+
+  const onDismissSaved = useCallback(() => {
+    setSaved(false);
+  }, [setSaved])
+
+  const { id, title, desc, factIds, state, userId, userName, publishedAt, createdAt, changes, changedAt } = pick;
+  const bookRead = readingPickId === id;
+  const inPrivate = picksMode === 'my';
+  const isBanned = state === 'dropped';
+  const canEdit = !isBanned;
+  const idProp = present(id) ? { id: `pick-${id}` } : {};
+
+  if (!inPrivate && isBanned) {
+    return <Dropped pick={pick} />;
+  }
+
+  return (
+    <li className={`pt-4 first:pt-0 ${inPrivate && isBanned ? 'bg-slate-300' : ''}`}>
+      <article {...idProp} className=''>
+        {inPrivate && isBanned &&
+          <div className='w-fit flex items-center mx-auto gap-x-3 bg-red-300/75 ring-[4px] ring-red-500 p-2 px-5 my-2 translate-y-4 shadow-xl rounded'>
+            受到管制處分
+          </div>
+        }
+        {saved && bookRead &&
+          <div className='w-fit flex items-center mx-auto gap-x-3 bg-lime-300/75 ring-[4px] ring-lime-500 p-2 px-5 my-2 translate-y-4 shadow-xl rounded'>
+            🎉 儲存成功
+            <XMarkIcon className='ml-auto cursor-pointer fill-slate-500 hover:scale-125' height={20} onClick={onDismissSaved} />
+          </div>
+        }
+        <header className='flex flex-col mb-1'>
+          <div className='flex items-center my-px mb-0'>
+            <h2 className={`font-bold ${state === 'published' ? '' : draftTextColor}`}>
+              {title}
+              { state === 'draft' && <span className='text-slate-500 font-normal'>（草稿）</span> }
+            </h2>
             <div className='ml-auto flex items-center'>
               <Tooltip placement='top'>
                 <TooltipTrigger>
@@ -59,6 +147,12 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode }: {
                           只顯示本篇
                         </button>
                       }
+                      {canEdit && onEditMode &&
+                        <button type='button' data-id={id} className='flex items-center gap-x-1 ml-auto mt-2 mb-1 btn bg-slate-100 text-slate-600 ring-1 hover:text-black hover:ring-2 hover:bg-white' onClick={onEditMode}>
+                          <MagnifyingGlassIcon className='' height={18} aria-label='編輯' />
+                          編輯
+                        </button>
+                      }
                     </TooltipContent>
                   </Tooltip>
                 :
@@ -76,17 +170,18 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode }: {
             </div>
           </div>
 
-          <div className='mb-1 flex flex-wrap justify-start gap-x-2 text-slate-600 text-sm items-center'>
+          <div className='mb-1 flex flex-wrap justify-start gap-x-4 text-slate-600 text-sm items-center'>
             <Link href={`/user/${userId}`} data-user-id={userId} className='break-keep mr-2 flex items-center hover:bg-yellow-300/50 text-inherit'>
               <UserCircleIcon className='fill-current' height={18} />
               {userName}
             </Link>
 
             {
-              publishedAt &&
+              publishedAt ?
                 <Tooltip placement='top'>
-                  <TooltipTrigger className='cursor-auto'>
-                    <Link href={`/facts/picks/${id}`} className='break-keep hover:bg-yellow-300/50 text-inherit rounded'>
+                  <TooltipTrigger className='text-black cursor-auto'>
+                    <Link href={`/facts/picks/${id}`} className={`break-keep hover:bg-yellow-300/50 text-inherit rounded flex items-center ${state === 'published' ? 'text-stone-950' : draftTextColor}`}>
+                      <GlobeAltIcon className='mr-1' height={18} aria-label='公開' />
                       <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
                         <time dateTime={formatISO({}, publishedAt)}>
                           {shortenDate(publishedAt, now)}
@@ -95,39 +190,43 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode }: {
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent className={`${tooltipCls}`}>
-                    發表日期：{ format({}, 'yyyy/MM/dd HH:mm', publishedAt) }
+                    { state !== 'published' && '原始' }發表日期：{ format({}, 'yyyy/MM/dd HH:mm', publishedAt) }
+                    { inPrivate && <div>建立日期：{ format({}, 'yyyy/MM/dd HH:mm', createdAt) }</div> }
                   </TooltipContent>
                 </Tooltip>
+              :
+              <Tooltip placement='top'>
+                <TooltipTrigger className='cursor-auto'>
+                  <Link href={`/facts/picks/${id}`} className={`break-keep hover:bg-yellow-300/50 text-inherit rounded flex items-center ${draftTextColor}`}>
+                    <CircleDashedIcon className='mr-1' width={18} height={18} aria-label='草稿' />
+                    <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
+                      <time dateTime={formatISO({}, createdAt)}>
+                        {shortenDate(createdAt, now)}
+                      </time>
+                    </ClientDate>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent className={`${tooltipCls}`}>
+                  建立日期：{ format({}, 'yyyy/MM/dd HH:mm', createdAt) }
+                </TooltipContent>
+              </Tooltip>
             }
-
-            <Tooltip placement='top'>
-              <TooltipTrigger className='cursor-auto'>
-                <Link href={`/facts/picks/${id}`} className='break-keep hover:bg-yellow-300/50 text-inherit rounded'>
-                  <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
-                    <time dateTime={formatISO({}, createdAt)}>
-                      {shortenDate(createdAt, now)}
-                    </time>
-                  </ClientDate>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent className={`${tooltipCls}`}>
-                建立日期：{ format({}, 'yyyy/MM/dd HH:mm', createdAt) }
-              </TooltipContent>
-            </Tooltip>
 
             {changes > 0 ?
               <div className='flex items-center text-slate-500/75'>
                 已編輯：
                 <Tooltip placement='top-start'>
                   <TooltipTrigger className='cursor-text'>
-                    <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
-                      <time dateTime={formatISO({}, changedAt)}>
-                        {shortenDate(changedAt, now)}
-                      </time>
-                    </ClientDate>
+                    <div>
+                      <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
+                        <time dateTime={formatISO({}, changedAt)}>
+                          {shortenDate(changedAt, now)}
+                        </time>
+                      </ClientDate>
+                    </div>
                   </TooltipTrigger>
                   <TooltipContent className={`${tooltipCls}`}>
-                    編輯日期：{ format({}, 'yyyy/MM/dd HH:mm', changedAt) }
+                    最後改版日期：{ format({}, 'yyyy/MM/dd HH:mm', changedAt) }
                   </TooltipContent>
                 </Tooltip>
                 <Tooltip placement='top-start'>

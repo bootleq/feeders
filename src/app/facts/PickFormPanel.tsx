@@ -20,7 +20,8 @@ const motionProps = {
 };
 
 const sectionCls = [
-  'bg-slate-100/95 px-3 py-2 overflow-scroll scrollbar-thin ring ring-[6px] ring-offset-1 ring-purple-600/50 rounded shadow-[10px_20px_20px_14px_rgba(0,0,0,0.5)]',
+  'bg-slate-100/95 px-3 py-2 overflow-scroll scrollbar-thin ring ring-[6px] rounded shadow-[10px_20px_20px_14px_rgba(0,0,0,0.5)]',
+  'ring-offset-1 ring-purple-600/50',
   'lg:min-w-80',
 ].join(' ')
 

@@ -9,6 +9,8 @@ export const SLUG_PATTERN = /^[\d\- ~BC]+_(\d+)$/;
 
 export const slugAtom = atom('');
 
+const invalidDate = new Date(NaN);
+
 export const viewCtrlAtom = atom(VIEW_CTRL_KEYS);
 export const toggleViewCtrlAtom = atom(
   get => get(viewCtrlAtom),
@@ -98,10 +100,12 @@ export const markIdsAtom = atom((get) => {
 });
 export const peekingMarkAtom = atom<string | null>(null);
 
-export type PicksMode = 'index' | 'item' | 'edit' | '';
+export type PicksMode = 'index' | 'item' | 'my' | 'edit' | '';
 export const picksAtom = atom<RecentPicksItemProps[]>([]);
 export const loadingPicksAtom = atom(false);
+export const initialPickLoadedAtom = atom<string[]>([]);
 export const picksModeAtom = atom<PicksMode>('');
+export const myPicksAtom = atom<RecentPicksItemProps[]>([]);
 export const pickAtom = atom<RecentPicksItemProps | null>(null);
 export const removePickMarkAtom = atom(
   null,
@@ -121,17 +125,32 @@ export const addPickMarkAtom = atom(
     set(pickAtom, R.assoc('factIds', newIds));
   }
 );
+const refreshPickById = (newItem: RecentPicksItemProps, oldItems: RecentPicksItemProps[]) => {
+  let found = false;
+  const newItems = oldItems.reduce((acc: RecentPicksItemProps[], item) => {
+    if (item.id === newItem.id) {
+      found = true;
+      acc.push(newItem);
+    } else {
+      acc.push(item);
+    }
+    return acc;
+  }, []);
+
+  if (!found) newItems.unshift(newItem);
+
+  return newItems;
+};
+
 export const refreshPickAtom = atom(
   null,
   (get, set, pick: RecentPicksItemProps) => {
+    const myPicks = get(myPicksAtom);
+    set(myPicksAtom, refreshPickById(pick, myPicks));
+
     const picks = get(picksAtom);
-    set(picksAtom, R.map((item) => {
-      if (item.id === pick.id) {
-        return pick;
-      } else {
-        return item;
-      }
-    }));
+    const masked = R.assoc('createdAt', invalidDate, pick);
+    set(picksAtom, refreshPickById(masked, picks));
   }
 );
 export const pickSavedAtom = atom(false);
