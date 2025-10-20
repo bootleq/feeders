@@ -120,7 +120,7 @@ export async function savePick(formData: FormData) {
         ]);
       }
 
-      const freshItems = await getPickById(data.id);
+      const freshItems = await getPickById(data.id, user.id);
 
       return {
         success: true,

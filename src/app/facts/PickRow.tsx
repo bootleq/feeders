@@ -1,34 +1,49 @@
+import { useCallback } from 'react';
 import Link from 'next/link';
-import { useAtomValue } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import type { RecentPicksItemProps } from '@/models/facts';
 import { present, shortenDate } from '@/lib/utils';
 import { format, formatISO } from '@/lib/date-fp';
+import { pickSavedAtom } from './store';
 import { nowAtom } from '@/components/store';
 import ClientDate from '@/components/ClientDate';
 import { Desc } from '@/components/Desc';
 import { UserCircleIcon, Square3Stack3DIcon } from '@heroicons/react/24/solid';
-import { BookOpenIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { BookOpenIcon, MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 const tooltipCls = [
   'text-xs p-1 px-2 rounded box-border w-max max-w-[calc(100vw_-_10px)] z-[1002]',
   'bg-gradient-to-br from-stone-50 to-slate-100 ring-2 ring-offset-1 ring-slate-300 shadow-lg',
 ].join(' ')
 
-export default function PickRow({ pick, readingPickId, onTake, onItemMode }: {
+export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEditMode }: {
   pick: RecentPicksItemProps,
   readingPickId: number | null,
   onTake: (e: React.MouseEvent<HTMLButtonElement>) => void,
   onItemMode?: () => void,
+  onEditMode?: () => void,
 }) {
   const now = useAtomValue(nowAtom);
+  const [saved, setSaved] = useAtom(pickSavedAtom);
+
+  const onDismissSaved = useCallback(() => {
+    setSaved(false);
+  }, [setSaved])
 
   const { id, title, desc, factIds, state, userId, userName, publishedAt, createdAt, changes, changedAt } = pick;
   const bookRead = readingPickId === id;
+  const idProp = present(id) ? { id: `pick-${id}` } : {};
 
   return (
     <li className='pt-4 first:pt-0'>
-      <article>
+      <article {...idProp}>
+        {saved && bookRead &&
+          <div className='w-fit flex items-center mx-auto gap-x-3 bg-lime-300/75 ring-[4px] ring-lime-500 p-2 px-5 my-2 translate-y-4 shadow-xl rounded'>
+            🎉 儲存成功
+            <XMarkIcon className='ml-auto cursor-pointer fill-slate-500 hover:scale-125' height={20} onClick={onDismissSaved} />
+          </div>
+        }
         <header className='flex flex-col mb-1'>
           <div className='flex items-center my-px mb-0'>
             <h2 className='font-bold'>{title}</h2>
@@ -57,6 +72,12 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode }: {
                         <button type='button' className='flex items-center gap-x-1 ml-auto mt-2 mb-1 btn bg-slate-100 text-slate-600 ring-1 hover:text-black hover:ring-2 hover:bg-white' onClick={onItemMode}>
                           <MagnifyingGlassIcon className='' height={18} aria-label='閱讀' />
                           只顯示本篇
+                        </button>
+                      }
+                      {onEditMode &&
+                        <button type='button' data-id={id} className='flex items-center gap-x-1 ml-auto mt-2 mb-1 btn bg-slate-100 text-slate-600 ring-1 hover:text-black hover:ring-2 hover:bg-white' onClick={onEditMode}>
+                          <MagnifyingGlassIcon className='' height={18} aria-label='編輯' />
+                          編輯
                         </button>
                       }
                     </TooltipContent>

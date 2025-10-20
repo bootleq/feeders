@@ -10,3 +10,19 @@
     }
   }
 }
+
+.animate-flash {
+  animation: feeders-picks-flash 1.4s ease-in-out 1;
+}
+
+@keyframes feeders-picks-flash {
+  0% {
+    background-color: white;
+  }
+  10% {
+    background-color: yellow;
+  }
+  100% {
+    background-color: transparent;
+  }
+}

@@ -52,8 +52,17 @@ function changesQuery() {
   return query;
 }
 
-export const getPickById = (id: number) => {
+export const getPickById = (id: number, userId?: string) => {
   const db = getDb();
+
+  const isPrivate = present(userId);
+  const userIdCond = isPrivate ? eq(factPicks.userId, userId!) : undefined;
+  const stateCond = [
+    PubStateEnum.enum.published,
+    PubStateEnum.enum.dropped,
+    ...(isPrivate ? [PubStateEnum.enum.draft] : []),
+  ];
+
   const profiles = profileQuery();
   const pickChanges = changesQuery();
 
@@ -74,7 +83,8 @@ export const getPickById = (id: number) => {
     .leftJoin(pickChanges, eq(pickChanges.docId, factPicks.id))
     .where(
       and(
-        inArray(factPicks.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped]),
+        inArray(factPicks.state, stateCond),
+        userIdCond,
         eq(factPicks.id, id),
       )
     );

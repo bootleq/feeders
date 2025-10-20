@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { jsonReviver } from '@/lib/utils';
 import { picksAtom, pickAtom, picksModeAtom, loadingPicksAtom, initialPickLoadedAtom, pickSavedAtom } from './store';
@@ -48,6 +48,7 @@ export default function PickList() {
   const setPicksMode = useSetAtom(picksModeAtom);
   const setLoading = useSetAtom(loadingPicksAtom);
   const [initLoad, setInitLoad] = useAtom(initialPickLoadedAtom);
+  const [initScroll, setInitScroll] = useState(false);
   const setSaved = useSetAtom(pickSavedAtom);
 
   const onTake = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
@@ -89,6 +90,20 @@ export default function PickList() {
   useEffect(() => {
     setSaved(false);
   }, [setSaved]);
+
+  useEffect(() => {
+    if (!initScroll && readingPick?.id) {
+      const $pick = document.querySelector(`#pick-${readingPick.id}`);
+      if ($pick) {
+        $pick.classList.remove(picksStyles['animate-flash']);
+        $pick.scrollIntoView({ block: 'center' });
+        window.setTimeout(() => {
+          $pick.classList.add(picksStyles['animate-flash']);
+        });
+      }
+      setInitScroll(true);
+    }
+  }, [initScroll, readingPick]);
 
   return (
     <>

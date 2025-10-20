@@ -1,10 +1,10 @@
 'use client'
 
-import { useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useThrottledCallback } from 'use-debounce';
 import { jsonReviver } from '@/lib/utils';
-import { myPicksAtom, pickAtom, loadingPicksAtom, initialPickLoadedAtom } from './store';
+import { myPicksAtom, pickAtom, picksModeAtom, loadingPicksAtom, initialPickLoadedAtom } from './store';
 import { nowAtom, addAlertAtom } from '@/components/store';
 import type { RecentPicksItemProps } from '@/models/facts';
 import picksStyles from './picks.module.scss';
@@ -67,9 +67,11 @@ export default function MyPickList() {
   const fetchPicks = useSetAtom(fetchMyPicksAtom);
   const picks = useAtomValue(myPicksAtom);
   const setNow = useSetAtom(nowAtom);
+  const setPicksMode = useSetAtom(picksModeAtom);
   const [readingPick, setPick] = useAtom(pickAtom);
   const [loading, setLoading] = useAtom(loadingPicksAtom);
   const [initLoad, setInitLoad] = useAtom(initialPickLoadedAtom);
+  const [initScroll, setInitScroll] = useState(false);
 
   const throttledSetNow = useThrottledCallback(() => {
     setNow(new Date());
@@ -98,6 +100,11 @@ export default function MyPickList() {
     }
   }, [picks, setPick]);
 
+  const onEditMode = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    onTake(e);
+    setPicksMode('edit');
+  }, [onTake, setPicksMode]);
+
   useEffect(() => {
     throttledSetNow();
   }, [throttledSetNow]);
@@ -109,6 +116,20 @@ export default function MyPickList() {
       setInitLoad([...initLoad, 'my']);
     }
   }, [initLoad, setInitLoad, setLoading, fetchPicks]);
+
+  useEffect(() => {
+    if (!initScroll && readingPick?.id) {
+      const $pick = document.querySelector(`#pick-${readingPick.id}`);
+      if ($pick) {
+        $pick.classList.remove(picksStyles['animate-flash']);
+        $pick.scrollIntoView({ block: 'center' });
+        window.setTimeout(() => {
+          $pick.classList.add(picksStyles['animate-flash']);
+        });
+      }
+      setInitScroll(true);
+    }
+  }, [initScroll, readingPick]);
 
   return (
     <>
@@ -124,7 +145,7 @@ export default function MyPickList() {
           picks.length > 0 ?
             <ol className={`flex flex-col ${picksStyles['pick-list']}`}>
               {picks.map(pick =>
-                <PickRow key={pick.id} readingPickId={readingPick?.id || null} pick={pick} onTake={onTake} />
+                <PickRow key={pick.id} readingPickId={readingPick?.id || null} pick={pick} onTake={onTake} onEditMode={onEditMode} />
               )}
             </ol>
             :

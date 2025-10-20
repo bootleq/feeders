@@ -123,17 +123,30 @@ export const addPickMarkAtom = atom(
     set(pickAtom, R.assoc('factIds', newIds));
   }
 );
+const refreshPickById = (newItem: RecentPicksItemProps, oldItems: RecentPicksItemProps[]) => {
+  let found = false;
+  const newItems = oldItems.reduce((acc: RecentPicksItemProps[], item) => {
+    if (item.id === newItem.id) {
+      found = true;
+      acc.push(newItem);
+    } else {
+      acc.push(item);
+    }
+    return acc;
+  }, []);
+
+  if (!found) newItems.unshift(newItem);
+
+  return newItems;
+};
+
 export const refreshPickAtom = atom(
   null,
   (get, set, pick: RecentPicksItemProps) => {
     const picks = get(picksAtom);
-    set(picksAtom, R.map((item) => {
-      if (item.id === pick.id) {
-        return pick;
-      } else {
-        return item;
-      }
-    }));
+    set(picksAtom, refreshPickById(pick, picks));
+    const myPicks = get(myPicksAtom);
+    set(myPicksAtom, refreshPickById(pick, myPicks));
   }
 );
 export const pickSavedAtom = atom(false);

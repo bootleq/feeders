@@ -184,12 +184,13 @@ function UnscopedForm() {
     const item = res.item as RecentPicksItemProps;
 
     if (res.success && item) {
+      setConfirming(false);
       setSending(false);
       setErrors({});
       setSaved(true);
       setPick(item);
       refresh(item);
-      setPicksMode('item');
+      setPicksMode('my');
       return;
     }
 
@@ -204,9 +205,10 @@ function UnscopedForm() {
   const cancel = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    setPicksMode('');
+    setPicksMode('my');
     setErrors({});
-  }, [setPicksMode, setErrors]);
+    setSaved(false);
+  }, [setPicksMode, setErrors, setSaved]);
 
   const canSave = !sending;
   const canEdit = status === 'authenticated' && session.user.state === 'active';
@@ -267,7 +269,7 @@ function UnscopedForm() {
         {R.isNotEmpty(errors) && <FormErrors errors={errors} />}
 
         {confirming &&
-          <div className='p-2 m-1 rounded ring-4 ring-yellow-400 bg-gradient-to-br from-amber-200 to-yellow-300 text-balance flex items-center gap-x-2'>
+          <div className='p-2 m-1 mb-3 rounded ring-4 ring-yellow-400 bg-gradient-to-br from-amber-200 to-yellow-300 text-balance flex items-center gap-x-2'>
             <ExclamationCircleIcon className='stroke-yellow-700 animate-pulse size-16 stroke-2' height={24} />
             <div className='flex flex-col'>
               即將送出資料
