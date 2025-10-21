@@ -74,6 +74,7 @@ export const allHighlighRangesAtom = atom((get) => {
 
 export const markPickingAtom = atom(false);
 export const peekingMarkAtom = atom<string | null>(null);
+export const latestAddMarkAtom = atom<number | null>(null);
 
 export const localMarksAtom = atom<number[]>([]);
 export const addLocalMarkAtom = atom(

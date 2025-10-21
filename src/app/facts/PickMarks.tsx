@@ -13,6 +13,7 @@ import {
   removeLocalMarkAtom,
   removePickMarkAtom,
   picksModeAtom,
+  latestAddMarkAtom,
 } from './store';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import tlStyles from './timeline.module.scss';
@@ -60,6 +61,17 @@ function resetMarkOffscreen() {
   if (tl) { delete tl.dataset.markOffscreen; }
 }
 
+function highlightAddedMark(id: number) {
+  const $mark = document.querySelector(`[data-role="sidebar"] li[data-fact-id="${id}"]`) as HTMLElement;
+  if ($mark) {
+    $mark.classList.remove(tlStyles['animate-flash']);
+    $mark.scrollIntoView({ block: 'center' });
+    window.setTimeout(() => {
+      $mark.classList.add(tlStyles['animate-flash']);
+    });
+  }
+}
+
 export default function PickMarks({ facts }: {
   facts: Fact[],
 }) {
@@ -67,6 +79,7 @@ export default function PickMarks({ facts }: {
   const latestPickId = useRef<number|null>(null);
   const factsDictionary = useMemo(() => buildFactsDictionary(facts), [facts]);
   const translate = useMemo(() => R.partial(translateFact, [factsDictionary]), [factsDictionary]);
+  const [latestAdded, setLatestAdded] = useAtom(latestAddMarkAtom);
 
   const [localMarks, setLocalMarks] = useAtom(localMarksAtom);
   const removeLocalMark = useSetAtom(removeLocalMarkAtom);
@@ -92,6 +105,13 @@ export default function PickMarks({ facts }: {
       }
     }
   }, [localMarks, setLocalMarks, factsDictionary]);
+
+  useEffect(() => {
+    if (latestAdded) {
+      highlightAddedMark(latestAdded);
+      setLatestAdded(null);
+    }
+  }, [latestAdded, setLatestAdded]);
 
   useEffect(() => {
     const el = ref.current;

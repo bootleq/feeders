@@ -42,7 +42,7 @@ export default function Mark({ id, anchor, title, onRemove, labelCls }: MarkProp
   const datePadEnd = date?.length < 10 ? <span className=''>{'\u00A0'.repeat(10 - date.length)}</span> : '';
 
   return (
-    <li className='flex items-center py-1' data-anchor={anchor} onMouseEnter={onMouseEnter} onMouseLeave={clearMarkIndicators}>
+    <li className='flex items-center py-1' data-anchor={anchor} data-fact-id={id} onMouseEnter={onMouseEnter} onMouseLeave={clearMarkIndicators}>
       <a className={`${markDateCls} ${labelCls}`} data-anchor={anchor} href={`#${anchor}`}>
         {date}{datePadEnd}
       </a>
