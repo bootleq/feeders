@@ -4,7 +4,14 @@ import { useState, useCallback, useEffect } from 'react';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useThrottledCallback } from 'use-debounce';
 import { jsonReviver } from '@/lib/utils';
-import { myPicksAtom, pickAtom, picksModeAtom, loadingPicksAtom, initialPickLoadedAtom } from './store';
+import {
+  myPicksAtom,
+  pickAtom,
+  picksModeAtom,
+  loadingPicksAtom,
+  initialPickLoadedAtom,
+  filterByMarksAtom,
+} from './store';
 import { nowAtom, addAlertAtom } from '@/components/store';
 import type { RecentPicksItemProps } from '@/models/facts';
 import picksStyles from './picks.module.scss';
@@ -68,6 +75,7 @@ export default function MyPickList() {
   const picks = useAtomValue(myPicksAtom);
   const setNow = useSetAtom(nowAtom);
   const setPicksMode = useSetAtom(picksModeAtom);
+  const setFiltered = useSetAtom(filterByMarksAtom);
   const [readingPick, setPick] = useAtom(pickAtom);
   const [loading, setLoading] = useAtom(loadingPicksAtom);
   const [initLoad, setInitLoad] = useAtom(initialPickLoadedAtom);
@@ -96,9 +104,10 @@ export default function MyPickList() {
           changes: changes || 0,
           changedAt: changedAt,
         });
+        setFiltered(true);
       }
     }
-  }, [picks, setPick]);
+  }, [picks, setPick, setFiltered]);
 
   const onEditMode = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     onTake(e);

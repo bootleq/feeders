@@ -20,6 +20,7 @@ import {
   tagsAtom,
   mergeTagsAtom,
   togglaAllTagsAtom,
+  filterByMarksAtom,
   markPickingAtom,
   localMarksAtom,
   peekingMarkAtom,
@@ -53,6 +54,8 @@ import {
 } from '@heroicons/react/24/outline';
 import UserPenIcon from '@/assets/user-pen.svg';
 import HighlighterIcon from '@/assets/highlighter.svg';
+import FunnelIcon from '@/assets/funnel.svg';
+import FunnelXIcon from '@/assets/funnel-x.svg';
 
 // NOTE: old storage key was 'feeders.factMarks.slot', breaking changed
 const currentMarkSlotAtom = atomWithStorage('feeders.facts.marks.slot', 0);
@@ -283,7 +286,6 @@ function TagCtrlPanel() {
 
 function FiltersCtrl() {
   const [panelOpen, setPanelOpen] = useState(true);
-  const rejectedCount = useAtomValue(filterRejectedCountAtom);
 
   const toggle = () => {
     setPanelOpen(R.not);
@@ -295,9 +297,30 @@ function FiltersCtrl() {
       <div className={`${panelOpen ? '' : 'hidden'}`}>
         <TextFilterCtrlPanel />
         <DateCtrlPanel />
-        <div className='flex items-center text-xs text-slate-600'>
-          已排除：<span className='text-sm font-mono'>{rejectedCount}</span>
+      </div>
+    </div>
+  );
+}
+
+function FilterResultCount({ total }: { total: number }) {
+  const [panelOpen, setPanelOpen] = useState(true);
+  const rejectedCount = useAtomValue(filterRejectedCountAtom);
+  const toggle = () => {
+    setPanelOpen(R.not);
+  };
+
+  return (
+    <div className={`${panelOpen ? 'py-2' : 'py-0 opacity-20 border-none'}`}>
+      <div className='flex items-center gap-x-4 text-xs text-slate-600'>
+        <div className='cursor-pointer' onClick={toggle}>
+          顯示筆數 <span className='font-mono'>{total - rejectedCount}</span>
         </div>
+        {
+          rejectedCount > 0 &&
+          <div className=''>
+            已排除 <span className='font-mono text-red-700'>{rejectedCount}</span>
+          </div>
+        }
       </div>
     </div>
   );
@@ -452,6 +475,7 @@ function MarkCtrlPanel({ facts }: {
 }) {
   const [panelOpen, setPanelOpen] = useState(true);
   const [slot, setSlot] = useAtom(currentMarkSlotAtom);
+  const [filtered, setFiltered] = useAtom(filterByMarksAtom);
   const [markPicking, setMarkPicking] = useAtom(markPickingAtom);
   const [localMarks, setLocalMarks] = useAtom(localMarksAtom);
   const [savedHint, setSavedHint] = useState(false);
@@ -538,6 +562,10 @@ function MarkCtrlPanel({ facts }: {
     URL.revokeObjectURL(url);
   };
 
+  const onToggleFilter = useCallback(() => {
+    setFiltered(R.not);
+  }, [setFiltered]);
+
   const onListPicks = useCallback(() => {
     setPicksMode('index');
   }, [setPicksMode]);
@@ -562,6 +590,7 @@ function MarkCtrlPanel({ facts }: {
         });
       }
       setPicksMode('edit');
+      setFiltered(true);
       return;
     }
 
@@ -582,10 +611,11 @@ function MarkCtrlPanel({ facts }: {
         changedAt: dummyDate,
       });
       setPicksMode('edit');
+      setFiltered(true);
     } else {
       addAlert('error', <>請先建立至少一個記號，按「選取<CursorArrowRippleIcon className='stroke-slate-700 stroke-0 ml-1' height={20} />」開始</>);
     }
-  }, [localMarks, pick, userId, setPick, setPicksMode, addAlert]);
+  }, [localMarks, pick, userId, setPick, setPicksMode, setFiltered, addAlert]);
 
   const onSavedHintFaded = () => {
     setSavedHint(false);
@@ -593,7 +623,25 @@ function MarkCtrlPanel({ facts }: {
 
   return (
     <div className='py-3 flex-grow flex flex-col'>
-      <div className='font-bold cursor-pointer' onClick={toggle}>記號</div>
+      <div className='font-bold cursor-pointer flex items-center'>
+        <div className='flex-grow' onClick={toggle}>
+          記號
+        </div>
+        <div className='ml-auto flex items-center'>
+          <Tooltip placement='top-start'>
+            <TooltipTrigger className=''>
+              <button type='button' className='btn text-slate-600 px-1 py-px translate-x-1 hover:text-black hover:ring-1 hover:bg-white disabled:opacity-30' aria-label='儲存到瀏覽器空間' onClick={onToggleFilter}
+              >
+                {filtered ? <FunnelIcon className='' height={20} /> : <FunnelXIcon className='opacity-55' height={20} />
+                }
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="p-1 text-sm rounded box-border w-max z-[1002] bg-slate-100 ring-1 text-balance shadow-lg">
+              篩選：只顯示對應<strong>記號</strong>的項目（{ filtered ? '已開啟' : '已關閉' }）
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </div>
       <div className={`flex flex-col flex-grow items-start w-full pl-1 py-2 gap-y-2 text-sm ${panelOpen ? '' : 'hidden'}`}>
         <div className='w-full flex items-center'>
           <ul className='flex items-center font-mono text-xs gap-x-1'>
@@ -728,6 +776,7 @@ export default function SideControl({ tags, facts }: {
       <ViewCtrlPanel />
       <TagCtrlPanel />
       <FiltersCtrl />
+      <FilterResultCount total={facts.length} />
       <MarkCtrlPanel facts={facts} />
       <iframe name='noop-trap' className='hidden' />
     </div>

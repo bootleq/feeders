@@ -97,7 +97,7 @@ export default async function Page({ params }: {
         <SideControl tags={tags} facts={facts} />
       </Sidebar>
 
-      <TimelineContainer facts={facts} initialSlug={slug} />
+      <TimelineContainer facts={facts} initialSlug={slug} initialPick={picksMode === 'item' && picks[0] || null}  />
 
       <Alerts itemsAtom={alertsAtom} dismissAtom={dismissAlertAtom} />
     </main>
