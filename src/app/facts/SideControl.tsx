@@ -286,7 +286,6 @@ function TagCtrlPanel() {
 
 function FiltersCtrl() {
   const [panelOpen, setPanelOpen] = useState(true);
-  const rejectedCount = useAtomValue(filterRejectedCountAtom);
 
   const toggle = () => {
     setPanelOpen(R.not);
@@ -298,9 +297,30 @@ function FiltersCtrl() {
       <div className={`${panelOpen ? '' : 'hidden'}`}>
         <TextFilterCtrlPanel />
         <DateCtrlPanel />
-        <div className='flex items-center text-xs text-slate-600'>
-          已排除：<span className='text-sm font-mono'>{rejectedCount}</span>
+      </div>
+    </div>
+  );
+}
+
+function FilterResultCount({ total }: { total: number }) {
+  const [panelOpen, setPanelOpen] = useState(true);
+  const rejectedCount = useAtomValue(filterRejectedCountAtom);
+  const toggle = () => {
+    setPanelOpen(R.not);
+  };
+
+  return (
+    <div className={`${panelOpen ? 'py-2' : 'py-0 opacity-20 border-none'}`}>
+      <div className='flex items-center gap-x-4 text-xs text-slate-600'>
+        <div className='cursor-pointer' onClick={toggle}>
+          顯示筆數 <span className='font-mono'>{total - rejectedCount}</span>
         </div>
+        {
+          rejectedCount > 0 &&
+          <div className=''>
+            已排除 <span className='font-mono text-red-700'>{rejectedCount}</span>
+          </div>
+        }
       </div>
     </div>
   );
@@ -756,6 +776,7 @@ export default function SideControl({ tags, facts }: {
       <ViewCtrlPanel />
       <TagCtrlPanel />
       <FiltersCtrl />
+      <FilterResultCount total={facts.length} />
       <MarkCtrlPanel facts={facts} />
       <iframe name='noop-trap' className='hidden' />
     </div>
