@@ -2,7 +2,7 @@
 
 import { useAtom } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
-import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'motion/react';
 import { useCallback } from 'react';
 import { picksModeAtom } from './store';
 import type { PicksMode } from './store';
