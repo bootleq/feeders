@@ -72,6 +72,19 @@ export const allHighlighRangesAtom = atom((get) => {
   return allRanges;
 });
 
+export const filterByMarksAtom = atom(false);
+export const currentMarksAtom = atom(
+  (get) => {
+    const pick = get(pickAtom);
+    if (pick) {
+      return pick.factIds;
+    } else {
+      const localMarks = get(localMarksAtom);
+      return localMarks;
+    }
+  }
+);
+
 export const markPickingAtom = atom(false);
 export const peekingMarkAtom = atom<string | null>(null);
 export const latestAddMarkAtom = atom<number | null>(null);
