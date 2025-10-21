@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react';
 import { useDebouncedCallback } from 'use-debounce';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useHydrateAtoms, atomWithStorage } from 'jotai/utils';
+import { format } from '@/lib/date-fp';
 import {
   viewCtrlAtom,
   toggleViewCtrlAtom,
@@ -565,9 +566,10 @@ function MarkCtrlPanel({ facts }: {
     }
 
     if (localMarks.length) {
-      const dummyDate = new Date();
+      const dummyDate = new Date(NaN);
+      const now = new Date();
       setPick({
-        title: '未命名',
+        title: `未命名 ${format({}, 'yyyyMMdd HH:mm', now)}`,
         desc:  '',
         factIds: localMarks,
         state: 'draft',

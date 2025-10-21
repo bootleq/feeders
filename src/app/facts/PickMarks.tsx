@@ -170,7 +170,7 @@ export default function PickMarks({ facts }: {
   return (
     <div ref={ref} className='w-full flex-grow'>
       {pick &&
-        <div className='w-full text-sm flex items-center gap-x-1 rounded py-1 -mb-1 hover:bg-rose-100'>
+        <div className='w-full text-sm flex items-center gap-x-1 rounded py-1 -mb-px hover:bg-rose-100'>
           <Tooltip placement='top'>
             <TooltipTrigger className='truncate'>
               <div className=''>
