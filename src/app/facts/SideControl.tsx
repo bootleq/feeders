@@ -20,15 +20,12 @@ import {
   mergeTagsAtom,
   togglaAllTagsAtom,
   markPickingAtom,
-  marksAtom,
-  markIdsAtom,
-  removeMarkAtom,
+  localMarksAtom,
   peekingMarkAtom,
   picksModeAtom,
   pickAtom,
-  timelineInterObserverAtom,
 } from './store';
-import type { Tags, Fact, FactMark, DateRange } from './store';
+import type { Tags, Fact, DateRange } from './store';
 import type { AnyFunction } from '@/lib/utils';
 import { tooltipClass, tooltipMenuCls } from '@/lib/utils';
 import useClientOnly from '@/lib/useClientOnly';
@@ -56,8 +53,9 @@ import {
 import UserPenIcon from '@/assets/user-pen.svg';
 import HighlighterIcon from '@/assets/highlighter.svg';
 
-const currentMarkSlotAtom = atomWithStorage('feeders.factMarks.slot', 0);
-const markSlotAtoms = R.range(0, 4).map(n => atomWithStorage<FactMark[]>(`feeders.factMarks.${n}`, []));
+// NOTE: old storage key was 'feeders.factMarks.slot', breaking changed
+const currentMarkSlotAtom = atomWithStorage('feeders.facts.marks.slot', 0);
+const markSlotAtoms = R.range(0, 4).map(n => atomWithStorage<number[]>(`feeders.facts.marks.${n}`, []));
 
 const MAX_COLUMNS = 4;
 
@@ -433,75 +431,16 @@ function DateCtrlPanel() {
   );
 }
 
-const markDateCls = [
-  'font-mono text-sm whitespace-nowrap ml-px mr-1 px-1 rounded-md ring-1 cursor-pointer',
-  'text-red-950 bg-gradient-to-br from-amber-200 to-amber-200/80',
-  'hover:ring hover:text-black',
-].join(' ');
-
-function Mark({ anchor, title, index }:
-  FactMark & { index: number }
-) {
-  const removeMark = useSetAtom(removeMarkAtom);
-  const interObserver = useAtomValue(timelineInterObserverAtom);
-
-  const onRemove = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    const el = e.currentTarget;
-    const li = el.closest('li');
-    if (li) {
-      const { anchor } = li.dataset;
-      if (anchor) removeMark(anchor);
-      const tl = document.querySelector('[data-role="timeline"]') as HTMLElement;
-      if (tl) { delete tl.dataset.markOffscreen; }
-    }
-  }, [removeMark]);
-
-  const onMouseEnter = useCallback((e: React.MouseEvent<HTMLLIElement>) => {
-    const el = e.currentTarget;
-    const { anchor } = el.dataset;
-    const fact = findFactElement(anchor);
-    const target = fact?.querySelector('[data-role="fact-date"]');
-    if (target) {
-      target.classList.add(tlStyles['peeking-target']);
-      interObserver?.observe(target);
-    }
-  }, [interObserver]);
-
-  const date = R.match(/fact-(.+)_\d+/, anchor)[1];
-  const datePadEnd = date.length < 10 ? <span className=''>{'\u00A0'.repeat(10 - date.length)}</span> : '';
-
-  return (
-    <li className='flex items-center py-1' data-anchor={anchor} onMouseEnter={onMouseEnter} onMouseLeave={clearMarkIndicators}>
-      <a className={markDateCls} data-anchor={anchor} href={`#${anchor}`}>
-        {date}{datePadEnd}
-      </a>
-      <Tooltip placement='right'>
-        <TooltipTrigger className='mb-1 block truncate'>
-          <div className='text-xs truncate'>
-            {title}
-          </div>
-        </TooltipTrigger>
-        <TooltipContent className="p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1">
-          {title}
-        </TooltipContent>
-      </Tooltip>
-      <button className='btn p-px ml-auto hover:bg-white rounded-full hover:scale-125 hover:drop-shadow' aria-label='刪除' onClick={onRemove}>
-        <XMarkIcon className='stroke-slate-700 stroke-2' height={16} />
-      </button>
-    </li>
-  );
-}
-
-const validateLocalMark = ({ anchor, title }: FactMark) => {
-  if (R.type(anchor) !== 'String' || R.type(title) !== 'String') {
-    throw new Error(`異常的本機 mark 記錄，anchor: ${anchor}`);
+const validateStorageMark = (item: any) => {
+  if (R.type(item) !== 'Number') {
+    throw new Error(`異常的本機 mark 記錄，anchor: ${JSON.stringify(item)}`);
   }
 };
 
 const createStorageAtom = (slot: number) => {
   return atom(
     get => get(markSlotAtoms[slot]),
-    (get, set, update: FactMark[]) => {
+    (get, set, update: number[]) => {
       set(markSlotAtoms[slot], update);
     }
   );
@@ -513,12 +452,11 @@ function MarkCtrlPanel({ facts }: {
   const [panelOpen, setPanelOpen] = useState(true);
   const [slot, setSlot] = useAtom(currentMarkSlotAtom);
   const [markPicking, setMarkPicking] = useAtom(markPickingAtom);
-  const [marks, setMarks] = useAtom(marksAtom);
-  const markIds = useAtomValue(markIdsAtom);
+  const [localMarks, setLocalMarks] = useAtom(localMarksAtom);
   const [savedHint, setSavedHint] = useState(false);
   const initialLoad = useRef(true);
   const slotAtom = useMemo(() => createStorageAtom(slot), [slot]);
-  const [localMarks, setLocalMarks] = useAtom(slotAtom);
+  const [storageMarks, setStorageMarks] = useAtom(slotAtom);
   const [picksMode, setPicksMode] = useAtom(picksModeAtom);
   const [pick, setPick] = useAtom(pickAtom);
   const addAlert = useSetAtom(addAlertAtom);
@@ -533,11 +471,11 @@ function MarkCtrlPanel({ facts }: {
 
   useEffect(() => {
     if (initialLoad) {
-      localMarks.forEach(validateLocalMark);
-      setMarks(localMarks);
+      storageMarks.forEach(validateStorageMark);
+      setLocalMarks(storageMarks);
       initialLoad.current = false;
     }
-  }, [setMarks, localMarks]);
+  }, [setLocalMarks, storageMarks]);
 
   useEffect(() => {
     // Quit /picks/ path started from server side
@@ -553,15 +491,14 @@ function MarkCtrlPanel({ facts }: {
     if (pick) {
       return true;
     }
-    if (marks.length !== localMarks.length) {
+    if (localMarks.length !== storageMarks.length) {
       return true;
     }
-    if (marks.length === 0) {
+    if (localMarks.length === 0) {
       return false;
     }
-    const makeKey = (items: FactMark[]) => items.map(R.prop('anchor')).join();
-    return makeKey(marks) !== makeKey(localMarks);
-  }, [marks, localMarks, pick]);
+    return JSON.stringify(localMarks) !== JSON.stringify(storageMarks);
+  }, [localMarks, storageMarks, pick]);
 
   const onTogglePicker = (e: React.MouseEvent) => {
     setMarkPicking(R.not);
@@ -574,18 +511,22 @@ function MarkCtrlPanel({ facts }: {
   };
 
   const onSave = () => {
-    if (localMarks.length) {
-      addAlert('error', <>儲存槽 <var className='font-mono font-bold'>{slot + 1}</var> 已經有內容，請先清空或換一個儲存槽</>);
+    if (pick) {
+      if (localMarks.length) {
+        addAlert('error', <>儲存槽 <var className='font-mono font-bold'>{slot + 1}</var> 已經有內容，請先清空或換一個儲存槽</>);
+      } else {
+        setLocalMarks(pick.factIds);
+        setStorageMarks(pick.factIds);
+        setSavedHint(true);
+      }
     } else {
-      // TODO: save pick marks
-      addAlert('error', <>未支援</>);
-      // setLocalMarks(marks);
-      // setSavedHint(true);
+      setStorageMarks(localMarks);
+      setSavedHint(true);
     }
   };
 
   const onDownload = () => {
-    const blob = new Blob([JSON.stringify(marks, null, 2)], {
+    const blob = new Blob([JSON.stringify(localMarks, null, 2)], {
       type: "application/json",
     });
     const url = URL.createObjectURL(blob);
@@ -623,12 +564,12 @@ function MarkCtrlPanel({ facts }: {
       return;
     }
 
-    if (markIds.length) {
+    if (localMarks.length) {
       const dummyDate = new Date();
       setPick({
         title: '未命名',
         desc:  '',
-        factIds: markIds,
+        factIds: localMarks,
         state: 'draft',
         id: 0,
         userId: '',
@@ -642,7 +583,7 @@ function MarkCtrlPanel({ facts }: {
     } else {
       addAlert('error', <>請先建立至少一個記號，按「選取<CursorArrowRippleIcon className='stroke-slate-700 stroke-0 ml-1' height={20} />」開始</>);
     }
-  }, [markIds, pick, userId, setPick, setPicksMode, addAlert]);
+  }, [localMarks, pick, userId, setPick, setPicksMode, addAlert]);
 
   const onSavedHintFaded = () => {
     setSavedHint(false);
@@ -763,20 +704,7 @@ function MarkCtrlPanel({ facts }: {
           </div>
         </div>
 
-        {
-          pick ?
-            <PickMarks pick={pick} facts={facts} />
-          :
-            <ul className='divide-y-2 divide-slate-300 w-full'>
-              {marks.length ?
-                marks.map(({ id, anchor, title }, idx) => (
-                  <Mark id={id} key={anchor} index={idx} anchor={anchor} title={title} />
-                ))
-              :
-                <li className='text-slate-600'>（空）</li>
-              }
-            </ul>
-        }
+        <PickMarks facts={facts} />
 
         <div className="inline-flex items-center justify-start text-sm mt-1 ml-auto">
         </div>

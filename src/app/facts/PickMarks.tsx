@@ -2,13 +2,15 @@
 
 import * as R from 'ramda';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import Mark from './Mark';
-import type { Fact, FactMark } from './store';
-import type { RecentPicksItemProps } from '@/models/facts';
+import type { Fact } from './store';
+import type { FactMark } from './Mark';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import {
   pickAtom,
+  localMarksAtom,
+  removeLocalMarkAtom,
   removePickMarkAtom,
   picksModeAtom,
 } from './store';
@@ -47,8 +49,18 @@ function sortByAnchor(ids: number[], dict: FactsDictionary) {
   )(ids);
 }
 
-export default function PickMarks({ pick, facts }: {
-  pick: RecentPicksItemProps,
+function getFactIdFromButton(e: React.MouseEvent<HTMLButtonElement>) {
+  const el = e.currentTarget;
+  const id = Number(el.dataset.factId);
+  return id;
+}
+
+function resetMarkOffscreen() {
+  const tl = document.querySelector('[data-role="timeline"]') as HTMLElement;
+  if (tl) { delete tl.dataset.markOffscreen; }
+}
+
+export default function PickMarks({ facts }: {
   facts: Fact[],
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -56,16 +68,30 @@ export default function PickMarks({ pick, facts }: {
   const factsDictionary = useMemo(() => buildFactsDictionary(facts), [facts]);
   const translate = useMemo(() => R.partial(translateFact, [factsDictionary]), [factsDictionary]);
 
-  const setPick = useSetAtom(pickAtom);
-  const removeMark = useSetAtom(removePickMarkAtom);
+  const [localMarks, setLocalMarks] = useAtom(localMarksAtom);
+  const removeLocalMark = useSetAtom(removeLocalMarkAtom);
+
+  const [pick, setPick] = useAtom(pickAtom);
+  const removePickMark = useSetAtom(removePickMarkAtom);
   const setPicksMode = useSetAtom(picksModeAtom);
 
   useEffect(() => {
-    const sorted = sortByAnchor(pick.factIds || [], factsDictionary);
-    if (!R.equals(pick.factIds, sorted)) {
-      setPick({ ...pick, factIds: sorted });
+    if (pick) {
+      const sorted = sortByAnchor(pick.factIds || [], factsDictionary);
+      if (!R.equals(pick.factIds, sorted)) {
+        setPick({ ...pick, factIds: sorted });
+      }
     }
-  }, [pick, factsDictionary, setPick]);
+  }, [pick, setPick, factsDictionary]);
+
+  useEffect(() => {
+    if (localMarks.length) {
+      const sorted = sortByAnchor(localMarks || [], factsDictionary);
+      if (!R.equals(localMarks, sorted)) {
+        setLocalMarks(sorted);
+      }
+    }
+  }, [localMarks, setLocalMarks, factsDictionary]);
 
   useEffect(() => {
     const el = ref.current;
@@ -83,44 +109,70 @@ export default function PickMarks({ pick, facts }: {
     setPicksMode('');
   }, [setPick, setPicksMode]);
 
-  const onRemoveMark = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    const el = e.currentTarget;
-    const id = Number(el.dataset.factId);
+  const onRemoveLocalMark = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    const id = getFactIdFromButton(e);
     if (id > 0) {
-      removeMark(id);
+      removeLocalMark(id);
+      resetMarkOffscreen();
     }
-  }, [removeMark]);
+  }, [removeLocalMark]);
 
-  const items = pick.factIds ? pick.factIds.map(translate) : [];
+  const onRemovePickMark = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    const id = getFactIdFromButton(e);
+    if (id > 0) {
+      removePickMark(id);
+      resetMarkOffscreen();
+    }
+  }, [removePickMark]);
+
+  const pickItems = useMemo(() => {
+    if (pick) {
+      return pick.factIds ? pick.factIds.map(translate) : [];
+    }
+    return [];
+  }, [pick, translate]);
+
+  const localItems = useMemo(() => {
+    if (localMarks.length) {
+      return localMarks.map(translate);
+    }
+    return [];
+  }, [localMarks, translate]);
 
   if (!facts) {
     return;
   }
 
+  const items    = pick ? pickItems : localItems;
+  const onRemove = pick ? onRemovePickMark : onRemoveLocalMark;
+  const labelCls = pick ? 'from-rose-200 to-rose-100/80' : 'from-amber-200 to-amber-200/80';
+
   return (
     <div ref={ref} className='w-full flex-grow'>
-      <div className='w-full text-sm flex items-center gap-x-1 rounded py-1 -mb-1 hover:bg-rose-100'>
-        <Tooltip placement='top'>
-          <TooltipTrigger className='truncate'>
-            <div className=''>
-              {pick.title}
-            </div>
-          </TooltipTrigger>
-          <TooltipContent className="p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1 leading-relaxed">
-            正在顯示選集的記號，要回到個人記號，請按關閉按鈕
-            <br />
-            標題：{pick.title}
-          </TooltipContent>
-        </Tooltip>
-        <button className='btn p-px ml-2 bg-rose-100 hover:bg-white rounded-full hover:scale-125 hover:drop-shadow' aria-label='刪除' onClick={onQuit}>
-          <XMarkIcon className='stroke-slate-700 stroke-2' height={16} />
-        </button>
-      </div>
+      {pick &&
+        <div className='w-full text-sm flex items-center gap-x-1 rounded py-1 -mb-1 hover:bg-rose-100'>
+          <Tooltip placement='top'>
+            <TooltipTrigger className='truncate'>
+              <div className=''>
+                {pick.title}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent className="p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1 leading-relaxed">
+              正在顯示選集的記號，要回到個人記號，請按關閉按鈕
+              <br />
+              標題：{pick.title}
+            </TooltipContent>
+          </Tooltip>
+          <button className='btn p-px ml-2 bg-rose-100 hover:bg-white rounded-full hover:scale-125 hover:drop-shadow' aria-label='刪除' onClick={onQuit}>
+            <XMarkIcon className='stroke-slate-700 stroke-2' height={16} />
+          </button>
+        </div>
+      }
 
       <ul className='divide-y-2 divide-slate-300 w-full'>
         {
           items.map(i => (
-            <Mark key={i.id} id={i.id} anchor={i.anchor} title={i.title} onRemove={onRemoveMark} />
+            <Mark key={i.id} id={i.id} anchor={i.anchor} title={i.title} onRemove={onRemove} labelCls={labelCls} />
           ))
         }
       </ul>

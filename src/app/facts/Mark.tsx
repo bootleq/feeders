@@ -3,22 +3,28 @@ import { useCallback } from 'react';
 import { useAtomValue } from 'jotai';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { timelineInterObserverAtom } from './store';
-import type { FactMark } from './store';
 import { findFactElement, clearMarkIndicators } from './utils';
 import tlStyles from './timeline.module.scss';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 const markDateCls = [
   'font-mono text-sm whitespace-nowrap ml-px mr-1 px-1 rounded-md ring-1 cursor-pointer',
-  'text-red-950 bg-gradient-to-br from-rose-200 to-rose-100/80',
+  'text-red-950 bg-gradient-to-br',
   'hover:ring hover:text-black',
 ].join(' ');
 
+export type FactMark = {
+  id: number,
+  anchor: string,
+  title: string,
+};
+
 type MarkProps = FactMark & {
   onRemove: (e: React.MouseEvent<HTMLButtonElement>) => void,
+  labelCls: string,
 }
 
-export default function Mark({ id, anchor, title, onRemove }: MarkProps) {
+export default function Mark({ id, anchor, title, onRemove, labelCls }: MarkProps) {
   const interObserver = useAtomValue(timelineInterObserverAtom);
 
   const onMouseEnter = useCallback((e: React.MouseEvent<HTMLLIElement>) => {
@@ -37,7 +43,7 @@ export default function Mark({ id, anchor, title, onRemove }: MarkProps) {
 
   return (
     <li className='flex items-center py-1' data-anchor={anchor} onMouseEnter={onMouseEnter} onMouseLeave={clearMarkIndicators}>
-      <a className={markDateCls} data-anchor={anchor} href={`#${anchor}`}>
+      <a className={`${markDateCls} ${labelCls}`} data-anchor={anchor} href={`#${anchor}`}>
         {date}{datePadEnd}
       </a>
       <Tooltip placement='right'>
