@@ -16,11 +16,12 @@ import {
   textFilterAtom,
   textHighlightAtom,
   highlightRangesAtomFamily,
-  marksAtom,
+  localMarksAtom,
   markPickingAtom,
-  addMarkAtom,
+  addLocalMarkAtom,
   pickAtom,
   addPickMarkAtom,
+  latestAddMarkAtom,
   timelineInterObserverAtom,
 } from './store';
 import type { Tags } from './store';
@@ -129,10 +130,11 @@ export default function Timeline({ facts, isSubView = false, col, isOnly = false
   const setSlug = useSetAtom(slugAtom);
   const viewCtrl = useAtomValue(viewCtrlAtom);
   const [markPicking, setMarkPicking] = useAtom(markPickingAtom);
-  const marks = useAtomValue(marksAtom);
-  const addMark = useSetAtom(addMarkAtom);
+  const localMarks = useAtomValue(localMarksAtom);
+  const addLocalMark = useSetAtom(addLocalMarkAtom);
   const pick = useAtomValue(pickAtom);
   const addPickMark = useSetAtom(addPickMarkAtom);
+  const setLatestMark = useSetAtom(latestAddMarkAtom);
   const addAlert = useSetAtom(addAlertAtom);
   const setInterObserver = useSetAtom(timelineInterObserverAtom);
   const [markOffscreen, setMarkOffscreen] = useState<null | 'up' | 'down'>(null);
@@ -206,33 +208,30 @@ export default function Timeline({ facts, isSubView = false, col, isOnly = false
     if (!fact) return;
 
     const id = Number(fact.dataset.id);
-    const anchor = fact.dataset.anchor;
-    const title = fact.querySelector('[data-role="title"]')?.textContent;
+
+    if (!id) {
+      addAlert('error', <>無法取得 id</>);
+      return;
+    }
 
     if (pick) {
       if (pick.factIds.includes(id)) {
         addAlert('info', <>已經加入過了，不能重複</>);
         return;
       }
-      if (id) {
-        addPickMark(id);
-        setMarkPicking(false);
-      } else {
-        addAlert('error', <>無法取得 id</>);
-      }
+      addPickMark(id);
+      setLatestMark(id);
     } else {
-      if (R.any(R.propEq(anchor, 'anchor'), marks)) {
+      if (localMarks.includes(id)) {
         addAlert('info', <>已經加入過了，不能重複</>);
         return;
       }
-      if (anchor && title) {
-        addMark({ id, anchor, title })
-        setMarkPicking(false);
-      } else {
-        addAlert('error', <>無法取得連結或標題</>);
-      }
+      addLocalMark(id);
+      setLatestMark(id);
     }
-  }, [marks, addMark, pick, addPickMark, setMarkPicking, addAlert]);
+
+    setMarkPicking(false);
+  }, [localMarks, addLocalMark, pick, addPickMark, setMarkPicking, setLatestMark, addAlert]);
 
   const Facts = useMemo(() => {
     return facts.map(fact => <Fact key={fact.id} fact={fact} isSubView={isSubView} onZoom={onZoom} />);

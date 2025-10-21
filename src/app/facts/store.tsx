@@ -72,33 +72,23 @@ export const allHighlighRangesAtom = atom((get) => {
   return allRanges;
 });
 
-export type FactMark = {
-  id: number,
-  anchor: string,
-  title: string,
-};
 export const markPickingAtom = atom(false);
-export const marksAtom = atom<FactMark[]>([]);
-export const addMarkAtom = atom(
-  null,
-  (get, set, update: FactMark) => {
-    set(marksAtom, R.pipe(
-      R.append(update),
-      R.sortBy(R.prop('anchor'))
-    ));
-  }
-);
-export const removeMarkAtom = atom(
-  null,
-  (get, set, anchor: string) => {
-    set(marksAtom, removeFirst(R.propEq(anchor, 'anchor')));
-  }
-);
-export const markIdsAtom = atom((get) => {
-  const anchors = R.pluck('anchor', get(marksAtom));
-  return anchors.map(a => Number(a.split('_').pop()));
-});
 export const peekingMarkAtom = atom<string | null>(null);
+export const latestAddMarkAtom = atom<number | null>(null);
+
+export const localMarksAtom = atom<number[]>([]);
+export const addLocalMarkAtom = atom(
+  null,
+  (get, set, factId: number) => {
+    set(localMarksAtom, R.append(factId));
+  }
+);
+export const removeLocalMarkAtom = atom(
+  null,
+  (get, set, id: number) => {
+    set(localMarksAtom, removeFirst(R.equals(id)));
+  }
+);
 
 export type PicksMode = 'index' | 'item' | 'my' | 'edit' | '';
 export const picksAtom = atom<RecentPicksItemProps[]>([]);
@@ -125,6 +115,7 @@ export const addPickMarkAtom = atom(
     set(pickAtom, R.assoc('factIds', newIds));
   }
 );
+
 const refreshPickById = (newItem: RecentPicksItemProps, oldItems: RecentPicksItemProps[]) => {
   let found = false;
   const newItems = oldItems.reduce((acc: RecentPicksItemProps[], item) => {
