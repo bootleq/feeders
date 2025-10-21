@@ -72,7 +72,7 @@ function highlightAddedMark(id: number) {
   }
 }
 
-export default function PickMarks({ facts }: {
+export default function MarkList({ facts }: {
   facts: Fact[],
 }) {
   const ref = useRef<HTMLDivElement>(null);

@@ -33,7 +33,7 @@ import useClientOnly from '@/lib/useClientOnly';
 import { findFactElement, clearMarkIndicators } from './utils';
 import tlStyles from './timeline.module.scss';
 import { getTagColor } from './colors';
-import PickMarks from './PickMarks';
+import MarkList from './MarkList';
 import { addAlertAtom } from '@/components/store';
 import { TextInput } from '@/components/form/Inputs';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipContentMenu, menuHoverProps } from '@/components/Tooltip';
@@ -706,7 +706,7 @@ function MarkCtrlPanel({ facts }: {
           </div>
         </div>
 
-        <PickMarks facts={facts} />
+        <MarkList facts={facts} />
 
         <div className="inline-flex items-center justify-start text-sm mt-1 ml-auto">
         </div>
