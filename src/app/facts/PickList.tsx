@@ -3,7 +3,15 @@
 import { useState, useCallback, useEffect } from 'react';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { jsonReviver } from '@/lib/utils';
-import { picksAtom, pickAtom, picksModeAtom, loadingPicksAtom, initialPickLoadedAtom, pickSavedAtom } from './store';
+import {
+  picksAtom,
+  pickAtom,
+  picksModeAtom,
+  loadingPicksAtom,
+  initialPickLoadedAtom,
+  pickSavedAtom,
+  filterByMarksAtom,
+} from './store';
 import { addAlertAtom } from '@/components/store';
 import type { RecentPicksItemProps } from '@/models/facts';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
@@ -46,6 +54,7 @@ export default function PickList() {
   const picks = useAtomValue(picksAtom);
   const [readingPick, setPick] = useAtom(pickAtom);
   const setPicksMode = useSetAtom(picksModeAtom);
+  const setFiltered = useSetAtom(filterByMarksAtom);
   const setLoading = useSetAtom(loadingPicksAtom);
   const [initLoad, setInitLoad] = useAtom(initialPickLoadedAtom);
   const [initScroll, setInitScroll] = useState(false);
@@ -70,10 +79,11 @@ export default function PickList() {
           changes: changes || 0,
           changedAt: changedAt,
         });
+        setFiltered(true);
         // setPicksMode('item');  // Stay in index mode, leave more info to user
       }
     }
-  }, [picks, setPick]);
+  }, [picks, setPick, setFiltered]);
 
   const onItemMode = useCallback(() => {
     setPicksMode('item');

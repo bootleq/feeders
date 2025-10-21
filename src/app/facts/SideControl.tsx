@@ -570,6 +570,7 @@ function MarkCtrlPanel({ facts }: {
         });
       }
       setPicksMode('edit');
+      setFiltered(true);
       return;
     }
 
@@ -590,10 +591,11 @@ function MarkCtrlPanel({ facts }: {
         changedAt: dummyDate,
       });
       setPicksMode('edit');
+      setFiltered(true);
     } else {
       addAlert('error', <>請先建立至少一個記號，按「選取<CursorArrowRippleIcon className='stroke-slate-700 stroke-0 ml-1' height={20} />」開始</>);
     }
-  }, [localMarks, pick, userId, setPick, setPicksMode, addAlert]);
+  }, [localMarks, pick, userId, setPick, setPicksMode, setFiltered, addAlert]);
 
   const onSavedHintFaded = () => {
     setSavedHint(false);
