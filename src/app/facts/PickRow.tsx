@@ -123,7 +123,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
             <div className='ml-auto flex items-center'>
               <Tooltip placement='top'>
                 <TooltipTrigger>
-                  <div className='text-sm font-mono'>
+                  <div className='text-sm font-mono mr-3'>
                     {factIds?.length}
                   </div>
                 </TooltipTrigger>
@@ -135,8 +135,8 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
                 bookRead ?
                   <Tooltip placement='top'>
                     <TooltipTrigger>
-                      <div className='btn ml-auto pr-0 translate-x-px'>
-                        <BookOpenIcon className='ml-1 ring-2 ring-rose-200 rounded-lg cursor-help stroke-slate-700/75 bg-rose-100 hover:stroke-black' height={20} aria-label='閱讀' />
+                      <div className='btn ml-auto p-0 translate-x-px'>
+                        <BookOpenIcon className='ring-2 ring-rose-200 rounded-lg cursor-help stroke-slate-700/75 bg-rose-100 hover:stroke-black' height={20} aria-label='閱讀' />
                       </div>
                     </TooltipTrigger>
                     <TooltipContent className="px-2 py-1 text-sm rounded box-border w-max z-[1002] bg-slate-100 ring-1 leading-relaxed shadow-lg">
@@ -157,9 +157,9 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
                   </Tooltip>
                 :
                   <Tooltip placement='right'>
-                    <TooltipTrigger className=''>
-                      <button type='button' className='btn ml-auto pr-0' data-id={id} onClick={onTake}>
-                        <BookOpenIcon className='ml-1 rounded stroke-slate-700/75 cursor-pointer hover:stroke-black' height={20} aria-label='閱讀' />
+                    <TooltipTrigger>
+                      <button type='button' className='btn ml-auto p-0 translate-x-px rounded-lg' data-id={id} onClick={onTake}>
+                        <BookOpenIcon className='rounded-lg stroke-slate-700/75 cursor-pointer hover:stroke-black' height={20} aria-label='閱讀' />
                       </button>
                     </TooltipTrigger>
                     <TooltipContent className="px-2 py-1 text-sm rounded box-border w-max z-[1002] bg-slate-100 ring-1 leading-relaxed shadow-lg">
