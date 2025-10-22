@@ -79,7 +79,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
   readingPickId: number | null,
   onTake: (e: React.MouseEvent<HTMLButtonElement>) => void,
   onItemMode?: () => void,
-  onEditMode?: () => void,
+  onEditMode?: (e: React.MouseEvent<HTMLButtonElement>) => void,
 }) {
   const now = useAtomValue(nowAtom);
   const [saved, setSaved] = useAtom(pickSavedAtom);
