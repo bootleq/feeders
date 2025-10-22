@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useThrottledCallback } from 'use-debounce';
 import { jsonReviver } from '@/lib/utils';
@@ -81,9 +81,21 @@ export default function MyPickList() {
   const [initLoad, setInitLoad] = useAtom(initialPickLoadedAtom);
   const [initScroll, setInitScroll] = useState(false);
 
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const [bodyScrolled, setBodyScrolled] = useState(false);
+
   const throttledSetNow = useThrottledCallback(() => {
     setNow(new Date());
   }, 3000, { trailing: false });
+
+  const detectBodyScroll = useThrottledCallback(() => {
+    const $body = bodyRef.current;
+    if ($body && $body.scrollTop > 0) {
+      setBodyScrolled(true);
+    } else {
+      setBodyScrolled(false);
+    }
+  }, 600, { trailing: true });
 
   const onTake = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     const id = Number(e.currentTarget?.dataset?.id);
@@ -114,6 +126,10 @@ export default function MyPickList() {
     setPicksMode('edit');
   }, [onTake, setPicksMode]);
 
+  const scrollToTop = useCallback(() => {
+    bodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   useEffect(() => {
     throttledSetNow();
   }, [throttledSetNow]);
@@ -140,15 +156,24 @@ export default function MyPickList() {
     }
   }, [initScroll, readingPick]);
 
+  useEffect(() => {
+    const $body = bodyRef.current;
+    $body?.addEventListener('scroll', detectBodyScroll);
+
+    return () => {
+      $body?.removeEventListener('scroll', detectBodyScroll);
+    }
+  }, [detectBodyScroll]);
+
   return (
     <>
-      <header className='flex items-center px-3 pb-1'>
-        <h2 className='text-slate-600'>
+      <header className={`flex items-center px-3 pb-2 border-slate-300 transition-shadow duration-200 ${bodyScrolled ? 'border-b shadow-xl' : ''}`}>
+        <h2 className='text-slate-600' onClick={scrollToTop}>
           我的選集
         </h2>
       </header>
 
-      <div className='text-base pt-2 pb-8 pr-3 ml-3 ring-red-500 overflow-y-scroll scrollbar-thin'>
+      <div ref={bodyRef} className='text-base pt-2 pb-8 pr-3 ml-3 ring-red-500 overflow-y-scroll scrollbar-thin'>
         <PicksLoading />
         {
           picks.length > 0 ?

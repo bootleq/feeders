@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { useThrottledCallback } from 'use-debounce';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { jsonReviver } from '@/lib/utils';
 import {
@@ -60,6 +61,18 @@ export default function PickList() {
   const [initScroll, setInitScroll] = useState(false);
   const setSaved = useSetAtom(pickSavedAtom);
 
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const [bodyScrolled, setBodyScrolled] = useState(false);
+
+  const detectBodyScroll = useThrottledCallback(() => {
+    const $body = bodyRef.current;
+    if ($body && $body.scrollTop > 0) {
+      setBodyScrolled(true);
+    } else {
+      setBodyScrolled(false);
+    }
+  }, 600, { trailing: true });
+
   const onTake = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     const id = Number(e.currentTarget?.dataset?.id);
     if (id > 0) {
@@ -89,6 +102,10 @@ export default function PickList() {
     setPicksMode('item');
   }, [setPicksMode]);
 
+  const scrollToTop = useCallback(() => {
+    bodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   useEffect(() => {
     if (!initLoad.includes('index')) {
       setLoading(true);
@@ -115,10 +132,19 @@ export default function PickList() {
     }
   }, [initScroll, readingPick]);
 
+  useEffect(() => {
+    const $body = bodyRef.current;
+    $body?.addEventListener('scroll', detectBodyScroll);
+
+    return () => {
+      $body?.removeEventListener('scroll', detectBodyScroll);
+    }
+  }, [detectBodyScroll]);
+
   return (
     <>
-      <header className='flex items-center px-3 pb-1'>
-        <h2 className='text-slate-600'>
+      <header className={`flex items-center px-3 pb-2 border-slate-300 transition-shadow duration-200 ${bodyScrolled ? 'border-b shadow-xl' : ''}`}>
+        <h2 className='text-slate-600' onClick={scrollToTop}>
           公開選集
         </h2>
         <Tooltip placement='top'>
@@ -133,7 +159,7 @@ export default function PickList() {
         </Tooltip>
       </header>
 
-      <div className='text-base pt-2 pb-8 pr-3 ml-3 ring-red-500 overflow-y-scroll scrollbar-thin'>
+      <div ref={bodyRef} className='text-base pt-2 pb-8 pr-3 ml-3 ring-red-500 overflow-y-scroll scrollbar-thin'>
         <PicksLoading />
         <ol className={`flex flex-col ${picksStyles['pick-list']}`}>
           {picks.map(pick =>
