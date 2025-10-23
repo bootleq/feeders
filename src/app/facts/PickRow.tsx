@@ -121,6 +121,12 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
               { state === 'draft' && <span className='text-slate-500 font-normal'>（草稿）</span> }
             </h2>
             <div className='ml-auto flex items-center'>
+              {state === 'published' &&
+                <a className='mr-1 px-1 opacity-60 rounded-full hover:opacity-100 hover:-rotate-12 hover:scale-110' href={`/facts/picks/${id}/`} title='單篇連結'>
+                  <img src='/assets/paper-clip.svg' alt='連結' width={16} height={16} className='max-w-none' />
+                  <span className='sr-only'>單篇連結</span>
+                </a>
+              }
               <Tooltip placement='top'>
                 <TooltipTrigger>
                   <div className='text-sm font-mono mr-3'>
