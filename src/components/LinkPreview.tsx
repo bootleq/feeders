@@ -10,7 +10,7 @@ import { linkPreviewUrlAtom } from '@/components/store';
 import styles from '@/components/link-preview.module.scss';
 import Spinner from '@/assets/spinner.svg';
 
-const MAX_SCREEN_USAGE = 0.7;
+const MAX_SCREEN_USAGE = 0.6;
 
 const wrapperCls = [
   'z-[1422] w-fit h-fit p-3 bg-slate-100/50 rounded-lg shadow-lg',

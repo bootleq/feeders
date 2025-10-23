@@ -116,7 +116,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
         }
         <header className='flex flex-col mb-1'>
           <div className='flex items-center my-px mb-0'>
-            <h2 className={`font-bold ${state === 'published' ? '' : draftTextColor}`}>
+            <h2 className={`font-bold font-mixed ${state === 'published' ? '' : draftTextColor}`}>
               {title}
               { state === 'draft' && <span className='text-slate-500 font-normal'>（草稿）</span> }
             </h2>
@@ -251,7 +251,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
         </header>
 
         {present(desc) &&
-        <Desc value={desc} className='max-h-96 overflow-auto md:max-w-xl lg:max-w-full mb-1 mx-px resize rounded' />
+        <Desc value={desc} className='max-h-96 overflow-auto md:max-w-xl lg:max-w-full mb-1 mx-px resize rounded font-mixed' />
         }
       </article>
     </li>
