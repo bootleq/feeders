@@ -45,7 +45,8 @@ export default function LinkPreview() {
 
   const onLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
     const { naturalWidth, naturalHeight } = e.currentTarget;
-    const { availWidth, availHeight } = window.screen;
+    const availWidth = window.innerWidth;
+    const availHeight = window.innerHeight;
     let width, height;
 
     if (naturalWidth > naturalHeight) {
