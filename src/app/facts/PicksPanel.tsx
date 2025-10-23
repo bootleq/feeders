@@ -19,8 +19,14 @@ const loadMotionFeatures = () =>
 
 type Layout = 'init' | 'right' | 'min';
 
+const minDimension = {
+  'init': { w: '30vw', h: '10vh' },
+  'right': { w: '20vw', h: '100vh' },
+  'min': { w: 0, h: 0 },
+};
+
 const containerCls = [
-  'fixed z-[900] w-max h-max max-w-[98vw] lg:min-w-[30vw]',
+  'fixed z-[900] w-max h-max max-w-[98vw]',
   'flex flex-col items-center gap-y-1',
   'mx-auto',
   '[--motion-top:0.25rem] md:[--motion-top:4vh]'
@@ -65,15 +71,14 @@ const motionProps = {
       overflow: 'hidden',
       width: '80px',
       height: '60px',
-      minWidth: 0,
     },
   },
 };
 
 const sectionCls = [
   'bg-slate-100 px-0 py-2 ring ring-[5px] rounded shadow-[10px_20px_20px_14px_rgba(0,0,0,0.5)]',
-  'flex flex-col flex-grow',
-  'relative top-0 overflow-hidden w-full h-hull max-h-full lg:min-w-80',
+  'flex flex-col flex-grow resize',
+  'relative top-0 overflow-hidden w-full h-hull max-w-[98vw] max-h-full',
 ].join(' ')
 
 export default function PicksPanel({ mode, children }: {
@@ -136,10 +141,11 @@ export default function PicksPanel({ mode, children }: {
   }
 
   const privateRingStyle = mode === 'my' ? 'ring-purple-600/50 ring-offset-1' : '';
+  const minDimensionStyle = { minWidth: minDimension[layout].w, minHeight: minDimension[layout].h };
 
   return (
     <LazyMotion strict features={loadMotionFeatures}>
-      <m.div {...motionProps} drag={canDrag} animate={layout} onAnimationComplete={onAnimateEnd} dragControls={controls} dragConstraints={viewportRef} className={containerCls}>
+      <m.div {...motionProps} drag={canDrag} animate={layout} onAnimationComplete={onAnimateEnd} dragControls={controls} dragConstraints={viewportRef} className={containerCls} style={minDimensionStyle}>
         <div className='absolute z-[901] right-2 top-1.5 ml-auto flex items-center gap-x-2'>
           {canDrag &&
             <div className={draggerCls} onPointerDown={startDrag} style={{ touchAction: 'none' }}>
@@ -185,7 +191,7 @@ export default function PicksPanel({ mode, children }: {
         </div>
 
         {!minimized &&
-          <section className={`${sectionCls} ${privateRingStyle}`}>
+          <section className={`${sectionCls} ${privateRingStyle}`} style={minDimensionStyle}>
             {children}
           </section>
         }

@@ -245,7 +245,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
         </header>
 
         {present(desc) &&
-          <Desc value={desc} className='max-h-96 overflow-auto md:max-w-xl mb-1 mx-px resize-y rounded' />
+        <Desc value={desc} className='max-h-96 overflow-auto md:max-w-xl lg:max-w-full mb-1 mx-px resize rounded' />
         }
       </article>
     </li>
