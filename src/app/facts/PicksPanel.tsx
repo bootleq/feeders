@@ -69,11 +69,22 @@ const motionProps = {
       x: 0,
       y: 0,
       overflow: 'hidden',
-      width: '80px',
-      height: '60px',
+      width: '90px',
+      height: '80px',
     },
   },
 };
+
+function MinimizedButton({ className }: {
+  className?: string
+}) {
+  return (
+    <div className={`flex text-lg items-center gap-x-1 w-fit p-2 rounded-full bg-white ring-1 ring-slate-300 ${className}`}>
+      <LibraryBigIcon height={22} />
+      選集
+    </div>
+  );
+}
 
 const sectionCls = [
   'bg-slate-100 px-0 py-2 ring ring-[5px] rounded shadow-[10px_20px_20px_14px_rgba(0,0,0,0.5)]',
@@ -154,11 +165,18 @@ export default function PicksPanel({ mode, children }: {
               移動位置
             </div>
           }
+
+          {minimized &&
+            <button data-layout={'init'} type='button' className='md:hidden z-[902]' onClick={onSwitchLayout}>
+              <MinimizedButton className='shadow-xl' />
+            </button>
+          }
+
           <Tooltip placement='top-start' hoverProps={menuHoverProps} role='menu'>
             <TooltipTrigger className=''>
-              <button type='button' className={`text-slate-600 ${minimized ? '' : 'hover:text-black bg-slate-100'}`} aria-label='顯示方式'>
+              <button type='button' className={`hidden md:block text-slate-600 ${minimized ? '' : 'hover:text-black bg-slate-100'}`} aria-label='顯示方式'>
                 {minimized ?
-                  <div className='flex text-lg items-center gap-x-1'>
+                  <div className='flex text-lg items-center gap-x-1 p-2 rounded-full bg-white/75 md:bg-transparent'>
                     <LibraryBigIcon height={22} />
                     選集
                   </div>
@@ -194,6 +212,21 @@ export default function PicksPanel({ mode, children }: {
           <section className={`${sectionCls} ${privateRingStyle}`} style={minDimensionStyle}>
             {children}
           </section>
+        }
+
+        {!minimized &&
+          <button data-layout={'min'} type='button' onClick={onSwitchLayout}
+            className='md:hidden flex flex-col w-max items-center gap-y-2 translate-y-4 p-3 px-5 text-slate-900 bg-gradient-to-br from-stone-50 to-stone-200 ring-4 ring-stone-400 rounded-2xl shadow-2xl z-[902]'
+          >
+            <div className=''>
+              點這裡開始看<br />
+              <strong>事實</strong>時間軸
+            </div>
+            <div className='flex items-center gap-x-1'>
+              要返回時再按
+              <MinimizedButton className='animate-pulse' />
+            </div>
+          </button>
         }
       </m.div>
     </LazyMotion>
