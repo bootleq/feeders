@@ -240,8 +240,8 @@ function UnscopedForm() {
       </h2>
       <form onSubmit={onSubmit} className='flex flex-col items-center gap-y-1 mt-3'>
         <div className='grid grid-cols-[min-content_2fr] gap-y-2 mb-1'>
-          <TextInput name='title' inputProps={{ required: true, className: 'cursor-text', defaultValue: pick.title || '', disabled: isBanned }} />
-          <Textarea name='desc' inputProps={{ rows: 8, className: 'md:min-w-[500px] cursor-text', defaultValue: pick.desc || '', disabled: isBanned }} labelOpts={{ align: 'start' }} />
+          <TextInput name='title' inputProps={{ required: true, className: 'cursor-text font-mixed', defaultValue: pick.title || '', disabled: isBanned }} />
+          <Textarea name='desc' inputProps={{ rows: 8, className: 'md:min-w-[500px] cursor-text font-mixed', defaultValue: pick.desc || '', disabled: isBanned }} labelOpts={{ align: 'start' }} />
           {
             pick.state === 'dropped' ?
             <>

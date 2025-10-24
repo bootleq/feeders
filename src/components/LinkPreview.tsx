@@ -2,7 +2,7 @@
 
 import * as R from 'ramda';
 import { useEffect, useState, useCallback } from 'react';
-import { useFloating, FloatingPortal, flip, shift, offset } from '@floating-ui/react';
+import { useFloating, FloatingPortal, shift, offset, autoPlacement } from '@floating-ui/react';
 import { useAtomValue } from 'jotai';
 import { useDebouncedCallback } from 'use-debounce';
 import { present } from '@/lib/utils';
@@ -10,7 +10,7 @@ import { linkPreviewUrlAtom } from '@/components/store';
 import styles from '@/components/link-preview.module.scss';
 import Spinner from '@/assets/spinner.svg';
 
-const MAX_SCREEN_USAGE = 0.7;
+const MAX_SCREEN_USAGE = 0.6;
 
 const wrapperCls = [
   'z-[1422] w-fit h-fit p-3 bg-slate-100/50 rounded-lg shadow-lg',
@@ -19,7 +19,7 @@ const wrapperCls = [
 ].join(' ');
 
 const wrapperLoadingCls = [
-  'z-[422] w-fit h-fit',
+  'z-[922] w-fit h-fit',
   'flex items-center justify-center',
 ].join(' ');
 
@@ -32,20 +32,21 @@ export default function LinkPreview() {
   const { refs, floatingStyles, update, context } = useFloating({
     open: present(url),
     strategy: 'absolute',
-    placement: 'right',
     middleware: [
-      offset(20),
-      shift(),
-      flip({
-        crossAxis: false,
-        fallbackAxisSideDirection: "start",
+      offset(30),
+      shift({
+        padding: 10,
+      }),
+      autoPlacement({
+        padding: 10,
       }),
     ],
   });
 
   const onLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
     const { naturalWidth, naturalHeight } = e.currentTarget;
-    const { availWidth, availHeight } = window.screen;
+    const availWidth = window.innerWidth;
+    const availHeight = window.innerHeight;
     let width, height;
 
     if (naturalWidth > naturalHeight) {

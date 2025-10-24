@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 import { useEffect } from 'react';
-import { useAnimate } from 'framer-motion';
+import { useAnimate } from 'motion/react';
 import type { AnyFunction } from '@/lib/utils';
 
 export function AnimateOnce({ onComplete, className, children }: {

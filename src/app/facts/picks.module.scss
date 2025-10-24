@@ -1,12 +1,7 @@
 .pick-list {
   li {
-    &:not(:first-child):before {
-      content: '';
-      display: block;
-      width: 98%;
-      height: 1px;
-      margin: 5px auto 20px;
-      border-top: 1px dotted rgb(59 130 246 / 0.5);
+    &:last-child [role='separator'] {
+      display: none;
     }
   }
 }

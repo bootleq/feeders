@@ -7,6 +7,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import PickRow from '@/app/facts/PickRow';
 import PicksLoading from '@/app/facts/PicksLoading';
 import type { RecentPicksItemProps } from '@/models/facts';
+import picksStyles from './picks.module.scss';
 import { QuestionMarkCircleIcon, ListBulletIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 export default function Pick({ initialPick }: {
@@ -82,7 +83,7 @@ export default function Pick({ initialPick }: {
       <div className='text-base pt-2 pb-8 pr-3 ml-3 ring-red-500 overflow-y-scroll scrollbar-thin'>
 
         <PicksLoading />
-        <ol className=''>
+        <ol className={`flex flex-col ${picksStyles['pick-list']}`}>
           <PickRow pick={currentPick} readingPickId={currentPick.id} onTake={onTake} />
         </ol>
       </div>
