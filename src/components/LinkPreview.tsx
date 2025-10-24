@@ -16,6 +16,7 @@ const wrapperCls = [
   'z-[1422] w-fit h-fit p-3 bg-slate-100/50 rounded-lg shadow-lg',
   'flex items-center justify-center',
   'border-3 border-slate-400/50 ring-2 ring-slate-300',
+  'pointer-events-none animate-preview-in',
 ].join(' ');
 
 const wrapperLoadingCls = [
@@ -31,7 +32,7 @@ export default function LinkPreview() {
 
   const { refs, floatingStyles, update, context } = useFloating({
     open: present(url),
-    strategy: 'absolute',
+    strategy: 'fixed',
     middleware: [
       offset(30),
       shift({
@@ -89,13 +90,13 @@ export default function LinkPreview() {
           height: 0,
           top: event.clientY,
           left: event.clientX,
-          right: event.clientX + dimension.width,
-          bottom: event.clientY + dimension.height,
+          right: event.clientX,
+          bottom: event.clientY,
         };
       },
     });
     update();
-  }, 7, { maxWait: 100, });
+  }, 50, { maxWait: 100 });
 
   useEffect(() => {
     if (url) window.addEventListener('mousemove', debouncedMoved);
@@ -103,7 +104,7 @@ export default function LinkPreview() {
     return () => {
       window.removeEventListener('mousemove', debouncedMoved);
     };
-  }, [url, update, dimension.width, dimension.height, debouncedMoved]);
+  }, [url, debouncedMoved]);
 
   if (!url) return null;
 
