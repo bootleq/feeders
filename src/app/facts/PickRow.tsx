@@ -20,15 +20,24 @@ const tooltipCls = [
   'bg-gradient-to-br from-stone-50 to-slate-100 ring-2 ring-offset-1 ring-slate-300 shadow-lg',
 ].join(' ')
 
+function Separator() {
+  return (
+    <div role='separator' className='flex items-center justify-center w-full h-14 mb-1'>
+      <div className='h-1 w-[98%] border-t border-dotted border-slate-700 translate-y-px'>
+      </div>
+    </div>
+  );
+}
+
 function Dropped({ pick }: {
   pick: RecentPicksItemProps,
 }) {
   const now = useAtomValue(nowAtom);
   const { publishedAt } = pick;
   return (
-    <li className='pt-4 first:pt-0'>
+    <li className=''>
       <article>
-        <header className='flex flex-col mb-1'>
+        <header className='flex flex-col mb-1 gap-y-px'>
           <div className='flex items-center my-px mb-0'>
             <Tooltip placement='top'>
               <TooltipTrigger className='text-red-950/75 cursor-help font-bold'>
@@ -70,6 +79,7 @@ function Dropped({ pick }: {
 
         <Desc value='（內容已隱藏）' className='opacity-50 max-h-96 overflow-auto md:max-w-xl mb-1 mx-px rounded' />
       </article>
+      <Separator />
     </li>
   );
 }
@@ -97,12 +107,13 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
   const idProp = present(id) ? { id: `pick-${id}` } : {};
 
   if (!inPrivate && isBanned) {
+    // Completely hide from public
     return <Dropped pick={pick} />;
   }
 
   return (
-    <li className={`pt-4 first:pt-0 ${inPrivate && isBanned ? 'bg-slate-300' : ''}`}>
-      <article {...idProp} className=''>
+    <li>
+      <article {...idProp} className={` ${inPrivate && isBanned ? 'bg-slate-300 pb-1 -translate-y-2' : ''}`}>
         {inPrivate && isBanned &&
           <div className='w-fit flex items-center mx-auto gap-x-3 bg-red-300/75 ring-[4px] ring-red-500 p-2 px-5 my-2 translate-y-4 shadow-xl rounded'>
             受到管制處分
@@ -114,8 +125,8 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
             <XMarkIcon className='ml-auto cursor-pointer fill-slate-500 hover:scale-125' height={20} onClick={onDismissSaved} />
           </div>
         }
-        <header className='flex flex-col mb-1'>
-          <div className='flex items-center my-px mb-0'>
+        <header className='flex flex-col mb-1 gap-y-px mb-1'>
+          <div className='flex items-center my-px'>
             <h2 className={`font-bold font-mixed ${state === 'published' ? '' : draftTextColor}`}>
               {title}
               { state === 'draft' && <span className='text-slate-500 font-normal'>（草稿）</span> }
@@ -254,6 +265,8 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
         <Desc value={desc} className='max-h-96 overflow-auto md:max-w-xl lg:max-w-full mb-1 mx-px resize rounded font-mixed' />
         }
       </article>
+
+      <Separator />
     </li>
   );
 }
