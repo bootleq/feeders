@@ -1,5 +1,6 @@
 "use client"
 
+import * as R from 'ramda';
 import { useAtom, useSetAtom } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -53,7 +54,9 @@ const motionProps = {
       height: 'auto',
       maxHeight: '88vh',
     },
-    right: {
+    right: ({ rightSpace }: {
+      rightSpace?: number,
+    }) => ({
       top: 0,
       left: '',
       right: 0,
@@ -61,7 +64,8 @@ const motionProps = {
       y: 0,
       height: '100vh',
       maxHeight: '100vh',
-    },
+      ...(rightSpace ? { width: rightSpace } : {}),
+    }),
     min: {
       top: '5vh',
       left: '',
@@ -105,6 +109,7 @@ export default function PicksPanel({ mode, children }: {
 
   const [layout, setLayout] = useState<Layout>('init');
   const [minimized, setMinimized] = useState(false);
+  const [rightSpace, setRightSpace] = useState<number>(0);
   const [canDrag, setCanDrag] = useState(true);
   const viewportRef = useRef<HTMLBodyElement|null>(null);
   const controls = useDragControls();
@@ -133,6 +138,15 @@ export default function PicksPanel({ mode, children }: {
       if (to !== 'min') {
         setMinimized(false);
       }
+      if (to === 'right') {
+        const $tl = Array.from(document.querySelectorAll('div[data-role="timeline"]')).pop();
+        const rightFree = $tl?.getBoundingClientRect()?.right;
+        if (rightFree && rightFree < window.innerWidth) {
+          setRightSpace(window.innerWidth - rightFree);
+        } else {
+          setRightSpace(0);
+        }
+      }
       setLayout(to as Layout);
     }
   }, []);
@@ -153,10 +167,13 @@ export default function PicksPanel({ mode, children }: {
 
   const privateRingStyle = mode === 'my' ? 'ring-purple-600/50 ring-offset-1' : '';
   const minDimensionStyle = { minWidth: minDimension[layout].w, minHeight: minDimension[layout].h };
+  const custom = {
+    rightSpace: rightSpace > 0 ? R.min(rightSpace, 600) : {},
+  };
 
   return (
     <LazyMotion strict features={loadMotionFeatures}>
-      <m.div {...motionProps} drag={canDrag} animate={layout} onAnimationComplete={onAnimateEnd} dragControls={controls} dragConstraints={viewportRef} className={containerCls} style={minDimensionStyle}>
+      <m.div {...motionProps} custom={custom} drag={canDrag} animate={layout} onAnimationComplete={onAnimateEnd} dragControls={controls} dragConstraints={viewportRef} className={containerCls} style={minDimensionStyle}>
         <div className='absolute z-[901] right-2 top-1.5 ml-auto flex items-center gap-x-2'>
           {canDrag &&
             <div className={draggerCls} onPointerDown={startDrag} style={{ touchAction: 'none' }}>
