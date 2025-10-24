@@ -21,9 +21,10 @@ const translations = {
   },
 
   factFields: { // NOTE: used in PickForm
-    'title': '標題',
-    'desc':  '說明',
-    'state': '狀態',
+    'title':   '標題',
+    'desc':    '說明',
+    'state':   '狀態',
+    'factIds': '事實',
   },
 
   spotAction: {
@@ -65,6 +66,7 @@ const translations = {
   changeScope: {
     'amendSpot':     '編修地點',
     'amendFollowup': '編修跟進',
+    'amendPick':     '編修選集',
   },
 };
 

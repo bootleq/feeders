@@ -248,7 +248,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
                 </Tooltip>
                 <Tooltip placement='top-start'>
                   <TooltipTrigger className='flex items-center'>
-                    <Link href={`/audit/picks/${id}`} className='inline-flex items-center justify-center p-1 ml-1 text-slate-500/75 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
+                    <Link href={`/audit/pick/${id}`} className='inline-flex items-center justify-center p-1 ml-1 text-slate-500/75 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
                       <Square3Stack3DIcon className='stroke-current mr-px' height={18} />
                       {changes}
                     </Link>

@@ -138,7 +138,7 @@ function DateInfo({ id, publishedAt, createdAt, changes, changedAt }: {
 
             <Tooltip placement='bottom-start'>
               <TooltipTrigger className='flex items-center ml-auto'>
-                <Link href={`/audit/picks/${id}`} className='inline-flex items-center justify-center p-1 ml-1 text-slate-500/75 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
+                <Link href={`/audit/pick/${id}`} className='inline-flex items-center justify-center p-1 ml-1 text-slate-500/75 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
                   <Square3Stack3DIcon className='stroke-current' height={18} />
                   {changes}
                 </Link>
