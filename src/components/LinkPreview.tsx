@@ -2,7 +2,7 @@
 
 import * as R from 'ramda';
 import { useEffect, useState, useCallback } from 'react';
-import { useFloating, FloatingPortal, flip, shift, offset } from '@floating-ui/react';
+import { useFloating, FloatingPortal, shift, offset, autoPlacement } from '@floating-ui/react';
 import { useAtomValue } from 'jotai';
 import { useDebouncedCallback } from 'use-debounce';
 import { present } from '@/lib/utils';
@@ -19,7 +19,7 @@ const wrapperCls = [
 ].join(' ');
 
 const wrapperLoadingCls = [
-  'z-[422] w-fit h-fit',
+  'z-[922] w-fit h-fit',
   'flex items-center justify-center',
 ].join(' ');
 
@@ -32,13 +32,13 @@ export default function LinkPreview() {
   const { refs, floatingStyles, update, context } = useFloating({
     open: present(url),
     strategy: 'absolute',
-    placement: 'right',
     middleware: [
-      offset(20),
-      shift(),
-      flip({
-        crossAxis: false,
-        fallbackAxisSideDirection: "start",
+      offset(30),
+      shift({
+        padding: 10,
+      }),
+      autoPlacement({
+        padding: 10,
       }),
     ],
   });
