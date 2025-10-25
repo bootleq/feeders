@@ -3,9 +3,11 @@
 import * as R from 'ramda';
 import { z } from 'zod';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useSession } from 'next-auth/react';
 import { useDebouncedCallback } from 'use-debounce';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useHydrateAtoms, atomWithStorage } from 'jotai/utils';
+import { format } from '@/lib/date-fp';
 import {
   viewCtrlAtom,
   toggleViewCtrlAtom,
@@ -18,20 +20,24 @@ import {
   tagsAtom,
   mergeTagsAtom,
   togglaAllTagsAtom,
+  filterByMarksAtom,
   markPickingAtom,
-  marksAtom,
-  removeMarkAtom,
+  localMarksAtom,
   peekingMarkAtom,
-  timelineInterObserverAtom,
+  picksModeAtom,
+  pickAtom,
 } from './store';
-import type { Tags, FactMark, DateRange } from './store';
+import type { Tags, Fact, DateRange } from './store';
 import type { AnyFunction } from '@/lib/utils';
+import { tooltipClass, tooltipMenuCls } from '@/lib/utils';
 import useClientOnly from '@/lib/useClientOnly';
 import { findFactElement, clearMarkIndicators } from './utils';
 import tlStyles from './timeline.module.scss';
 import { getTagColor } from './colors';
+import MarkList from './MarkList';
+import { addAlertAtom } from '@/components/store';
 import { TextInput } from '@/components/form/Inputs';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipContentMenu, menuHoverProps } from '@/components/Tooltip';
 import { AnimateOnce } from '@/components/AnimateOnce';
 import { EyeIcon } from '@heroicons/react/24/outline';
 import { EyeSlashIcon } from '@heroicons/react/24/outline';
@@ -40,12 +46,20 @@ import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import { CheckIcon } from '@heroicons/react/24/outline';
 import { XCircleIcon } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { ArrowLeftEndOnRectangleIcon } from '@heroicons/react/24/outline';
-import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { GlobeAltIcon, BookOpenIcon } from '@heroicons/react/24/outline';
+import {
+  ArrowLeftEndOnRectangleIcon,
+  ArrowUpTrayIcon,
+  ArrowDownTrayIcon
+} from '@heroicons/react/24/outline';
+import UserPenIcon from '@/assets/user-pen.svg';
 import HighlighterIcon from '@/assets/highlighter.svg';
+import FunnelIcon from '@/assets/funnel.svg';
+import FunnelXIcon from '@/assets/funnel-x.svg';
 
-const currentMarkSlotAtom = atomWithStorage('feeders.factMarks.slot', 0);
-const markSlotAtoms = R.range(0, 4).map(n => atomWithStorage<FactMark[]>(`feeders.factMarks.${n}`, []));
+// NOTE: old storage key was 'feeders.factMarks.slot', breaking changed
+const currentMarkSlotAtom = atomWithStorage('feeders.facts.marks.slot', 0);
+const markSlotAtoms = R.range(0, 4).map(n => atomWithStorage<number[]>(`feeders.facts.marks.${n}`, []));
 
 const MAX_COLUMNS = 4;
 
@@ -272,7 +286,6 @@ function TagCtrlPanel() {
 
 function FiltersCtrl() {
   const [panelOpen, setPanelOpen] = useState(true);
-  const rejectedCount = useAtomValue(filterRejectedCountAtom);
 
   const toggle = () => {
     setPanelOpen(R.not);
@@ -284,9 +297,30 @@ function FiltersCtrl() {
       <div className={`${panelOpen ? '' : 'hidden'}`}>
         <TextFilterCtrlPanel />
         <DateCtrlPanel />
-        <div className='flex items-center text-xs text-slate-600'>
-          已排除：<span className='text-sm font-mono'>{rejectedCount}</span>
+      </div>
+    </div>
+  );
+}
+
+function FilterResultCount({ total }: { total: number }) {
+  const [panelOpen, setPanelOpen] = useState(true);
+  const rejectedCount = useAtomValue(filterRejectedCountAtom);
+  const toggle = () => {
+    setPanelOpen(R.not);
+  };
+
+  return (
+    <div className={`${panelOpen ? 'py-2' : 'py-0 opacity-20 border-none'}`}>
+      <div className='flex items-center gap-x-4 text-xs text-slate-600'>
+        <div className='cursor-pointer' onClick={toggle}>
+          顯示筆數 <span className='font-mono'>{total - rejectedCount}</span>
         </div>
+        {
+          rejectedCount > 0 &&
+          <div className=''>
+            已排除 <span className='font-mono text-red-700'>{rejectedCount}</span>
+          </div>
+        }
       </div>
     </div>
   );
@@ -421,89 +455,51 @@ function DateCtrlPanel() {
   );
 }
 
-const markDateCls = [
-  'font-mono text-sm whitespace-nowrap ml-px mr-1 px-1 rounded-md ring-1 cursor-pointer',
-  'text-red-950 bg-gradient-to-br from-amber-200 to-amber-200/80',
-  'hover:ring hover:text-black',
-].join(' ');
-
-function Mark({ anchor, title, index }:
-  FactMark & { index: number }
-) {
-  const removeMark = useSetAtom(removeMarkAtom);
-  const interObserver = useAtomValue(timelineInterObserverAtom);
-
-  const onRemove = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    const el = e.currentTarget;
-    const li = el.closest('li');
-    if (li) {
-      const { anchor } = li.dataset;
-      if (anchor) removeMark(anchor);
-      const tl = document.querySelector('[data-role="timeline"]') as HTMLElement;
-      if (tl) { delete tl.dataset.markOffscreen; }
-    }
-  }, [removeMark]);
-
-  const onMouseEnter = useCallback((e: React.MouseEvent<HTMLLIElement>) => {
-    const el = e.currentTarget;
-    const { anchor } = el.dataset;
-    const fact = findFactElement(anchor);
-    const target = fact?.querySelector('[data-role="fact-date"]');
-    if (target) {
-      target.classList.add(tlStyles['peeking-target']);
-      interObserver?.observe(target);
-    }
-  }, [interObserver]);
-
-  const date = R.match(/fact-(.+)_\d+/, anchor)[1];
-  const datePadEnd = date.length < 10 ? <span className=''>{'\u00A0'.repeat(10 - date.length)}</span> : '';
-
-  return (
-    <li className='flex items-center py-1' data-anchor={anchor} onMouseEnter={onMouseEnter} onMouseLeave={clearMarkIndicators}>
-      <a className={markDateCls} data-anchor={anchor} href={`#${anchor}`}>
-        {date}{datePadEnd}
-      </a>
-      <Tooltip placement='right'>
-        <TooltipTrigger className='mb-1 block truncate'>
-          <div className='text-xs truncate'>
-            {title}
-          </div>
-        </TooltipTrigger>
-        <TooltipContent className="p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1">
-          {title}
-        </TooltipContent>
-      </Tooltip>
-      <button className='btn p-px ml-auto hover:bg-white rounded-full hover:scale-125 hover:drop-shadow' aria-label='刪除' onClick={onRemove}>
-        <XMarkIcon className='stroke-slate-700 stroke-2' height={16} />
-      </button>
-    </li>
-  );
-}
-
-const validateLocalMark = ({ anchor, title }: FactMark) => {
-  if (R.type(anchor) !== 'String' || R.type(title) !== 'String') {
-    throw new Error(`異常的本機 mark 記錄，anchor: ${anchor}`);
+const validateStorageMark = (item: any) => {
+  if (R.type(item) !== 'Number') {
+    throw new Error(`異常的本機 mark 記錄，anchor: ${JSON.stringify(item)}`);
   }
 };
 
 const createStorageAtom = (slot: number) => {
   return atom(
     get => get(markSlotAtoms[slot]),
-    (get, set, update: FactMark[]) => {
+    (get, set, update: number[]) => {
       set(markSlotAtoms[slot], update);
     }
   );
 };
 
-function MarkCtrlPanel() {
+const pickForkHint = (pickId: number) => {
+  const url = new URL(window.location.href);
+  const link = `${url.origin}/facts/pick/${pickId}`;
+
+  return [
+    "（❗ 這篇原本是別人發布的內容，因「編輯」而複製過來，可以作為草稿，請尊重他人著作，不要直接發布。",
+    `原文連結： ${link}`,
+    "內容複製如下 🡻🡻）\r\n",
+  ].join("\r\n")
+};
+
+function MarkCtrlPanel({ facts }: {
+  facts: Fact[]
+}) {
   const [panelOpen, setPanelOpen] = useState(true);
   const [slot, setSlot] = useAtom(currentMarkSlotAtom);
+  const [filtered, setFiltered] = useAtom(filterByMarksAtom);
   const [markPicking, setMarkPicking] = useAtom(markPickingAtom);
-  const [marks, setMarks] = useAtom(marksAtom);
+  const [localMarks, setLocalMarks] = useAtom(localMarksAtom);
   const [savedHint, setSavedHint] = useState(false);
   const initialLoad = useRef(true);
   const slotAtom = useMemo(() => createStorageAtom(slot), [slot]);
-  const [localMarks, setLocalMarks] = useAtom(slotAtom);
+  const [storageMarks, setStorageMarks] = useAtom(slotAtom);
+  const [picksMode, setPicksMode] = useAtom(picksModeAtom);
+  const [pick, setPick] = useAtom(pickAtom);
+  const addAlert = useSetAtom(addAlertAtom);
+  const { data: session, status } = useSession();
+
+  const canEdit = status === 'authenticated' && session.user.state === 'active';
+  const userId = session?.user.id;
 
   const toggle = () => {
     setPanelOpen(R.not);
@@ -511,22 +507,34 @@ function MarkCtrlPanel() {
 
   useEffect(() => {
     if (initialLoad) {
-      localMarks.forEach(validateLocalMark);
-      setMarks(localMarks);
+      storageMarks.forEach(validateStorageMark);
+      setLocalMarks(storageMarks);
       initialLoad.current = false;
     }
-  }, [setMarks, localMarks]);
+  }, [setLocalMarks, storageMarks]);
+
+  useEffect(() => {
+    // Quit /picks/ path started from server side
+    if (!['index', 'item'].includes(picksMode)) {
+      const path = window.location.pathname;
+      if (path.startsWith('/facts/picks/')) {
+        window.history.replaceState(window.history.state, '', '/facts/');
+      }
+    }
+  }, [picksMode]);
 
   const isSlotDirty = useMemo(() => {
-    if (marks.length !== localMarks.length) {
+    if (pick) {
       return true;
     }
-    if (marks.length === 0) {
+    if (localMarks.length !== storageMarks.length) {
+      return true;
+    }
+    if (localMarks.length === 0) {
       return false;
     }
-    const makeKey = (items: FactMark[]) => items.map(R.prop('anchor')).join();
-    return makeKey(marks) !== makeKey(localMarks);
-  }, [marks, localMarks]);
+    return JSON.stringify(localMarks) !== JSON.stringify(storageMarks);
+  }, [localMarks, storageMarks, pick]);
 
   const onTogglePicker = (e: React.MouseEvent) => {
     setMarkPicking(R.not);
@@ -539,12 +547,22 @@ function MarkCtrlPanel() {
   };
 
   const onSave = () => {
-    setLocalMarks(marks);
-    setSavedHint(true);
+    if (pick) {
+      if (localMarks.length) {
+        addAlert('error', <>儲存槽 <var className='font-mono font-bold'>{slot + 1}</var> 已經有內容，請先清空或換一個儲存槽</>);
+      } else {
+        setLocalMarks(pick.factIds);
+        setStorageMarks(pick.factIds);
+        setSavedHint(true);
+      }
+    } else {
+      setStorageMarks(localMarks);
+      setSavedHint(true);
+    }
   };
 
   const onDownload = () => {
-    const blob = new Blob([JSON.stringify(marks, null, 2)], {
+    const blob = new Blob([JSON.stringify(localMarks, null, 2)], {
       type: "application/json",
     });
     const url = URL.createObjectURL(blob);
@@ -555,14 +573,96 @@ function MarkCtrlPanel() {
     URL.revokeObjectURL(url);
   };
 
+  const onToggleFilter = useCallback(() => {
+    setFiltered(R.not);
+  }, [setFiltered]);
+
+  const onListPicks = useCallback(() => {
+    setPicksMode('index');
+  }, [setPicksMode]);
+
+  const onListMyPicks = useCallback(() => {
+    setPicksMode('my');
+  }, [setPicksMode]);
+
+  const onEditPick = useCallback(() => {
+    if (!userId) {
+      throw new Error('未登入');
+    }
+
+    if (pick) {
+      if (userId === pick.userId) {
+        setPick(pick);
+      } else {
+        const dummyDate = new Date(NaN);
+        setPick({
+          title: `（複製自${pick.userName}）${pick.title}`,
+          desc: `${pickForkHint(pick.id)}\n${pick.desc}`,
+          userId: userId,
+          userName: '',
+          factIds: pick.factIds,
+          state: 'draft',
+          id: 0,
+          publishedAt: null,
+          createdAt: dummyDate,
+          changes: 0,
+          changedAt: dummyDate,
+        });
+      }
+      setPicksMode('edit');
+      setFiltered(true);
+      return;
+    }
+
+    if (localMarks.length) {
+      const dummyDate = new Date(NaN);
+      const now = new Date();
+      setPick({
+        title: `未命名 ${format({}, 'yyyyMMdd HH:mm', now)}`,
+        desc:  '',
+        factIds: localMarks,
+        state: 'draft',
+        id: 0,
+        userId: '',
+        userName: '',
+        publishedAt: null,
+        createdAt: dummyDate,
+        changes: 0,
+        changedAt: dummyDate,
+      });
+      setPicksMode('edit');
+      setFiltered(true);
+    } else {
+      addAlert('error', <>請先建立至少一個記號，按「選取<CursorArrowRippleIcon className='stroke-slate-700 stroke-0 ml-1' height={20} />」開始</>);
+    }
+  }, [localMarks, pick, userId, setPick, setPicksMode, setFiltered, addAlert]);
+
   const onSavedHintFaded = () => {
     setSavedHint(false);
   };
 
   return (
-    <div className='py-3'>
-      <div className='font-bold cursor-pointer' onClick={toggle}>記號</div>
-      <div className={`flex flex-col items-start w-full pl-1 py-2 gap-y-2 text-sm ${panelOpen ? '' : 'hidden'}`}>
+    <div className='py-3 flex-grow flex flex-col'>
+      <div className='font-bold cursor-pointer flex items-center'>
+        <div className='flex-grow' onClick={toggle}>
+          記號
+        </div>
+        <div className='ml-auto flex items-center'>
+          <Tooltip placement='top-start'>
+            <TooltipTrigger className=''>
+              <button type='button' className='btn text-slate-600 px-1 py-px translate-x-1 hover:text-black hover:ring-1 hover:bg-white disabled:opacity-30' aria-label='儲存到瀏覽器空間' onClick={onToggleFilter}
+              >
+                {filtered ? <FunnelIcon className='' height={20} /> : <FunnelXIcon className='opacity-55' height={20} />
+                }
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="p-1 text-sm rounded box-border w-max z-[1002] bg-slate-100 ring-1 text-balance shadow-lg">
+              篩選：只顯示對應<strong>記號</strong>的項目（{ filtered ? '已開啟' : '已關閉' }）
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </div>
+      <div className={`flex flex-col flex-grow items-start w-full pl-1 py-2 gap-y-2 text-sm ${panelOpen ? '' : 'hidden'}`}>
         <div className='w-full flex items-center'>
           <ul className='flex items-center font-mono text-xs gap-x-1'>
             {markSlotAtoms.map((a, idx) => {
@@ -586,7 +686,7 @@ function MarkCtrlPanel() {
               </AnimateOnce>
             }
 
-            <Tooltip placement='bottom-end'>
+            <Tooltip placement='top-start'>
               <TooltipTrigger className=''>
                 <button
                   type='button' className='btn bg-slate-100 text-slate-600 hover:text-black hover:ring-1 hover:bg-white disabled:opacity-30'
@@ -600,7 +700,54 @@ function MarkCtrlPanel() {
               </TooltipContent>
             </Tooltip>
 
-            <Tooltip placement='bottom-end'>
+            <Tooltip placement='top-start' hoverProps={menuHoverProps} role='menu'>
+              <TooltipTrigger className=''>
+                <button type='button' className={`btn hover:text-black hover:ring-1 ${pick ? 'bg-rose-100 text-slate-800 ring-1' : 'text-slate-600 bg-slate-100'} hover:bg-white`} aria-label='閱讀選集'>
+                  <GlobeAltIcon height={20} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContentMenu className={tooltipClass('text-sm drop-shadow-md')}>
+                <div className={tooltipMenuCls()}>
+                  <Tooltip placement='right' offset={6} hoverProps={menuHoverProps}>
+                    <TooltipTrigger className='p-2 w-full cursor-pointer flex items-center gap-1 rounded hover:bg-amber-200' onClick={onListPicks}>
+                      <BookOpenIcon className='stroke-current' height={20} />
+                      閱讀公開選集
+                    </TooltipTrigger>
+                    <TooltipContent className='p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1 text-balance shadow-lg'>
+                      顯示由使用者分享的選集
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip placement='right' offset={6} hoverProps={menuHoverProps}>
+                    <TooltipTrigger
+                      className={`p-2 w-full ${canEdit ? 'cursor-pointer' : 'cursor-not-allowed opacity-45'} flex items-center gap-1 rounded hover:bg-amber-200`}
+                      {...(canEdit ? {onClick: onListMyPicks} : {})}
+                    >
+                      <UserPenIcon className='stroke-current' height={20} />
+                      我的選集
+                    </TooltipTrigger>
+                    <TooltipContent className='p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1 text-balance shadow-lg'>
+                      { canEdit ? '查看我編寫的選集，包括草稿' : '登入後才可以使用' }
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip placement='right' offset={6} hoverProps={menuHoverProps}>
+                    <TooltipTrigger
+                      className={`p-2 w-full ${canEdit ? 'cursor-pointer' : 'cursor-not-allowed opacity-45'} flex items-center gap-1 rounded hover:bg-amber-200`}
+                      {...(canEdit ? {onClick: onEditPick} : {})}
+                    >
+                      <ArrowUpTrayIcon className='stroke-current' height={20} />
+                      編輯與上傳
+                    </TooltipTrigger>
+                    <TooltipContent className='p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1 text-balance shadow-lg'>
+                      { canEdit ? '編寫題目與說明，上傳分享目前清單' : '登入後才可以使用' }
+                    </TooltipContent>
+                  </Tooltip>
+
+                </div>
+              </TooltipContentMenu>
+            </Tooltip>
+
+            <Tooltip placement='top-start'>
               <TooltipTrigger className=''>
                 <button type='button' className='btn bg-slate-100 text-slate-600 hover:text-black hover:ring-1 hover:bg-white' aria-label='儲存目前清單到本機' onClick={onDownload}>
                   <ArrowDownTrayIcon className='stroke-current' height={20} />
@@ -627,15 +774,7 @@ function MarkCtrlPanel() {
           </div>
         </div>
 
-        <ul className='divide-y-2 divide-slate-300 w-full'>
-          {marks.length ?
-            marks.map(({ anchor, title }, idx) => (
-              <Mark key={anchor} index={idx} anchor={anchor} title={title} />
-            ))
-          :
-            <li className='text-slate-600'>（空）</li>
-          }
-        </ul>
+        <MarkList facts={facts} />
 
         <div className="inline-flex items-center justify-start text-sm mt-1 ml-auto">
         </div>
@@ -644,19 +783,21 @@ function MarkCtrlPanel() {
   );
 }
 
-export default function SideControl({ tags }: {
+export default function SideControl({ tags, facts }: {
   tags: Tags,
+  facts: Fact[],
 }) {
   useHydrateAtoms([
     [tagsAtom, tags],
   ]);
 
   return (
-    <div className='p-2 pb-7 sm:pb-2 divide-y-4 overflow-auto scrollbar-thin' data-nosnippet>
+    <div className='p-2 pb-7 sm:pb-2 divide-y-4 overflow-auto scrollbar-thin flex flex-col flex-grow' data-nosnippet>
       <ViewCtrlPanel />
       <TagCtrlPanel />
       <FiltersCtrl />
-      <MarkCtrlPanel />
+      <FilterResultCount total={facts.length} />
+      <MarkCtrlPanel facts={facts} />
       <iframe name='noop-trap' className='hidden' />
     </div>
   );

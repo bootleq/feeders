@@ -1,0 +1,219 @@
+import * as R from 'ramda';
+import {
+  eq,
+  gte,
+  and,
+  or,
+  inArray,
+  desc,
+  sql,
+  getTableName,
+} from 'drizzle-orm';
+
+import {
+  users,
+  changes,
+  factPicks,
+  PubStateEnum,
+  sqlDateMapper,
+} from '@/lib/schema';
+import { present } from '@/lib/utils';
+
+import type {
+  CreateSchema as CreatePickSchema,
+} from '@/app/facts/save-pick';
+
+import { getDb } from '@/lib/db';
+
+const maskedText = '--';
+const maskedDate = new Date(NaN);
+
+function maskResult(isPublic: boolean, item: RecentPicksItemProps) {
+  if (typeof isPublic !== 'boolean') {
+    throw new Error('invalid argument');
+  }
+
+  const { state } = item;
+
+  // NOTE: should be synced with client side masking (facts/store: refreshPickAtom)
+  if (isPublic) {
+    item = {
+      ...item,
+      createdAt: maskedDate,
+    };
+  }
+
+  if (state === PubStateEnum.enum.dropped) {
+    item = {
+      ...item,
+      title: maskedText,
+      desc: maskedText,
+      factIds: [],
+      userId: maskedText,
+      createdAt: maskedDate,
+      userName: maskedText,
+      changes: 0,
+      changedAt: maskedDate,
+    };
+  }
+
+  return item;
+}
+
+export const buildMasker = ({ isPublic }: { isPublic: boolean}) => R.partial(maskResult, [isPublic]);
+
+function profileQuery() {
+  const db = getDb();
+  const query = db.select({
+    id:        users.id,
+    name:      users.name,
+    state:     users.state,
+  }).from(users).as('profiles');
+
+  return query;
+}
+
+function changesQuery() {
+  const db = getDb();
+  const query = db.select({
+    docId:     changes.docId,
+    count:     sql<number>`COUNT()`.as('followupChangesCount'),
+    changedAt: sql<Date>`MAX(${changes.createdAt})`.mapWith(sqlDateMapper).as('changedAt'),
+  }).from(changes)
+    .groupBy(changes.docId)
+    .where(and(
+      eq(changes.docType, getTableName(factPicks)),
+      eq(changes.scope, 'amendPick'),
+    )).as('pickChanges');
+
+  return query;
+}
+
+export const getPickById = (id: number, userId?: string) => {
+  const db = getDb();
+
+  const isPrivate = present(userId);
+  const userIdCond = isPrivate ? eq(factPicks.userId, userId!) : undefined;
+  const stateCond = [
+    PubStateEnum.enum.published,
+    PubStateEnum.enum.dropped,
+    ...(isPrivate ? [PubStateEnum.enum.draft] : []),
+  ];
+
+  const profiles = profileQuery();
+  const pickChanges = changesQuery();
+
+  const query = db.select({
+    id:          factPicks.id,
+    title:       factPicks.title,
+    desc:        factPicks.desc,
+    factIds:     factPicks.factIds,
+    state:       factPicks.state,
+    userId:      factPicks.userId,
+    publishedAt: factPicks.publishedAt,
+    createdAt:   factPicks.createdAt,
+    userName:    profiles.name,
+    changes:     pickChanges.count,
+    changedAt:   pickChanges.changedAt,
+  }).from(factPicks)
+    .innerJoin(profiles, eq(profiles.id, factPicks.userId))
+    .leftJoin(pickChanges, eq(pickChanges.docId, factPicks.id))
+    .where(
+      and(
+        inArray(factPicks.state, stateCond),
+        userIdCond,
+        eq(factPicks.id, id),
+      )
+    );
+
+  return query;
+}
+
+export const recentPicks = (fetchLimit: number, userId?: string) => {
+  const db = getDb();
+
+  const isPrivate = present(userId);
+  const userIdCond = isPrivate ? eq(factPicks.userId, userId!) : undefined;
+  const stateCond = [
+    PubStateEnum.enum.published,
+    PubStateEnum.enum.dropped,
+    ...(isPrivate ? [PubStateEnum.enum.draft] : []),
+  ];
+
+  const oldestDate = db.selectDistinct({
+    dateBegin: sql`unixepoch(DATETIME(${factPicks.publishedAt}, 'unixepoch'), 'start of day', '-8 hours')`.as('dateBegin')
+  }).from(factPicks)
+    .orderBy(desc(factPicks.publishedAt))
+    .limit(1).offset(5);
+
+  const profiles = db.select({
+    id:        users.id,
+    name:      users.name,
+    state:     users.state,
+  }).from(users).as('profiles');
+
+  const pickChanges = db.select({
+    docId:     changes.docId,
+    count:     sql<number>`COUNT()`.as('followupChangesCount'),
+    changedAt: sql<Date>`MAX(${changes.createdAt})`.mapWith(sqlDateMapper).as('changedAt'),
+  }).from(changes)
+    .groupBy(changes.docId)
+    .where(and(
+      eq(changes.docType, getTableName(factPicks)),
+      eq(changes.scope, 'amendPick'),
+    )).as('pickChanges');
+
+  const query = db.select({
+    id:          factPicks.id,
+    title:       factPicks.title,
+    desc:        factPicks.desc,
+    factIds:     factPicks.factIds,
+    state:       factPicks.state,
+    userId:      factPicks.userId,
+    publishedAt: factPicks.publishedAt,
+    createdAt:   factPicks.createdAt,
+    userName:    profiles.name,
+    changes:     pickChanges.count,
+    changedAt:   pickChanges.changedAt,
+  }).from(factPicks)
+    .innerJoin(profiles, eq(profiles.id, factPicks.userId))
+    .leftJoin(pickChanges, eq(pickChanges.docId, factPicks.id))
+    .where(
+      and(
+        inArray(factPicks.state, stateCond),
+        userIdCond,
+        or(
+          gte(factPicks.publishedAt, sql`IFNULL(${oldestDate}, 0)`),
+          gte(factPicks.createdAt, sql`IFNULL(${oldestDate}, 0)`),
+          gte(pickChanges.changedAt, sql`IFNULL(${oldestDate}, 0)`),
+        ),
+      )
+    )
+    .orderBy(
+      desc(factPicks.publishedAt),
+      desc(pickChanges.changedAt),
+      desc(factPicks.createdAt),
+    )
+    .limit(fetchLimit);
+
+  return query;
+};
+
+type RecentPicksQuery = ReturnType<typeof recentPicks>;
+export type RecentPicksItemProps = Awaited<RecentPicksQuery>[number];
+
+export async function createPick(data: CreatePickSchema) {
+  const db = getDb();
+
+  const pubAt = data.state === PubStateEnum.enum.published ? new Date() : null;
+  const pick = await db.insert(factPicks).values({
+    title:       data.title,
+    desc:        data.desc,
+    factIds:     data.factIds,
+    state:       data.state,
+    userId:      data.userId,
+    publishedAt: pubAt,
+  }).returning().get();
+
+  return pick;
+}

@@ -4,7 +4,7 @@ import * as R from 'ramda';
 import geohash from 'ngeohash';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState, ReactElement, useCallback } from 'react';
-import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'motion/react';
 import { useDebouncedCallback } from 'use-debounce';
 import { navTitleAtom, alertsAtom, addAlertAtom, dismissAlertAtom } from '@/components/store';
 import type { keyedAlert } from '@/components/store';

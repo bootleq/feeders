@@ -21,13 +21,12 @@ import {
 } from 'react-aria-components';
 import type { DatePickerProps, HeadingProps } from 'react-aria-components';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
-import { errorsAtom } from '@/components/form/store';
 import { CalendarIcon } from '@heroicons/react/24/solid';
 import { XCircleIcon } from '@heroicons/react/24/outline';
 
 import { wordWord } from '@/lib/utils';
 import { t } from '@/lib/i18n';
-import { labelCls, inputCls, tooltipTrigger, useFieldError, LabelProps } from './Inputs';
+import { labelCls, inputCls, tooltipTrigger, useFieldError, useFieldNameTranslate, LabelProps } from './Inputs';
 import styles from '@/components/form.module.scss'
 
 interface MyDatePickerProps extends DatePickerProps<ZonedDateTime> {
@@ -36,8 +35,6 @@ interface MyDatePickerProps extends DatePickerProps<ZonedDateTime> {
   tooltip?: React.ReactNode,
   dateInputClass?: string,
 }
-
-const fieldName = R.partial(t, ['spotFields']);
 
 const focusInput = (e: React.MouseEvent<HTMLLabelElement>) => {
   const picker = e.currentTarget.nextElementSibling?.querySelector('.react-aria-DateSegment') as HTMLElement;
@@ -62,6 +59,8 @@ export function DateTimeField(
 ) {
   const [key, setKey] = useState(0);
   const errors = useFieldError(name);
+  const fieldName = useFieldNameTranslate(name);
+
   const invalid = errors?.length > 0;
   const labelProps: LabelProps = {
     className: labelCls,

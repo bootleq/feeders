@@ -4,9 +4,11 @@ import * as R from 'ramda';
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { useSetAtom, useAtomValue } from 'jotai';
-import striptags from 'striptags';
 import { useHydrateAtoms } from 'jotai/utils';
+import striptags from 'striptags';
+import type { RecentPicksItemProps } from '@/models/facts';
 import { present, blank, scrollAnywhereFix } from '@/lib/utils';
+import { filterByMarksAtom, pickAtom, currentMarksAtom } from '@/app/facts/store';
 import {
   slugAtom,
   SLUG_PATTERN,
@@ -31,10 +33,15 @@ const columnClassMapping: Record<number, string> = {
   5: 'md:grid-cols-5',
 };
 
-export default function TimelineContainer({ facts, initialSlug }: {
+export default function TimelineContainer({ facts, initialSlug, initialPick }: {
   facts: any[],
   initialSlug: string,
+  initialPick: RecentPicksItemProps | null,
 }) {
+  useHydrateAtoms([
+    [pickAtom, initialPick],
+    [filterByMarksAtom, present(initialPick)],
+  ]);
   const setSlug = useSetAtom(slugAtom);
   const [isInitialZoom, setIsInitialZoom] = useState(present(initialSlug));
   const textFilter = useAtomValue(textFilterAtom);
@@ -48,11 +55,18 @@ export default function TimelineContainer({ facts, initialSlug }: {
   const lastAlertSlug = useRef('');
   const addAlert = useSetAtom(addAlertAtom);
 
+  const filterByMarks = useAtomValue(filterByMarksAtom);
+  const marks = useAtomValue(currentMarksAtom);
+
   const validFacts = useMemo(() => {
-    if (dateRangeKey === ',' && blank(textFilter)) return facts;
+    if (dateRangeKey === ',' && blank(textFilter) && !filterByMarks) return facts;
 
     const [from, to] = dateRangeKey.split(',');
-    return R.filter(({ title, desc, date }) => {
+    return R.filter(({ id, title, desc, date }) => {
+      if (filterByMarks && marks && !marks.includes(id)) {
+        return false;
+      }
+
       if (present(from) && date < from) {
         return false;
       }
@@ -69,7 +83,7 @@ export default function TimelineContainer({ facts, initialSlug }: {
 
       return true;
     }, facts);
-  }, [facts, textFilter, dateRangeKey]);
+  }, [facts, textFilter, dateRangeKey, marks, filterByMarks]);
 
   const onMouseEnter = useCallback((e: React.MouseEvent<HTMLElement>) => {
     setTimeout(() => {
@@ -102,6 +116,9 @@ export default function TimelineContainer({ facts, initialSlug }: {
       if (present(newSlug)) {
         setZoomedFact(null);
         const slugString = JSON.stringify(newSlug);
+        if (newSlug === 'picks') {
+          return;
+        }
         if (lastAlertSlug.current !== slugString) {
           addAlert('error', <>網址不正確（<code>{slugString}</code> 無法辨識）</>);
           lastAlertSlug.current = slugString;

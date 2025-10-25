@@ -3,8 +3,10 @@
 import Linkify from 'linkify-react';
 import type { Options, Opts, IntermediateRepresentation } from 'linkifyjs';
 import { useSetAtom } from 'jotai';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { linkPreviewUrlAtom } from '@/components/store';
+
+const MAX_URL_LENGTH = 75;
 
 const canPreview = (href: string) => {
   const url = new URL(href);
@@ -21,6 +23,25 @@ const canPreview = (href: string) => {
   ].includes(ext);
 }
 
+function TruncateText({ value }: {
+  value: string
+}) {
+  let url = value;
+  if (url.length > MAX_URL_LENGTH) {
+    const chunk = Math.floor(MAX_URL_LENGTH / 5);
+    const head = url.slice(0, chunk * 3);
+    const tail = url.slice(-1 * chunk * 2);
+    return (
+      <>
+        {head}
+        <span className='text-purple-500'>...</span>
+        {tail}
+      </>
+    );
+  }
+  return url;
+}
+
 function Anchor({ href, content, ...props }: {
   href: string,
   content: string,
@@ -29,24 +50,25 @@ function Anchor({ href, content, ...props }: {
   const setPreviewURL = useSetAtom(linkPreviewUrlAtom);
 
   const onMouseOver = useCallback(() => {
-    if (canPreview(href)) {
-      setPreviewURL(href);
-    }
+    setPreviewURL(href);
   }, [href, setPreviewURL]);
 
   const onMouseOut = useCallback(() => {
     setPreviewURL(null);
   }, [setPreviewURL]);
 
+  const previewEnabled = useMemo(() => {
+    return canPreview(href);
+  }, [href]);
+
   return (
     <a
       href={href}
       className={`underline underline-offset-[3px] decoration-slate-500 hover:bg-yellow-200/50 font-mono text-sm leading-6 align-text-bottom`}
-      onMouseOver={onMouseOver}
-      onMouseOut={onMouseOut}
+      {...(previewEnabled ? { onMouseOver, onMouseOut } : {}) }
       {...props}
     >
-      {content}
+      <TruncateText value={content} />
     </a>
   );
 }
@@ -76,6 +98,7 @@ const defaultOptions: Opts = {
   rel: relFn,
   validate: validateFn,
   render: renderFn,
+  nl2br: true, // has to enable to avoid SSR bad <!-- --> marks
 };
 
 type Props = {
