@@ -159,6 +159,9 @@ export const refreshPickAtom = atom(
 );
 export const pickSavedAtom = atom(false);
 
+export type PicksDisplay = '' | 'header';
+export const pickDisplayAtom = atom<PicksDisplay>('');
+
 export const zoomedFactAtom = atom<any>(null);
 
 export const timelineInterObserverAtom = atom<IntersectionObserver | null>(null);

@@ -10,6 +10,7 @@ import {
   picksModeAtom,
   loadingPicksAtom,
   initialPickLoadedAtom,
+  pickDisplayAtom,
   filterByMarksAtom,
 } from './store';
 import { nowAtom, addAlertAtom } from '@/components/store';
@@ -77,6 +78,7 @@ export default function MyPickList() {
   const setPicksMode = useSetAtom(picksModeAtom);
   const setFiltered = useSetAtom(filterByMarksAtom);
   const [readingPick, setPick] = useAtom(pickAtom);
+  const displayMode = useAtomValue(pickDisplayAtom);
   const [loading, setLoading] = useAtom(loadingPicksAtom);
   const [initLoad, setInitLoad] = useAtom(initialPickLoadedAtom);
   const [initScroll, setInitScroll] = useState(false);
@@ -177,7 +179,7 @@ export default function MyPickList() {
         <PicksLoading />
         {
           picks.length > 0 ?
-            <ol className={`flex flex-col ${picksStyles['pick-list']}`}>
+            <ol className={`flex flex-col ${picksStyles['pick-list']}`} data-display-mode={displayMode}>
               {picks.map(pick =>
                 <PickRow key={pick.id} readingPickId={readingPick?.id || null} pick={pick} onTake={onTake} onEditMode={onEditMode} />
               )}

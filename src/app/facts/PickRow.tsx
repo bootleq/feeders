@@ -6,6 +6,7 @@ import type { RecentPicksItemProps } from '@/models/facts';
 import { present, shortenDate } from '@/lib/utils';
 import { format, formatISO } from '@/lib/date-fp';
 import { pickSavedAtom, picksModeAtom } from './store';
+import picksStyles from './picks.module.scss';
 import { nowAtom } from '@/components/store';
 import ClientDate from '@/components/ClientDate';
 import { Desc } from '@/components/Desc';
@@ -41,7 +42,7 @@ function Dropped({ pick }: {
           <div className='flex items-center my-px mb-0'>
             <Tooltip placement='top'>
               <TooltipTrigger className='text-red-950/75 cursor-help font-bold'>
-                已隱藏
+                <div data-role='dummy-h2'>已隱藏</div>
               </TooltipTrigger>
               <TooltipContent className={`${tooltipCls}`}>
                 這個項目受到網站管理處分，只有作者能看見內容
@@ -77,7 +78,7 @@ function Dropped({ pick }: {
           </div>
         </header>
 
-        <Desc value='（內容已隱藏）' className='opacity-50 max-h-96 overflow-auto md:max-w-xl mb-1 mx-px rounded' />
+        <Desc value='（內容已隱藏）' className={`opacity-50 max-h-96 overflow-auto md:max-w-xl mb-1 mx-px rounded ${picksStyles.desc}`} />
       </article>
       <Separator />
     </li>
@@ -125,7 +126,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
             <XMarkIcon className='ml-auto cursor-pointer fill-slate-500 hover:scale-125' height={20} onClick={onDismissSaved} />
           </div>
         }
-        <header className='flex flex-col mb-1 gap-y-px mb-1'>
+        <header className='flex flex-col mb-1 gap-y-px'>
           <div className='flex items-center my-px'>
             <h2 className={`font-bold font-mixed ${state === 'published' ? '' : draftTextColor}`}>
               {title}
@@ -250,7 +251,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
                 </Tooltip>
                 <Tooltip placement='top-start'>
                   <TooltipTrigger className='flex items-center'>
-                    <Link href={`/audit/pick/${id}`} className='inline-flex items-center justify-center p-1 ml-1 text-slate-500/75 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
+                    <Link href={`/audit/pick/${id}`} className='inline-flex items-center justify-center pl-1 ml-1 text-slate-500/75 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
                       <Square3Stack3DIcon className='stroke-current mr-px' height={18} />
                       {changes}
                     </Link>
@@ -264,7 +265,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
         </header>
 
         {present(desc) &&
-        <Desc value={desc} className='max-h-96 overflow-auto md:max-w-xl lg:max-w-full mb-1 mx-px resize rounded font-mixed' />
+          <Desc value={desc} className={`max-h-96 overflow-auto md:max-w-xl lg:max-w-full mb-1 mx-px resize rounded font-mixed ${picksStyles.desc}`} />
         }
       </article>
 

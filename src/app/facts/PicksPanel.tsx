@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { LazyMotion, m, useDragControls } from 'motion/react';
 import { Tooltip, TooltipTrigger, TooltipContentMenu, menuHoverProps } from '@/components/Tooltip';
 import { picksModeAtom, pickSavedAtom } from './store';
+import PickDisplayMenu from './PickDisplayMenu';
 import { tooltipClass, tooltipMenuCls } from '@/lib/utils';
 import type { PicksMode } from '@/app/facts/store';
 import { XMarkIcon, Bars3Icon, MinusIcon } from '@heroicons/react/24/solid';
@@ -34,7 +35,8 @@ const containerCls = [
 ].join(' ');
 
 const draggerCls = [
-  'flex items-center p-1 px-4 mr-2 text-sm text-nowrap opacity-0 rounded',
+  'hidden md:flex',
+  'items-center p-1 px-4 mr-2 text-sm text-nowrap opacity-0 rounded',
   'select-none cursor-grab group',
   'hover:bg-white hover:ring-1 hover:opacity-100',
   'active:text-white active:ring-2 active:ring-yellow-300 active:cursor-grabbing',
@@ -188,6 +190,8 @@ export default function PicksPanel({ mode, children }: {
               <MinimizedButton className='shadow-xl' />
             </button>
           }
+
+          <PickDisplayMenu className='mr-1' />
 
           <Tooltip placement='top-start' hoverProps={menuHoverProps} role='menu'>
             <TooltipTrigger className=''>

@@ -11,6 +11,7 @@ import {
   loadingPicksAtom,
   initialPickLoadedAtom,
   pickSavedAtom,
+  pickDisplayAtom,
   filterByMarksAtom,
 } from './store';
 import { addAlertAtom } from '@/components/store';
@@ -60,6 +61,7 @@ export default function PickList() {
   const [initLoad, setInitLoad] = useAtom(initialPickLoadedAtom);
   const [initScroll, setInitScroll] = useState(false);
   const setSaved = useSetAtom(pickSavedAtom);
+  const displayMode = useAtomValue(pickDisplayAtom);
 
   const bodyRef = useRef<HTMLDivElement>(null);
   const [bodyScrolled, setBodyScrolled] = useState(false);
@@ -161,7 +163,7 @@ export default function PickList() {
 
       <div ref={bodyRef} className='text-base pt-2 pb-8 pr-3 ml-3 ring-red-500 overflow-y-scroll scrollbar-thin'>
         <PicksLoading />
-        <ol className={`flex flex-col ${picksStyles['pick-list']}`}>
+        <ol className={`flex flex-col ${picksStyles['pick-list']}`} data-display-mode={displayMode}>
           {picks.map(pick =>
             <PickRow key={pick.id} readingPickId={readingPick?.id || null} pick={pick} onTake={onTake} onItemMode={onItemMode} />
           )}
