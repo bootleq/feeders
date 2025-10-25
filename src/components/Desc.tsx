@@ -3,7 +3,7 @@
 import Linkify from 'linkify-react';
 import type { Options, Opts, IntermediateRepresentation } from 'linkifyjs';
 import { useSetAtom } from 'jotai';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { linkPreviewUrlAtom } from '@/components/store';
 
 const canPreview = (href: string) => {
@@ -29,21 +29,22 @@ function Anchor({ href, content, ...props }: {
   const setPreviewURL = useSetAtom(linkPreviewUrlAtom);
 
   const onMouseOver = useCallback(() => {
-    if (canPreview(href)) {
-      setPreviewURL(href);
-    }
+    setPreviewURL(href);
   }, [href, setPreviewURL]);
 
   const onMouseOut = useCallback(() => {
     setPreviewURL(null);
   }, [setPreviewURL]);
 
+  const previewEnabled = useMemo(() => {
+    return canPreview(href);
+  }, [href]);
+
   return (
     <a
       href={href}
       className={`underline underline-offset-[3px] decoration-slate-500 hover:bg-yellow-200/50 font-mono text-sm leading-6 align-text-bottom`}
-      onMouseOver={onMouseOver}
-      onMouseOut={onMouseOut}
+      {...(previewEnabled ? { onMouseOver, onMouseOut } : {}) }
       {...props}
     >
       {content}
