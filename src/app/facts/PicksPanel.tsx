@@ -202,7 +202,7 @@ export default function PicksPanel({ mode, children }: {
                 }
               </button>
             </TooltipTrigger>
-            <TooltipContentMenu className={tooltipClass('text-sm drop-shadow-md')}>
+            <TooltipContentMenu className={tooltipClass('text-sm drop-shadow-md')} dismissOnClick>
               <div className={tooltipMenuCls()}>
                 <button data-layout={'init'} type='button' className={layoutBtnCls} onClick={onSwitchLayout} disabled={layout === 'init'}>
                   <DotIcon width={20} height={20} className='' />

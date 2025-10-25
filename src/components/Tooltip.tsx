@@ -18,6 +18,7 @@ import {
   FloatingFocusManager,
 } from "@floating-ui/react";
 import type { Placement, OffsetOptions, UseHoverProps, UseRoleProps } from "@floating-ui/react";
+import { useCallback } from 'react';
 
 interface TooltipOptions {
   initialOpen?: boolean;
@@ -182,10 +183,15 @@ export const TooltipContent = React.forwardRef<
 
 export const TooltipContentMenu = React.forwardRef<
   HTMLDivElement,
-  React.HTMLProps<HTMLDivElement>
->(function TooltipContent({ style, ...props }, propRef) {
+  React.HTMLProps<HTMLDivElement> & { dismissOnClick?: boolean }
+>(function TooltipContent({ style, dismissOnClick, ...props }, propRef) {
   const context = useTooltipContext();
   const ref = useMergeRefs([context.refs.setFloating, propRef]);
+
+  const onClickDismiss = useCallback(() => {
+    context.setOpen(false);
+  }, [context]);
+
   const focusOptions = {
     context: context.context,
     initialFocus: -1,
@@ -208,6 +214,9 @@ export const TooltipContentMenu = React.forwardRef<
             role: 'menu',
             ...props
           })}
+          {
+            ...(dismissOnClick ? { onClick: onClickDismiss } : {})
+          }
         />
       </FloatingFocusManager>
     </FloatingPortal>
