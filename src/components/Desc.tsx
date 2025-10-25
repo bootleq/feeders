@@ -6,6 +6,8 @@ import { useSetAtom } from 'jotai';
 import { useCallback, useMemo } from 'react';
 import { linkPreviewUrlAtom } from '@/components/store';
 
+const MAX_URL_LENGTH = 75;
+
 const canPreview = (href: string) => {
   const url = new URL(href);
   const ext = url.pathname.toLowerCase().split('.').pop();
@@ -19,6 +21,25 @@ const canPreview = (href: string) => {
     'avif',
     'apng',
   ].includes(ext);
+}
+
+function TruncateText({ value }: {
+  value: string
+}) {
+  let url = value;
+  if (url.length > MAX_URL_LENGTH) {
+    const chunk = Math.floor(MAX_URL_LENGTH / 5);
+    const head = url.slice(0, chunk * 3);
+    const tail = url.slice(-1 * chunk * 2);
+    return (
+      <>
+        {head}
+        <span className='text-purple-500'>...</span>
+        {tail}
+      </>
+    );
+  }
+  return url;
 }
 
 function Anchor({ href, content, ...props }: {
@@ -47,7 +68,7 @@ function Anchor({ href, content, ...props }: {
       {...(previewEnabled ? { onMouseOver, onMouseOut } : {}) }
       {...props}
     >
-      {content}
+      <TruncateText value={content} />
     </a>
   );
 }
