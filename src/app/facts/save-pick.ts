@@ -148,9 +148,11 @@ export async function savePick(formData: FormData) {
         userId: session.userId,
       });
 
+      const freshItems = await getPickById(newPick.id, user.id);
+
       return {
         success: true,
-        item: newPick,
+        item: freshItems.pop(),
       };
     } catch (e) {
       console.log('save-pick (create) failed', e);

@@ -212,21 +212,23 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
                   </TooltipContent>
                 </Tooltip>
               :
-              <Tooltip placement='top'>
-                <TooltipTrigger className='cursor-auto'>
-                  <Link href={`/facts/picks/${id}`} className={`break-keep hover:bg-yellow-300/50 text-inherit rounded flex items-center ${draftTextColor}`}>
-                    <CircleDashedIcon className='mr-1' width={18} height={18} aria-label='草稿' />
-                    <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
-                      <time dateTime={formatISO({}, createdAt)}>
-                        {shortenDate(createdAt, now)}
-                      </time>
-                    </ClientDate>
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent className={`${tooltipCls}`}>
-                  建立日期：{ format({}, 'yyyy/MM/dd HH:mm', createdAt) }
-                </TooltipContent>
-              </Tooltip>
+              (createdAt &&
+                <Tooltip placement='top'>
+                  <TooltipTrigger className='cursor-auto'>
+                    <Link href={`/facts/picks/${id}`} className={`break-keep hover:bg-yellow-300/50 text-inherit rounded flex items-center ${draftTextColor}`}>
+                      <CircleDashedIcon className='mr-1' width={18} height={18} aria-label='草稿' />
+                      <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
+                        <time dateTime={formatISO({}, createdAt)}>
+                          {shortenDate(createdAt, now)}
+                        </time>
+                      </ClientDate>
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent className={`${tooltipCls}`}>
+                    建立日期：{ format({}, 'yyyy/MM/dd HH:mm', createdAt) }
+                  </TooltipContent>
+                </Tooltip>
+              )
             }
 
             {changes > 0 ?
