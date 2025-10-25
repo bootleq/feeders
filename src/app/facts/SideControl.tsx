@@ -470,6 +470,17 @@ const createStorageAtom = (slot: number) => {
   );
 };
 
+const pickForkHint = (pickId: number) => {
+  const url = new URL(window.location.href);
+  const link = `${url.origin}/facts/pick/${pickId}`;
+
+  return [
+    "（❗ 這篇原本是別人發布的內容，因「編輯」而複製過來，可以作為草稿，請尊重他人著作，不要直接發布。",
+    `原文連結： ${link}`,
+    "內容複製如下 🡻🡻）\r\n",
+  ].join("\r\n")
+};
+
 function MarkCtrlPanel({ facts }: {
   facts: Fact[]
 }) {
@@ -583,10 +594,19 @@ function MarkCtrlPanel({ facts }: {
       if (userId === pick.userId) {
         setPick(pick);
       } else {
+        const dummyDate = new Date(NaN);
         setPick({
-          ...pick,
-          title: `（複製自）${pick.title}`,
+          title: `（複製自${pick.userName}）${pick.title}`,
+          desc: `${pickForkHint(pick.id)}\n${pick.desc}`,
           userId: userId,
+          userName: '',
+          factIds: pick.factIds,
+          state: 'draft',
+          id: 0,
+          publishedAt: null,
+          createdAt: dummyDate,
+          changes: 0,
+          changedAt: dummyDate,
         });
       }
       setPicksMode('edit');
