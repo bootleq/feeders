@@ -71,7 +71,7 @@ function Dropped({ pick }: {
                   </div>
                 </TooltipTrigger>
                 <TooltipContent className={`${tooltipCls}`}>
-                  原始發表日期：{ format({}, 'yyyy/MM/dd HH:mm', publishedAt) }
+                  原始發表日期：<span className='font-mono'>{ format({}, 'yyyy/MM/dd HH:mm', publishedAt) }</span>
                 </TooltipContent>
               </Tooltip>
             }
@@ -208,8 +208,8 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent className={`${tooltipCls}`}>
-                    { state !== 'published' && '原始' }發表日期：{ format({}, 'yyyy/MM/dd HH:mm', publishedAt) }
-                    { inPrivate && <div>建立日期：{ format({}, 'yyyy/MM/dd HH:mm', createdAt) }</div> }
+                    { state !== 'published' && '原始' }發表日期：<span className='font-mono'>{ format({}, 'yyyy/MM/dd HH:mm', publishedAt)}</span>
+                    { inPrivate && <div>建立日期：<span className='font-mono'>{ format({}, 'yyyy/MM/dd HH:mm', createdAt) }</span></div> }
                   </TooltipContent>
                 </Tooltip>
               :
@@ -226,7 +226,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent className={`${tooltipCls}`}>
-                    建立日期：{ format({}, 'yyyy/MM/dd HH:mm', createdAt) }
+                    建立日期：<span className='font-mono'>{ format({}, 'yyyy/MM/dd HH:mm', createdAt) }</span>
                   </TooltipContent>
                 </Tooltip>
               )
@@ -246,7 +246,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
                     </div>
                   </TooltipTrigger>
                   <TooltipContent className={`${tooltipCls}`}>
-                    最後改版日期：{ format({}, 'yyyy/MM/dd HH:mm', changedAt) }
+                    最後改版日期：<span className='font-mono'>{ format({}, 'yyyy/MM/dd HH:mm', changedAt) }</span>
                   </TooltipContent>
                 </Tooltip>
                 <Tooltip placement='top-start'>
