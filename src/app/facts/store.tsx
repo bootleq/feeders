@@ -2,10 +2,10 @@ import * as R from 'ramda';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
 import { atomFamily } from 'jotai/utils';
 import { removeFirst } from '@/lib/utils';
-import type { RecentPicksItemProps } from '@/models/facts';
+import type { PickProps } from '@/models/facts';
 
 export const VIEW_CTRL_KEYS= ['desc', 'summary', 'origin', 'tags'];
-export const SLUG_PATTERN = /^[\d\- ~BC]+_(\d+)$/;
+export const ZOOM_SLUG_PATTERN = /^[\d\- ~BC]+_(\d+)$/;
 
 export const slugAtom = atom('');
 
@@ -114,11 +114,11 @@ export const picksModeAtom = atom(
   }
 );
 
-export const picksAtom = atom<RecentPicksItemProps[]>([]);
+export const picksAtom = atom<PickProps[]>([]);
 export const loadingPicksAtom = atom(false);
 export const initialPickLoadedAtom = atom<string[]>([]);
-export const myPicksAtom = atom<RecentPicksItemProps[]>([]);
-export const pickAtom = atom<RecentPicksItemProps | null>(null);
+export const myPicksAtom = atom<PickProps[]>([]);
+export const pickAtom = atom<PickProps | null>(null);
 export const removePickMarkAtom = atom(
   null,
   (get, set, factId: number) => {
@@ -138,9 +138,9 @@ export const addPickMarkAtom = atom(
   }
 );
 
-const refreshPickById = (newItem: RecentPicksItemProps, oldItems: RecentPicksItemProps[]) => {
+const refreshPickById = (newItem: PickProps, oldItems: PickProps[]) => {
   let found = false;
-  const newItems = oldItems.reduce((acc: RecentPicksItemProps[], item) => {
+  const newItems = oldItems.reduce((acc: PickProps[], item) => {
     if (item.id === newItem.id) {
       found = true;
       acc.push(newItem);
@@ -157,7 +157,7 @@ const refreshPickById = (newItem: RecentPicksItemProps, oldItems: RecentPicksIte
 
 export const refreshPickAtom = atom(
   null,
-  (get, set, pick: RecentPicksItemProps) => {
+  (get, set, pick: PickProps) => {
     const myPicks = get(myPicksAtom);
     set(myPicksAtom, refreshPickById(pick, myPicks));
 

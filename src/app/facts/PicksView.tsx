@@ -6,7 +6,7 @@ import { useThrottledCallback } from 'use-debounce';
 import { useHydrateAtoms } from 'jotai/utils';
 import { picksAtom, picksModeAtom } from '@/app/facts/store';
 import { nowAtom } from '@/components/store';
-import type { RecentPicksItemProps } from '@/models/facts';
+import type { PickProps } from '@/models/facts';
 import type { PicksMode } from '@/app/facts/store';
 import PicksPanel from '@/app/facts/PicksPanel';
 import Pick from '@/app/facts/Pick';
@@ -16,7 +16,7 @@ import LinkPreview from '@/components/LinkPreview';
 
 export default function PicksView({ id, picks, mode }: {
   id: number,
-  picks: RecentPicksItemProps[],
+  picks: PickProps[],
   mode: PicksMode,
 }) {
   useHydrateAtoms([

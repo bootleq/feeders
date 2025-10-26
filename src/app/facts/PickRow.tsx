@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import Link from 'next/link';
 import { useAtom, useAtomValue } from 'jotai';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
-import type { RecentPicksItemProps } from '@/models/facts';
+import type { PickProps } from '@/models/facts';
 import { present, shortenDate } from '@/lib/utils';
 import { format, formatISO } from '@/lib/date-fp';
 import { pickSavedAtom, picksModeAtom } from './store';
@@ -31,7 +31,7 @@ function Separator() {
 }
 
 function Dropped({ pick }: {
-  pick: RecentPicksItemProps,
+  pick: PickProps,
 }) {
   const now = useAtomValue(nowAtom);
   const { publishedAt } = pick;
@@ -71,7 +71,7 @@ function Dropped({ pick }: {
                   </div>
                 </TooltipTrigger>
                 <TooltipContent className={`${tooltipCls}`}>
-                  原始發表日期：{ format({}, 'yyyy/MM/dd HH:mm', publishedAt) }
+                  原始發表日期：<span className='font-mono'>{ format({}, 'yyyy/MM/dd HH:mm', publishedAt) }</span>
                 </TooltipContent>
               </Tooltip>
             }
@@ -86,7 +86,7 @@ function Dropped({ pick }: {
 }
 
 export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEditMode }: {
-  pick: RecentPicksItemProps,
+  pick: PickProps,
   readingPickId: number | null,
   onTake: (e: React.MouseEvent<HTMLButtonElement>) => void,
   onItemMode?: () => void,
@@ -134,7 +134,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
             </h2>
             <div className='ml-auto flex items-center'>
               {state === 'published' &&
-                <a className='mr-1 px-1 opacity-60 rounded-full hover:opacity-100 hover:-rotate-12 hover:scale-110' href={`/facts/picks/${id}/`} title='單篇連結'>
+                <a className='mr-1 px-1 opacity-60 rounded-full hover:opacity-100 hover:-rotate-12 hover:scale-110' href={`/facts/picks/${id}/`} target='_blank' title='單篇連結'>
                   <img src='/assets/paper-clip.svg' alt='連結' width={16} height={16} className='max-w-none' />
                   <span className='sr-only'>單篇連結</span>
                 </a>
@@ -198,7 +198,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
               publishedAt ?
                 <Tooltip placement='top'>
                   <TooltipTrigger className='text-black cursor-auto'>
-                    <Link href={`/facts/picks/${id}`} className={`break-keep hover:bg-yellow-300/50 text-inherit rounded flex items-center ${state === 'published' ? 'text-stone-950' : draftTextColor}`}>
+                    <Link href={`/facts/picks/${id}`} target='_blank' className={`break-keep hover:bg-yellow-300/50 text-inherit rounded flex items-center ${state === 'published' ? 'text-stone-950' : draftTextColor}`}>
                       <GlobeAltIcon className='mr-1' height={18} aria-label='公開' />
                       <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
                         <time dateTime={formatISO({}, publishedAt)}>
@@ -208,8 +208,8 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent className={`${tooltipCls}`}>
-                    { state !== 'published' && '原始' }發表日期：{ format({}, 'yyyy/MM/dd HH:mm', publishedAt) }
-                    { inPrivate && <div>建立日期：{ format({}, 'yyyy/MM/dd HH:mm', createdAt) }</div> }
+                    { state !== 'published' && '原始' }發表日期：<span className='font-mono'>{ format({}, 'yyyy/MM/dd HH:mm', publishedAt)}</span>
+                    { inPrivate && createdAt && <div>建立日期：<span className='font-mono'>{ format({}, 'yyyy/MM/dd HH:mm', createdAt) }</span></div> }
                   </TooltipContent>
                 </Tooltip>
               :
@@ -226,13 +226,13 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent className={`${tooltipCls}`}>
-                    建立日期：{ format({}, 'yyyy/MM/dd HH:mm', createdAt) }
+                    建立日期：<span className='font-mono'>{ format({}, 'yyyy/MM/dd HH:mm', createdAt) }</span>
                   </TooltipContent>
                 </Tooltip>
               )
             }
 
-            {changes > 0 ?
+            {(changes > 0 && changedAt) ?
               <div className='flex items-center text-slate-500/75'>
                 已編輯：
                 <Tooltip placement='top-start'>
@@ -246,7 +246,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
                     </div>
                   </TooltipTrigger>
                   <TooltipContent className={`${tooltipCls}`}>
-                    最後改版日期：{ format({}, 'yyyy/MM/dd HH:mm', changedAt) }
+                    最後改版日期：<span className='font-mono'>{ format({}, 'yyyy/MM/dd HH:mm', changedAt) }</span>
                   </TooltipContent>
                 </Tooltip>
                 <Tooltip placement='top-start'>

@@ -6,12 +6,12 @@ import { usePathname } from 'next/navigation';
 import { useSetAtom, useAtomValue } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
 import striptags from 'striptags';
-import type { RecentPicksItemProps } from '@/models/facts';
+import type { PickProps } from '@/models/facts';
 import { present, blank, scrollAnywhereFix } from '@/lib/utils';
 import { filterByMarksAtom, pickAtom, currentMarksAtom } from '@/app/facts/store';
 import {
   slugAtom,
-  SLUG_PATTERN,
+  ZOOM_SLUG_PATTERN,
   textFilterAtom,
   dateRangeAtom,
   filterRejectedCountAtom,
@@ -36,7 +36,7 @@ const columnClassMapping: Record<number, string> = {
 export default function TimelineContainer({ facts, initialSlug, initialPick }: {
   facts: any[],
   initialSlug: string,
-  initialPick: RecentPicksItemProps | null,
+  initialPick: PickProps | null,
 }) {
   useHydrateAtoms([
     [pickAtom, initialPick],
@@ -92,7 +92,7 @@ export default function TimelineContainer({ facts, initialSlug, initialPick }: {
   }, []);
 
   const setZoomBySlug = useCallback((newSlug?: string) => {
-    const zoom = newSlug?.match(SLUG_PATTERN);
+    const zoom = newSlug?.match(ZOOM_SLUG_PATTERN);
     if (zoom) {
       const factId = Number.parseInt(zoom.pop() || '', 10);
       if (factId) {

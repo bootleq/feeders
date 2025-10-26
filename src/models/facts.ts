@@ -26,9 +26,8 @@ import type {
 import { getDb } from '@/lib/db';
 
 const maskedText = '--';
-const maskedDate = new Date(NaN);
 
-function maskResult(isPublic: boolean, item: RecentPicksItemProps) {
+function maskResult(isPublic: boolean, item: PickProps) {
   if (typeof isPublic !== 'boolean') {
     throw new Error('invalid argument');
   }
@@ -39,7 +38,7 @@ function maskResult(isPublic: boolean, item: RecentPicksItemProps) {
   if (isPublic) {
     item = {
       ...item,
-      createdAt: maskedDate,
+      createdAt: null,
     };
   }
 
@@ -50,10 +49,10 @@ function maskResult(isPublic: boolean, item: RecentPicksItemProps) {
       desc: maskedText,
       factIds: [],
       userId: maskedText,
-      createdAt: maskedDate,
+      createdAt: null,
       userName: maskedText,
       changes: 0,
-      changedAt: maskedDate,
+      changedAt: null,
     };
   }
 
@@ -201,6 +200,10 @@ export const recentPicks = (fetchLimit: number, userId?: string) => {
 
 type RecentPicksQuery = ReturnType<typeof recentPicks>;
 export type RecentPicksItemProps = Awaited<RecentPicksQuery>[number];
+export type PickProps = Omit<RecentPicksItemProps, 'createdAt' | 'changedAt'> & {
+  createdAt: Date | null;
+  changedAt: Date | null;
+};
 
 export async function createPick(data: CreatePickSchema) {
   const db = getDb();

@@ -594,7 +594,6 @@ function MarkCtrlPanel({ facts }: {
       if (userId === pick.userId) {
         setPick(pick);
       } else {
-        const dummyDate = new Date(NaN);
         setPick({
           title: `（複製自${pick.userName}）${pick.title}`,
           desc: `${pickForkHint(pick.id)}\n${pick.desc}`,
@@ -604,9 +603,9 @@ function MarkCtrlPanel({ facts }: {
           state: 'draft',
           id: 0,
           publishedAt: null,
-          createdAt: dummyDate,
+          createdAt: null,
           changes: 0,
-          changedAt: dummyDate,
+          changedAt: null,
         });
       }
       setPicksMode('edit');
@@ -615,7 +614,6 @@ function MarkCtrlPanel({ facts }: {
     }
 
     if (localMarks.length) {
-      const dummyDate = new Date(NaN);
       const now = new Date();
       setPick({
         title: `未命名 ${format({}, 'yyyyMMdd HH:mm', now)}`,
@@ -626,9 +624,9 @@ function MarkCtrlPanel({ facts }: {
         userId: '',
         userName: '',
         publishedAt: null,
-        createdAt: dummyDate,
+        createdAt: null,
         changes: 0,
-        changedAt: dummyDate,
+        changedAt: null,
       });
       setPicksMode('edit');
       setFiltered(true);

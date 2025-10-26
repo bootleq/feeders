@@ -6,12 +6,12 @@ import { pickAtom, picksModeAtom } from './store';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import PickRow from '@/app/facts/PickRow';
 import PicksLoading from '@/app/facts/PicksLoading';
-import type { RecentPicksItemProps } from '@/models/facts';
+import type { PickProps } from '@/models/facts';
 import picksStyles from './picks.module.scss';
 import { QuestionMarkCircleIcon, ListBulletIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 export default function Pick({ initialPick }: {
-  initialPick: RecentPicksItemProps;  // pick from server side
+  initialPick: PickProps;  // pick from server side
 }) {
   const [pick, setPick] = useAtom(pickAtom);
   const setPicksMode = useSetAtom(picksModeAtom);
