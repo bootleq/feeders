@@ -11,7 +11,7 @@ import ClientDate from '@/components/ClientDate';
 import { format, formatDistanceToNow } from '@/lib/date-fp';
 import { present, shortenDate, ACCESS_CTRL } from '@/lib/utils';
 import { t } from '@/lib/i18n';
-import type { RecentPicksItemProps } from '@/models/facts';
+import type { PickProps } from '@/models/facts';
 import {
   picksModeAtom,
   picksModePrevAtom,
@@ -183,7 +183,7 @@ function UnscopedForm() {
 
     setSending(true);
     const res = await savePick(formData);
-    const item = res.item as RecentPicksItemProps;
+    const item = res.item as PickProps;
 
     if (res.success && item) {
       setConfirming(false);

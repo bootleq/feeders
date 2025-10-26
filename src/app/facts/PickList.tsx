@@ -15,7 +15,7 @@ import {
   filterByMarksAtom,
 } from './store';
 import { addAlertAtom } from '@/components/store';
-import type { RecentPicksItemProps } from '@/models/facts';
+import type { PickProps } from '@/models/facts';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import picksStyles from './picks.module.scss';
 import PickRow from './PickRow';
@@ -29,7 +29,7 @@ const fetchPicksAtom = atom(
       const url = '/api/picks/';
       const response = await fetch(url);
       const json = await response.text();
-      const fetched: {items: RecentPicksItemProps[]} = JSON.parse(json, jsonReviver);
+      const fetched: {items: PickProps[]} = JSON.parse(json, jsonReviver);
       if (response.ok) {
         set(picksAtom, fetched.items);
       } else {

@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useSetAtom, useAtomValue } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
 import striptags from 'striptags';
-import type { RecentPicksItemProps } from '@/models/facts';
+import type { PickProps } from '@/models/facts';
 import { present, blank, scrollAnywhereFix } from '@/lib/utils';
 import { filterByMarksAtom, pickAtom, currentMarksAtom } from '@/app/facts/store';
 import {
@@ -36,7 +36,7 @@ const columnClassMapping: Record<number, string> = {
 export default function TimelineContainer({ facts, initialSlug, initialPick }: {
   facts: any[],
   initialSlug: string,
-  initialPick: RecentPicksItemProps | null,
+  initialPick: PickProps | null,
 }) {
   useHydrateAtoms([
     [pickAtom, initialPick],

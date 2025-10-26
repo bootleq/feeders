@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import Link from 'next/link';
 import { useAtom, useAtomValue } from 'jotai';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
-import type { RecentPicksItemProps } from '@/models/facts';
+import type { PickProps } from '@/models/facts';
 import { present, shortenDate } from '@/lib/utils';
 import { format, formatISO } from '@/lib/date-fp';
 import { pickSavedAtom, picksModeAtom } from './store';
@@ -31,7 +31,7 @@ function Separator() {
 }
 
 function Dropped({ pick }: {
-  pick: RecentPicksItemProps,
+  pick: PickProps,
 }) {
   const now = useAtomValue(nowAtom);
   const { publishedAt } = pick;
@@ -86,7 +86,7 @@ function Dropped({ pick }: {
 }
 
 export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEditMode }: {
-  pick: RecentPicksItemProps,
+  pick: PickProps,
   readingPickId: number | null,
   onTake: (e: React.MouseEvent<HTMLButtonElement>) => void,
   onItemMode?: () => void,

@@ -4,7 +4,7 @@ import { preload } from 'react-dom';
 import striptags from 'striptags';
 import { getFacts } from '@/app/facts/getFacts';
 import { getPickById, recentPicks, buildMasker } from '@/models/facts';
-import type { RecentPicksItemProps } from '@/models/facts';
+import type { PickProps } from '@/models/facts';
 import { BASE_META } from '@/app/facts/utils';
 import { slugAtom, ZOOM_SLUG_PATTERN } from '@/app/facts/store';
 import Sidebar from '@/components/Sidebar';
@@ -76,7 +76,7 @@ export default async function Page({ params }: {
   const picksMode = slug === 'picks' ? (pickId > 0 ? 'item' : 'index') : '';
   const zoomedFact = await findZoomedFact(slug);
 
-  let picks: RecentPicksItemProps[] = [];
+  let picks: PickProps[] = [];
   if (picksMode === 'index') {
     picks = await getPicks();
   } else if (picksMode === 'item') {

@@ -14,7 +14,7 @@ import {
   filterByMarksAtom,
 } from './store';
 import { nowAtom, addAlertAtom } from '@/components/store';
-import type { RecentPicksItemProps } from '@/models/facts';
+import type { PickProps } from '@/models/facts';
 import picksStyles from './picks.module.scss';
 import PickRow from './PickRow';
 import PicksLoading from '@/app/facts/PicksLoading';
@@ -28,7 +28,7 @@ const fetchMyPicksAtom = atom(
       const url = '/api/picks/my';
       const response = await fetch(url);
       const json = await response.text();
-      const fetched: {items: RecentPicksItemProps[]} = JSON.parse(json, jsonReviver);
+      const fetched: {items: PickProps[]} = JSON.parse(json, jsonReviver);
       if (response.ok) {
         set(myPicksAtom, fetched.items);
       } else {
