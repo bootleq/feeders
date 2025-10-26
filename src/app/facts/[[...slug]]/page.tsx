@@ -46,23 +46,40 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   let meta = { ...BASE_META };
 
-  const slug = (await params).slug?.[0] || '';
-  const fact = await findZoomedFact(slug);
-  if (fact) {
-    meta.title = `${fact.date}: ${fact.title.trim()} - ${meta.title}`;
+  const slugs = (await params).slug || [];
 
-    const anchor = `fact-${fact.date}_${fact.id}`;
-    const zoomPath = `/facts/${anchor.replace('fact-', '')}/`;
-    meta.alternates.canonical = zoomPath;
-
-    if (fact.summary) {
-      meta.description = striptags(fact.summary);
+  if (slugs[0] === 'picks') {
+    if (slugs.length > 1) {
+      const pickId = Number(slugs[1]);
+      if (pickId > 0) {
+        const pick = (await getPicksById(pickId)).pop();
+        if (pick) {
+          meta.title = `${pick.title} - ${pick.userName} | 選集 - ${meta.title}`;
+          meta.description = ''; // will be removed
+          meta.alternates.canonical = `/facts/picks/${pick.id}/`;
+        }
+      }
+      // TODO: 404
     } else {
-      meta.description = ''; // will be removed
+      meta.title = `選集 - ${meta.title}`;
+      meta.description =  '使用者分享的事件清單（由事實時間軸中挑選），並加上個人意見';
+    }
+  } else if (slugs[0]?.match(ZOOM_SLUG_PATTERN)) {
+    const fact = await findZoomedFact(slugs[0]);
+    if (fact) {
+      meta.title = `${fact.date}: ${fact.title.trim()} - ${meta.title}`;
+
+      const anchor = `fact-${fact.date}_${fact.id}`;
+      const zoomPath = `/facts/${anchor.replace('fact-', '')}/`;
+      meta.alternates.canonical = zoomPath;
+
+      if (fact.summary) {
+        meta.description = striptags(fact.summary);
+      } else {
+        meta.description = ''; // will be removed
+      }
     }
   }
-
-  // TODO: Picks / Pick pages
 
   return meta;
 }
