@@ -209,7 +209,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
                   </TooltipTrigger>
                   <TooltipContent className={`${tooltipCls}`}>
                     { state !== 'published' && '原始' }發表日期：<span className='font-mono'>{ format({}, 'yyyy/MM/dd HH:mm', publishedAt)}</span>
-                    { inPrivate && <div>建立日期：<span className='font-mono'>{ format({}, 'yyyy/MM/dd HH:mm', createdAt) }</span></div> }
+                    { inPrivate && createdAt && <div>建立日期：<span className='font-mono'>{ format({}, 'yyyy/MM/dd HH:mm', createdAt) }</span></div> }
                   </TooltipContent>
                 </Tooltip>
               :
@@ -232,7 +232,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
               )
             }
 
-            {changes > 0 ?
+            {(changes > 0 && changedAt) ?
               <div className='flex items-center text-slate-500/75'>
                 已編輯：
                 <Tooltip placement='top-start'>
