@@ -4,7 +4,7 @@ import * as R from 'ramda';
 import { useEffect, useRef, useState } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import { present, SITE_NAME } from '@/lib/utils';
-import { zoomedFactAtom, slugAtom, SLUG_PATTERN } from './store';
+import { zoomedFactAtom } from './store';
 import { useHydrateAtoms } from 'jotai/utils';
 import { BASE_META } from '@/app/facts/utils';
 import tlStyles from './timeline.module.scss';

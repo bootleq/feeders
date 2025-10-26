@@ -6,7 +6,7 @@ import { getFacts } from '@/app/facts/getFacts';
 import { getPickById, recentPicks, buildMasker } from '@/models/facts';
 import type { RecentPicksItemProps } from '@/models/facts';
 import { BASE_META } from '@/app/facts/utils';
-import { slugAtom, SLUG_PATTERN } from '@/app/facts/store';
+import { slugAtom, ZOOM_SLUG_PATTERN } from '@/app/facts/store';
 import Sidebar from '@/components/Sidebar';
 import Alerts from '@/components/Alerts';
 import { alertsAtom, dismissAlertAtom } from '@/components/store';
@@ -19,7 +19,7 @@ import SideControl from '@/app/facts/SideControl';
 const pickMasker = buildMasker({ isPublic: true });
 
 async function findZoomedFact(slug: string) {
-  const zoom = slug.match(SLUG_PATTERN);
+  const zoom = slug.match(ZOOM_SLUG_PATTERN);
 
   if (zoom) {
     const { facts } = await getFacts();

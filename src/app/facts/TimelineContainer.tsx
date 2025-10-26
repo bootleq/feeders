@@ -11,7 +11,7 @@ import { present, blank, scrollAnywhereFix } from '@/lib/utils';
 import { filterByMarksAtom, pickAtom, currentMarksAtom } from '@/app/facts/store';
 import {
   slugAtom,
-  SLUG_PATTERN,
+  ZOOM_SLUG_PATTERN,
   textFilterAtom,
   dateRangeAtom,
   filterRejectedCountAtom,
@@ -92,7 +92,7 @@ export default function TimelineContainer({ facts, initialSlug, initialPick }: {
   }, []);
 
   const setZoomBySlug = useCallback((newSlug?: string) => {
-    const zoom = newSlug?.match(SLUG_PATTERN);
+    const zoom = newSlug?.match(ZOOM_SLUG_PATTERN);
     if (zoom) {
       const factId = Number.parseInt(zoom.pop() || '', 10);
       if (factId) {

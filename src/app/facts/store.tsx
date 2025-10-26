@@ -5,7 +5,7 @@ import { removeFirst } from '@/lib/utils';
 import type { RecentPicksItemProps } from '@/models/facts';
 
 export const VIEW_CTRL_KEYS= ['desc', 'summary', 'origin', 'tags'];
-export const SLUG_PATTERN = /^[\d\- ~BC]+_(\d+)$/;
+export const ZOOM_SLUG_PATTERN = /^[\d\- ~BC]+_(\d+)$/;
 
 export const slugAtom = atom('');
 

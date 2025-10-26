@@ -10,7 +10,7 @@ import { KeywordRangeCollector } from '@/components/KeywordRangeCollector';
 import {
   slugAtom,
   VIEW_CTRL_KEYS,
-  SLUG_PATTERN,
+  ZOOM_SLUG_PATTERN,
   viewCtrlAtom,
   tagsAtom,
   textFilterAtom,
@@ -152,7 +152,7 @@ export default function Timeline({ facts, isSubView = false, col, isOnly = false
     const slug = newUrl.pathname.split('/')[2];
     const decodedSlug = decodeURI(slug);
 
-    if (slug && decodedSlug.match(SLUG_PATTERN)) {
+    if (slug && decodedSlug.match(ZOOM_SLUG_PATTERN)) {
       setSlug(decodedSlug);
       window.history.pushState(null, '', `/facts/${slug}/`);
     } else {
