@@ -104,10 +104,19 @@ export const removeLocalMarkAtom = atom(
 );
 
 export type PicksMode = 'index' | 'item' | 'my' | 'edit' | '';
+export const picksModePrevAtom = atom<PicksMode>('');
+export const picksModeNowAtom = atom<PicksMode>('');
+export const picksModeAtom = atom(
+  (get) => get(picksModeNowAtom),
+  (get, set, mode: PicksMode) => {
+    set(picksModePrevAtom, get(picksModeNowAtom));
+    set(picksModeNowAtom, mode);
+  }
+);
+
 export const picksAtom = atom<RecentPicksItemProps[]>([]);
 export const loadingPicksAtom = atom(false);
 export const initialPickLoadedAtom = atom<string[]>([]);
-export const picksModeAtom = atom<PicksMode>('');
 export const myPicksAtom = atom<RecentPicksItemProps[]>([]);
 export const pickAtom = atom<RecentPicksItemProps | null>(null);
 export const removePickMarkAtom = atom(

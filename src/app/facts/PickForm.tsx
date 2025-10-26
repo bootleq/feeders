@@ -3,7 +3,7 @@
 import * as R from 'ramda';
 import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { ScopeProvider } from 'jotai-scope'
 import Link from 'next/link';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
@@ -14,6 +14,7 @@ import { t } from '@/lib/i18n';
 import type { RecentPicksItemProps } from '@/models/facts';
 import {
   picksModeAtom,
+  picksModePrevAtom,
   pickAtom,
   pickSavedAtom,
   refreshPickAtom,
@@ -157,6 +158,7 @@ function UnscopedForm() {
   const [sending, setSending] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [pick, setPick] = useAtom(pickAtom);
+  const prevMode = useAtomValue(picksModePrevAtom);
   const setPicksMode = useSetAtom(picksModeAtom);
   const setSaved = useSetAtom(pickSavedAtom);
   const refresh = useSetAtom(refreshPickAtom);
@@ -205,7 +207,7 @@ function UnscopedForm() {
   const cancel = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    setPicksMode('my');
+    setPicksMode(prevMode);
     setErrors({});
     setSaved(false);
   }, [setPicksMode, setErrors, setSaved]);
