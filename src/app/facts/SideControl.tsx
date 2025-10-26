@@ -475,7 +475,7 @@ const pickForkHint = (pickId: number) => {
   const link = `${url.origin}/facts/pick/${pickId}`;
 
   return [
-    "（❗ 這篇原本是別人發布的內容，因「編輯」而複製過來，可以作為草稿，請尊重他人著作，不要直接發布。",
+    "（❗ 這篇原本是別人發布的內容，因「編輯」而複製過來，請尊重他人著作，不要直接發布。",
     `原文連結： ${link}`,
     "內容複製如下 🡻🡻）\r\n",
   ].join("\r\n")
