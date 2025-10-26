@@ -2,6 +2,7 @@ import * as R from 'ramda';
 import type { Metadata, ResolvingMetadata } from "next";
 import { preload } from 'react-dom';
 import striptags from 'striptags';
+import { notFound } from 'next/navigation';
 import { getFacts } from '@/app/facts/getFacts';
 import { getPickById, recentPicks, buildMasker } from '@/models/facts';
 import type { PickProps } from '@/models/facts';
@@ -24,7 +25,8 @@ async function findZoomedFact(slug: string) {
   if (zoom) {
     const { facts } = await getFacts();
     const factId = Number.parseInt(zoom.pop() || '', 10);
-    return facts.find(f => f.id === factId);
+    const fact = facts.find(f => f.id === factId);
+    return fact;
   }
 }
 
@@ -50,16 +52,19 @@ export async function generateMetadata(
 
   if (slugs[0] === 'picks') {
     if (slugs.length > 1) {
+      let pick;
       const pickId = Number(slugs[1]);
       if (pickId > 0) {
-        const pick = (await getPicksById(pickId)).pop();
+        pick = (await getPicksById(pickId)).pop();
         if (pick) {
           meta.title = `${pick.title} - ${pick.userName} | 選集 - ${meta.title}`;
           meta.description = ''; // will be removed
           meta.alternates.canonical = `/facts/picks/${pick.id}/`;
         }
       }
-      // TODO: 404
+      if (!pick) {
+        notFound();
+      }
     } else {
       meta.title = `選集 - ${meta.title}`;
       meta.description =  '使用者分享的事件清單（由事實時間軸中挑選），並加上個人意見';
@@ -78,6 +83,8 @@ export async function generateMetadata(
       } else {
         meta.description = ''; // will be removed
       }
+    } else {
+      notFound();
     }
   }
 
