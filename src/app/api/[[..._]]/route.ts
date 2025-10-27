@@ -1,13 +1,15 @@
 import { fromHono } from './chanfana-adapter';
 
 import { Hono } from 'hono';
-import { handle } from 'hono/vercel'
+import { handle } from 'hono/vercel';
+import { apiKeyAuth } from './middlewares/apiKeyAuth';
 
 import { getSpots } from "./endpoints/getSpots";
 import { getFollowups } from './endpoints/getFollowups';
 import { getFactPicks } from './endpoints/getFactPicks';
 import { getFactPickById } from './endpoints/getFactPickById';
 import { getMyFactPicks } from './endpoints/getMyFactPicks';
+import { deleteCache } from './endpoints/deleteCache';
 // import { createSpot } from "./endpoints/createSpot";
 
 const app = new Hono().basePath('/api')
@@ -24,6 +26,8 @@ openapi.get('/followups/:spotId/', getFollowups);
 openapi.get('/picks/', getFactPicks);
 openapi.get('/picks/my/', getMyFactPicks);
 openapi.get('/picks/:id/', getFactPickById);
+openapi.delete('/cache/', apiKeyAuth, deleteCache);
 
 export const GET = handle(app)
 export const POST = handle(app)
+export const DELETE = handle(app)

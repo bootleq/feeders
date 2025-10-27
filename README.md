@@ -151,6 +151,9 @@ Prepare env by copy `.env.sample` to `.env.test`.
       pnpm tsx scripts/admin_drop_followup.mjs {ID} dropped --remote
       pnpm tsx scripts/admin_drop_pick.mjs {ID} dropped --remote
 
+- Revalidate cache
+
+      pnpm tsx --env-file=.env.development scripts/admin_revalidate_cache.mjs --path /audit --tags users
 
 
 [feeders.fyi]: https://feeders.fyi
