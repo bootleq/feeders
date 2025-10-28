@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { auth } from '@/lib/auth';
 import { getDb } from '@/lib/db';
 import { and, eq, inArray, getTableName } from 'drizzle-orm';
+import { revalidateTag } from 'next/cache';
 import { parseFormData, blank, ACCESS_CTRL } from '@/lib/utils';
 import { diffForm } from '@/lib/diff';
 import { factPicks, changes } from '@/lib/schema';
@@ -24,6 +25,11 @@ const createSchema = formSchema.omit({ id: true });
 export type CreateSchema = z.infer<typeof createSchema> & { userId: string };
 
 const diffProps = ['title', 'desc', 'factIds', 'state'] as const;
+
+function revalidate(id?: number) {
+  if (!id) return;
+  revalidateTag('picks');
+}
 
 export async function savePick(formData: FormData) {
   if (ACCESS_CTRL !== 'open') return { errors: { _: ['功能未開放'] } };
@@ -120,11 +126,12 @@ export async function savePick(formData: FormData) {
         ]);
       }
 
-      const freshItems = await getPickById(data.id, user.id);
+      const freshItem = (await getPickById(data.id, user.id)).pop();
+      revalidate(freshItem?.id);
 
       return {
         success: true,
-        item: freshItems.pop(),
+        item: freshItem,
       };
     } catch (e) {
       console.log('save-pick (update) failed', e);
@@ -148,11 +155,12 @@ export async function savePick(formData: FormData) {
         userId: session.userId,
       });
 
-      const freshItems = await getPickById(newPick.id, user.id);
+      const freshItem = (await getPickById(newPick.id, user.id)).pop();
+      revalidate(freshItem?.id);
 
       return {
         success: true,
-        item: freshItems.pop(),
+        item: freshItem,
       };
     } catch (e) {
       console.log('save-pick (create) failed', e);

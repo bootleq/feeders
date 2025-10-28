@@ -1,6 +1,7 @@
 import { fromHono } from './chanfana-adapter';
 
 import { Hono } from 'hono';
+import { etag } from 'hono/etag';
 import { handle } from 'hono/vercel';
 import { apiKeyAuth } from './middlewares/apiKeyAuth';
 
@@ -13,6 +14,8 @@ import { deleteCache } from './endpoints/deleteCache';
 // import { createSpot } from "./endpoints/createSpot";
 
 const app = new Hono().basePath('/api')
+
+app.use('/*', etag());
 
 const openapi = fromHono(app, {
   base: '/api',
