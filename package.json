@@ -71,6 +71,7 @@
     "react-leaflet": "^4.2.1",
     "react-leaflet-cluster": "^2.1.0",
     "striptags": "4.0.0-alpha.4",
+    "superjson": "^2.2.3",
     "use-debounce": "^10.0.2",
     "zod": "^3.23.8"
   },
