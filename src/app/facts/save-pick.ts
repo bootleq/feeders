@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { auth } from '@/lib/auth';
 import { getDb } from '@/lib/db';
 import { and, eq, inArray, getTableName } from 'drizzle-orm';
-import { revalidateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { parseFormData, blank, ACCESS_CTRL } from '@/lib/utils';
 import { diffForm } from '@/lib/diff';
 import { factPicks, changes } from '@/lib/schema';
@@ -28,7 +28,9 @@ const diffProps = ['title', 'desc', 'factIds', 'state'] as const;
 
 function revalidate(id?: number) {
   if (!id) return;
-  revalidateTag('picks');
+  revalidatePath('/api/picks/');
+  revalidatePath('/facts/picks/');
+  revalidatePath(`/facts/picks/${id}/`);
 }
 
 export async function savePick(formData: FormData) {
@@ -134,7 +136,7 @@ export async function savePick(formData: FormData) {
         item: freshItem,
       };
     } catch (e) {
-      console.log('save-pick (update) failed', e);
+      console.log("save-pick (update) failed:\n", e);
 
       return {
         errors: { _: ['儲存失敗，意外的錯誤'] },

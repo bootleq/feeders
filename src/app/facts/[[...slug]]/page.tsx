@@ -39,15 +39,14 @@ const getPicks = unstable_cache(
     return items.map(pickMasker);
   },
   ['facts', 'picks'],
-  {
-    tags: ['picks', 'users'],
-  }
 );
 
-async function getPicksById(id: number) {
-  const items = await getPickById(id);
-  return items.map(pickMasker);
-}
+const getPicksById = unstable_cache(
+  async (id: number) => {
+    const items = await getPickById(id);
+    return items.map(pickMasker);
+  },
+);
 
 export async function generateMetadata(
   { params }: { params: Promise<{ slug: string[] }> },
