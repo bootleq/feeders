@@ -9,7 +9,7 @@ import { getDb } from '@/lib/db';
 import { parseFormData, ACCESS_CTRL } from '@/lib/utils';
 import { eq, and, getTableName } from 'drizzle-orm';
 import { users, changes, UserStateEnum } from '@/lib/schema';
-import { getQuickProfileQuery, RENAME_COOL_OFF_DAYS } from '@/models/users';
+import { getQuickProfileQuery, RENAME_COOL_OFF_DAYS, getPickIds } from '@/models/users';
 
 const formSchema = z.object({
   field: z.enum(['name', 'desc']),
@@ -74,7 +74,24 @@ export default async function updateUser(formData: FormData) {
       return { error: '儲存失敗，非預期的錯誤' };
     }
 
-    revalidatePath(`/user/${session.user.id}`);
+    try {
+      revalidatePath(`/user/${session.user.id}`);
+
+      const picks = await getPickIds(user.id);
+      if (picks.length > 0) {
+        revalidatePath('/api/picks/');
+        revalidatePath('/facts/picks/');
+        picks.forEach(pick => {
+          revalidatePath(`/facts/picks/${pick.id}/`);
+        });
+      }
+    } catch (e) {
+      console.error({
+        'update-user': 'revalidatePath failed',
+        error: e,
+      });
+    }
+
     return { success: true };
   } else if (data.field === 'desc') {
     try {

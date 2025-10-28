@@ -5,6 +5,7 @@ import {
   users,
   areas,
   changes,
+  factPicks,
   spotFollowups,
 } from '@/lib/schema';
 import { SpotActionEnum } from '@/lib/schema';
@@ -154,6 +155,17 @@ export const getProfile = async (userId: string) => {
 
 type ProfileQuery = ReturnType<typeof getProfile>;
 export type ProfileResult = NonNullable<Awaited<ProfileQuery>> | null;
+
+export const getPickIds = (userId: string) => {
+  const db = getDb();
+  const query = db.select({
+    id: factPicks.id,
+  }).from(users)
+    .leftJoin(factPicks, eq(users.id, factPicks.userId))
+    .where(eq(users.id, userId));
+
+  return query;
+};
 
 export const saveArea = async (userId: string, areaId: number | null, bounds: LatLngBounds) => {
   const db = getDb();

@@ -42,6 +42,13 @@ const cmd = [
 try {
   console.log(cmd);
   execSync(cmd, { stdio: 'inherit' });
+
+  console.log([
+    "\nHint: should revalidate cache:",
+    '/api/picks/',
+    '/facts/picks/',
+    `/facts/picks/${itemId}/`,
+  ].join("\n"));
 } catch (error) {
   console.error('執行失敗：', error);
 } finally {
