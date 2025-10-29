@@ -48,6 +48,7 @@ try {
     '/api/picks/',
     '/facts/picks/',
     `/facts/picks/${itemId}/`,
+    `/audit/pick/${itemId}/`,
   ].join("\n"));
 } catch (error) {
   console.error('執行失敗：', error);

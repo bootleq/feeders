@@ -43,7 +43,8 @@ async function hintAboutCache(userId) {
         "\nHint: should revalidate cache:",
         '/api/picks/',
         '/facts/picks/',
-        ...(picks.map(({ id }) => `/facts/picks/${id}/`))
+        ...(picks.map(({ id }) => `/facts/picks/${id}/`)),
+        ...(picks.map(({ id }) => `/audit/pick/${id}/`)),
       ].join("\n"));
     }
   } catch (e) {

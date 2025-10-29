@@ -83,6 +83,7 @@ export default async function updateUser(formData: FormData) {
         revalidatePath('/facts/picks/');
         picks.forEach(pick => {
           revalidatePath(`/facts/picks/${pick.id}/`);
+          revalidatePath(`/audit/pick/${pick.id}/`);
         });
       }
     } catch (e) {

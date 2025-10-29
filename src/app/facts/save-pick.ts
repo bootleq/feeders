@@ -31,6 +31,7 @@ function revalidate(id?: number) {
   revalidatePath('/api/picks/');
   revalidatePath('/facts/picks/');
   revalidatePath(`/facts/picks/${id}/`);
+  revalidatePath(`/audit/pick/${id}/`);
 }
 
 export async function savePick(formData: FormData) {
