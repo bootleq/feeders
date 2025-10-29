@@ -6,6 +6,7 @@ import type { Metadata, ResolvingMetadata } from 'next';
 import parse, { HTMLReactParserOptions, Element, DOMNode, attributesToProps } from 'html-react-parser';
 import { selectOne } from 'css-select';
 import { parseSlug } from '@/lib/utils';
+import { getInsights } from '@/app/insights/getInsights';
 import { getInsightById } from './getInsightById';
 import type { File } from './getInsightById';
 import Article from './Article';
@@ -14,6 +15,17 @@ type Insight = {
   content: ReturnType<typeof parse>,
   [key: string]: any,
 };
+
+export async function generateStaticParams() {
+  const insights = await getInsights();
+
+  return insights.map((insight) => {
+    const { id, slug } = insight;
+    return {
+      id: `/insights/${id}-${slug}/`,
+    };
+  });
+}
 
 const cmsFileIdFromSrc = (src: string) => {
   const prefix = `${CMS_URL}/assets/`;
