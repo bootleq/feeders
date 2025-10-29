@@ -101,13 +101,13 @@ function ViewCtrlPanel() {
               <span className='mr-1'>
                 全部
               </span>
-              <Link href={`/laws/?judge=1${latestHash}`} className='btn bg-slate-100 mx-0 px-px py-px ring-1 text-slate-600 text-xs hover:bg-white' onClick={onToggleAll(true)}>
+              <a href={`/laws/?judge=1${latestHash}`} className='btn bg-slate-100 mx-0 px-px py-px ring-1 text-slate-600 text-xs hover:bg-white' onClick={onToggleAll(true)}>
                 展開
-              </Link>
+              </a>
               ／
-              <Link href={`/laws/${latestHash}`} className='btn bg-slate-100 mx-0 px-px py-px ring-1 text-slate-600 text-xs hover:bg-white' onClick={onToggleAll(false)}>
+              <a href={`/laws/${latestHash}`} className='btn bg-slate-100 mx-0 px-px py-px ring-1 text-slate-600 text-xs hover:bg-white' onClick={onToggleAll(false)}>
                 收合
-              </Link>
+              </a>
             </div>
           </div>
         </div>

@@ -28,7 +28,7 @@ export default async function Page({ params }: {
       </h1>
 
       <p className='py-1'>
-        基於<Link href='/facts' className='underline underline-offset-4 decoration-2 decoration-amber-900 hover:text-sky-900'>事實</Link>整理出看法，公開刊載，協助形成社會共識。
+        基於<Link href='/facts/' className='underline underline-offset-4 decoration-2 decoration-amber-900 hover:text-sky-900'>事實</Link>整理出看法，公開刊載，協助形成社會共識。
       </p>
 
       <ul className='mt-3'>
@@ -36,7 +36,7 @@ export default async function Page({ params }: {
           const { id, slug, title, publishedAt, modifiedAt, tags } = item;
         return (
         <li key={id} className='flex items-center text-lg'>
-          <Link href={`/insights/${id}-${slug}`} className='flex items-center hover:text-sky-900'>
+          <Link href={`/insights/${id}-${slug}/`} className='flex items-center hover:text-sky-900'>
             <time className='font-mono mr-3 text-base'>
               <ClientDate fallback={<span className='opacity-20'>{format({}, 'yyyy-MM-dd', publishedAt)}</span>}>
                 {format({}, 'yyyy-MM-dd', publishedAt)}
