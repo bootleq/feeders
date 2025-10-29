@@ -75,7 +75,7 @@ export default async function updateUser(formData: FormData) {
     }
 
     try {
-      revalidatePath(`/user/${session.user.id}`);
+      revalidatePath(`/user/${session.user.id}/`);
 
       const picks = await getPickIds(user.id);
       if (picks.length > 0) {
@@ -104,7 +104,7 @@ export default async function updateUser(formData: FormData) {
       return { error: '儲存失敗，非預期的錯誤' };
     }
 
-    revalidatePath(`/user/${session.user.id}`);
+    revalidatePath(`/user/${session.user.id}/`);
     return { success: true };
   }
 
