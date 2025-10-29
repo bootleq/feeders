@@ -3,6 +3,7 @@
 import * as R from 'ramda';
 import { z } from 'zod';
 import { auth } from '@/lib/auth';
+import { revalidatePath } from 'next/cache';
 import { getDb } from '@/lib/db';
 import { diffForm } from '@/lib/diff';
 import { spotFollowups, changes } from '@/lib/schema';
@@ -123,6 +124,15 @@ export async function amendFollowup(formData: FormData) {
         content: changeset.old,
       }).returning({ id: changes.id})
     ]);
+
+    try {
+      revalidatePath(`/audit/followup/${data.id}/`);
+    } catch (e) {
+      console.error({
+        'amend-followup': 'revalidatePath failed',
+        error: e,
+      });
+    }
 
     const reloadSpots = await geoSpots([data.geohash]);
 
