@@ -25,7 +25,7 @@ const fetchMyPicksAtom = atom(
   null,
   async (get, set) => {
     try {
-      const url = '/api/picks/my';
+      const url = '/api/picks/my/';
       const response = await fetch(url);
       const json = await response.text();
       const fetched: {items: PickProps[]} = JSON.parse(json, jsonReviver);
