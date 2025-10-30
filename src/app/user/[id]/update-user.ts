@@ -4,12 +4,12 @@ import { z } from 'zod';
 import { differenceInDays } from 'date-fns';
 import { format } from '@/lib/date-fp';
 import { auth } from '@/lib/auth';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { getDb } from '@/lib/db';
 import { parseFormData, ACCESS_CTRL } from '@/lib/utils';
 import { eq, and, getTableName } from 'drizzle-orm';
 import { users, changes, UserStateEnum } from '@/lib/schema';
-import { getQuickProfileQuery, RENAME_COOL_OFF_DAYS, getPickIds } from '@/models/users';
+import { getQuickProfileQuery, RENAME_COOL_OFF_DAYS, getCacheIds } from '@/models/users';
 
 const formSchema = z.object({
   field: z.enum(['name', 'desc']),
@@ -77,18 +77,27 @@ export default async function updateUser(formData: FormData) {
     try {
       revalidatePath(`/user/${session.user.id}/`);
 
-      const picks = await getPickIds(user.id);
+      const { spots, followupSpots, picks } = await getCacheIds(user.id);
+
+      if (spots.length > 0 || followupSpots.length > 0) {
+        revalidateTag('spots');
+      }
+      if (followupSpots.length > 0) {
+        followupSpots.forEach(id => {
+          revalidatePath(`/api/followups/${id}/`);
+        });
+      }
       if (picks.length > 0) {
         revalidatePath('/api/picks/');
         revalidatePath('/facts/picks/');
-        picks.forEach(pick => {
-          revalidatePath(`/facts/picks/${pick.id}/`);
-          revalidatePath(`/audit/pick/${pick.id}/`);
+        picks.forEach(id => {
+          revalidatePath(`/facts/picks/${id}/`);
+          revalidatePath(`/audit/pick/${id}/`);
         });
       }
     } catch (e) {
       console.error({
-        'update-user': 'revalidatePath failed',
+        'update-user': 'Revalidate cache failed',
         error: e,
       });
     }

@@ -3,6 +3,7 @@
 import * as R from 'ramda';
 import { z } from 'zod';
 import { auth } from '@/lib/auth';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { SpotActionEnum } from '@/lib/schema';
 import { parseFormData, zondedDateTimeSchema, ACCESS_CTRL } from '@/lib/utils';
 import { createFollowup as save, geoSpots } from '@/models/spots';
@@ -85,6 +86,16 @@ export async function createFollowup(formData: FormData) {
       ...data,
       userId: session.userId,
     });
+
+    try {
+      revalidatePath(`/api/followups/${data.spotId}/`);
+      revalidateTag('spots');
+    } catch (e) {
+      console.error({
+        'create-spot': 'Revalidate Cache failed',
+        error: e,
+      });
+    }
 
     const reloadSpots = await geoSpots([data.geohash]);
 

@@ -156,15 +156,30 @@ export const getProfile = async (userId: string) => {
 type ProfileQuery = ReturnType<typeof getProfile>;
 export type ProfileResult = NonNullable<Awaited<ProfileQuery>> | null;
 
-export const getPickIds = (userId: string) => {
+export const getCacheIds = async (userId: string) => {
   const db = getDb();
-  const query = db.select({
-    id: factPicks.id,
-  }).from(users)
-    .leftJoin(factPicks, eq(users.id, factPicks.userId))
-    .where(eq(users.id, userId));
 
-  return query;
+  const result = await db.query.users.findFirst({
+    where: eq(users.id, userId),
+    columns: { id: true },
+    with: {
+      picks: {
+        columns: { id: true, },
+      },
+      spots: {
+        columns: { id: true, },
+      },
+      followups: {
+        columns: { spotId: true, },
+      },
+    },
+  });
+
+  return {
+    picks: result?.picks.map(R.prop('id')) || [],
+    spots: result?.spots.map(R.prop('id')) || [],
+    followupSpots: result?.followups.map(R.prop('spotId')) || [],
+  };
 };
 
 export const saveArea = async (userId: string, areaId: number | null, bounds: LatLngBounds) => {

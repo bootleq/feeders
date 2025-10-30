@@ -3,7 +3,7 @@
 import * as R from 'ramda';
 import { z } from 'zod';
 import { auth } from '@/lib/auth';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { getDb } from '@/lib/db';
 import { diffForm } from '@/lib/diff';
 import { spotFollowups, changes } from '@/lib/schema';
@@ -82,6 +82,7 @@ export async function amendFollowup(formData: FormData) {
     spawnedAt: spotFollowups.spawnedAt,
     removedAt: spotFollowups.removedAt,
     userId: spotFollowups.userId,
+    spotId: spotFollowups.spotId,
   }).from(spotFollowups)
     .where(and(
       eq(spotFollowups.id, data.id),
@@ -127,6 +128,8 @@ export async function amendFollowup(formData: FormData) {
 
     try {
       revalidatePath(`/audit/followup/${data.id}/`);
+      revalidatePath(`/api/followups/${followup.spotId}/`);
+      revalidateTag('spots');
     } catch (e) {
       console.error({
         'amend-followup': 'revalidatePath failed',
