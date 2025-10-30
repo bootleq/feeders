@@ -4,6 +4,7 @@ import * as R from 'ramda';
 import { z } from 'zod';
 import geohash from 'ngeohash';
 import { auth } from '@/lib/auth';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { getDb } from '@/lib/db';
 import { diffForm } from '@/lib/diff';
 import { spots, changes } from '@/lib/schema';
@@ -121,6 +122,16 @@ export async function amendSpot(formData: FormData) {
         content: changeset.old,
       }).returning({ id: changes.id})
     ]);
+
+    try {
+      revalidatePath(`/audit/spots/${data.id}/`);
+      revalidateTag('spots');
+    } catch (e) {
+      console.error({
+        'amend-spot': 'Revalidate Cache failed',
+        error: e,
+      });
+    }
 
     const reloadSpots = await geoSpots(R.uniq(reloadHashes));
 

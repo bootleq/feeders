@@ -3,7 +3,6 @@
 import * as R from 'ramda';
 import { useMemo, Suspense } from 'react';
 import { atom, useAtomValue } from 'jotai';
-import Link from 'next/link';
 import Html from '@/components/Html';
 import { tagsAtom, ACT_ABBRS } from './store';
 import Judgements from './Judgements';
@@ -60,9 +59,9 @@ export default function Law({ item }: {
         <div data-role='title' className='flex items-center leading-tight sm:text-start'>
           <strong className='mr-2 text-lg'>{title}</strong>
           {link &&
-            <Link href={link} target='_blank' className='hover:bg-amber-300/50 hover:scale-125'>
+            <a href={link} target='_blank' className='hover:bg-amber-300/50 hover:scale-125'>
               <ArrowTopRightOnSquareIcon className='stroke-current' height={16} />
-            </Link>
+            </a>
           }
         </div>
 

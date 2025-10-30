@@ -5,7 +5,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { ScopeProvider } from 'jotai-scope'
-import Link from 'next/link';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import ClientDate from '@/components/ClientDate';
 import { format, formatDistanceToNow } from '@/lib/date-fp';
@@ -139,10 +138,10 @@ function DateInfo({ id, publishedAt, createdAt, changes, changedAt }: {
 
             <Tooltip placement='bottom-start'>
               <TooltipTrigger className='flex items-center ml-auto'>
-                <Link href={`/audit/pick/${id}`} className='inline-flex items-center justify-center p-1 ml-1 text-slate-500/75 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
+                <a href={`/audit/pick/${id}/`} className='inline-flex items-center justify-center p-1 ml-1 text-slate-500/75 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
                   <Square3Stack3DIcon className='stroke-current' height={18} />
                   {changes}
-                </Link>
+                </a>
               </TooltipTrigger>
               <TooltipContent className={`${tooltipCls}`}>調閱編修記錄（在新分頁開啟）</TooltipContent>
             </Tooltip>

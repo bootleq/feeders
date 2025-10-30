@@ -189,7 +189,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
           </div>
 
           <div className='mb-1 flex flex-wrap justify-start gap-x-4 text-slate-600 text-sm items-center'>
-            <Link href={`/user/${userId}`} data-user-id={userId} className='break-keep mr-2 flex items-center hover:bg-yellow-300/50 text-inherit'>
+            <Link href={`/user/${userId}/`} prefetch={false} data-user-id={userId} className='break-keep mr-2 flex items-center hover:bg-yellow-300/50 text-inherit'>
               <UserCircleIcon className='fill-current' height={18} />
               {userName}
             </Link>
@@ -198,7 +198,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
               publishedAt ?
                 <Tooltip placement='top'>
                   <TooltipTrigger className='text-black cursor-auto'>
-                    <Link href={`/facts/picks/${id}`} target='_blank' className={`break-keep hover:bg-yellow-300/50 text-inherit rounded flex items-center ${state === 'published' ? 'text-stone-950' : draftTextColor}`}>
+                    <Link href={`/facts/picks/${id}/`} prefetch={false} target='_blank' className={`break-keep hover:bg-yellow-300/50 text-inherit rounded flex items-center ${state === 'published' ? 'text-stone-950' : draftTextColor}`}>
                       <GlobeAltIcon className='mr-1' height={18} aria-label='公開' />
                       <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
                         <time dateTime={formatISO({}, publishedAt)}>
@@ -216,7 +216,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
               (createdAt &&
                 <Tooltip placement='top'>
                   <TooltipTrigger className='cursor-auto'>
-                    <Link href={`/facts/picks/${id}`} className={`break-keep hover:bg-yellow-300/50 text-inherit rounded flex items-center ${draftTextColor}`}>
+                    <Link href={`/facts/picks/${id}/`} prefetch={false} className={`break-keep hover:bg-yellow-300/50 text-inherit rounded flex items-center ${draftTextColor}`}>
                       <CircleDashedIcon className='mr-1' width={18} height={18} aria-label='草稿' />
                       <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
                         <time dateTime={formatISO({}, createdAt)}>
@@ -251,10 +251,10 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
                 </Tooltip>
                 <Tooltip placement='top-start'>
                   <TooltipTrigger className='flex items-center'>
-                    <Link href={`/audit/pick/${id}`} className='inline-flex items-center justify-center pl-1 ml-1 text-slate-500/75 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
+                    <a href={`/audit/pick/${id}`} className='inline-flex items-center justify-center pl-1 ml-1 text-slate-500/75 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
                       <Square3Stack3DIcon className='stroke-current mr-px' height={18} />
                       {changes}
-                    </Link>
+                    </a>
                   </TooltipTrigger>
                   <TooltipContent className={`${tooltipCls}`}>調閱編修記錄（在新分頁開啟）</TooltipContent>
                 </Tooltip>

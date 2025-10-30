@@ -1,7 +1,7 @@
 import { rmSync } from 'fs';
 import { dirname } from 'path';
 import { execSync } from 'child_process';
-import { makeTempSQL, unprepareStatement } from '@/lib/dev';
+import { makeTempSQL, unprepareStatement, revalidateCache } from '@/lib/dev';
 import { PubStateEnum } from '@/lib/schema.ts';
 
 const args = process.argv.slice(2);
@@ -42,6 +42,15 @@ const cmd = [
 try {
   console.log(cmd);
   execSync(cmd, { stdio: 'inherit' });
+
+  await revalidateCache(remote, {
+    paths: [
+      '/api/picks/',
+      '/facts/picks/',
+      `/facts/picks/${itemId}/`,
+      `/audit/pick/${itemId}/`,
+    ]
+  });
 } catch (error) {
   console.error('執行失敗：', error);
 } finally {

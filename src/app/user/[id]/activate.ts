@@ -55,7 +55,7 @@ export default async function saveUserArea() {
     return { error: '儲存失敗，非預期的錯誤' };
   }
 
-  revalidatePath(`/user/${session.user.id}`);
+  revalidatePath(`/user/${session.user.id}/`);
 
   return {
     success: true

@@ -5,6 +5,7 @@ import striptags from 'striptags';
 import { notFound } from 'next/navigation';
 import { getFacts } from '@/app/facts/getFacts';
 import { getPickById, recentPicks, buildMasker } from '@/models/facts';
+import { unstable_cache } from '@/lib/cache';
 import type { PickProps } from '@/models/facts';
 import { BASE_META } from '@/app/facts/utils';
 import { slugAtom, ZOOM_SLUG_PATTERN } from '@/app/facts/store';
@@ -30,17 +31,22 @@ async function findZoomedFact(slug: string) {
   }
 }
 
-async function getPicks() {
-  // TODO: pagination
-  const pageSize = 300;
-  const items = await recentPicks(pageSize);
-  return items.map(pickMasker);
-}
+const getPicks = unstable_cache(
+  async () => {
+    // TODO: pagination
+    const pageSize = 300;
+    const items = await recentPicks(pageSize);
+    return items.map(pickMasker);
+  },
+  ['facts', 'picks'],
+);
 
-async function getPicksById(id: number) {
-  const items = await getPickById(id);
-  return items.map(pickMasker);
-}
+const getPicksById = unstable_cache(
+  async (id: number) => {
+    const items = await getPickById(id);
+    return items.map(pickMasker);
+  },
+);
 
 export async function generateMetadata(
   { params }: { params: Promise<{ slug: string[] }> },

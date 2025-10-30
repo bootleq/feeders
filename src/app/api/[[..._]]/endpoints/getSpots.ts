@@ -11,6 +11,18 @@ import {
 } from '@/app/api/schema/api';
 import { spots, users, PubStateEnum } from '@/lib/schema';
 import { geoSpots } from '@/models/spots';
+import { unstable_cache } from '@/lib/cache';
+
+const getItems = unstable_cache(
+  async (geohash: string[]) => {
+    const items = await geoSpots(geohash);
+    return items;
+  },
+  ['api', 'spots'],
+  {
+    tags: ['spots'],
+  }
+);
 
 const geohash = z.string().trim().transform((val, ctx) => {
   const list = val.split(',').filter(s => s.length);
@@ -48,7 +60,7 @@ export class getSpots extends ApiRoute {
 
   async handle(c: Context) {
     const data = await this.getValidatedData<typeof this.schema>()
-    const items = await geoSpots(data.params.geohash);
+    const items = await getItems(data.params.geohash);
 
     return c.json({
       success: true,

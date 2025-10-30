@@ -148,10 +148,10 @@ function Followup({ fo, now, canEdit, startAmendFollowup, editingItemId, geohash
         {fo.changes > 0 ?
           <Tooltip>
             <TooltipTrigger>
-              <Link href={`/audit/followup/${fo.id}`} className='inline-flex items-center justify-center p-1 ml-1 text-slate-500/75 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
+              <a href={`/audit/followup/${fo.id}`} className='inline-flex items-center justify-center p-1 ml-1 text-slate-500/75 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
                 <Square3Stack3DIcon className='stroke-current' height={18} />
                 {fo.changes}
-              </Link>
+              </a>
               <TooltipContent className={`${tooltipCls}`}>調閱編修記錄（在新分頁開啟）</TooltipContent>
             </TooltipTrigger>
           </Tooltip>
@@ -339,10 +339,10 @@ export default function SpotMarkers({ spots }: {
                   {s.changes > 0 ?
                     <Tooltip>
                       <TooltipTrigger>
-                        <Link href={`/audit/spot/${s.id}`} className='inline-flex items-center justify-center p-1 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
+                        <a href={`/audit/spot/${s.id}`} className='inline-flex items-center justify-center p-1 hover:bg-purple-700/50 hover:text-white rounded-full' target='_blank'>
                           <Square3Stack3DIcon className='stroke-current' height={18} />
                           {s.changes}
-                        </Link>
+                        </a>
                         <TooltipContent className={`${tooltipCls}`}>調閱編修記錄（在新分頁開啟）</TooltipContent>
                       </TooltipTrigger>
                     </Tooltip>

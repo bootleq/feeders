@@ -76,21 +76,20 @@ export default function SpotInfo() {
       </Tooltip>
 
       <div className='flex flex-wrap justify-start items-center'>
-        <Link href={`/user/${spot.userId}`} data-user-id={spot.userId} className='mr-2 text-sm flex items-center hover:bg-yellow-300/50'>
+        <Link href={`/user/${spot.userId}`} prefetch={false} data-user-id={spot.userId} className='mr-2 text-sm flex items-center hover:bg-yellow-300/50'>
           <UserCircleIcon className='fill-current' height={24} />
           { spot.userName }
         </Link>
         {
           R.any(R.isNotNil)(R.props(['city', 'town'], spot)) ?
-            <Link
+            <a
               href={`/world/area/@${spot.lat},${spot.lon}`}
               onClick={visitArea}
               className='break-keep whitespace-nowrap w-min cursor-pointer text-sm opacity-60 mr-2 hover:bg-yellow-300'
               data-disable-progress={true}
-              prefetch={false}
             >
               {spot.city}{spot.town}
-            </Link>
+            </a>
             : ''
         }
 

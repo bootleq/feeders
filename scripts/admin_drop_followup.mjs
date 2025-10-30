@@ -1,8 +1,12 @@
 import { rmSync } from 'fs';
 import { dirname } from 'path';
 import { execSync } from 'child_process';
-import { makeTempSQL, unprepareStatement } from '@/lib/dev';
+import { getLocalDB, makeTempSQL, revalidateCache } from '@/lib/dev';
 import { PubStateEnum } from '@/lib/schema.ts';
+import {
+  spotFollowups,
+} from '@/lib/schema';
+import { eq } from 'drizzle-orm';
 
 const args = process.argv.slice(2);
 
@@ -39,9 +43,28 @@ const cmd = [
   remote ? '--remote' : '--local',
 ].join(' ');
 
+async function handleCache(id) {
+  const db = getLocalDB();
+  const result = await db.query.spotFollowups.findFirst({
+    where: eq(spotFollowups.id, id),
+    columns: { spotId: true },
+  });
+  const spotId = result.spotId;
+
+  await revalidateCache(remote, {
+    tags: ['spots'],
+    paths: [
+      `/api/followups/${spotId}/`,
+      `/audit/followups/${itemId}/`,
+    ]
+  });
+}
+
 try {
   console.log(cmd);
   execSync(cmd, { stdio: 'inherit' });
+
+  await handleCache(itemId);
 } catch (error) {
   console.error('執行失敗：', error);
 } finally {
