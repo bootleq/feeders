@@ -11,7 +11,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { Desc } from '@/components/Desc';
 import ClientDate from '@/components/ClientDate';
 import Link from 'next/link';
-import { UserCircleIcon } from '@heroicons/react/24/solid';
+import { ArrowDownIcon, UserCircleIcon } from '@heroicons/react/24/solid';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import { Square3Stack3DIcon } from '@heroicons/react/24/outline';
 import { NoSymbolIcon } from '@heroicons/react/24/solid';
@@ -365,9 +365,12 @@ export default function SpotMarkers({ spots }: {
                   }
                 </div>
 
-                <hr className='w-11/12 h-px mx-auto my-5 bg-gray-200 border-0 dark:bg-gray-700' />
-                <span className='block mx-auto -mt-[1.9rem] mb-2 px-3 w-min whitespace-nowrap bg-white text-sm text-center text-slate-500'>
-                  最新動態
+                <hr className='w-11/12 h-px mx-auto my-9 bg-gray-200 border-0 dark:bg-gray-700' />
+
+                <span className='flex items-center gap-x-2 mx-auto -mt-[2.9rem] mb-8 px-3 w-min whitespace-nowrap bg-white text-sm text-center text-slate-500'>
+                  <ArrowDownIcon className='stroke-slate-200' height={18} />
+                  跟進
+                  <ArrowDownIcon className='stroke-slate-200' height={18} />
                 </span>
 
                 <div className='max-h-[65vh] overflow-auto scrollbar-thin'>
