@@ -98,9 +98,9 @@ function DroppedSpotMarker({ spot }: {
   spot: GeoSpotsResult['spot'],
 }) {
   return (
-    <Marker key={spot.id} position={[spot.lat, spot.lon]} icon={DroppedMarkerIcon} autoPan={false}>
+    <Marker position={[spot.lat, spot.lon]} icon={DroppedMarkerIcon} autoPan={false}>
       <Popup autoPan={false}>
-        <div className='py-2 text-red-950/80'>（受網站管理處分，看不見）</div>
+        <div data-id={spot.id} className='py-2 text-red-950/80'>（受網站管理處分，看不見）</div>
       </Popup>
     </Marker>
   );
@@ -125,12 +125,18 @@ function Followup({ fo, now, canEdit, startAmendFollowup, editingItemId, geohash
         </Link>
         <Tooltip>
           <TooltipTrigger className='text-sm mr-2 whitespace-nowrap font-mono'>
-            {formatDistance(now, fo.createdAt).replace('大約', '').trim()}
+            <div data-id={fo.id}>
+              {formatDistance(now, fo.createdAt).replace('大約', '').trim()}
+            </div>
           </TooltipTrigger>
-          <TooltipContent className={`${tooltipCls} font-mono`}>
+          <TooltipContent className={`${tooltipCls}`}>
+            建立日期：
             <ClientDate>
-              {format({}, 'y/M/d HH:mm', fo.createdAt)}
+              <span className='font-mono'>{format({}, 'y/M/d HH:mm', fo.createdAt)}</span>
             </ClientDate>
+            <span className='text-xs text-slate-400 ml-3'>
+              #{fo.id}
+            </span>
           </TooltipContent>
         </Tooltip>
         <ActionLabel action={fo.action} className='ml-auto flex items-center' />
@@ -174,8 +180,8 @@ function DroppedFollowup({ fo }: {
   fo: GeoSpotsResultFollowup,
 }) {
   return (
-    <div key={fo.id} className='flex flex-col justify-start items-start mb-1'>
-      <div className='flex items-start justify-start self-stretch text-left px-1 py-1 text-red-950/75'>
+    <div data-id={fo.id} className='flex flex-col justify-start items-start mb-1'>
+      <div className='flex items-center justify-start self-stretch text-left px-1 py-1 text-red-950/75'>
         <NoSymbolIcon className='fill-current opacity-50' height={18} />
         <span className='opacity-50'>（這個跟進受到網站管理處分，看不見）</span>
       </div>
@@ -316,10 +322,19 @@ export default function SpotMarkers({ spots }: {
                 }
 
                 <div className='flex items-center justify-end mt-2 px-2 text-xs text-slate-500/75'>
-                  建立：<span className='font-mono mr-1'>
-                    <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
-                      {format({}, 'y/M/d', s.createdAt)}
-                    </ClientDate>
+                  建立：<span data-id={s.id} className='font-mono mr-1'>
+                    <Tooltip>
+                      <TooltipTrigger className=''>
+                        <div data-id={s.id}>
+                          <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
+                            {format({}, 'y/M/d', s.createdAt)}
+                          </ClientDate>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent className={`${tooltipCls} text-xs text-slate-600`}>
+                        #{s.id}
+                      </TooltipContent>
+                    </Tooltip>
                   </span> by
                   <Link href={`/user/${s.userId}`} data-user-id={s.userId} className='ml-1 hover:bg-yellow-300/50 hover:text-slate-950'>
                     {s.userName}
