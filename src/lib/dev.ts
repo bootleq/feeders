@@ -1,6 +1,8 @@
 import { join } from 'path';
 import { tmpdir } from 'os';
 import { readdirSync, mkdtempSync, writeFileSync } from 'fs';
+import confirm from '@inquirer/confirm';
+import { spawnSync } from 'child_process';
 import Database from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { sql } from 'drizzle-orm';
@@ -60,3 +62,41 @@ export const getLocalDB = () => {
   const sqlite = new Database(file, { fileMustExist: true });
   return drizzle(sqlite, { schema });
 };
+
+export async function revalidateCache(remote: boolean, { paths, tags }: {
+  paths?: string[],
+  tags?: string[],
+}) {
+  const envFile = remote ? '.env.production' : '.env.development';
+  const args: string[] = [`--env-file=${envFile}`, 'scripts/admin_revalidate_cache.mjs'];
+
+  if (paths && paths.length > 0) {
+    args.push('--paths', ...paths);
+  }
+  if (tags && tags.length > 0) {
+    args.push('--tags', ...tags);
+  }
+
+  const yes = await confirm({
+    message: 'Revalidate cache now?',
+    default: false,
+  });
+  if (!yes) {
+    console.log('Cache to be revalidated:');
+    console.log(JSON.stringify({paths, tags}, null, 2));
+    return;
+  }
+
+  const result = spawnSync(
+    'pnpm',
+    ['tsx', ...args],
+    { stdio: 'inherit' }
+  );
+
+  if (result.error) {
+    console.error(`Failed to execute admin_revalidate_cache script: ${result.error.message}`);
+  }
+  if (result.status !== 0) {
+    console.error(`Failed with exit code ${result.status}`);
+  }
+}

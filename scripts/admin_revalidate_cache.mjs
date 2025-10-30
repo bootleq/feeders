@@ -17,7 +17,8 @@ async function clearCache({ paths = [], tags = [] }) {
     if (paths.length > 0) body.paths = paths;
     if (tags.length > 0) body.tags = tags;
 
-    console.log('Clearing cache...');
+    console.log('Clearing cache:');
+    console.log(JSON.stringify({ paths, tags }, null, 2));
 
     const response = await fetch(`${API_URL}/cache/`, {
       method: 'DELETE',
