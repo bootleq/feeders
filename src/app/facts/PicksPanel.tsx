@@ -191,7 +191,9 @@ export default function PicksPanel({ mode, children }: {
             </button>
           }
 
-          <PickDisplayMenu className='mr-1' />
+          {!minimized &&
+            <PickDisplayMenu className='mr-1' />
+          }
 
           <Tooltip placement='top-start' hoverProps={menuHoverProps} role='menu'>
             <TooltipTrigger className=''>
