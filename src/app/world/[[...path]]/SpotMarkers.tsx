@@ -6,6 +6,7 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useThrottledCallback } from 'use-debounce';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { MapContainer, TileLayer, useMapEvents, Marker, Popup } from "react-leaflet";
+import type { LeafletEvent } from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { Desc } from '@/components/Desc';
@@ -24,6 +25,7 @@ import AmendSpotForm from './AmendSpotForm';
 import AmendFollowupForm from './AmendFollowupForm';
 import { editingFormAtom, spotFollowupsAtom, mergeSpotFollowupsAtom, loadingFollowupsAtom } from './store';
 import { addAlertAtom } from '@/components/store';
+import { openSpotMarkerById } from './util';
 import { present, jsonReviver, ACCESS_CTRL } from '@/lib/utils';
 import { format, formatDistance } from '@/lib/date-fp';
 import type { GeoSpotsResult, GeoSpotsResultFollowup } from '@/models/spots';
@@ -215,6 +217,22 @@ export default function SpotMarkers({ spots }: {
   const eventHandlers = useMemo(
     () => ({
       popupopen: throttledSetNow,
+      popupclose: () => {
+        // Remove hash to quit #id state
+        const url = new URL(window.location.href);
+        url.hash = '';
+        window.history.replaceState(null, '', url.toString());
+      },
+      add: (e: LeafletEvent) => {
+        // Open the Marker with id matches URL hash.
+        // This cover the missing part of followHash: when the Marker is first
+        // time added thus can't be found during hashchange.
+        // FIXME: cover MarkerClusterGroup, spiderfied markers not opened
+        const hashId = window.location.hash.match(/^#(\d+)$/)?.[1];
+        if (hashId) {
+          openSpotMarkerById(Number(hashId), e.target, 800);
+        }
+      }
     }),
     [throttledSetNow],
   );
@@ -271,10 +289,10 @@ export default function SpotMarkers({ spots }: {
           }
 
           return (
-            <Marker key={s.id} position={[s.lat, s.lon]} icon={icon} autoPan={false} eventHandlers={eventHandlers}>
+            <Marker spot-id={s.id} key={s.id} position={[s.lat, s.lon]} icon={icon} autoPan={false} eventHandlers={eventHandlers}>
               <Popup className={mapStyles.popup} autoPan={false}>
                 <div className='p-1'>
-                  <strong className='block mb-1'>{s.title}</strong>
+                  <h2 className='block mb-1 font-bold'>{s.title}</h2>
 
                   <FoodLife spot={foodable} now={now} />
 
@@ -323,18 +341,11 @@ export default function SpotMarkers({ spots }: {
 
                 <div className='flex items-center justify-end mt-2 px-2 text-xs text-slate-500/75'>
                   建立：<span data-id={s.id} className='font-mono mr-1'>
-                    <Tooltip>
-                      <TooltipTrigger className=''>
-                        <div data-id={s.id}>
-                          <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
-                            {format({}, 'y/M/d', s.createdAt)}
-                          </ClientDate>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent className={`${tooltipCls} text-xs text-slate-600`}>
-                        #{s.id}
-                      </TooltipContent>
-                    </Tooltip>
+                    <a href={`#${s.id}`} data-id={s.id}>
+                      <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
+                        {format({}, 'y/M/d', s.createdAt)}
+                      </ClientDate>
+                    </a>
                   </span> by
                   <Link href={`/user/${s.userId}`} data-user-id={s.userId} className='ml-1 hover:bg-yellow-300/50 hover:text-slate-950'>
                     {s.userName}

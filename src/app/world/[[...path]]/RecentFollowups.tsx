@@ -200,7 +200,7 @@ function Followups({ items, today, dates }: {
                   <Tooltip placement='bottom-end'>
                     <TooltipTrigger className='break-keep w-min cursor-pointer'>
                       <a
-                        href={`/world/area/@${i.lat},${i.lon}`}
+                        href={`/world/area/@${i.lat},${i.lon}#${i.spotId}`}
                         onClick={(e) => { e.preventDefault(); setViewItem(i); } }
                         className='break-keep w-min cursor-pointer'
                         data-disable-progress={true}
@@ -211,16 +211,17 @@ function Followups({ items, today, dates }: {
                         }
                       </a>
                     </TooltipTrigger>
-                    <TooltipContent className="p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1">
-                      {i.city} {i.town}
+                    <TooltipContent className="p-1 text-sm rounded box-border w-max z-[1002] bg-slate-100 ring-1">
                       <a
-                        href={`/world/area/@${i.lat},${i.lon}`}
-                        className='break-keep w-min cursor-pointer text-slate-600'
+                        href={`/world/area/@${i.lat},${i.lon}#${i.spotId}`}
+                        onClick={visitArea}
+                        className='btn px-1 mr-1 break-keep w-min cursor-pointer text-slate-600 bg-slate-100 hover:bg-yellow-400/50 inline-flex items-center'
                         data-disable-progress={true}
                       >
-                        <ArrowRightIcon className='inline ml-2' height={16} />
-                        去
+                        前往
+                        <ArrowRightIcon className='inline ml-1' height={16} />
                       </a>
+                      {i.city} {i.town}
                     </TooltipContent>
                   </Tooltip>
                 </li>

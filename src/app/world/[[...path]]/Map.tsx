@@ -26,7 +26,7 @@ import {
   advanceDistrictModeAtom,
 } from './store';
 import { jsonReviver } from '@/lib/utils';
-import { parsePath, updatePath, AREA_ZOOM_MAX, GEOHASH_PRECISION } from './util';
+import { parsePath, updatePath, openSpotMarkerById, AREA_ZOOM_MAX, GEOHASH_PRECISION } from './util';
 import { useHydrateAtoms } from 'jotai/utils';
 import Status from './Status';
 import MapStatus from './MapStatus';
@@ -165,6 +165,22 @@ function MapUser(props: {
     moveend: debouncedMoveEnd,
   });
 
+  const followHash = useCallback((e: HashChangeEvent) => {
+    // Automatically open the Marker which id matches URL hash
+    const hashId = decodeURI(new URL(e.newURL).hash).match(/^#(\d+)$/)?.[1];
+    if (hashId) {
+      const openedPopup = document.querySelector('.leaflet-popup');
+      if (!openedPopup) {
+        let opened = false;
+        map.eachLayer((layer: any) => {
+          if (opened) return;
+          const found = openSpotMarkerById(Number(hashId), layer);
+          if (found) opened = true;
+        });
+      }
+    }
+  }, [map]);
+
   useEffect(() => {
     setMap(map);
   }, [map, setMap]);
@@ -200,6 +216,13 @@ function MapUser(props: {
     }
     prevMode.current = mode;
   }, [mode, addAlert]);
+
+  useEffect(() => {
+    window.addEventListener('hashchange', followHash);
+    return () => {
+      window.removeEventListener('hashchange', followHash);
+    };
+  }, [followHash]);
 
   useEffect(() => {
     if (prevStatus.current !== 'areaPicker' && status === 'areaPicker') {
