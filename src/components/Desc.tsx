@@ -64,7 +64,7 @@ function Anchor({ href, content, ...props }: {
   return (
     <a
       href={href}
-      className={`underline underline-offset-[3px] decoration-slate-500 hover:bg-yellow-200/50 font-mono text-sm leading-6 align-text-bottom`}
+      className={`underline underline-offset-[3px] decoration-slate-500 hover:bg-yellow-200/50 font-mono text-sm leading-6 align-bottom`}
       {...(previewEnabled ? { onMouseOver, onMouseOut } : {}) }
       {...props}
     >

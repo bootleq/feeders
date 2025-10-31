@@ -44,6 +44,13 @@
   }
 }
 
+.desc {
+  a[href] {
+    display: inline-block;
+    transform: translateY(-1px);
+  }
+}
+
 .animate-flash {
   animation: feeders-picks-flash 1.4s ease-in-out 1;
 }
