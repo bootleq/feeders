@@ -57,17 +57,19 @@ export default function FoodLife({ spot, now }: {
       </span>
 
       <Tooltip>
-        <TooltipTrigger className='flex items-center'>
-          {duration &&
-            <span className='text-sm whitespace-nowrap font-mono'>
-              （{duration.replace('大約', '').trim()}）
-            </span>
-          }
+        <TooltipTrigger className=''>
+          <div className='flex items-center'>
+            {duration &&
+              <span className='text-sm whitespace-nowrap font-mono'>
+                （{duration.replace('大約', '').trim()}）
+              </span>
+            }
 
-          <div className='text-xs font-mono opacity-60 flex items-center'>
-            <ClientDate fallback={<FallbackDate />}>{spawned}</ClientDate>
-            <ArrowLongRightIcon className='inline fill-gray-600 mx-[-9px]' width={48} height={24} />
-            <ClientDate fallback={<FallbackDate />}>{removed}</ClientDate>
+            <div className='text-xs font-mono opacity-60 flex items-center'>
+              <ClientDate fallback={<FallbackDate />}>{spawned}</ClientDate>
+              <ArrowLongRightIcon className='inline fill-gray-600 mx-[-9px]' width={48} height={24} />
+              <ClientDate fallback={<FallbackDate />}>{removed}</ClientDate>
+            </div>
           </div>
         </TooltipTrigger>
         <TooltipContent className={`${tooltipCls}`}>

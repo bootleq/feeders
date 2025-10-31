@@ -11,15 +11,17 @@ import { visitArea } from './util';
 
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { Desc } from '@/components/Desc';
+import { nowAtom } from '@/components/store';
 import ActionLabel from './ActionLabel';
 import FoodLife from './FoodLife';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
+import HumanIcon from '@/assets/man-walk.svg';
 
 export default function SpotInfo() {
   const spot = useAtomValue(viewItemAtom);
   const [autoExpand, setAutoExpand] = useState(false);
   const [isOverflow, setIsOverflow] = useState(false);
-  const [now, setNow] = useState<Date | null>(null);
+  const now = useAtomValue(nowAtom);
   const viewBoxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -29,10 +31,6 @@ export default function SpotInfo() {
     } else {
       setIsOverflow(false);
     }
-  }, [spot]);
-
-  useEffect(() => {
-    setNow(new Date());
   }, [spot]);
 
   const descClass = [
@@ -83,7 +81,7 @@ export default function SpotInfo() {
         {
           R.any(R.isNotNil)(R.props(['city', 'town'], spot)) ?
             <a
-              href={`/world/area/@${spot.lat},${spot.lon}`}
+              href={`/world/area/@${spot.lat},${spot.lon}#${spot.spotId}`}
               onClick={visitArea}
               className='break-keep whitespace-nowrap w-min cursor-pointer text-sm opacity-60 mr-2 hover:bg-yellow-300'
               data-disable-progress={true}
@@ -100,7 +98,25 @@ export default function SpotInfo() {
         <ActionLabel action={spot.action} />
       </div>
 
-      <FoodLife spot={spot} now={now} />
+      <div className='flex items-center'>
+        <FoodLife spot={spot} now={now} />
+
+        <Tooltip>
+          <TooltipTrigger>
+            <a
+              href={`/world/area/@${spot.lat},${spot.lon}#${spot.spotId}`}
+              onClick={visitArea}
+              className='ml-auto break-keep whitespace-nowrap w-min text-sm p-1 rounded opacity-50 hover:bg-yellow-300 hover:opacity-100 hover:ring-1'
+              data-disable-progress={true}
+            >
+              <HumanIcon className='fill-current scale-[180%]' width={18} height={18} />
+            </a>
+          </TooltipTrigger>
+          <TooltipContent className="p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1">
+            移動地圖，前往這個地點
+          </TooltipContent>
+        </Tooltip>
+      </div>
 
       <div className={descClass} ref={viewBoxRef} data-name='spot-view-item'>
         <Desc value={spot.desc} />

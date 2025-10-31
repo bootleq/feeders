@@ -3,15 +3,15 @@
 import * as R from 'ramda';
 import Leaflet, { MarkerCluster } from 'leaflet';
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { useThrottledCallback } from 'use-debounce';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { MapContainer, TileLayer, useMapEvents, Marker, Popup } from "react-leaflet";
+import type { LeafletEvent } from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { Desc } from '@/components/Desc';
 import ClientDate from '@/components/ClientDate';
 import Link from 'next/link';
-import { UserCircleIcon } from '@heroicons/react/24/solid';
+import { ArrowDownIcon, UserCircleIcon } from '@heroicons/react/24/solid';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import { Square3Stack3DIcon } from '@heroicons/react/24/outline';
 import { NoSymbolIcon } from '@heroicons/react/24/solid';
@@ -23,7 +23,8 @@ import FollowupForm from './FollowupForm';
 import AmendSpotForm from './AmendSpotForm';
 import AmendFollowupForm from './AmendFollowupForm';
 import { editingFormAtom, spotFollowupsAtom, mergeSpotFollowupsAtom, loadingFollowupsAtom } from './store';
-import { addAlertAtom } from '@/components/store';
+import { nowAtom, addAlertAtom } from '@/components/store';
+import { openSpotMarkerById } from './util';
 import { present, jsonReviver, ACCESS_CTRL } from '@/lib/utils';
 import { format, formatDistance } from '@/lib/date-fp';
 import type { GeoSpotsResult, GeoSpotsResultFollowup } from '@/models/spots';
@@ -98,9 +99,9 @@ function DroppedSpotMarker({ spot }: {
   spot: GeoSpotsResult['spot'],
 }) {
   return (
-    <Marker key={spot.id} position={[spot.lat, spot.lon]} icon={DroppedMarkerIcon} autoPan={false}>
+    <Marker position={[spot.lat, spot.lon]} icon={DroppedMarkerIcon} autoPan={false}>
       <Popup autoPan={false}>
-        <div className='py-2 text-red-950/80'>（受網站管理處分，看不見）</div>
+        <div data-id={spot.id} className='py-2 text-red-950/80'>（受網站管理處分，看不見）</div>
       </Popup>
     </Marker>
   );
@@ -125,12 +126,18 @@ function Followup({ fo, now, canEdit, startAmendFollowup, editingItemId, geohash
         </Link>
         <Tooltip>
           <TooltipTrigger className='text-sm mr-2 whitespace-nowrap font-mono'>
-            {formatDistance(now, fo.createdAt).replace('大約', '').trim()}
+            <div data-id={fo.id}>
+              {formatDistance(now, fo.createdAt).replace('大約', '').trim()}
+            </div>
           </TooltipTrigger>
-          <TooltipContent className={`${tooltipCls} font-mono`}>
+          <TooltipContent className={`${tooltipCls}`}>
+            建立日期：
             <ClientDate>
-              {format({}, 'y/M/d HH:mm', fo.createdAt)}
+              <span className='font-mono'>{format({}, 'y/M/d HH:mm', fo.createdAt)}</span>
             </ClientDate>
+            <span className='text-xs text-slate-400 ml-3'>
+              #{fo.id}
+            </span>
           </TooltipContent>
         </Tooltip>
         <ActionLabel action={fo.action} className='ml-auto flex items-center' />
@@ -174,8 +181,8 @@ function DroppedFollowup({ fo }: {
   fo: GeoSpotsResultFollowup,
 }) {
   return (
-    <div key={fo.id} className='flex flex-col justify-start items-start mb-1'>
-      <div className='flex items-start justify-start self-stretch text-left px-1 py-1 text-red-950/75'>
+    <div data-id={fo.id} className='flex flex-col justify-start items-start mb-1'>
+      <div className='flex items-center justify-start self-stretch text-left px-1 py-1 text-red-950/75'>
         <NoSymbolIcon className='fill-current opacity-50' height={18} />
         <span className='opacity-50'>（這個跟進受到網站管理處分，看不見）</span>
       </div>
@@ -189,18 +196,10 @@ export default function SpotMarkers({ spots }: {
   const { data: session, status } = useSession();
   const [editingForm, setEditingForm] = useAtom(editingFormAtom);
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
-  const [now, setNow] = useState(() => new Date());
+  const now = useAtomValue(nowAtom);
   const fetchFollowups = useSetAtom(fetchFollowupsAtom);
   const postloadFollowups = useAtomValue(spotFollowupsAtom);
   const loading = useAtomValue(loadingFollowupsAtom);
-
-  useEffect(() => {
-    setNow(new Date());
-  }, []);
-
-  const throttledSetNow = useThrottledCallback(() => {
-    setNow(new Date());
-  }, 3000, { trailing: false });
 
   const loadFollowups = useCallback((spotId: number) => {
     fetchFollowups(spotId);
@@ -208,9 +207,24 @@ export default function SpotMarkers({ spots }: {
 
   const eventHandlers = useMemo(
     () => ({
-      popupopen: throttledSetNow,
+      popupclose: () => {
+        // Remove hash to quit #id state
+        const url = new URL(window.location.href);
+        url.hash = '';
+        window.history.replaceState(null, '', url.toString());
+      },
+      add: (e: LeafletEvent) => {
+        // Open the Marker with id matches URL hash.
+        // This cover the missing part of followHash: when the Marker is first
+        // time added thus can't be found during hashchange.
+        // FIXME: cover MarkerClusterGroup, spiderfied markers not opened
+        const hashId = window.location.hash.match(/^#(\d+)$/)?.[1];
+        if (hashId) {
+          openSpotMarkerById(Number(hashId), e.target, 800);
+        }
+      }
     }),
-    [throttledSetNow],
+    [],
   );
 
   const startEdit = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
@@ -265,10 +279,10 @@ export default function SpotMarkers({ spots }: {
           }
 
           return (
-            <Marker key={s.id} position={[s.lat, s.lon]} icon={icon} autoPan={false} eventHandlers={eventHandlers}>
+            <Marker spot-id={s.id} key={s.id} position={[s.lat, s.lon]} icon={icon} autoPan={false} eventHandlers={eventHandlers}>
               <Popup className={mapStyles.popup} autoPan={false}>
                 <div className='p-1'>
-                  <strong className='block mb-1'>{s.title}</strong>
+                  <h2 className='block mb-1 font-bold'>{s.title}</h2>
 
                   <FoodLife spot={foodable} now={now} />
 
@@ -316,10 +330,12 @@ export default function SpotMarkers({ spots }: {
                 }
 
                 <div className='flex items-center justify-end mt-2 px-2 text-xs text-slate-500/75'>
-                  建立：<span className='font-mono mr-1'>
-                    <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
-                      {format({}, 'y/M/d', s.createdAt)}
-                    </ClientDate>
+                  建立：<span data-id={s.id} className='font-mono mr-1'>
+                    <a href={`#${s.id}`} data-id={s.id}>
+                      <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
+                        {format({}, 'y/M/d', s.createdAt)}
+                      </ClientDate>
+                    </a>
                   </span> by
                   <Link href={`/user/${s.userId}`} data-user-id={s.userId} className='ml-1 hover:bg-yellow-300/50 hover:text-slate-950'>
                     {s.userName}
@@ -350,9 +366,12 @@ export default function SpotMarkers({ spots }: {
                   }
                 </div>
 
-                <hr className='w-11/12 h-px mx-auto my-5 bg-gray-200 border-0 dark:bg-gray-700' />
-                <span className='block mx-auto -mt-[1.9rem] mb-2 px-3 w-min whitespace-nowrap bg-white text-sm text-center text-slate-500'>
-                  最新動態
+                <hr className='w-11/12 h-px mx-auto my-9 bg-gray-200 border-0 dark:bg-gray-700' />
+
+                <span className='flex items-center gap-x-2 mx-auto -mt-[2.9rem] mb-8 px-3 w-min whitespace-nowrap bg-white text-sm text-center text-slate-500'>
+                  <ArrowDownIcon className='stroke-slate-200' height={18} />
+                  跟進
+                  <ArrowDownIcon className='stroke-slate-200' height={18} />
                 </span>
 
                 <div className='max-h-[65vh] overflow-auto scrollbar-thin'>
