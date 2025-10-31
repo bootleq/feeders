@@ -113,6 +113,8 @@ export default async function Page({ params }: {
     picks = await getPicksById(pickId);
   }
 
+  const initialPick = (picksMode === 'item' && picks[0]?.state !== 'dropped') ? picks[0] : null;
+
   preload('/assets/GeistMonoDigits.woff2', { as: 'font' });
   preload('/assets/BootleqSpace.woff2', { as: 'font' });
 
@@ -127,7 +129,7 @@ export default async function Page({ params }: {
         <SideControl tags={tags} facts={facts} />
       </Sidebar>
 
-      <TimelineContainer facts={facts} initialSlug={slug} initialPick={picksMode === 'item' && picks[0] || null}  />
+      <TimelineContainer facts={facts} initialSlug={slug} initialPick={initialPick}  />
 
       <Alerts itemsAtom={alertsAtom} dismissAtom={dismissAlertAtom} />
     </main>

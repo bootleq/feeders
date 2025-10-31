@@ -523,6 +523,16 @@ function MarkCtrlPanel({ facts }: {
     }
   }, [picksMode]);
 
+  useEffect(() => {
+    // Quit /picks/ path started from server side
+    const path = window.location.pathname;
+    if (pick && path.startsWith('/facts/picks/')) {
+      if (!path.startsWith(`/facts/picks/${pick.id}/`)) {
+        window.history.replaceState(window.history.state, '', '/facts/');
+      }
+    }
+  }, [pick]);
+
   const isSlotDirty = useMemo(() => {
     if (pick) {
       return true;

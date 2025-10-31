@@ -11,7 +11,7 @@ import picksStyles from './picks.module.scss';
 import { QuestionMarkCircleIcon, ListBulletIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 export default function Pick({ initialPick }: {
-  initialPick: PickProps;  // pick from server side
+  initialPick?: PickProps | null;  // pick from server side
 }) {
   const [pick, setPick] = useAtom(pickAtom);
   const setPicksMode = useSetAtom(picksModeAtom);
@@ -41,7 +41,9 @@ export default function Pick({ initialPick }: {
 
   useEffect(() => {
     if (!pick && initialPick) {
-      setPick(initialPick);
+      if (initialPick.state !== 'dropped') {
+        setPick(initialPick);
+      }
     }
   }, [pick, initialPick, setPick]);
 

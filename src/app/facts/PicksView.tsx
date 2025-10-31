@@ -24,7 +24,6 @@ export default function PicksView({ id, picks, mode }: {
     [picksModeAtom, mode],
   ]);
   const currentMode = useAtomValue(picksModeAtom);
-  const setPicks = useSetAtom(picksAtom);
   const setNow = useSetAtom(nowAtom);
 
   const throttledSetNow = useThrottledCallback(() => {

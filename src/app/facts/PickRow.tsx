@@ -36,8 +36,8 @@ function Dropped({ pick }: {
   const now = useAtomValue(nowAtom);
   const { publishedAt } = pick;
   return (
-    <li className=''>
-      <article>
+    <li>
+      <article id={`pick-${pick.id}`}>
         <header className='flex flex-col mb-1 gap-y-px'>
           <div className='flex items-center my-px mb-0'>
             <Tooltip placement='top'>
