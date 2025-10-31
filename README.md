@@ -79,9 +79,12 @@ When everything is ready, run the drizzle migrations on remote D1.
 
 - Run migrations on remote D1
 
-      pnpm wrangler d1 list
+      pnpm wrangler d1 migrations list feeders --remote
       pnpm wrangler d1 migrations apply feeders --remote
 
+- Export schema and data
+
+      pnpm wrangler d1 export feeders --remote --output=./db.sql
 
 ## Authentication
 
