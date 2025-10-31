@@ -11,6 +11,7 @@ import { visitArea } from './util';
 
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { Desc } from '@/components/Desc';
+import { nowAtom } from '@/components/store';
 import ActionLabel from './ActionLabel';
 import FoodLife from './FoodLife';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
@@ -20,7 +21,7 @@ export default function SpotInfo() {
   const spot = useAtomValue(viewItemAtom);
   const [autoExpand, setAutoExpand] = useState(false);
   const [isOverflow, setIsOverflow] = useState(false);
-  const [now, setNow] = useState<Date | null>(null);
+  const now = useAtomValue(nowAtom);
   const viewBoxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -30,10 +31,6 @@ export default function SpotInfo() {
     } else {
       setIsOverflow(false);
     }
-  }, [spot]);
-
-  useEffect(() => {
-    setNow(new Date());
   }, [spot]);
 
   const descClass = [

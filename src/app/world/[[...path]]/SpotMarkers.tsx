@@ -3,7 +3,6 @@
 import * as R from 'ramda';
 import Leaflet, { MarkerCluster } from 'leaflet';
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { useThrottledCallback } from 'use-debounce';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { MapContainer, TileLayer, useMapEvents, Marker, Popup } from "react-leaflet";
 import type { LeafletEvent } from 'leaflet';
@@ -24,7 +23,7 @@ import FollowupForm from './FollowupForm';
 import AmendSpotForm from './AmendSpotForm';
 import AmendFollowupForm from './AmendFollowupForm';
 import { editingFormAtom, spotFollowupsAtom, mergeSpotFollowupsAtom, loadingFollowupsAtom } from './store';
-import { addAlertAtom } from '@/components/store';
+import { nowAtom, addAlertAtom } from '@/components/store';
 import { openSpotMarkerById } from './util';
 import { present, jsonReviver, ACCESS_CTRL } from '@/lib/utils';
 import { format, formatDistance } from '@/lib/date-fp';
@@ -197,18 +196,10 @@ export default function SpotMarkers({ spots }: {
   const { data: session, status } = useSession();
   const [editingForm, setEditingForm] = useAtom(editingFormAtom);
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
-  const [now, setNow] = useState(() => new Date());
+  const now = useAtomValue(nowAtom);
   const fetchFollowups = useSetAtom(fetchFollowupsAtom);
   const postloadFollowups = useAtomValue(spotFollowupsAtom);
   const loading = useAtomValue(loadingFollowupsAtom);
-
-  useEffect(() => {
-    setNow(new Date());
-  }, []);
-
-  const throttledSetNow = useThrottledCallback(() => {
-    setNow(new Date());
-  }, 3000, { trailing: false });
 
   const loadFollowups = useCallback((spotId: number) => {
     fetchFollowups(spotId);
@@ -216,7 +207,6 @@ export default function SpotMarkers({ spots }: {
 
   const eventHandlers = useMemo(
     () => ({
-      popupopen: throttledSetNow,
       popupclose: () => {
         // Remove hash to quit #id state
         const url = new URL(window.location.href);
@@ -234,7 +224,7 @@ export default function SpotMarkers({ spots }: {
         }
       }
     }),
-    [throttledSetNow],
+    [],
   );
 
   const startEdit = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {

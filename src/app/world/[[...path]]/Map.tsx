@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState, ReactElement, useCallback } from 'react';
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'motion/react';
 import { useDebouncedCallback } from 'use-debounce';
-import { navTitleAtom, alertsAtom, addAlertAtom, dismissAlertAtom } from '@/components/store';
+import { nowAtom, navTitleAtom, alertsAtom, addAlertAtom, dismissAlertAtom } from '@/components/store';
 import type { keyedAlert } from '@/components/store';
 
 import type { GeoSpotsResult, GeoSpotsByGeohash } from '@/models/spots';
@@ -99,6 +99,7 @@ const fetchSpotsAtom = atom(
 function MapUser(props: {
 }) {
   const setMap = useSetAtom(mapAtom);
+  const setNow = useSetAtom(nowAtom);
   const geoSet = useAtomValue(geohashesAtom);
   const fetchSpots = useSetAtom(fetchSpotsAtom);
   const [picker, setPicker] = useAtom(areaPickerAtom);
@@ -184,6 +185,10 @@ function MapUser(props: {
   useEffect(() => {
     setMap(map);
   }, [map, setMap]);
+
+  useEffect(() => {
+    setNow(new Date());
+  }, [setNow]);
 
   useEffect(() => {
     setNavTitle(mode === 'area' ? '區域地圖' : '世界地圖');
