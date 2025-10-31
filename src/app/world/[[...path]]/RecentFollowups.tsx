@@ -16,7 +16,7 @@ import type { GeoSpotsByGeohash, GeoSpotsResultSpot, RecentFollowupsItemProps } 
 import type { LatLngBounds } from '@/lib/schema';
 import { visitArea } from './util';
 import SpotInfoPreview from './SpotInfoPreview';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
+import { Tooltip, TooltipTrigger, TooltipContent, menuHoverProps } from '@/components/Tooltip';
 import { StarIcon } from '@heroicons/react/24/outline';
 import { MapPinIcon } from '@heroicons/react/24/solid';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
@@ -197,7 +197,7 @@ function Followups({ items, today, dates }: {
             <ul className='flex flex-row flex-wrap p-1'>
               {subItems.map((i: RecentFollowupsItemProps) => (
                 <li key={i.spotId} className={`relative ${viewItem === i ? viewItemPinCls : ''}`} onKeyUp={onKeyUp}>
-                  <Tooltip placement='bottom-end'>
+                  <Tooltip placement='bottom-end' hoverProps={menuHoverProps}>
                     <TooltipTrigger className='break-keep w-min cursor-pointer'>
                       <a
                         href={`/world/area/@${i.lat},${i.lon}#${i.spotId}`}
