@@ -109,13 +109,14 @@ function DroppedSpotMarker({ spot }: {
 
 function Followup({ fo, now, canEdit, startAmendFollowup, editingItemId, geohash }: {
   fo: GeoSpotsResultFollowup,
-  now: Date,
+  now: Date | null,
   canEdit: boolean,
   startAmendFollowup: any,
   editingItemId: number | null,
   geohash: string,
 }) {
   const [editingForm, setEditingForm] = useAtom(editingFormAtom);
+  if (!now) return;
 
   return (
     <div className='flex flex-col justify-start items-start mb-2'>

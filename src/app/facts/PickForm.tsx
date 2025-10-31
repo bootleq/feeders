@@ -209,7 +209,7 @@ function UnscopedForm() {
     setPicksMode(prevMode);
     setErrors({});
     setSaved(false);
-  }, [setPicksMode, setErrors, setSaved]);
+  }, [setPicksMode, prevMode, setErrors, setSaved]);
 
   if (!pick) {
     return;

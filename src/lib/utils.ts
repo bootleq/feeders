@@ -126,7 +126,7 @@ export const ariaDatePickerValueFix = (formData: FormData, fieldNames: string[])
   });
 };
 
-export function shortenDate(date: Date, now?: Date) {
+export function shortenDate(date: Date, now: Date | null) {
   if (!now || !date) return '----/-/-';
 
   if (now.getFullYear() === date.getFullYear()) {
