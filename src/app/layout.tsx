@@ -41,7 +41,7 @@ export default async function RootLayout({
     <html lang="zh-TW" className='overscroll-none'>
       <body className={inter.className}>
         <Provider>
-          <SessionProvider>
+          <SessionProvider refetchOnWindowFocus={false} refetchWhenOffline={false}>
             <ProgressProvider>
               {children}
             </ProgressProvider>
