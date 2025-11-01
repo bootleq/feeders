@@ -51,13 +51,25 @@ const fetchPicksAtom = atom(
   }
 );
 
+function NoRecord() {
+  return (
+    <div className='mt-2'>
+      <span className='line-through' >動保處獲報已前往現場，但沒有發現犬隻</span>
+      <hr className='my-3' />
+      <div className='flex items-center justify-center text-slate-400 text-3xl tracking-widest min-h-40 mt-6 border-dashed border-4 border-slate-300 rounded'>
+        空無一物
+      </div>
+    </div>
+  );
+}
+
 export default function PickList() {
   const fetchPicks = useSetAtom(fetchPicksAtom);
   const picks = useAtomValue(picksAtom);
   const [readingPick, setPick] = useAtom(pickAtom);
   const setPicksMode = useSetAtom(picksModeAtom);
   const setFiltered = useSetAtom(filterByMarksAtom);
-  const setLoading = useSetAtom(loadingPicksAtom);
+  const [loading, setLoading] = useAtom(loadingPicksAtom);
   const [initLoad, setInitLoad] = useAtom(initialPickLoadedAtom);
   const [initScroll, setInitScroll] = useState(false);
   const setSaved = useSetAtom(pickSavedAtom);
@@ -163,11 +175,16 @@ export default function PickList() {
 
       <div ref={bodyRef} className='text-base pt-2 pb-8 pr-3 ml-3 ring-red-500 overflow-y-scroll scrollbar-thin'>
         <PicksLoading />
-        <ol className={`flex flex-col ${picksStyles['pick-list']}`} data-display-mode={displayMode}>
-          {picks.map(pick =>
-            <PickRow key={pick.id} readingPickId={readingPick?.id || null} pick={pick} onTake={onTake} onItemMode={onItemMode} />
-          )}
-        </ol>
+        {
+          picks.length > 0 ?
+            <ol className={`flex flex-col ${picksStyles['pick-list']}`} data-display-mode={displayMode}>
+              {picks.map(pick =>
+              <PickRow key={pick.id} readingPickId={readingPick?.id || null} pick={pick} onTake={onTake} onItemMode={onItemMode} />
+              )}
+            </ol>
+            :
+          !loading && <NoRecord />
+        }
       </div>
     </>
   );
