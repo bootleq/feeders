@@ -4,7 +4,7 @@ import * as R from 'ramda';
 import { z } from 'zod';
 import geohash from 'ngeohash';
 import { auth } from '@/lib/auth';
-import { revalidateTag } from 'next/cache';
+import { revalidateByAPI } from '@/lib/cache';
 import { SpotActionEnum } from '@/lib/schema';
 import { parseFormData, zondedDateTimeSchema, ACCESS_CTRL } from '@/lib/utils';
 import { queryDistrict, createSpot as save, geoSpots } from '@/models/spots';
@@ -100,7 +100,9 @@ export async function createSpot(formData: FormData) {
     });
 
     try {
-      revalidateTag('spots');
+      await revalidateByAPI({
+        tags: ['spots'],
+      });
     } catch (e) {
       console.error({
         'create-spot': 'Revalidate Cache failed',

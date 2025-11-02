@@ -78,7 +78,7 @@ export function UnscopedForm({ spot }: {
           <TextInput name='spotTitle' inputProps={{ required: true, defaultValue: spot.title || '' }} />
           <TextInput name='lat' inputProps={{ required: true, defaultValue: spot.lat || '', className: 'font-mono', readOnly: false }} />
           <TextInput name='lon' inputProps={{ required: true, defaultValue: spot.lon || '', className: 'font-mono', readOnly: false }} />
-          <Textarea name='spotDesc' inputProps={{ defaultValue: spot.desc || ''}} />
+          <Textarea name='spotDesc' inputProps={{ defaultValue: spot.desc || '', className: 'min-h-40'} } />
 
           <input type='hidden' name='id' value={spot.id} />
         </div>

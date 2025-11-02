@@ -111,7 +111,7 @@ export function UnscopedForm({ item, geohash }: {
               <DateTimeField name='removedAt' defaultValue={defaultRemovedAt} maxValue={nowValue} />
           }
 
-          <Textarea name='desc' inputProps={{ defaultValue: item.desc || '', className: 'text-sm' }} />
+          <Textarea name='desc' inputProps={{ defaultValue: item.desc || '', className: 'text-sm min-h-40' }} />
           <TextInput name='material' inputProps={{ placeholder: '例：狗罐頭', defaultValue: item.material || '', className: 'text-sm' }} />
           <TextInput
             name='feedeeCount' type='number' tooltip={<SimpleTooltip text='同時出現的狗群隻數' />}

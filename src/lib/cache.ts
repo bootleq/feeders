@@ -7,6 +7,27 @@ import { parse, stringify } from 'superjson';
 
 type Callback = (...args: any[]) => Promise<any>;
 
+export async function revalidateByAPI({ paths, tags }: {
+  paths?: string[],
+  tags?: string[],
+}) {
+  const apiKey = process.env.ADMIN_API_SECRET;
+  if (!apiKey) {
+    throw new Error('missing api key');
+  }
+
+  return await fetch(`${process.env.API_URL}/cache/`, {
+    method: 'DELETE',
+    headers: {
+      'X-API-Key': apiKey,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      paths, tags
+    }),
+  });
+}
+
 export function unstable_cache<T extends Callback>(
   fn: T,
   keyParts?: string[],
