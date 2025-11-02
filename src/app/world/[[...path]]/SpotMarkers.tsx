@@ -211,8 +211,10 @@ export default function SpotMarkers({ spots }: {
       popupclose: () => {
         // Remove hash to quit #id state
         const url = new URL(window.location.href);
-        url.hash = '';
-        window.history.replaceState(null, '', url.toString());
+        if (url.hash) {
+          url.hash = '';
+          window.history.replaceState(null, '', url.toString());
+        }
       },
       add: (e: LeafletEvent) => {
         // Open the Marker with id matches URL hash.
