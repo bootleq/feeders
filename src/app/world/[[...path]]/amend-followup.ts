@@ -3,13 +3,13 @@
 import * as R from 'ramda';
 import { z } from 'zod';
 import { auth } from '@/lib/auth';
-import { revalidatePath, revalidateTag } from 'next/cache';
 import { getDb } from '@/lib/db';
 import { diffForm } from '@/lib/diff';
 import { spotFollowups, changes } from '@/lib/schema';
 import { PubStateEnum, SpotActionEnum } from '@/lib/schema';
 import { and, eq, getTableName } from 'drizzle-orm';
 import { parseFormData, zondedDateTimeSchema, ACCESS_CTRL } from '@/lib/utils';
+import { revalidateByAPI } from '@/lib/cache';
 import { geoSpots } from '@/models/spots';
 import type { FieldErrors } from '@/components/form/store';
 
@@ -127,12 +127,16 @@ export async function amendFollowup(formData: FormData) {
     ]);
 
     try {
-      revalidatePath(`/audit/followup/${data.id}/`);
-      revalidatePath(`/api/followups/${followup.spotId}/`);
-      revalidateTag('spots');
+      await revalidateByAPI({
+        paths: [
+          `/audit/followup/${data.id}/`,
+          `/api/followups/${followup.spotId}/`,
+        ],
+        tags: ['spots'],
+      });
     } catch (e) {
       console.error({
-        'amend-followup': 'revalidatePath failed',
+        'amend-followup': 'Revalidate Cache failed',
         error: e,
       });
     }
