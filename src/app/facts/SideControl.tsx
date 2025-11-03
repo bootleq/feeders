@@ -457,7 +457,7 @@ function DateCtrlPanel() {
 
 const validateStorageMark = (item: any) => {
   if (R.type(item) !== 'Number') {
-    throw new Error(`異常的本機 mark 記錄，anchor: ${JSON.stringify(item)}`);
+    throw new Error(`異常的本機 mark 記錄: ${JSON.stringify(item)}`);
   }
 };
 
@@ -490,7 +490,6 @@ function MarkCtrlPanel({ facts }: {
   const [markPicking, setMarkPicking] = useAtom(markPickingAtom);
   const [localMarks, setLocalMarks] = useAtom(localMarksAtom);
   const [savedHint, setSavedHint] = useState(false);
-  const initialLoad = useRef(true);
   const slotAtom = useMemo(() => createStorageAtom(slot), [slot]);
   const [storageMarks, setStorageMarks] = useAtom(slotAtom);
   const [picksMode, setPicksMode] = useAtom(picksModeAtom);
@@ -506,11 +505,8 @@ function MarkCtrlPanel({ facts }: {
   };
 
   useEffect(() => {
-    if (initialLoad) {
-      storageMarks.forEach(validateStorageMark);
-      setLocalMarks(storageMarks);
-      initialLoad.current = false;
-    }
+    storageMarks.forEach(validateStorageMark);
+    setLocalMarks(storageMarks);
   }, [setLocalMarks, storageMarks]);
 
   useEffect(() => {
@@ -551,9 +547,13 @@ function MarkCtrlPanel({ facts }: {
   };
 
   const onSwitchSlot = (e: React.MouseEvent<HTMLElement>) => {
-    const el = e.currentTarget as HTMLElement;
-    const idx = parseInt(el.dataset.slot || '', 10);
-    setSlot(idx);
+    if (localMarks.length > 0 && localMarks.length !== storageMarks.length) {
+      addAlert('error', <>儲存槽 <var className='font-mono font-bold'>{slot + 1}</var> 的內容還未存檔，請先儲存，或清空</>);
+    } else {
+      const el = e.currentTarget as HTMLElement;
+      const idx = parseInt(el.dataset.slot || '', 10);
+      setSlot(idx);
+    }
   };
 
   const onSave = () => {
@@ -601,7 +601,7 @@ function MarkCtrlPanel({ facts }: {
     }
 
     if (pick) {
-      if (userId === pick.userId) {
+      if (!pick.userId || userId === pick.userId) {
         setPick(pick);
       } else {
         setPick({
