@@ -158,6 +158,7 @@ export default async function Page({ params }: {
     id: string
   }
 }) {
+  console.log({ '💀 cache thru': 'audit followup', args: [params.id] });
   const items = await getItems(params.id);
 
   return (

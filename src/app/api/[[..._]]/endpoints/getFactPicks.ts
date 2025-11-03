@@ -12,6 +12,8 @@ const fetchLimit = 300;
 
 const getItems = unstable_cache(
   async () => {
+    console.log({ '💀 cache thru': 'API getItems' });
+
     const items = await recentPicks(fetchLimit);
     return items;
   },
