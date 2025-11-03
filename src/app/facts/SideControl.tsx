@@ -601,7 +601,7 @@ function MarkCtrlPanel({ facts }: {
     }
 
     if (pick) {
-      if (userId === pick.userId) {
+      if (!pick.userId || userId === pick.userId) {
         setPick(pick);
       } else {
         setPick({
