@@ -156,7 +156,8 @@ Prepare env by copy `.env.sample` to `.env.test`.
 
 - Revalidate cache
 
-      pnpm tsx --env-file=.env.development scripts/admin_revalidate_cache.mjs --path /audit --tags users
+      pnpm tsx --env-file=.env.development scripts/admin_revalidate_cache.mjs --paths /audit/followup/2/ --tags spots
+      pnpm tsx --env-file=.env.production scripts/admin_revalidate_cache.mjs --paths /audit/followup/2/ --tags spots
 
 
 [feeders.fyi]: https://feeders.fyi
