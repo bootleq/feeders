@@ -9,14 +9,14 @@ export default defineCloudflareConfig({
   incrementalCache: withRegionalCache(r2IncrementalCache, {
     mode: "long-lived",
     shouldLazilyUpdateOnCacheHit: false,
-    bypassTagCacheOnCacheHit: true, // default: false
+    bypassTagCacheOnCacheHit: false, // default: false
   }),
   queue: doQueue,
   tagCache: doShardedTagCache({
     baseShardSize: 12,
     regionalCache: true, // default: false
     regionalCacheTtlSec: 5,
-    regionalCacheDangerouslyPersistMissingTags: true, // default: false
+    regionalCacheDangerouslyPersistMissingTags: false, // default: false
     shardReplication: {
       numberOfSoftReplicas: 4,
       numberOfHardReplicas: 2,
