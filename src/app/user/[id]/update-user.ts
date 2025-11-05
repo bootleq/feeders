@@ -75,7 +75,7 @@ export default async function updateUser(formData: FormData) {
     }
 
     try {
-      revalidatePath(`/user/${session.user.id}/`);
+      revalidateTag('profiles');
 
       const { spots, followupSpots, picks } = await getCacheIds(user.id);
 
@@ -84,14 +84,12 @@ export default async function updateUser(formData: FormData) {
       }
       if (followupSpots.length > 0) {
         followupSpots.forEach(id => {
-          revalidatePath(`/api/followups/${id}/`);
+          revalidateTag('followups');
         });
       }
       if (picks.length > 0) {
-        revalidatePath('/api/picks/');
-        revalidatePath('/facts/picks/');
+        revalidateTag('picks');
         picks.forEach(id => {
-          revalidatePath(`/facts/picks/${id}/`);
           revalidatePath(`/audit/pick/${id}/`);
         });
       }
@@ -113,7 +111,8 @@ export default async function updateUser(formData: FormData) {
       return { error: '儲存失敗，非預期的錯誤' };
     }
 
-    revalidatePath(`/user/${session.user.id}/`);
+    revalidateTag('profiles');
+
     return { success: true };
   }
 

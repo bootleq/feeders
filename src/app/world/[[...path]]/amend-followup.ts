@@ -130,9 +130,11 @@ export async function amendFollowup(formData: FormData) {
       await revalidateByAPI({
         paths: [
           `/audit/followup/${data.id}/`,
-          `/api/followups/${followup.spotId}/`,
         ],
-        tags: ['spots'],
+        tags: [
+          'spots',
+          'followups'
+        ],
       });
     } catch (e) {
       console.error({

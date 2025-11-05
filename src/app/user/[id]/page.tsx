@@ -32,6 +32,9 @@ const fetchProfile = unstable_cache(
     return profile;
   },
   ['user'],
+  {
+    tags: ['profiles']
+  }
 );
 
 function parseActionCounts(json: string) {

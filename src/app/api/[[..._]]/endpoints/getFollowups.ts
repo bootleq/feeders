@@ -18,6 +18,9 @@ const getItems = unstable_cache(
     return items;
   },
   ['api', 'followups'],
+  {
+    tags: ['followups'],
+  }
 );
 
 export class getFollowups extends ApiRoute {

@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { auth } from '@/lib/auth';
 import { getDb } from '@/lib/db';
 import { and, eq, inArray, getTableName } from 'drizzle-orm';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { parseFormData, blank, ACCESS_CTRL } from '@/lib/utils';
 import { diffForm } from '@/lib/diff';
 import { factPicks, changes } from '@/lib/schema';
@@ -28,9 +28,7 @@ const diffProps = ['title', 'desc', 'factIds', 'state'] as const;
 
 function revalidate(id?: number) {
   if (!id) return;
-  revalidatePath('/api/picks/');
-  revalidatePath('/facts/picks/');
-  revalidatePath(`/facts/picks/${id}/`);
+  revalidateTag('picks');
   revalidatePath(`/audit/pick/${id}/`);
 }
 

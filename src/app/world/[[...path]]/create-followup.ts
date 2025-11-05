@@ -89,8 +89,7 @@ export async function createFollowup(formData: FormData) {
 
     try {
       await revalidateByAPI({
-        paths: [`/api/followups/${data.spotId}/`],
-        tags: ['spots'],
+        tags: ['spots', 'followups'],
       });
     } catch (e) {
       console.error({

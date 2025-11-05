@@ -46,6 +46,10 @@ const getPicksById = unstable_cache(
     const items = await getPickById(id);
     return items.map(pickMasker);
   },
+  ['facts', 'pick'],
+  {
+    tags: ['picks']
+  }
 );
 
 export async function generateMetadata(
