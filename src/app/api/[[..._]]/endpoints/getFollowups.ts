@@ -10,6 +10,18 @@ import {
 } from 'drizzle-orm';
 import { spots, spotFollowups, PubStateEnum, SpotActionEnum } from '@/lib/schema';
 import { getFollowups as dbGetFollowups } from '@/models/spots';
+import { unstable_cache } from '@/lib/cache';
+
+const getItems = unstable_cache(
+  async (id: number) => {
+    const items = await dbGetFollowups(id);
+    return items;
+  },
+  ['api', 'followups'],
+  {
+    tags: ['followups'],
+  }
+);
 
 export class getFollowups extends ApiRoute {
   schema = {
@@ -46,7 +58,7 @@ export class getFollowups extends ApiRoute {
 
   async handle(c: Context) {
     const data = await this.getValidatedData<typeof this.schema>()
-    const items = await dbGetFollowups(data.params.spotId);
+    const items = await getItems(data.params.spotId);
 
     return c.json({
       success: true,

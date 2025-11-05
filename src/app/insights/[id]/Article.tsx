@@ -18,7 +18,7 @@ function Fact({ fact }: {
   return (
     <li className='flex items-center my-2 w-fit'>
       <div className='font-mono text-sm whitespace-nowrap ml-px mr-1 px-1 rounded-md ring-1 text-red-950 bg-gradient-to-br from-amber-200 to-amber-200/80 hover:ring'>
-        <Link href={`/facts/#${anchor}`}>
+        <Link href={`/facts/#${anchor}`} prefetch={false}>
           {date}{datePadEnd}
         </Link>
       </div>

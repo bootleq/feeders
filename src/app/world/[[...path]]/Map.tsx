@@ -4,9 +4,9 @@ import * as R from 'ramda';
 import geohash from 'ngeohash';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState, ReactElement, useCallback } from 'react';
-import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'motion/react';
 import { useDebouncedCallback } from 'use-debounce';
-import { navTitleAtom, alertsAtom, addAlertAtom, dismissAlertAtom } from '@/components/store';
+import { nowAtom, navTitleAtom, alertsAtom, addAlertAtom, dismissAlertAtom } from '@/components/store';
 import type { keyedAlert } from '@/components/store';
 
 import type { GeoSpotsResult, GeoSpotsByGeohash } from '@/models/spots';
@@ -26,7 +26,7 @@ import {
   advanceDistrictModeAtom,
 } from './store';
 import { jsonReviver } from '@/lib/utils';
-import { parsePath, updatePath, AREA_ZOOM_MAX, GEOHASH_PRECISION } from './util';
+import { parsePath, updatePath, openSpotMarkerById, AREA_ZOOM_MAX, GEOHASH_PRECISION } from './util';
 import { useHydrateAtoms } from 'jotai/utils';
 import Status from './Status';
 import MapStatus from './MapStatus';
@@ -99,6 +99,7 @@ const fetchSpotsAtom = atom(
 function MapUser(props: {
 }) {
   const setMap = useSetAtom(mapAtom);
+  const setNow = useSetAtom(nowAtom);
   const geoSet = useAtomValue(geohashesAtom);
   const fetchSpots = useSetAtom(fetchSpotsAtom);
   const [picker, setPicker] = useAtom(areaPickerAtom);
@@ -165,9 +166,29 @@ function MapUser(props: {
     moveend: debouncedMoveEnd,
   });
 
+  const followHash = useCallback((e: HashChangeEvent) => {
+    // Automatically open the Marker which id matches URL hash
+    const hashId = decodeURI(new URL(e.newURL).hash).match(/^#(\d+)$/)?.[1];
+    if (hashId) {
+      const openedPopup = document.querySelector('.leaflet-popup');
+      if (!openedPopup) {
+        let opened = false;
+        map.eachLayer((layer: any) => {
+          if (opened) return;
+          const found = openSpotMarkerById(Number(hashId), layer);
+          if (found) opened = true;
+        });
+      }
+    }
+  }, [map]);
+
   useEffect(() => {
     setMap(map);
   }, [map, setMap]);
+
+  useEffect(() => {
+    setNow(new Date());
+  }, [setNow]);
 
   useEffect(() => {
     setNavTitle(mode === 'area' ? '區域地圖' : '世界地圖');
@@ -200,6 +221,13 @@ function MapUser(props: {
     }
     prevMode.current = mode;
   }, [mode, addAlert]);
+
+  useEffect(() => {
+    window.addEventListener('hashchange', followHash);
+    return () => {
+      window.removeEventListener('hashchange', followHash);
+    };
+  }, [followHash]);
 
   useEffect(() => {
     if (prevStatus.current !== 'areaPicker' && status === 'areaPicker') {

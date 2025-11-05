@@ -30,6 +30,7 @@ const providers = [
         // Try remove "openid profile" from default. However even only request
         // "email", consent screen still ask for profile.
         scope: 'email',
+        prompt: 'select_account',
       }
     },
 

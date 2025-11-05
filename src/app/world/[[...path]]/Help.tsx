@@ -1,7 +1,7 @@
 "use client"
 
 import { useAtom } from 'jotai';
-import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'motion/react';
 import { toggleHelpAtom } from './store';
 import mapStyles from './map.module.scss';
 import { XMarkIcon } from '@heroicons/react/24/solid';

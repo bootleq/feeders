@@ -34,8 +34,9 @@ export function updatePath(params: {
   newCenter?: LatLng
 }) {
   const { newCenter, newZoom } = params;
-  const { pathname, search } = window.location;
-  let newPath = pathname;
+  const oldHref = window.location.href;
+  const newURL = new URL(oldHref);
+  let newPath = newURL.pathname;
 
   if (newCenter) {
     newPath = newPath.replaceAll(atRegexp, '');
@@ -50,18 +51,68 @@ export function updatePath(params: {
     }
   }
 
-  window.history.replaceState(null, '', newPath + search);
+  newURL.pathname = newPath;
+  const newHref = newURL.href;
+
+  if (oldHref !== newHref) {
+    window.history.replaceState(null, '', newHref);
+  }
 }
 
 export function visitArea(e: React.MouseEvent<HTMLAnchorElement>) {
   e.preventDefault();
 
   const href = e.currentTarget.href;
-  const matches = href.match(/area\/@([\d\.]+),([\d\.]+)\/?/);
-  if (matches && matches.length === 3) {
-    const [, lat, lon] = matches;
-    window.history.pushState(null, '', `/world/area/@${lat},${lon}`);
+  const newURL = new URL(href);
+  const matches = href.match(/area\/@([\d\.]+),([\d\.]+)(#\d+)?\/?/);
+
+  if (matches && matches.length >= 3) {
+    const [, lat, lon, hash] = matches;
+    newURL.pathname = `/world/area/@${lat},${lon}`;
+    newURL.hash = hash || '';
+    window.history.pushState(null, '', newURL.href);
+
+    if (hash) {
+      // re-trigger hashchange for Marker id following
+      const hashChangeEvent = new HashChangeEvent('hashchange', {
+        oldURL: href,
+        newURL: newURL.href,
+        bubbles: true,
+      });
+      window.dispatchEvent(hashChangeEvent);
+    }
   } else {
     console.error('無法由連結解析位址');
   }
+}
+
+export function openSpotMarkerById(id: number, layer: any, timeout: number = 0) {
+  let found = false;
+
+  if (typeof layer.eachLayer === 'function' && typeof layer.zoomToShowLayer === 'function') { // is MarkerClusterGroup
+    layer.eachLayer((sub: any) => {
+      if (sub.options['spot-id'] === id) {
+        found = true;
+        setTimeout(() => {
+          const openedPopup = document.querySelector('.leaflet-popup');
+          if (!openedPopup) {
+            layer.zoomToShowLayer(sub, () => {
+              sub.openPopup();
+            });
+          }
+        }, timeout);
+      }
+    });
+  } else {
+    if (layer.options['spot-id'] === id) {
+      found = true;
+      setTimeout(() => {
+        const openedPopup = document.querySelector('.leaflet-popup');
+        if (!openedPopup) {
+          layer.openPopup();
+        }
+      }, timeout);
+    }
+  }
+  return found;
 }

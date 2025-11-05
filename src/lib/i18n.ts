@@ -20,6 +20,13 @@ const translations = {
     'lon': '經度',
   },
 
+  factFields: { // NOTE: used in PickForm
+    'title':   '標題',
+    'desc':    '說明',
+    'state':   '狀態',
+    'factIds': '事實',
+  },
+
   spotAction: {
     'see':      '看見',
     'remove':   '移除',
@@ -51,9 +58,15 @@ const translations = {
     'resolve':  'bg-green-900',
   },
 
+  pickState: {
+    'draft':     '草稿',
+    'published': '公開',
+  },
+
   changeScope: {
     'amendSpot':     '編修地點',
     'amendFollowup': '編修跟進',
+    'amendPick':     '編修選集',
   },
 };
 

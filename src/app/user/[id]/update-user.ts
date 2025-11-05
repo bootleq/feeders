@@ -4,12 +4,12 @@ import { z } from 'zod';
 import { differenceInDays } from 'date-fns';
 import { format } from '@/lib/date-fp';
 import { auth } from '@/lib/auth';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { getDb } from '@/lib/db';
 import { parseFormData, ACCESS_CTRL } from '@/lib/utils';
 import { eq, and, getTableName } from 'drizzle-orm';
 import { users, changes, UserStateEnum } from '@/lib/schema';
-import { getQuickProfileQuery, RENAME_COOL_OFF_DAYS } from '@/models/users';
+import { getQuickProfileQuery, RENAME_COOL_OFF_DAYS, getCacheIds } from '@/models/users';
 
 const formSchema = z.object({
   field: z.enum(['name', 'desc']),
@@ -74,7 +74,32 @@ export default async function updateUser(formData: FormData) {
       return { error: '儲存失敗，非預期的錯誤' };
     }
 
-    revalidatePath(`/user/${session.user.id}`);
+    try {
+      revalidateTag('profiles');
+
+      const { spots, followupSpots, picks } = await getCacheIds(user.id);
+
+      if (spots.length > 0 || followupSpots.length > 0) {
+        revalidateTag('spots');
+      }
+      if (followupSpots.length > 0) {
+        followupSpots.forEach(id => {
+          revalidateTag('followups');
+        });
+      }
+      if (picks.length > 0) {
+        revalidateTag('picks');
+        picks.forEach(id => {
+          revalidatePath(`/audit/pick/${id}/`);
+        });
+      }
+    } catch (e) {
+      console.error({
+        'update-user': 'Revalidate cache failed',
+        error: e,
+      });
+    }
+
     return { success: true };
   } else if (data.field === 'desc') {
     try {
@@ -86,7 +111,8 @@ export default async function updateUser(formData: FormData) {
       return { error: '儲存失敗，非預期的錯誤' };
     }
 
-    revalidatePath(`/user/${session.user.id}`);
+    revalidateTag('profiles');
+
     return { success: true };
   }
 

@@ -51,8 +51,7 @@ pnpm run deploy
 
 ## Database
 
-Currently, local Pages dev doesn't support `--remote` D1, so we use local
-sqlite db during development.
+During development, we use local D1 in .wrangler directory.
 
 When everything is ready, run the drizzle migrations on remote D1.
 
@@ -62,14 +61,13 @@ When everything is ready, run the drizzle migrations on remote D1.
 
 - Migrations with drizzle-kit (locally)
 
-      pnpm db:migrate:gen
-      pnpm db:migrate:drop
+      pnpm drizzle-kit generate --name=your-migration-name
       pnpm db:migrate
 
 - Remove local db + drizzle meta, then reset with migrations (DANGER)
 
       pnpm db:delete
-      pnpm db:delete && pnpm db:tables && pnpm db:migrate:gen && pnpm db:migrate
+      pnpm db:delete && pnpm db:tables && pnpm drizzle-kit generate && pnpm db:migrate
 
 - Directly execute commands on local D1
 
@@ -81,9 +79,12 @@ When everything is ready, run the drizzle migrations on remote D1.
 
 - Run migrations on remote D1
 
-      pnpm wrangler d1 list
+      pnpm wrangler d1 migrations list feeders --remote
       pnpm wrangler d1 migrations apply feeders --remote
 
+- Export schema and data
+
+      pnpm wrangler d1 export feeders --remote --output=./db.sql
 
 ## Authentication
 
@@ -147,11 +148,16 @@ Prepare env by copy `.env.sample` to `.env.test`.
 
       pnpm tsx scripts/admin_activate_user.mjs {USER_ID} inactive --remote
 
-- Drop spot, or followup
+- Drop spot, followup, or pick
 
       pnpm tsx scripts/admin_drop_spot.mjs {ID} dropped --remote
       pnpm tsx scripts/admin_drop_followup.mjs {ID} dropped --remote
+      pnpm tsx scripts/admin_drop_pick.mjs {ID} dropped --remote
 
+- Revalidate cache
+
+      pnpm tsx --env-file=.env.development scripts/admin_revalidate_cache.mjs --paths /audit/followup/2/ --tags spots
+      pnpm tsx --env-file=.env.production scripts/admin_revalidate_cache.mjs --paths /audit/followup/2/ --tags spots
 
 
 [feeders.fyi]: https://feeders.fyi

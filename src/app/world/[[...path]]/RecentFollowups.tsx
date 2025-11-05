@@ -7,7 +7,6 @@ import { useHydrateAtoms } from 'jotai/utils';
 import { ACCESS_CTRL } from '@/lib/utils';
 import { subDays, formatISO } from '@/lib/date-fp';
 import useClientOnly from '@/lib/useClientOnly';
-import Link from 'next/link';
 
 import { userAtom } from '@/components/store';
 import { mapAtom, areaPickerAtom, viewItemAtom } from './store';
@@ -17,7 +16,7 @@ import type { GeoSpotsByGeohash, GeoSpotsResultSpot, RecentFollowupsItemProps } 
 import type { LatLngBounds } from '@/lib/schema';
 import { visitArea } from './util';
 import SpotInfoPreview from './SpotInfoPreview';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
+import { Tooltip, TooltipTrigger, TooltipContent, menuHoverProps } from '@/components/Tooltip';
 import { StarIcon } from '@heroicons/react/24/outline';
 import { MapPinIcon } from '@heroicons/react/24/solid';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
@@ -97,15 +96,14 @@ function Areas({ areas }: {
         {picked.map(([geohash, { lat, lon, city, town }]) => {
           return (
             <li key={geohash} className={areaItemCls}>
-              <Link
+              <a
                 href={`/world/area/@${lat},${lon}`}
                 onClick={visitArea}
                 className='break-keep w-min cursor-pointer'
                 data-disable-progress={true}
-                prefetch={false}
               >
                 {city} {town}
-              </Link>
+              </a>
             </li>
           );
         })}
@@ -199,32 +197,31 @@ function Followups({ items, today, dates }: {
             <ul className='flex flex-row flex-wrap p-1'>
               {subItems.map((i: RecentFollowupsItemProps) => (
                 <li key={i.spotId} className={`relative ${viewItem === i ? viewItemPinCls : ''}`} onKeyUp={onKeyUp}>
-                  <Tooltip placement='bottom-end'>
+                  <Tooltip placement='bottom-end' hoverProps={menuHoverProps}>
                     <TooltipTrigger className='break-keep w-min cursor-pointer'>
-                      <Link
-                        href={`/world/area/@${i.lat},${i.lon}`}
+                      <a
+                        href={`/world/area/@${i.lat},${i.lon}#${i.spotId}`}
                         onClick={(e) => { e.preventDefault(); setViewItem(i); } }
                         className='break-keep w-min cursor-pointer'
-                        prefetch={false}
                         data-disable-progress={true}
                       >
                         <MapPinIcon className={`cursor-pointer ${mapPinCls(i.spotState)}`} height={24} />
                         {viewItem === i &&
                           <div className='absolute -bottom-[0.4rem] bg-yellow-400 h-1 w-full scale-x-75'></div>
                         }
-                      </Link>
+                      </a>
                     </TooltipTrigger>
-                    <TooltipContent className="p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1">
-                      {i.city} {i.town}
-                      <Link
-                        href={`/world/area/@${i.lat},${i.lon}`}
-                        className='break-keep w-min cursor-pointer text-slate-600'
-                        prefetch={false}
+                    <TooltipContent className="p-1 text-sm rounded box-border w-max z-[1002] bg-slate-100 ring-1">
+                      <a
+                        href={`/world/area/@${i.lat},${i.lon}#${i.spotId}`}
+                        onClick={visitArea}
+                        className='btn px-1 mr-1 break-keep w-min cursor-pointer text-slate-600 bg-slate-100 hover:bg-yellow-400/50 inline-flex items-center'
                         data-disable-progress={true}
                       >
-                        <ArrowRightIcon className='inline ml-2' height={16} />
-                        去
-                      </Link>
+                        前往
+                        <ArrowRightIcon className='inline ml-1' height={16} />
+                      </a>
+                      {i.city} {i.town}
                     </TooltipContent>
                   </Tooltip>
                 </li>

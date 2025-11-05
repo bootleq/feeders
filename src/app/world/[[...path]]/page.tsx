@@ -1,6 +1,7 @@
 import * as R from 'ramda';
 import type { Metadata } from "next";
 import { auth } from '@/lib/auth';
+import { unstable_cache } from '@/lib/cache';
 import dynamic from 'next/dynamic';
 import geohash from 'ngeohash';
 import parse, { HTMLReactParserOptions, Element, Text, DOMNode } from 'html-react-parser';
@@ -34,11 +35,18 @@ const fetchLimit = 200;
 const overwriteToday = new Date();
 const PRELOAD_AREA_SIZE = 3;
 
-async function getSpots() {
-  const query = recentFollowups(fetchLimit + 1);
-  const items = await query;
-  return items;
-}
+const getSpots = unstable_cache(
+  async () => {
+    const query = recentFollowups(fetchLimit + 1);
+    const items = await query;
+    return items;
+  },
+  ['world', 'spots'],
+  {
+    tags: ['spots'],
+    revalidate: 86400, // 1 day
+  }
+);
 
 async function preloadGeoSpots(hashes: string[]) {
   if (!hashes.length) {

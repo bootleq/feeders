@@ -9,6 +9,7 @@ import { spotFollowups, changes } from '@/lib/schema';
 import { PubStateEnum, SpotActionEnum } from '@/lib/schema';
 import { and, eq, getTableName } from 'drizzle-orm';
 import { parseFormData, zondedDateTimeSchema, ACCESS_CTRL } from '@/lib/utils';
+import { revalidateByAPI } from '@/lib/cache';
 import { geoSpots } from '@/models/spots';
 import type { FieldErrors } from '@/components/form/store';
 
@@ -81,6 +82,7 @@ export async function amendFollowup(formData: FormData) {
     spawnedAt: spotFollowups.spawnedAt,
     removedAt: spotFollowups.removedAt,
     userId: spotFollowups.userId,
+    spotId: spotFollowups.spotId,
   }).from(spotFollowups)
     .where(and(
       eq(spotFollowups.id, data.id),
@@ -123,6 +125,23 @@ export async function amendFollowup(formData: FormData) {
         content: changeset.old,
       }).returning({ id: changes.id})
     ]);
+
+    try {
+      await revalidateByAPI({
+        paths: [
+          `/audit/followup/${data.id}/`,
+        ],
+        tags: [
+          'spots',
+          'followups'
+        ],
+      });
+    } catch (e) {
+      console.error({
+        'amend-followup': 'Revalidate Cache failed',
+        error: e,
+      });
+    }
 
     const reloadSpots = await geoSpots([data.geohash]);
 

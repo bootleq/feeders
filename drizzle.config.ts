@@ -1,5 +1,6 @@
 import { defineConfig } from 'drizzle-kit';
 import { type Config } from 'drizzle-kit';
+import { readdirSync } from 'node:fs';
 
 const { REMOTE_D1 } = process.env;
 
@@ -23,16 +24,19 @@ if (REMOTE_D1) {
     strict: true,
   }, config);
 } else {
-  const { LOCAL_DB_PATH } = process.env;
+  const localDbDir = '.wrangler/state/v3/d1/miniflare-D1DatabaseObject';
+  const files = readdirSync(localDbDir);
+  const file = files.find(file => file.endsWith('.sqlite'));
+  const localDbPath = file ? `${localDbDir}/${file}` : null;
 
-  if (LOCAL_DB_PATH) {
+  if (localDbPath) {
     Object.assign(config, {
       dbCredentials: {
-        url: LOCAL_DB_PATH
+        url: localDbPath
       }
     });
   } else {
-    throw new Error('Missing LOCAL_DB_PATH');
+    throw new Error(`Aborted. Missing local DB, expect sqlite file in: ${localDbDir}.`);
   }
 }
 

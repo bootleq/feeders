@@ -3,7 +3,7 @@
 import { useSetAtom, useAtomValue } from 'jotai';
 import type { PrimitiveAtom, WritableAtom } from 'jotai';
 import { ReactElement } from 'react';
-import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'motion/react';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 

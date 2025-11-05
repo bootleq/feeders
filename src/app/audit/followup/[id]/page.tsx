@@ -22,6 +22,8 @@ import {
   getTableName,
 } from 'drizzle-orm';
 
+export const dynamic = 'force-static';
+
 async function getItems(id: string) {
   const db = getDb();
   const items = await db.select({
@@ -156,6 +158,7 @@ export default async function Page({ params }: {
     id: string
   }
 }) {
+  console.log({ '💀 cache thru': 'audit followup', args: [params.id] });
   const items = await getItems(params.id);
 
   return (

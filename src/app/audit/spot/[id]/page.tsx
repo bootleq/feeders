@@ -23,6 +23,8 @@ import {
   getTableName,
 } from 'drizzle-orm';
 
+export const dynamic = 'force-static';
+
 async function getItems(id: string) {
   const db = getDb();
   const items = await db.select({

@@ -25,6 +25,17 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+
+      keyframes: {
+        'preview-in': {
+          '0%': { opacity: '0' },
+          '50%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+      },
+      animation: {
+        'preview-in': 'preview-in 200ms ease-in forwards',
+      },
     },
   },
   plugins: [

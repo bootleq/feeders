@@ -4,36 +4,47 @@ import * as React from "react";
 import {
   useFloating,
   autoUpdate,
-  offset,
+  offset as offsetMiddleware,
   flip,
   shift,
   useHover,
   useFocus,
-  // safePolygon,
+  safePolygon,
   useDismiss,
   useRole,
   useInteractions,
   useMergeRefs,
-  FloatingPortal
+  FloatingPortal,
+  FloatingFocusManager,
 } from "@floating-ui/react";
-import type { Placement, UseHoverProps } from "@floating-ui/react";
+import type { Placement, OffsetOptions, UseHoverProps, UseRoleProps } from "@floating-ui/react";
+import { useCallback } from 'react';
 
 interface TooltipOptions {
   initialOpen?: boolean;
   placement?: Placement;
+  offset?: OffsetOptions;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   transform?: boolean,
   hoverProps?: UseHoverProps;
+  role?: UseRoleProps['role'],
 }
+
+export const menuHoverProps = {
+  delay: { open: 0, close: 240 },
+  handleClose: safePolygon(),
+};
 
 export function useTooltip({
   initialOpen = false,
   placement = "top",
+  offset = 5,
   transform = true,
   hoverProps = {
     delay: { open: 0, close: 240 },
   },
+  role = 'tooltip',
   open: controlledOpen,
   onOpenChange: setControlledOpen,
 }: TooltipOptions = {}) {
@@ -49,7 +60,7 @@ export function useTooltip({
     onOpenChange: setOpen,
     whileElementsMounted: autoUpdate,
     middleware: [
-      offset(5),
+      offsetMiddleware(offset),
       flip({
         crossAxis: placement.includes("-"),
         fallbackAxisSideDirection: "start",
@@ -71,9 +82,9 @@ export function useTooltip({
     enabled: controlledOpen == null
   });
   const dismiss = useDismiss(context);
-  const role = useRole(context, { role: "tooltip" });
+  const aRole = useRole(context, { role });
 
-  const interactions = useInteractions([hover, focus, dismiss, role]);
+  const interactions = useInteractions([hover, focus, dismiss, aRole]);
 
   return React.useMemo(
     () => ({
@@ -129,9 +140,9 @@ export const TooltipTrigger = React.forwardRef<
       context.getReferenceProps({
         ref,
         ...props,
-        ...children.props,
-        "data-state": context.open ? "open" : "closed"
-      })
+        ...(typeof children.props === 'object' ? children.props : {}),
+        ["data-state" as keyof typeof props]: context.open ? "open" : "closed"
+      }) as React.HTMLProps<Element> & { "data-state"?: string }
     );
   }
 
@@ -166,6 +177,48 @@ export const TooltipContent = React.forwardRef<
         }}
         {...context.getFloatingProps(props)}
       />
+    </FloatingPortal>
+  );
+});
+
+export const TooltipContentMenu = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLProps<HTMLDivElement> & { dismissOnClick?: boolean }
+>(function TooltipContent({ style, dismissOnClick, ...props }, propRef) {
+  const context = useTooltipContext();
+  const ref = useMergeRefs([context.refs.setFloating, propRef]);
+
+  const onClickDismiss = useCallback(() => {
+    context.setOpen(false);
+  }, [context]);
+
+  const focusOptions = {
+    context: context.context,
+    initialFocus: -1,
+    modal: false,
+    closeOnFocusOut: true,
+  };
+
+  if (!context.open) return null;
+
+  return (
+    <FloatingPortal>
+      <FloatingFocusManager {...focusOptions}>
+        <div
+          ref={ref}
+          style={{
+            ...context.floatingStyles,
+            ...style
+          }}
+          {...context.getFloatingProps({
+            role: 'menu',
+            ...props
+          })}
+          {
+            ...(dismissOnClick ? { onClick: onClickDismiss } : {})
+          }
+        />
+      </FloatingFocusManager>
     </FloatingPortal>
   );
 });

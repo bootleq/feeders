@@ -1,7 +1,7 @@
 'use server'
 
 import { auth } from '@/lib/auth';
-import { revalidatePath } from 'next/cache';
+import { revalidateTag } from 'next/cache';
 import { ENABLE_ACTIVATE } from '@/lib/utils';
 import { getDb } from '@/lib/db';
 import { eq, and, getTableName } from 'drizzle-orm';
@@ -55,7 +55,7 @@ export default async function saveUserArea() {
     return { error: '儲存失敗，非預期的錯誤' };
   }
 
-  revalidatePath(`/user/${session.user.id}`);
+  revalidateTag('profiles');
 
   return {
     success: true

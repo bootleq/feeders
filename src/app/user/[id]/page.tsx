@@ -2,6 +2,7 @@ import * as R from 'ramda';
 import type { Metadata } from "next";
 import { auth } from '@/lib/auth';
 import { Fragment } from 'react';
+import { unstable_cache } from '@/lib/cache';
 import { SpotActionEnum } from '@/lib/schema';
 import { format } from '@/lib/date-fp';
 import { getWorldUsers, getProfile } from '@/models/users';
@@ -25,6 +26,17 @@ async function getUser(id: string | undefined) {
   return null;
 }
 
+const fetchProfile = unstable_cache(
+  async (id: string) => {
+    const profile = await getProfile(id);
+    return profile;
+  },
+  ['user'],
+  {
+    tags: ['profiles']
+  }
+);
+
 function parseActionCounts(json: string) {
   const source = JSON.parse(json) as { action: string, count: number }[];
   const result = source.reduce<Record<string, number>>(
@@ -44,13 +56,14 @@ export const metadata: Metadata = {
 export default async function Page({ params }: {
   params: { id: string }
 }) {
-  const session = await auth();
-  const user = await getUser(session?.userId);
-  const profile = await getProfile(params.id);
+  const profile = await fetchProfile(params.id);
 
   if (!profile) {
     notFound();
   }
+
+  const session = await auth();
+  const user = await getUser(session?.userId);
 
   const { renames } = profile;
 

@@ -46,8 +46,10 @@ export const users = sqliteTable("users", {
   lockedAt: timestampCol('lockedAt'),
 })
 export const usersRelations = relations(users, ({ many }) => ({
-  spots: many(spots),
-  areas: many(areas),
+  spots:     many(spots),
+  followups: many(spotFollowups),
+  areas:     many(areas),
+  picks:     many(factPicks),
 }));
 
 export const accounts = sqliteTable('accounts', {
@@ -140,7 +142,29 @@ export const spotFollowupsRelations = relations(spotFollowups, ({ one }) => ({
   spot: one(spots, {
     fields: [spotFollowups.spotId],
     references: [spots.id]
+  }),
+  author: one(users, {
+    fields: [spotFollowups.userId],
+    references: [users.id]
   })
+}));
+
+export const factPicks = sqliteTable("factPicks", {
+  id: incrementIdCol(),
+  state: pubStateCol().notNull(),
+  factIds: text('factIds', { mode: 'json' }).$type<number[]>().notNull().default(sql`'[]'`),
+  title: text('title'),
+  desc: text('desc'),
+  createdAt: createdAtCol(),
+  publishedAt: timestampCol('publishedAt'),
+  userId: text('userId').references(() => users.id)
+});
+
+export const factPicksRelations = relations(factPicks, ({ one, many }) => ({
+  author: one(users, {
+    fields: [factPicks.userId],
+    references: [users.id]
+  }),
 }));
 
 export const changes = sqliteTable("changes", {

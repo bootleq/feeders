@@ -10,6 +10,7 @@ import { spots, changes } from '@/lib/schema';
 import { PubStateEnum } from '@/lib/schema';
 import { and, eq, getTableName } from 'drizzle-orm';
 import { parseFormData, ACCESS_CTRL } from '@/lib/utils';
+import { revalidateByAPI } from '@/lib/cache';
 import { queryDistrict, geoSpots } from '@/models/spots';
 import type { FieldErrors } from '@/components/form/store';
 
@@ -121,6 +122,18 @@ export async function amendSpot(formData: FormData) {
         content: changeset.old,
       }).returning({ id: changes.id})
     ]);
+
+    try {
+      await revalidateByAPI({
+        paths: ['/audit/spots/${data.id}/'],
+        tags: ['spots'],
+      });
+    } catch (e) {
+      console.error({
+        'amend-spot': 'Revalidate Cache failed',
+        error: e,
+      });
+    }
 
     const reloadSpots = await geoSpots(R.uniq(reloadHashes));
 

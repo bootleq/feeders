@@ -2,7 +2,7 @@ import * as R from 'ramda';
 import directus from '@/lib/directus';
 import { readItems } from '@directus/sdk';
 import { cmsBuiltURL, blank } from '@/lib/utils';
-import type { Tags } from '@/app/facts/store';
+import type { Fact, Tags } from '@/app/facts/store';
 
 const tagOrder = [
   '餵食',
@@ -50,7 +50,7 @@ async function fromR2() {
   }).then(async (res) => {
     const result = await res.json();
     return result as {
-      facts: Record<string, any>[],
+      facts: Fact[],
       tags: Tags,
     };
   });
@@ -89,5 +89,8 @@ export async function getFacts(build = false) {
     return acc;
   }, {});
 
-  return { facts, tags };
+  return { facts, tags } as {
+    facts: Fact[],
+    tags: Tags,
+  };
 }

@@ -4,7 +4,9 @@ import type { Delta, ModifiedDelta, ObjectDelta } from 'jsondiffpatch';
 
 const instance = create();
 
-export function diffForm(oldObj: object, newObj: object) {
+type Obj = Record<string, any>;
+
+export function diffForm(oldObj: Obj, newObj: Obj) {
   const delta = instance.diff(oldObj, newObj);
 
   if (R.isNil(delta)) {
@@ -14,17 +16,12 @@ export function diffForm(oldObj: object, newObj: object) {
   const changeset = Object.entries(delta).reduce((acc, deltaPair) => {
     const [key, deltaEntry] = deltaPair as [string, ObjectDelta];
 
-    // Only support shallow object of ModifiedDelta
-    // https://github.com/benjamine/jsondiffpatch/blob/master/docs/deltas.md
-    if (!Array.isArray(deltaEntry)) throw new Error(`Unexpected delta ${deltaPair}`);
-    if (deltaEntry.length !== 2) throw new Error(`Unexpected delta ${deltaPair}`);
-
-    acc.old[key] = deltaEntry[0];
-    acc.new[key] = deltaEntry[1];
+    acc.old[key] = oldObj[key];
+    acc.new[key] = newObj[key];
     return acc;
   }, {
-    old: {} as { [key: string]: any },
-    new: {} as { [key: string]: any },
+    old: {} as Obj,
+    new: {} as Obj,
   });
 
   return changeset;

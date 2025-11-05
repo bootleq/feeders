@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { auth } from '@/lib/auth';
 import { SpotActionEnum } from '@/lib/schema';
 import { parseFormData, zondedDateTimeSchema, ACCESS_CTRL } from '@/lib/utils';
+import { revalidateByAPI } from '@/lib/cache';
 import { createFollowup as save, geoSpots } from '@/models/spots';
 import type { FieldErrors } from '@/components/form/store';
 
@@ -85,6 +86,17 @@ export async function createFollowup(formData: FormData) {
       ...data,
       userId: session.userId,
     });
+
+    try {
+      await revalidateByAPI({
+        tags: ['spots', 'followups'],
+      });
+    } catch (e) {
+      console.error({
+        'create-spot': 'Revalidate Cache failed',
+        error: e,
+      });
+    }
 
     const reloadSpots = await geoSpots([data.geohash]);
 

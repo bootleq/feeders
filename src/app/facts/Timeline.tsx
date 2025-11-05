@@ -10,15 +10,18 @@ import { KeywordRangeCollector } from '@/components/KeywordRangeCollector';
 import {
   slugAtom,
   VIEW_CTRL_KEYS,
-  SLUG_PATTERN,
+  ZOOM_SLUG_PATTERN,
   viewCtrlAtom,
   tagsAtom,
   textFilterAtom,
   textHighlightAtom,
   highlightRangesAtomFamily,
-  marksAtom,
+  localMarksAtom,
   markPickingAtom,
-  addMarkAtom,
+  addLocalMarkAtom,
+  pickAtom,
+  addPickMarkAtom,
+  latestAddMarkAtom,
   timelineInterObserverAtom,
 } from './store';
 import type { Tags } from './store';
@@ -57,7 +60,7 @@ function Fact({ fact, isSubView, onZoom }: {
   const idProp = isSubView ? {} : { id: anchor };
 
   return (
-    <div data-role='fact' data-anchor={anchor} className='px-1 pl-3 py-1 relative group rounded ring-slate-700/20'>
+    <div data-role='fact' data-id={id} data-anchor={anchor} className='px-1 pl-3 py-1 relative group rounded ring-slate-700/20'>
       <div className='flex items-center py-1 group/header group-hover:bg-slate-100 group-hover:ring ring-slate-200'>
         <div {...idProp} className='font-mono text-sm relative flex items-center whitespace-nowrap ml-px mr-1 px-1 rounded-md ring-1 text-red-950 bg-gradient-to-br from-amber-200 to-amber-200/80'>
           <a className='absolute flex items-center justify-center size-3 drop-shadow z-20 -left-[15px] bg-slate-100 border border-slate-400 rounded-full' href={`#${anchor}`}></a>
@@ -127,8 +130,11 @@ export default function Timeline({ facts, isSubView = false, col, isOnly = false
   const setSlug = useSetAtom(slugAtom);
   const viewCtrl = useAtomValue(viewCtrlAtom);
   const [markPicking, setMarkPicking] = useAtom(markPickingAtom);
-  const marks = useAtomValue(marksAtom);
-  const addMark = useSetAtom(addMarkAtom);
+  const localMarks = useAtomValue(localMarksAtom);
+  const addLocalMark = useSetAtom(addLocalMarkAtom);
+  const pick = useAtomValue(pickAtom);
+  const addPickMark = useSetAtom(addPickMarkAtom);
+  const setLatestMark = useSetAtom(latestAddMarkAtom);
   const addAlert = useSetAtom(addAlertAtom);
   const setInterObserver = useSetAtom(timelineInterObserverAtom);
   const [markOffscreen, setMarkOffscreen] = useState<null | 'up' | 'down'>(null);
@@ -146,7 +152,7 @@ export default function Timeline({ facts, isSubView = false, col, isOnly = false
     const slug = newUrl.pathname.split('/')[2];
     const decodedSlug = decodeURI(slug);
 
-    if (slug && decodedSlug.match(SLUG_PATTERN)) {
+    if (slug && decodedSlug.match(ZOOM_SLUG_PATTERN)) {
       setSlug(decodedSlug);
       window.history.pushState(null, '', `/facts/${slug}/`);
     } else {
@@ -201,21 +207,31 @@ export default function Timeline({ facts, isSubView = false, col, isOnly = false
     const fact = el.closest('[data-role="fact"]') as HTMLElement;
     if (!fact) return;
 
-    const anchor = fact.dataset.anchor;
-    const title = fact.querySelector('[data-role="title"]')?.textContent;
+    const id = Number(fact.dataset.id);
 
-    if (R.any(R.propEq(anchor, 'anchor'), marks)) {
-      addAlert('info', <>已經加入過了，不能重複</>);
+    if (!id) {
+      addAlert('error', <>無法取得 id</>);
       return;
     }
 
-    if (anchor && title) {
-      addMark({ anchor, title })
-      setMarkPicking(false);
+    if (pick) {
+      if (pick.factIds.includes(id)) {
+        addAlert('info', <>已經加入過了，不能重複</>);
+        return;
+      }
+      addPickMark(id);
+      setLatestMark(id);
     } else {
-      addAlert('error', <>無法取得連結或標題</>);
+      if (localMarks.includes(id)) {
+        addAlert('info', <>已經加入過了，不能重複</>);
+        return;
+      }
+      addLocalMark(id);
+      setLatestMark(id);
     }
-  }, [marks, addMark, setMarkPicking, addAlert]);
+
+    setMarkPicking(false);
+  }, [localMarks, addLocalMark, pick, addPickMark, setMarkPicking, setLatestMark, addAlert]);
 
   const Facts = useMemo(() => {
     return facts.map(fact => <Fact key={fact.id} fact={fact} isSubView={isSubView} onZoom={onZoom} />);
