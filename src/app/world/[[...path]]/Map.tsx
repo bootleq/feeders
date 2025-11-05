@@ -170,15 +170,12 @@ function MapUser(props: {
     // Automatically open the Marker which id matches URL hash
     const hashId = decodeURI(new URL(e.newURL).hash).match(/^#(\d+)$/)?.[1];
     if (hashId) {
-      const openedPopup = document.querySelector('.leaflet-popup');
-      if (!openedPopup) {
-        let opened = false;
-        map.eachLayer((layer: any) => {
-          if (opened) return;
-          const found = openSpotMarkerById(Number(hashId), layer);
-          if (found) opened = true;
-        });
-      }
+      let opened = false;
+      map.eachLayer((layer: any) => {
+        if (opened) return;
+        const found = openSpotMarkerById(Number(hashId), layer);
+        if (found) opened = true;
+      });
     }
   }, [map]);
 

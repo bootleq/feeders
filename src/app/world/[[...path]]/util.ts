@@ -94,12 +94,9 @@ export function openSpotMarkerById(id: number, layer: any, timeout: number = 0) 
       if (sub.options['spot-id'] === id) {
         found = true;
         setTimeout(() => {
-          const openedPopup = document.querySelector('.leaflet-popup');
-          if (!openedPopup) {
-            layer.zoomToShowLayer(sub, () => {
-              sub.openPopup();
-            });
-          }
+          layer.zoomToShowLayer(sub, () => {
+            sub.openPopup();
+          });
         }, timeout);
       }
     });
@@ -107,10 +104,7 @@ export function openSpotMarkerById(id: number, layer: any, timeout: number = 0) 
     if (layer.options['spot-id'] === id) {
       found = true;
       setTimeout(() => {
-        const openedPopup = document.querySelector('.leaflet-popup');
-        if (!openedPopup) {
-          layer.openPopup();
-        }
+        layer.openPopup();
       }, timeout);
     }
   }
