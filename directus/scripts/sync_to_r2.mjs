@@ -21,6 +21,7 @@ const rclone = async () => {
     srcDir,
     `${rcloneRemote}:${STORAGE_S3_BUCKET}/${r2Dir}`,
     // '--dry-run',
+    '--fast-list',
     '--metadata-set="content-type=application/json"',
     `--metadata-set='cache-control="public, max-age=10368000"'`,
     // NOTE: final cache-control is set by domain's Caching Rules eventually
