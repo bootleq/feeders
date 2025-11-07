@@ -41,27 +41,22 @@ const tagOrder = [
   null,
 ];
 
+export const tags = tagOrder.reduce((acc, k) => {
+  acc[k || ''] = true;
+  return acc;
+}, {} as Tags);
 
 async function fromR2() {
   const url = cmsBuiltURL('facts.json');
 
-  const { facts, tags } = await fetch(url, {
+  const facts = await fetch(url, {
     next: { revalidate: false }
   }).then(async (res) => {
-    const result = await res.json();
-    return result as {
-      facts: Fact[],
-      tags: Tags,
-    };
+    return await res.json() as Fact[];
   });
 
-  return { facts, tags };
+  return facts;
 }
-
-const tagOrderIndex = R.pipe(
-  R.flip(R.indexOf)(tagOrder),
-  R.defaultTo(Infinity)
-);
 
 export async function getFacts(build = false) {
   if (!build && process.env.NODE_ENV !== 'development') {
@@ -79,18 +74,5 @@ export async function getFacts(build = false) {
     }
   });
 
-  const tags = R.pipe(
-    R.flatten,
-    R.uniq,
-    R.sortBy(tagOrderIndex),
-  )(facts.map(i => i.tags)).reduce<Record<string, boolean>>((acc, tag) => {
-    const key = (tag as string | null) || '';
-    acc[key] = true;
-    return acc;
-  }, {});
-
-  return { facts, tags } as {
-    facts: Fact[],
-    tags: Tags,
-  };
+  return facts as Fact[];
 }
