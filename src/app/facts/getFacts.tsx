@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 import directus from '@/lib/directus';
-import { readItems } from '@directus/sdk';
-import { cmsBuiltURL, blank } from '@/lib/utils';
+import { readItem, readItems } from '@directus/sdk';
+import { cmsBuiltURL, present, blank } from '@/lib/utils';
 import type { Fact, Tags } from '@/app/facts/store';
 
 const tagOrder = [
@@ -46,8 +46,9 @@ export const tags = tagOrder.reduce((acc, k) => {
   return acc;
 }, {} as Tags);
 
-async function fromR2() {
-  const url = cmsBuiltURL('facts.json');
+async function fromR2(id?: number) {
+  const path = present(id) ? `facts/${id}.json` : 'facts.json';
+  const url = cmsBuiltURL(path);
 
   const facts = await fetch(url, {
     next: { revalidate: false }
@@ -75,4 +76,19 @@ export async function getFacts(build = false) {
   });
 
   return facts as Fact[];
+}
+
+export async function getFactById(id: number, build = false) {
+  if (!build && process.env.NODE_ENV !== 'development') {
+    const items = await fromR2(id);
+    return items.length ? items.pop() : null;
+  }
+
+  const fact = await directus.request(readItem('facts', id));
+
+  if (blank(fact.tags)) {
+    fact['tags'] = null;
+  }
+
+  return fact as Fact;
 }

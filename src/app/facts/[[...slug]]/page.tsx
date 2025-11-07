@@ -3,7 +3,7 @@ import type { Metadata, ResolvingMetadata } from "next";
 import { preload } from 'react-dom';
 import striptags from 'striptags';
 import { notFound } from 'next/navigation';
-import { getFacts, tags } from '@/app/facts/getFacts';
+import { getFacts, tags, getFactById } from '@/app/facts/getFacts';
 import { getPickById, recentPicks, buildMasker } from '@/models/facts';
 import { unstable_cache } from '@/lib/cache';
 import type { PickProps } from '@/models/facts';
@@ -24,10 +24,13 @@ async function findZoomedFact(slug: string) {
   const zoom = slug.match(ZOOM_SLUG_PATTERN);
 
   if (zoom) {
-    const facts = await getFacts();
     const factId = Number.parseInt(zoom.pop() || '', 10);
-    const fact = facts.find(f => f.id === factId);
-    return fact;
+    try {
+      const fact = await getFactById(factId);
+      return fact;
+    } catch (e) {
+      notFound();
+    }
   }
 }
 
