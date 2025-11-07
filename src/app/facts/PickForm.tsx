@@ -240,7 +240,7 @@ function UnscopedForm() {
         編輯選集
       </h2>
       <form onSubmit={onSubmit} className='flex flex-col items-center gap-y-1 mt-3'>
-        <div className='grid grid-cols-[min-content_2fr] gap-y-2 mb-1'>
+        <div className='w-full grid grid-cols-[min-content_2fr] gap-y-2 mb-1'>
           <TextInput name='title' inputProps={{ required: true, className: 'cursor-text font-mixed', defaultValue: pick.title || '', disabled: isBanned }} />
           <Textarea name='desc' inputProps={{ rows: 8, className: 'md:min-w-[500px] cursor-text font-mixed', defaultValue: pick.desc || '', disabled: isBanned }} labelOpts={{ align: 'start' }} />
           {
