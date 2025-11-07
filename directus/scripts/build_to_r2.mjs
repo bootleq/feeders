@@ -62,7 +62,7 @@ const upload = async (aFile) => {
   }
 };
 
-const saveToDisk = (data, name) => {
+const saveToDisk = (data, name, reportUnchanged = true) => {
   const json = JSON.stringify(data);
   const key = `${r2Dir}/${name}`;
   const destPath = `${localDir}/${key}`;
@@ -72,7 +72,9 @@ const saveToDisk = (data, name) => {
   if (fs.existsSync(destPath)) {
     const extFile = fs.readFileSync(destPath, 'utf8');
     if (extFile === json) {
-      console.log(chalk.gray(`  skip ${key} (unchanged).`));
+      if (reportUnchanged) {
+        console.log(chalk.gray(`  skip ${key} (unchanged).`));
+      }
       return;
     }
   }
@@ -107,6 +109,11 @@ const blocks = await getAllBlocks();
 saveToDisk(facts, 'facts.json');
 saveToDisk(insights, 'insights.json');
 saveToDisk(laws, 'laws.json');
+
+facts.forEach((fact) => {
+  const { id } = fact;
+  saveToDisk(fact, `facts/${id}.json`, false);
+});
 
 fs.mkdirSync(`${localDir}/${r2Dir}/insights`, { recursive: true });
 for (let idx = 0; idx < insights.length; idx++) {
