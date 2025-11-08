@@ -36,8 +36,8 @@ importers:
         specifier: ^14.2.5
         version: 14.2.5
       '@opennextjs/cloudflare':
-        specifier: ^1.11.0
-        version: 1.11.0(wrangler@4.46.0)
+        specifier: ^1.11.1
+        version: 1.11.1(wrangler@4.46.0)
       '@react-leaflet/core':
         specifier: ^2.1.0
         version: 2.1.0(leaflet@1.9.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2479,8 +2479,8 @@ packages:
     resolution: {integrity: sha512-elpMb0fJZc0a1VtymedFa7P1lYcyOmt+Pwqyacpq2C/SvbETIeBlW/Xle/vY95ICtccKUxITI8MtonrCo2+2/Q==}
     hasBin: true
 
-  '@opennextjs/cloudflare@1.11.0':
-    resolution: {integrity: sha512-2QVZLjCr3hPwkcGEetLarTZvlNIHsGV3j2+i+KNsjFIBgvsnxhmRqJbT0u8J9cVMFKNh19hSOTOmUKs1T3DWig==}
+  '@opennextjs/cloudflare@1.11.1':
+    resolution: {integrity: sha512-KBZ8AdTwzFDfNCfE8mwNtBzdvA7tuFG8nGK5Eqi4WJ8C7tZQygG0++6t3XF5uZfTUeD+omFz42zlbI5pLK0WDg==}
     hasBin: true
     peerDependencies:
       wrangler: ^4.38.0
@@ -6806,6 +6806,7 @@ packages:
   rclone.js@0.6.6:
     resolution: {integrity: sha512-Dxh34cab/fNjFq5SSm0fYLNkGzG2cQSBy782UW9WwxJCEiVO4cGXkvaXcNlgv817dK8K8PuQ+NHUqSAMMhWujQ==}
     engines: {node: '>=12'}
+    cpu: [arm, arm64, mips, mipsel, x32, x64]
     os: [darwin, freebsd, linux, openbsd, sunos, win32]
     hasBin: true
 
@@ -10861,7 +10862,7 @@ snapshots:
       - aws-crt
       - supports-color
 
-  '@opennextjs/cloudflare@1.11.0(wrangler@4.46.0)':
+  '@opennextjs/cloudflare@1.11.1(wrangler@4.46.0)':
     dependencies:
       '@dotenvx/dotenvx': 1.31.0
       '@opennextjs/aws': 3.8.5
