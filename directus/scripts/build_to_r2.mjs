@@ -115,6 +115,8 @@ facts.forEach((fact) => {
   saveToDisk(fact, `facts/${id}.json`, false);
 });
 
+saveToDisk(facts.slice(-10), 'facts/latest.json');
+
 fs.mkdirSync(`${localDir}/${r2Dir}/insights`, { recursive: true });
 for (let idx = 0; idx < insights.length; idx++) {
   const id = insights[idx].id;

@@ -47,7 +47,12 @@ export const tags = tagOrder.reduce((acc, k) => {
 }, {} as Tags);
 
 async function fromR2(id?: number) {
-  const path = present(id) ? `facts/${id}.json` : 'facts.json';
+  let path;
+  if (present(id)) {
+    path = id === -10 ? 'facts/latest.json' : `facts/${id}.json`;
+  } else {
+    path = 'facts.json';
+  }
   const url = cmsBuiltURL(path);
 
   const facts = await fetch(url, {
@@ -76,6 +81,24 @@ export async function getFacts(build = false) {
   });
 
   return facts as Fact[];
+}
+
+export async function getLatestFacts() {
+  if (process.env.NODE_ENV !== 'development') {
+    return await fromR2(-10);
+  }
+
+  const facts = await directus.request(readItems('facts', {
+    limit: 10,
+    sort: ['-date'],
+  }));
+
+  facts.forEach(f => {
+    if (blank(f.tags)) {
+      f['tags'] = null;
+    }
+  });
+  return R.reverse(facts) as Fact[];
 }
 
 export async function getFactById(id: number, build = false) {

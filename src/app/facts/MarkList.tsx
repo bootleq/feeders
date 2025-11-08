@@ -40,7 +40,11 @@ function translateFact(dict: FactsDictionary, factId: number) {
     const { id, anchor, title } = fact;
     return { id, anchor, title };
   } else {
-    throw new Error(`Can't find Fact for mark, with id: ${factId}`);
+    return {
+      id: factId,
+      anchor: `fact- _${factId}`,
+      title: ''
+    };
   }
 }
 

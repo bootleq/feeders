@@ -3,7 +3,7 @@ import type { Metadata, ResolvingMetadata } from "next";
 import { preload } from 'react-dom';
 import striptags from 'striptags';
 import { notFound } from 'next/navigation';
-import { getFacts, tags, getFactById } from '@/app/facts/getFacts';
+import { getLatestFacts, tags, getFactById } from '@/app/facts/getFacts';
 import { getPickById, recentPicks, buildMasker } from '@/models/facts';
 import { unstable_cache } from '@/lib/cache';
 import type { PickProps } from '@/models/facts';
@@ -107,11 +107,16 @@ export async function generateMetadata(
 export default async function Page({ params }: {
   params: { slug: string[], }
 }) {
-  const facts = await getFacts();
+  const facts = await getLatestFacts();
   const slug = params.slug?.[0] || '';
   const pickId = slug === 'picks' ? Number(params.slug?.[1]) : -1;
   const picksMode = slug === 'picks' ? (pickId > 0 ? 'item' : 'index') : '';
   const zoomedFact = await findZoomedFact(slug);
+
+  if (zoomedFact) {
+    facts.unshift(zoomedFact);
+    facts.sort();
+  }
 
   let picks: PickProps[] = [];
   if (picksMode === 'index') {
