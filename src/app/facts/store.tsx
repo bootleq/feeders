@@ -38,6 +38,44 @@ export type Fact = {
   insights: number[],
 }
 
+export const factsAtom = atom<Fact[]>([]);
+export const factsLoadedAtom = atom(false);
+export const mergeFactsAtom = atom(
+  null,
+  (get, set, newItems: Fact[]) => {
+    const oldItems = get(factsAtom);
+    const mergedItems = [];
+    const seenIds = new Set();
+    let i = 0;
+    let j = 0;
+
+    while (i < oldItems.length || j < newItems.length) {
+      const currentItem = oldItems[i];
+      const incomingItem = newItems[j];
+      let itemToAdd = null;
+      const takeFromOld = (j >= newItems.length) || (i < oldItems.length && currentItem.date <= incomingItem.date);
+
+      if (takeFromOld) {
+        if (!seenIds.has(currentItem.id)) {
+          itemToAdd = currentItem;
+        }
+        i++;
+      } else {
+        if (!seenIds.has(incomingItem.id)) {
+          itemToAdd = incomingItem;
+        }
+        j++;
+      }
+
+      if (itemToAdd !== null) {
+        mergedItems.push(itemToAdd);
+        seenIds.add(itemToAdd.id);
+      }
+    }
+    set(factsAtom, mergedItems);
+  }
+);
+
 export type Tags = Record<string, boolean>;
 export const tagsAtom = atom<Tags>({});
 export const mergeTagsAtom = atom(

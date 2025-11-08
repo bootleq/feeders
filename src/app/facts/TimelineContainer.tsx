@@ -8,7 +8,7 @@ import { useHydrateAtoms } from 'jotai/utils';
 import striptags from 'striptags';
 import type { PickProps } from '@/models/facts';
 import { present, blank, scrollAnywhereFix } from '@/lib/utils';
-import { filterByMarksAtom, pickAtom, currentMarksAtom } from '@/app/facts/store';
+import { factsAtom, filterByMarksAtom, pickAtom, currentMarksAtom } from '@/app/facts/store';
 import {
   slugAtom,
   ZOOM_SLUG_PATTERN,
@@ -33,15 +33,17 @@ const columnClassMapping: Record<number, string> = {
   5: 'md:grid-cols-5',
 };
 
-export default function TimelineContainer({ facts, initialSlug, initialPick }: {
+export default function TimelineContainer({ facts: initialFacts, initialSlug, initialPick }: {
   facts: any[],
   initialSlug: string,
   initialPick: PickProps | null,
 }) {
   useHydrateAtoms([
+    [factsAtom, initialFacts],
     [pickAtom, initialPick],
     [filterByMarksAtom, present(initialPick)],
   ]);
+  const facts = useAtomValue(factsAtom);
   const setSlug = useSetAtom(slugAtom);
   const [isInitialZoom, setIsInitialZoom] = useState(present(initialSlug));
   const textFilter = useAtomValue(textFilterAtom);

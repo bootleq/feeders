@@ -13,6 +13,7 @@ import Sidebar from '@/components/Sidebar';
 import Alerts from '@/components/Alerts';
 import { alertsAtom, dismissAlertAtom } from '@/components/store';
 import TimelineContainer from '@/app/facts/TimelineContainer';
+import FactsLoader from '@/app/facts/FactsLoader';
 import ZoomArticle from '@/app/facts/ZoomArticle';
 import PicksView from '@/app/facts/PicksView';
 import PickFormPanel from '@/app/facts/PickFormPanel';
@@ -141,6 +142,7 @@ export default async function Page({ params }: {
         <SideControl tags={tags} facts={facts} />
       </Sidebar>
 
+      <FactsLoader />
       <TimelineContainer facts={facts} initialSlug={slug} initialPick={initialPick}  />
 
       <Alerts itemsAtom={alertsAtom} dismissAtom={dismissAlertAtom} />
