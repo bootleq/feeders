@@ -47,18 +47,18 @@ export const tags = tagOrder.reduce((acc, k) => {
 }, {} as Tags);
 
 async function fromR2(id?: number) {
-  let path;
-  if (present(id)) {
-    path = id === -10 ? 'facts/latest.json' : `facts/${id}.json`;
-  } else {
-    path = 'facts.json';
-  }
+  const getLatest = id === -10
+  const byId = !getLatest && present(id);
+
+  const path = byId ? `facts/${id}.json` : (getLatest ? 'facts/latest.json' : 'facts.json');
   const url = cmsBuiltURL(path);
 
   const facts = await fetch(url, {
     next: { revalidate: false }
   }).then(async (res) => {
-    return await res.json() as Fact[];
+    const parsed = await res.json();
+    const items = byId ? [parsed] : parsed;
+    return items as Fact[];
   });
 
   return facts;
@@ -101,8 +101,8 @@ export async function getLatestFacts() {
   return R.reverse(facts) as Fact[];
 }
 
-export async function getFactById(id: number, build = false) {
-  if (!build && process.env.NODE_ENV !== 'development') {
+export async function getFactById(id: number) {
+  if (process.env.NODE_ENV !== 'development') {
     const items = await fromR2(id);
     return items.length ? items.pop() : null;
   }
