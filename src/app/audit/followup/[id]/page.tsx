@@ -51,6 +51,8 @@ async function getItems(id: string) {
 
 function contentValueCls(key: string) {
   switch (key) {
+    case 'desc':
+      return 'whitespace-pre-wrap';
     case 'removedAt':
     case 'spawnedAt':
       return 'font-mono';

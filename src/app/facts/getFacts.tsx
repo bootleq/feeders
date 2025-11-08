@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 import directus from '@/lib/directus';
-import { readItems } from '@directus/sdk';
-import { cmsBuiltURL, blank } from '@/lib/utils';
+import { readItem, readItems } from '@directus/sdk';
+import { cmsBuiltURL, present, blank } from '@/lib/utils';
 import type { Fact, Tags } from '@/app/facts/store';
 
 const tagOrder = [
@@ -41,27 +41,28 @@ const tagOrder = [
   null,
 ];
 
+export const tags = tagOrder.reduce((acc, k) => {
+  acc[k || ''] = true;
+  return acc;
+}, {} as Tags);
 
-async function fromR2() {
-  const url = cmsBuiltURL('facts.json');
+async function fromR2(id?: number) {
+  let path;
+  if (present(id)) {
+    path = id === -10 ? 'facts/latest.json' : `facts/${id}.json`;
+  } else {
+    path = 'facts.json';
+  }
+  const url = cmsBuiltURL(path);
 
-  const { facts, tags } = await fetch(url, {
+  const facts = await fetch(url, {
     next: { revalidate: false }
   }).then(async (res) => {
-    const result = await res.json();
-    return result as {
-      facts: Fact[],
-      tags: Tags,
-    };
+    return await res.json() as Fact[];
   });
 
-  return { facts, tags };
+  return facts;
 }
-
-const tagOrderIndex = R.pipe(
-  R.flip(R.indexOf)(tagOrder),
-  R.defaultTo(Infinity)
-);
 
 export async function getFacts(build = false) {
   if (!build && process.env.NODE_ENV !== 'development') {
@@ -79,18 +80,38 @@ export async function getFacts(build = false) {
     }
   });
 
-  const tags = R.pipe(
-    R.flatten,
-    R.uniq,
-    R.sortBy(tagOrderIndex),
-  )(facts.map(i => i.tags)).reduce<Record<string, boolean>>((acc, tag) => {
-    const key = (tag as string | null) || '';
-    acc[key] = true;
-    return acc;
-  }, {});
+  return facts as Fact[];
+}
 
-  return { facts, tags } as {
-    facts: Fact[],
-    tags: Tags,
-  };
+export async function getLatestFacts() {
+  if (process.env.NODE_ENV !== 'development') {
+    return await fromR2(-10);
+  }
+
+  const facts = await directus.request(readItems('facts', {
+    limit: 10,
+    sort: ['-date'],
+  }));
+
+  facts.forEach(f => {
+    if (blank(f.tags)) {
+      f['tags'] = null;
+    }
+  });
+  return R.reverse(facts) as Fact[];
+}
+
+export async function getFactById(id: number, build = false) {
+  if (!build && process.env.NODE_ENV !== 'development') {
+    const items = await fromR2(id);
+    return items.length ? items.pop() : null;
+  }
+
+  const fact = await directus.request(readItem('facts', id));
+
+  if (blank(fact.tags)) {
+    fact['tags'] = null;
+  }
+
+  return fact as Fact;
 }

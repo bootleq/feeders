@@ -17,6 +17,7 @@ import {
   textHighlightAtom,
   dateRangeAtom,
   filterRejectedCountAtom,
+  factsAtom,
   tagsAtom,
   mergeTagsAtom,
   togglaAllTagsAtom,
@@ -791,13 +792,15 @@ function MarkCtrlPanel({ facts }: {
   );
 }
 
-export default function SideControl({ tags, facts }: {
+export default function SideControl({ tags, facts: initialFacts }: {
   tags: Tags,
   facts: Fact[],
 }) {
   useHydrateAtoms([
+    [factsAtom, initialFacts],
     [tagsAtom, tags],
   ]);
+  const facts = useAtomValue(factsAtom);
 
   return (
     <div className='p-2 pb-7 sm:pb-2 divide-y-4 overflow-auto scrollbar-thin flex flex-col flex-grow' data-nosnippet>

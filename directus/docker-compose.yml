@@ -2,7 +2,7 @@ name: feeders
 
 services:
   directus:
-    image: directus/directus:11.12.0
+    image: directus/directus:11.13.1
     container_name: feeders-directus
     ports:
       - 8044:8055
@@ -26,8 +26,8 @@ services:
       STORAGE_S3_BUCKET: feeders
       STORAGE_S3_REGION: apac
       STORAGE_S3_ENDPOINT_FILE: /run/secrets/s3_endpoint
-      # CORS_ENABLED: true
-      # CORS_ORIGIN: true
+      CORS_ENABLED: true
+      CORS_ORIGIN: ${CORS_ORIGIN}
       PUBLIC_URL: ${PUBLIC_URL}
       CONTENT_SECURITY_POLICY_DIRECTIVES__FRAME_SRC: ${CSP__FRAME_SRC}
       SESSION_COOKIE_TTL: 6d

@@ -52,6 +52,8 @@ async function getItems(id: string) {
 
 function contentValueCls(key: string) {
   switch (key) {
+    case 'desc':
+      return 'whitespace-pre-wrap';
     case 'lat':
     case 'lon':
       return 'font-mono';
