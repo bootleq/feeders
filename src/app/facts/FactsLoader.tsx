@@ -11,6 +11,18 @@ import {
 } from './store';
 import { addAlertAtom } from '@/components/store';
 
+function triggerHashChange(hash: string) {
+  const href = window.location.href;
+  const hashChangeEvent = new HashChangeEvent('hashchange', {
+    oldURL: href,
+    newURL: href,
+    bubbles: true,
+  });
+  setTimeout(() => {
+    window.dispatchEvent(hashChangeEvent);
+  }, 700);
+}
+
 const fetchFactsAtom = atom(
   null,
   async (get, set) => {
@@ -19,6 +31,11 @@ const fetchFactsAtom = atom(
       if (present(facts)) {
         set(mergeFactsAtom, facts);
         set(factsLoadedAtom, true);
+
+        const hash = window.location.hash;
+        if (hash.startsWith('#fact-')) {
+          triggerHashChange(hash);
+        }
       } else {
         const errorNode = <>無法取得資料</>;
         set(addAlertAtom, 'error', errorNode);
