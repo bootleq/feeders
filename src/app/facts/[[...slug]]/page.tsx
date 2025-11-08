@@ -3,7 +3,7 @@ import type { Metadata, ResolvingMetadata } from "next";
 import { preload } from 'react-dom';
 import striptags from 'striptags';
 import { notFound } from 'next/navigation';
-import { getFacts } from '@/app/facts/getFacts';
+import { getLatestFacts, tags, getFactById } from '@/app/facts/getFacts';
 import { getPickById, recentPicks, buildMasker } from '@/models/facts';
 import { unstable_cache } from '@/lib/cache';
 import type { PickProps } from '@/models/facts';
@@ -13,6 +13,7 @@ import Sidebar from '@/components/Sidebar';
 import Alerts from '@/components/Alerts';
 import { alertsAtom, dismissAlertAtom } from '@/components/store';
 import TimelineContainer from '@/app/facts/TimelineContainer';
+import FactsLoader from '@/app/facts/FactsLoader';
 import ZoomArticle from '@/app/facts/ZoomArticle';
 import PicksView from '@/app/facts/PicksView';
 import PickFormPanel from '@/app/facts/PickFormPanel';
@@ -24,10 +25,13 @@ async function findZoomedFact(slug: string) {
   const zoom = slug.match(ZOOM_SLUG_PATTERN);
 
   if (zoom) {
-    const { facts } = await getFacts();
     const factId = Number.parseInt(zoom.pop() || '', 10);
-    const fact = facts.find(f => f.id === factId);
-    return fact;
+    try {
+      const fact = await getFactById(factId);
+      return fact;
+    } catch (e) {
+      notFound();
+    }
   }
 }
 
@@ -104,11 +108,16 @@ export async function generateMetadata(
 export default async function Page({ params }: {
   params: { slug: string[], }
 }) {
-  const { facts, tags } = await getFacts();
+  const facts = await getLatestFacts();
   const slug = params.slug?.[0] || '';
   const pickId = slug === 'picks' ? Number(params.slug?.[1]) : -1;
   const picksMode = slug === 'picks' ? (pickId > 0 ? 'item' : 'index') : '';
   const zoomedFact = await findZoomedFact(slug);
+
+  if (zoomedFact) {
+    facts.unshift(zoomedFact);
+    facts.sort();
+  }
 
   let picks: PickProps[] = [];
   if (picksMode === 'index') {
@@ -133,6 +142,7 @@ export default async function Page({ params }: {
         <SideControl tags={tags} facts={facts} />
       </Sidebar>
 
+      <FactsLoader />
       <TimelineContainer facts={facts} initialSlug={slug} initialPick={initialPick}  />
 
       <Alerts itemsAtom={alertsAtom} dismissAtom={dismissAlertAtom} />

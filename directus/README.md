@@ -11,6 +11,8 @@ Please note the content will be empty, we don't share production data currently.
 
 Prepare secret files, you can copy `secrets/sample/*.txt` to `secrets/` as starting.
 
+Prepare `.env` file, ensure `PUBLIC_URL` and other vars in `docker-compose.yml` were defined.
+
 After starting CMS with `pnpm cms`, apply latest schema snapshot with:
 
     docker compose exec directus npx directus schema apply /directus/snapshots/$(ls snapshots | sort | tail -n 1)
