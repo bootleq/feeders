@@ -12,6 +12,9 @@ import Acts from './Acts';
 export const metadata: Metadata = {
   title: '法規',
   description: '遊蕩犬不當餵食問題的相關法規整理',
+  alternates: {
+    canonical: '/laws/',
+  },
 };
 
 export default async function Page({ params }: {
