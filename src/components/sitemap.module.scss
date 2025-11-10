@@ -9,9 +9,10 @@
 
 .map {
   background-color: var(--bg-color);
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   width: 100%;
   margin: auto;
+
+  animation: feeders-nav-shadow-pulse 13s ease-in-out infinite;
 
   @container sitemap-menu (min-width: 240px) {
     padding: 5cqi 0;
@@ -20,6 +21,18 @@
   @container sitemap-menu (min-width: 460px) {
     width: 440px;
     padding: 3em 2em;
+  }
+}
+
+@keyframes feeders-nav-shadow-pulse {
+  0%, 60%, 100% {
+    box-shadow:   0   10px 15px -3px rgb(0 0 0 / 0.1),   0    4px 6px -4px rgb(0 0 0 / 0.1);
+  }
+  20% {
+    box-shadow:  10px 12px 18px  3px rgb(0 0 0 / 0.2),  -2px  5px 5px -1px rgb(0 0 0 / 0.2)
+  }
+  75% {
+    box-shadow:  -6px 10px 24px  4px rgb(0 0 0 / 0.2),  -1px -2px 1px -4px rgb(0 0 0 / 0.2)
   }
 }
 
