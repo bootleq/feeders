@@ -14,6 +14,7 @@ import {
   removePickMarkAtom,
   picksModeAtom,
   latestAddMarkAtom,
+  factsLoadedAtom,
 } from './store';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import tlStyles from './timeline.module.scss';
@@ -91,6 +92,8 @@ export default function MarkList({ facts }: {
   const [pick, setPick] = useAtom(pickAtom);
   const removePickMark = useSetAtom(removePickMarkAtom);
   const setPicksMode = useSetAtom(picksModeAtom);
+
+  const factLoaded = useAtomValue(factsLoadedAtom);
 
   useEffect(() => {
     if (pick) {
@@ -172,7 +175,7 @@ export default function MarkList({ facts }: {
   const labelCls = pick ? 'from-rose-200 to-rose-100/80' : 'from-amber-200 to-amber-200/80';
 
   return (
-    <div ref={ref} className='w-full flex-grow'>
+    <div ref={ref} className={`w-full flex-grow ${factLoaded ? '' : 'animate-pulse'}`}>
       {pick &&
         <div className='w-full text-sm flex items-center gap-x-1 rounded py-1 -mb-px hover:bg-rose-100'>
           <Tooltip placement='top'>
