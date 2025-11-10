@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
+import { Noto_Serif_TC } from "next/font/google";
 import Image from 'next/image';
 import Link from 'next/link';
 import { SITE_NAME } from '@/lib/utils';
 import HomeNav from './HomeNav';
 import siteIcon from './icon.svg'
+
+const notoSerif = Noto_Serif_TC({
+  weight: '400',
+  subsets: ['latin'],
+});
 
 export default async function Home() {
   return (
@@ -22,11 +28,21 @@ export default async function Home() {
 
       <HomeNav />
 
-      <Link href='about' className='self-end mt-5 text-slate-600 w-fit hover:text-black hover:underline decoration-yellow-300 decoration-4 underline-offset-3'>
+      <Link href='about' className='self-end mt-5 mb-12 text-slate-600 w-fit hover:text-black hover:underline decoration-yellow-300 decoration-4 underline-offset-3'>
         關於本站
       </Link>
 
-      <Image src={siteIcon} alt='倒置的碗' className='mt-auto' />
+      <div className="flex flex-col items-center mt-auto">
+        <div className='text-2xl md:text-3xl text-center tracking-[16px] -mb-20 text-stone-400 animate-[pulse_6444ms_ease-in_infinite]'>
+          <p className={notoSerif.className}>
+            餵得嗜佛油陰
+          </p>
+          <p className="text-lg mt-1 md:mt-2">
+            feeders.fyi
+          </p>
+        </div>
+        <Image src={siteIcon} alt='倒置的碗' className='mt-auto' />
+      </div>
     </main>
   );
 }
