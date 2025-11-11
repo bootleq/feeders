@@ -63,6 +63,7 @@ export async function generateMetadata(
   let meta = { ...BASE_META };
 
   const slugs = (await params).slug || [];
+  const decodedSlug = decodeURI(slugs[0] || '');
 
   if (slugs[0] === 'picks') {
     if (slugs.length > 1) {
@@ -83,8 +84,8 @@ export async function generateMetadata(
       meta.title = `選集 - ${meta.title}`;
       meta.description =  '使用者分享的事件清單（由事實時間軸中挑選），並加上個人意見';
     }
-  } else if (slugs[0]?.match(ZOOM_SLUG_PATTERN)) {
-    const fact = await findZoomedFact(slugs[0]);
+  } else if (decodedSlug.match(ZOOM_SLUG_PATTERN)) {
+    const fact = await findZoomedFact(decodedSlug);
     if (fact) {
       meta.title = `${fact.date}: ${fact.title.trim()} - ${meta.title}`;
 
@@ -109,7 +110,7 @@ export default async function Page({ params }: {
   params: { slug: string[], }
 }) {
   const facts = await getLatestFacts();
-  const slug = params.slug?.[0] || '';
+  const slug = decodeURI(params.slug?.[0] || '');
   const pickId = slug === 'picks' ? Number(params.slug?.[1]) : -1;
   const picksMode = slug === 'picks' ? (pickId > 0 ? 'item' : 'index') : '';
   const zoomedFact = await findZoomedFact(slug);
