@@ -65,7 +65,10 @@ function ViewCtrlPanel() {
     });
   }, []);
 
-  const onToggleAll = (toggle: boolean) => () => onToggleJudgements(toggle);
+  const onToggleAll = (toggle: boolean) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    onToggleJudgements(toggle);
+  };
 
   const onHashChange = useCallback(() => {
     const hash = new URL(document.location.href).hash;
