@@ -6,6 +6,8 @@ const commonCSS = `
     --extension-ring-color: rgba(200,90,90,.7);
     --extension-ring: 4px solid var(--extension-ring-color);
     --font-mono: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", monospace;
+
+    text-autospace: normal;
   }
 
   h2, h3, h4 {
