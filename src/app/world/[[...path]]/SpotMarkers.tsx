@@ -128,7 +128,7 @@ function Followup({ fo, now, canEdit, startAmendFollowup, editingItemId, geohash
         <Tooltip>
           <TooltipTrigger className='text-sm mr-2 whitespace-nowrap font-mono'>
             <div data-id={fo.id}>
-              {formatDistance(now, fo.createdAt).replace('大約', '').trim()}
+              {formatDistance(now, fo.createdAt).replace('大約', '').trim()}前
             </div>
           </TooltipTrigger>
           <TooltipContent className={`${tooltipCls}`}>

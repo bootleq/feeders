@@ -61,7 +61,7 @@ export default function FoodLife({ spot, now }: {
           <div className='flex items-center'>
             {duration &&
               <span className='text-sm whitespace-nowrap font-mono'>
-                （{duration.replace('大約', '').trim()}）
+                （{duration.replace('大約', '').trim()}前）
               </span>
             }
 
