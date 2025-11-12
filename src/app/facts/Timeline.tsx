@@ -23,12 +23,14 @@ import {
   addPickMarkAtom,
   latestAddMarkAtom,
   timelineInterObserverAtom,
+  factsLoadedAtom,
 } from './store';
 import type { Tags } from './store';
 import FactTagList from './FactTagList';
 import { getTagColor } from './colors';
 import tlStyles from './timeline.module.scss';
 import { ArrowsPointingOutIcon } from '@heroicons/react/24/outline';
+import Spinner from '@/assets/spinner.svg';
 
 const createTagsHiddenAtom = (tagNames: string[]) => {
   return atom(get => {
@@ -118,6 +120,14 @@ function MarkOffscreenIndicators({ direct }: {
   );
 }
 
+function LoadingInitialFacts() {
+  return (
+    <div className='w-full py-6 animate-pulse'>
+      <Spinner className='' aria-label='讀取中' />
+    </div>
+  );
+}
+
 type TimelineProps = {
   facts: any[],
   isSubView?: boolean,
@@ -138,6 +148,7 @@ export default function Timeline({ facts, isSubView = false, col, isOnly = false
   const addAlert = useSetAtom(addAlertAtom);
   const setInterObserver = useSetAtom(timelineInterObserverAtom);
   const [markOffscreen, setMarkOffscreen] = useState<null | 'up' | 'down'>(null);
+  const factLoaded = useAtomValue(factsLoadedAtom);
 
   const rangesAtom = useMemo(() => {
     return highlightRangesAtomFamily(col);
@@ -271,6 +282,7 @@ export default function Timeline({ facts, isSubView = false, col, isOnly = false
     >
       {!isSubView && <a href='#head' className='absolute -top-2'></a>}
       {!isSubView && <MarkOffscreenIndicators direct='up' />}
+      {!factLoaded && <LoadingInitialFacts />}
       {Facts}
       {!isSubView && <MarkOffscreenIndicators direct='down' />}
 
