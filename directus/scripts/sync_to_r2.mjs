@@ -7,6 +7,13 @@ const rcloneRemote = process.env.RCLONE_REMOTE;
 const srcDir = 'directus/build/cms';
 const r2Dir = 'cms';
 
+const fullSync = false;
+// To reduce API class B cost, set `fullSync` to false to use
+// `--update --use-server-modtime` options (see rclone S3 doc).
+//
+// However it can't touch files whose modtime were older, also can't delete
+// files. If certain operation is needed, enable fullSync and bear the cost.
+
 if (!rcloneRemote) {
   console.error('Variable "RCLONE_REMOTE" is not set, aborted.');
   process.exit(1);
@@ -22,10 +29,20 @@ const rclone = async () => {
     `${rcloneRemote}:${STORAGE_S3_BUCKET}/${r2Dir}`,
     // '--dry-run',
     '--fast-list',
+
+    ...(
+      fullSync ? [] : [
+        '--update',
+        '--use-server-modtime',
+      ]
+    ),
+
     '--metadata-set="content-type=application/json"',
     `--metadata-set='cache-control="public, max-age=10368000"'`,
     // NOTE: final cache-control is set by domain's Caching Rules eventually
-    '-v'
+    '-v',
+    // '--s3-no-head-object',
+    // '--dump=headers,bodies'
   ];
 
   const yes = await confirm({

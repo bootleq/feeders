@@ -39,6 +39,7 @@ const S3 = new S3Client({
 const localDir = 'directus/build';
 const r2Dir = 'cms';
 const buildKeyPath = path.join(localDir, 'BUILD_KEY');
+const changedFiles = [];
 fs.mkdirSync(`${localDir}/${r2Dir}`, { recursive: true });
 
 const upload = async (aFile) => {
@@ -80,7 +81,10 @@ const saveToDisk = (data, name, reportUnchanged = true) => {
   }
 
   console.log(chalk.green('Write to disk', key));
-  fs.writeFileSync(`${localDir}/${key}`, json);
+  const outputPath = `${localDir}/${key}`;
+  fs.writeFileSync(outputPath, json);
+
+  changedFiles.push(outputPath);
 };
 
 const rcloneSync = async () => {
@@ -132,8 +136,15 @@ blocks.forEach(block => {
 const buildKey = Date.now().toString();
 fs.writeFileSync(buildKeyPath, buildKey);
 
-console.log(`\nDone, BUILD_KEY:`, buildKey);
 
-await rcloneSync();
+console.log([
+  '\nSaved:',
+  '- BUILD_KEY: ${buildKey}',
+  `- Changed files count: ${changedFiles.length}`
+].join("\n"));
+
+if (changedFiles.length) {
+  await rcloneSync();
+}
 
 process.exit();
