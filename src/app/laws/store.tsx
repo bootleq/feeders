@@ -24,7 +24,8 @@ export const ACT_ABBRS: Record<string, string> = {
   '動物保護自治條例（各縣市）': '動保自治',
   '公園管理自治條例（各縣市）': '公園自治',
   '國立政治大學犬隻管理原則': '政大犬管原則',
-  '動物傳染病防治條例': '傳染病條例'
+  '動物傳染病防治條例': '傳染病條例',
+  '國家公園法': '國家公園',
 };
 
 export const ACTS = Object.keys(ACT_ABBRS);
