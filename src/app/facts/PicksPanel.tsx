@@ -4,6 +4,8 @@ import * as R from 'ramda';
 import { useAtom, useSetAtom } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
 import { useState, useEffect, useCallback, useRef } from 'react';
+import type { ErrorInfo } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { LazyMotion, m, useDragControls } from 'motion/react';
 import { Tooltip, TooltipTrigger, TooltipContentMenu, menuHoverProps } from '@/components/Tooltip';
 import { picksModeAtom, pickSavedAtom } from './store';
@@ -88,6 +90,26 @@ function MinimizedButton({ className }: {
     <div className={`flex text-lg items-center gap-x-1 w-fit p-2 rounded-full bg-white ring-1 ring-slate-300 ${className}`}>
       <LibraryBigIcon height={22} />
       選集
+    </div>
+  );
+}
+
+function logError(error: Error, info: ErrorInfo) {
+  console.error({ error: error, comp: 'PicksPanel' });
+}
+
+function fallbackRender({ error, resetErrorBoundary }: {
+  error: Error & { digest?: string }
+  resetErrorBoundary: () => void
+}) {
+  return (
+    <div className='flex flex-col items-start px-3 pb-2 gap-y-3'>
+      <h2 className='text-xl'>發生錯誤</h2>
+      <div className='flex items-center'>
+        <p>
+          出錯了，對不起
+        </p>
+      </div>
     </div>
   );
 }
@@ -233,7 +255,9 @@ export default function PicksPanel({ mode, children }: {
 
         {!minimized &&
           <section className={`${sectionCls} ${privateRingStyle}`} style={minDimensionStyle}>
-            {children}
+            <ErrorBoundary fallbackRender={fallbackRender} onError={logError}>
+              {children}
+            </ErrorBoundary>
           </section>
         }
 
