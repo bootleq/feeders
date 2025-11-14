@@ -9,8 +9,6 @@ export const ZOOM_SLUG_PATTERN = /^[\d\- ~BC]+_(\d+)$/;
 
 export const slugAtom = atom('');
 
-const invalidDate = new Date(NaN);
-
 export const viewCtrlAtom = atom(VIEW_CTRL_KEYS);
 export const toggleViewCtrlAtom = atom(
   get => get(viewCtrlAtom),
@@ -200,7 +198,7 @@ export const refreshPickAtom = atom(
     set(myPicksAtom, refreshPickById(pick, myPicks));
 
     const picks = get(picksAtom);
-    const masked = R.assoc('createdAt', invalidDate, pick);
+    const masked = R.assoc('createdAt', null, pick);
     set(picksAtom, refreshPickById(masked, picks));
   }
 );

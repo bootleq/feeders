@@ -179,7 +179,7 @@ export default function PickList() {
           picks.length > 0 ?
             <ol className={`flex flex-col ${picksStyles['pick-list']}`} data-display-mode={displayMode}>
               {picks.map(pick =>
-              <PickRow key={pick.id} readingPickId={readingPick?.id || null} pick={pick} onTake={onTake} onItemMode={onItemMode} />
+                <PickRow key={pick.id} readingPickId={readingPick?.id || null} pick={pick} onTake={onTake} onItemMode={onItemMode} />
               )}
             </ol>
             :
