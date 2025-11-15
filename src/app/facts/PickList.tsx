@@ -22,6 +22,11 @@ import PickRow from './PickRow';
 import PicksLoading from '@/app/facts/PicksLoading';
 import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 
+export const pickListBoxCls = [
+  'text-base pt-2 pb-8 pr-3 ml-3 ring-red-500 overflow-y-scroll scrollbar-thin',
+  'min-[1024px]:max-w-4xl',
+].join(' ');
+
 const fetchPicksAtom = atom(
   null,
   async (get, set) => {
@@ -173,7 +178,7 @@ export default function PickList() {
         </Tooltip>
       </header>
 
-      <div ref={bodyRef} className='text-base pt-2 pb-8 pr-3 ml-3 ring-red-500 overflow-y-scroll scrollbar-thin'>
+      <div ref={bodyRef} className={pickListBoxCls}>
         <PicksLoading />
         {
           picks.length > 0 ?

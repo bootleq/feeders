@@ -18,6 +18,7 @@ import type { PickProps } from '@/models/facts';
 import picksStyles from './picks.module.scss';
 import PickRow from './PickRow';
 import PicksLoading from '@/app/facts/PicksLoading';
+import { pickListBoxCls } from '@/app/facts/PickList';
 import { GlobeAltIcon, ArrowUpTrayIcon } from '@heroicons/react/24/outline';
 import { CursorArrowRippleIcon } from '@heroicons/react/24/solid';
 
@@ -175,7 +176,7 @@ export default function MyPickList() {
         </h2>
       </header>
 
-      <div ref={bodyRef} className='text-base pt-2 pb-8 pr-3 ml-3 ring-red-500 overflow-y-scroll scrollbar-thin'>
+      <div ref={bodyRef} className={pickListBoxCls}>
         <PicksLoading />
         {
           picks.length > 0 ?
