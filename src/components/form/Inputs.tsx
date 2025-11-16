@@ -129,13 +129,14 @@ export function Textarea({ label, name, children, tooltip, labelOpts = {}, input
   );
 }
 
-export function Select({ label, name, children, tooltip, inputProps = {}, after }: {
+export function Select({ label, name, children, tooltip, inputProps = {}, labelCls: labelClsProp, after }: {
   label?: string,
   name: string,
   children?: React.ReactNode,
   after?: React.ReactNode,
   tooltip?: React.ReactNode,
   inputProps?: React.InputHTMLAttributes<HTMLSelectElement>,
+  labelCls?: string,
 }) {
   const id = useId();
   const { className = '', name: _name, ...restProps } = inputProps;
@@ -146,7 +147,7 @@ export function Select({ label, name, children, tooltip, inputProps = {}, after 
   const invalid = errors?.length > 0;
   const labelProps: LabelProps = {
     htmlFor: id,
-    className: labelCls,
+    className: `${labelCls} ${labelClsProp}`,
     children: label || fieldName(name),
     ...(invalid ? { 'aria-invalid': true } : {})
   };
@@ -155,7 +156,7 @@ export function Select({ label, name, children, tooltip, inputProps = {}, after 
     return (
       <>
         <label {...labelProps} />
-        <div className='flex items-center'>
+        <div className='flex flex-wrap items-center'>
           {tag}
           <Tooltip>
             {tooltipTrigger}

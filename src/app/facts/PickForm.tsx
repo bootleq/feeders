@@ -119,7 +119,7 @@ function DateInfo({ id, publishedAt, createdAt, changes, changedAt }: {
       }
       {
         (present(changes) && changedAt) &&
-          <div className='ml-auto flex items-center'>
+          <div className='ml-auto flex items-center basis-full justify-end md:basis-auto'>
             已編輯：
             <Tooltip placement='bottom-start'>
               <TooltipTrigger className='mr-2 whitespace-nowrap cursor-text'>
@@ -239,10 +239,10 @@ function UnscopedForm() {
       <h2 className='text-lg font-bold'>
         編輯選集
       </h2>
-      <form onSubmit={onSubmit} className='flex flex-col items-center gap-y-1 mt-3'>
+      <form onSubmit={onSubmit} className='flex flex-col items-center gap-y-1 mt-3 min-[1024px]:w-[56rem]'>
         <div className='w-full grid grid-cols-[min-content_2fr] gap-y-2 mb-1'>
           <TextInput name='title' inputProps={{ required: true, className: 'cursor-text font-mixed', defaultValue: pick.title || '', disabled: isBanned }} />
-          <Textarea name='desc' inputProps={{ rows: 8, className: 'md:min-w-[500px] cursor-text font-mixed', defaultValue: pick.desc || '', disabled: isBanned }} labelOpts={{ align: 'start' }} />
+          <Textarea name='desc' inputProps={{ rows: 14, className: 'md:min-w-[500px] cursor-text font-mixed', defaultValue: pick.desc || '', disabled: isBanned }} labelOpts={{ align: 'start' }} />
           {
             pick.state === 'dropped' ?
             <>
@@ -260,6 +260,7 @@ function UnscopedForm() {
             <Select name='state'
               inputProps={{ className: 'max-w-24', defaultValue: pick.state }}
               tooltip={<StateTooltip />}
+              labelCls='self-center'
               after={<DateInfo id={pick.id} publishedAt={pick.publishedAt} createdAt={pick.createdAt} changes={pick.changes} changedAt={pick.changedAt} />} >
               {
                 ['draft', 'published'].map(o => (

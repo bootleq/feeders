@@ -49,7 +49,7 @@ const sectionCls = [
   'bg-slate-100/95 px-3 py-2 scrollbar-thin ring ring-[6px] rounded shadow-[10px_20px_20px_14px_rgba(0,0,0,0.5)]',
   'ring-offset-1 ring-purple-600/50',
   'overflow-scroll resize',
-  'md:min-w-[540px] min-h-96 max-w-full max-h-screen',
+  'min-w-64 md:min-w-[540px] min-h-96 max-w-full max-h-screen',
 ].join(' ')
 
 const draggerCls = [
