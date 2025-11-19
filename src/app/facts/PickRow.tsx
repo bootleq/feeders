@@ -23,7 +23,7 @@ const tooltipCls = [
 
 function Separator() {
   return (
-    <div role='separator' className='flex items-center justify-center w-full h-14 mb-1'>
+    <div role='separator' className='flex items-center justify-center w-full h-14 my-1'>
       <div className='h-1 w-[98%] border-t border-dotted border-slate-700 translate-y-px'>
       </div>
     </div>
@@ -38,11 +38,11 @@ function Dropped({ pick }: {
   return (
     <li>
       <article id={`pick-${pick.id}`}>
-        <header className='flex flex-col mb-1 gap-y-px'>
+        <header className='flex flex-col mb-2 gap-y-px'>
           <div className='flex items-center my-px mb-0'>
             <Tooltip placement='top'>
               <TooltipTrigger className='text-red-950/75 cursor-help font-bold'>
-                <div data-role='dummy-h2'>已隱藏</div>
+                <div data-role='dummy-h2' className='text-lg'>已隱藏</div>
               </TooltipTrigger>
               <TooltipContent className={`${tooltipCls}`}>
                 這個項目受到網站管理處分，只有作者能看見內容
@@ -126,9 +126,9 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
             <XMarkIcon className='ml-auto cursor-pointer fill-slate-500 hover:scale-125' height={20} onClick={onDismissSaved} />
           </div>
         }
-        <header className='flex flex-col mb-1 gap-y-px'>
+        <header className='flex flex-col mb-2 gap-y-px'>
           <div className='flex items-center my-px'>
-            <h2 className={`font-bold font-mixed ${state === 'published' ? '' : draftTextColor}`}>
+            <h2 className={`font-bold font-mixed text-lg pb-0.5 ${state === 'published' ? '' : draftTextColor}`}>
               {title}
               { state === 'draft' && <span className='text-slate-500 font-normal'>（草稿）</span> }
             </h2>
