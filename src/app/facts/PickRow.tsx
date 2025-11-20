@@ -22,8 +22,8 @@ const tooltipCls = [
 ].join(' ')
 
 const descCls = [
-  'overflow-auto overscroll-contain',
-  'md:max-w-xl lg:max-w-full mb-1 mx-px resize rounded font-mixed',
+  'overflow-auto overscroll-contain scrollbar-thumb-indigo-300 scrollbar-track-slate-200',
+  'md:max-w-xl lg:max-w-full mb-1 mx-px pr-1 resize rounded font-mixed',
   picksStyles.desc,
 ].join(' ');
 
