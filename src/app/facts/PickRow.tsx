@@ -21,6 +21,12 @@ const tooltipCls = [
   'bg-gradient-to-br from-stone-50 to-slate-100 ring-2 ring-offset-1 ring-slate-300 shadow-lg',
 ].join(' ')
 
+const descCls = [
+  'overflow-auto overscroll-contain',
+  'md:max-w-xl lg:max-w-full mb-1 mx-px resize rounded font-mixed',
+  picksStyles.desc,
+].join(' ');
+
 function Separator() {
   return (
     <div role='separator' className='flex items-center justify-center w-full h-14 my-1'>
@@ -267,7 +273,7 @@ export default function PickRow({ pick, readingPickId, onTake, onItemMode, onEdi
         {present(desc) &&
           <Desc
             value={desc}
-            className={`${picksMode === 'item' ? '' : 'max-h-96 '} overflow-auto overscroll-contain md:max-w-xl lg:max-w-full mb-1 mx-px resize rounded font-mixed ${picksStyles.desc}`}
+            className={`${picksMode === 'item' ? '' : 'max-h-96 '} ${descCls}`}
           />
         }
       </article>
