@@ -117,13 +117,18 @@ export async function savePick(formData: FormData) {
             .set({ ...hardProps, ...changeset.new })
             .where(eq(factPicks.id, data.id)),
 
-          db.insert(changes).values({
-            docType: getTableName(factPicks),
-            docId: data.id.toString(),
-            scope: 'amendPick',
-            whodunnit: user.id,
-            content: changeset.old,
-          }).returning({ id: changes.id})
+          ...(
+            blank(pick.publishedAt) ? [] // skip saving changes for first time publishing
+            : [
+              db.insert(changes).values({
+                docType: getTableName(factPicks),
+                docId: data.id.toString(),
+                scope: 'amendPick',
+                whodunnit: user.id,
+                content: changeset.old,
+              }).returning({ id: changes.id})
+            ]
+          )
         ]);
       }
 
