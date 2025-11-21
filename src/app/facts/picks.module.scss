@@ -8,8 +8,6 @@
   &[data-display-mode="header"] {
 
     > li {
-      position: relative;
-
       &:not(:last-child) {
         header {
           border-bottom: 1px dashed #666;
@@ -26,12 +24,6 @@
         header {
           > div:first-child {
             position: relative;
-
-            h2,
-            [data-role='dummy-h2'] {
-              position: absolute;
-              top: 50%;
-            }
           }
         }
       }
