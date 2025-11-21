@@ -117,7 +117,7 @@ function fallbackRender({ error, resetErrorBoundary }: {
 const sectionCls = [
   'bg-slate-100 px-0 py-2 ring ring-[5px] rounded shadow-[10px_20px_20px_14px_rgba(0,0,0,0.5)]',
   'flex flex-col flex-grow resize',
-  'relative top-0 overflow-hidden w-full h-hull max-w-[98vw] max-h-full',
+  'relative top-0 overflow-hidden w-full h-hull max-w-4xl max-h-full',
 ].join(' ')
 
 export default function PicksPanel({ mode, children }: {
@@ -254,7 +254,7 @@ export default function PicksPanel({ mode, children }: {
         </div>
 
         {!minimized &&
-          <section className={`${sectionCls} ${privateRingStyle}`} style={minDimensionStyle}>
+          <section className={`${sectionCls} ${privateRingStyle} ${layout === 'right' ? 'self-end' : ''}`} style={minDimensionStyle}>
             <ErrorBoundary fallbackRender={fallbackRender} onError={logError}>
               {children}
             </ErrorBoundary>
