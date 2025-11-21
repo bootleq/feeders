@@ -136,15 +136,36 @@ export default function PicksPanel({ mode, children }: {
   const [rightSpace, setRightSpace] = useState<number>(0);
   const [canDrag, setCanDrag] = useState(true);
   const viewportRef = useRef<HTMLBodyElement|null>(null);
+  const containerRef = useRef<HTMLDivElement|null>(null);
   const controls = useDragControls();
 
   const startDrag = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     controls.start(e, { snapToCursor: false });
   }, [controls]);
 
+  const onAnimateStart = useCallback((latest: any) => {
+    if (latest === 'init') {
+      const $container = containerRef.current;
+      const $toolbar = $container?.querySelector('div[role="toolbar"]');
+      if ($toolbar && $toolbar instanceof HTMLElement) {
+        $toolbar.style.opacity = '0';
+      }
+    }
+  }, []);
+
   const onAnimateEnd = useCallback((latest: any) => {
     if (latest === 'init') {
       setCanDrag(true);
+      const $container = containerRef.current;
+      if ($container) {
+        const $toolbar = $container.querySelector('div[role="toolbar"]');
+        if ($toolbar && $toolbar instanceof HTMLElement) {
+          setTimeout(() => {
+            $container.style.width = '';
+            $toolbar.style.opacity = '100%';
+          }, 120);
+        }
+      }
     }
     setMinimized(latest === 'min');
   }, []);
@@ -197,8 +218,12 @@ export default function PicksPanel({ mode, children }: {
 
   return (
     <LazyMotion strict features={loadMotionFeatures}>
-      <m.div {...motionProps} custom={custom} drag={canDrag} animate={layout} onAnimationComplete={onAnimateEnd} dragControls={controls} dragConstraints={viewportRef} className={containerCls} style={minDimensionStyle}>
-        <div className='absolute z-[901] right-2 top-1.5 ml-auto flex items-center gap-x-2'>
+      <m.div
+        ref={containerRef}
+        {...motionProps} custom={custom} drag={canDrag} animate={layout} onAnimationStart={onAnimateStart} onAnimationComplete={onAnimateEnd}
+        dragControls={controls} dragConstraints={viewportRef} className={containerCls} style={minDimensionStyle}
+      >
+        <div role='toolbar' className='absolute z-[901] right-2 top-1.5 ml-auto flex items-center gap-x-2 transition-opacity'>
           {canDrag &&
             <div className={draggerCls} onPointerDown={startDrag} style={{ touchAction: 'none' }}>
               拖曳這裡
