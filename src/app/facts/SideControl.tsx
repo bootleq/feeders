@@ -8,6 +8,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useHydrateAtoms, atomWithStorage } from 'jotai/utils';
 import { format } from '@/lib/date-fp';
+import Link from 'next/link';
 import {
   viewCtrlAtom,
   toggleViewCtrlAtom,
@@ -588,7 +589,10 @@ function MarkCtrlPanel({ facts }: {
     setFiltered(R.not);
   }, [setFiltered]);
 
-  const onListPicks = useCallback(() => {
+  const onListPicks = useCallback((event: React.MouseEvent<HTMLElement> | undefined) => {
+    if (event && event.target instanceof HTMLAnchorElement) {
+      event.preventDefault();
+    }
     setPicksMode('index');
   }, [setPicksMode]);
 
@@ -720,7 +724,9 @@ function MarkCtrlPanel({ facts }: {
                   <Tooltip placement='right' offset={6} hoverProps={menuHoverProps}>
                     <TooltipTrigger className='p-2 w-full cursor-pointer flex items-center gap-1 rounded hover:bg-amber-200' onClick={onListPicks}>
                       <BookOpenIcon className='stroke-current' height={20} />
-                      閱讀公開選集
+                      <Link href='/facts/picks/' prefetch={false} target='_blank' onClick={onListPicks}>
+                        閱讀公開選集
+                      </Link>
                     </TooltipTrigger>
                     <TooltipContent className='p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1 text-balance shadow-lg'>
                       顯示由使用者分享的選集
@@ -732,7 +738,7 @@ function MarkCtrlPanel({ facts }: {
                       className={`p-2 w-full ${canEdit ? 'cursor-pointer' : 'cursor-not-allowed opacity-45'} flex items-center gap-1 rounded hover:bg-amber-200`}
                       {...(canEdit ? {onClick: onListMyPicks} : {})}
                     >
-                      <UserPenIcon className='stroke-current' height={20} />
+                      <UserPenIcon className='stroke-current' width={20} height={20} />
                       我的選集
                     </TooltipTrigger>
                     <TooltipContent className='p-1 text-xs rounded box-border w-max z-[1002] bg-slate-100 ring-1 text-balance shadow-lg'>
