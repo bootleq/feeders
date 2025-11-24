@@ -82,7 +82,7 @@ export default function Pick({ initialPick }: {
         </Tooltip>
       </header>
 
-      <div className='text-base pt-2 pb-8 pr-3 ml-3 ring-red-500 overflow-y-scroll scrollbar-thin'>
+      <div className='text-base pt-2 pb-8 pr-3 ml-3 ring-red-500 overflow-y-scroll scrollbar-thin min-[1024px]:max-w-4xl'>
 
         <PicksLoading />
         <ol className={`flex flex-col ${picksStyles['pick-list']}`}>
