@@ -2,6 +2,7 @@
 
 import * as R from 'ramda';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
 import { ReactElement } from 'react';
 import { nanoid } from 'nanoid';
 
@@ -14,6 +15,8 @@ export const userAtom = atom<WorldUserResult | null>(null);
 export const navTitleAtom = atom('');
 
 export const nowAtom = atom<Date | null>(null);
+
+export const sidebarOpenedAtom = atomWithStorage<boolean | null>('feeders.sidebar.open', null);
 
 export type keyedAlert = [string, 'info' | 'error', ReactElement];
 export const alertsAtom = atom<keyedAlert[]>([]);

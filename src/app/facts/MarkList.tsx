@@ -3,6 +3,7 @@
 import * as R from 'ramda';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { sidebarOpenedAtom } from '@/components/store';
 import Mark from './Mark';
 import type { Fact } from './store';
 import type { FactMark } from './Mark';
@@ -95,6 +96,8 @@ export default function MarkList({ facts }: {
 
   const factLoaded = useAtomValue(factsLoadedAtom);
 
+  const [sidebarOpen, setSidebarOpen] = useAtom(sidebarOpenedAtom);
+
   useEffect(() => {
     if (pick) {
       const sorted = sortByAnchor(pick.factIds || [], factsDictionary);
@@ -152,6 +155,10 @@ export default function MarkList({ facts }: {
     }
   }, [removePickMark]);
 
+  const onCloseSidebar = useCallback(() => {
+    setSidebarOpen(false);
+  }, [setSidebarOpen]);
+
   const pickItems = useMemo(() => {
     if (pick) {
       return pick.factIds ? pick.factIds.map(translate) : [];
@@ -203,6 +210,18 @@ export default function MarkList({ facts }: {
           ))
         }
       </ul>
+
+      {
+        sidebarOpen && (items.length > 0) &&
+          <button type='button' onClick={onCloseSidebar}
+            className='md:hidden block w-max mx-auto mt-5 p-1 px-5 leading-6 text-slate-600 bg-gradient-to-br from-stone-50 to-stone-200 ring-4 ring-stone-400 rounded-2xl shadow-2xl z-[902]'
+          >
+            點這裡
+            <span className='text-slate-900'>關閉側邊欄</span>
+            <br />
+            （因為<strong>時間軸</strong>在後面）
+          </button>
+      }
     </div>
   );
 }
