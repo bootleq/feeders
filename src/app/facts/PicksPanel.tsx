@@ -1,19 +1,19 @@
 "use client"
 
 import * as R from 'ramda';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { ErrorInfo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { LazyMotion, m, useDragControls } from 'motion/react';
 import { Tooltip, TooltipTrigger, TooltipContentMenu, menuHoverProps } from '@/components/Tooltip';
-import { picksModeAtom, pickSavedAtom } from './store';
+import { picksModeAtom, pickSavedAtom, pickAtom } from './store';
 import PickDisplayMenu from './PickDisplayMenu';
 import { tooltipClass, tooltipMenuCls } from '@/lib/utils';
 import type { PicksMode } from '@/app/facts/store';
 import { XMarkIcon, Bars3Icon, MinusIcon } from '@heroicons/react/24/solid';
-import { ChevronRightIcon } from '@heroicons/react/24/outline';
+import { ChevronRightIcon, BookOpenIcon } from '@heroicons/react/24/outline';
 import DotIcon from '@/assets/dot.svg';
 import MoveIcon from '@/assets/move.svg';
 import LibraryBigIcon from '@/assets/library-big.svg';
@@ -95,17 +95,30 @@ function MinimizedButton({ className }: {
 }
 
 function MobileGuide() {
+  const readingPick = useAtomValue(pickAtom);
+
+  if (readingPick) {
+    return (
+      <>
+        <div className=''>
+          點這裡隱藏「選集」內文，<br />
+          開始看
+          <strong>事實</strong>時間軸
+        </div>
+        <div className='flex items-center gap-x-1'>
+          要返回時再按
+          <MinimizedButton className='animate-pulse' />
+        </div>
+      </>
+    );
+  }
+
   return (
-    <>
-      <div className=''>
-        點這裡開始看<br />
-        <strong>事實</strong>時間軸
-      </div>
-      <div className='flex items-center gap-x-1'>
-        要返回時再按
-        <MinimizedButton className='animate-pulse' />
-      </div>
-    </>
+    <div className='flex items-center gap-x-1'>
+      點選標題旁邊的
+      <BookOpenIcon className='rounded-lg' height={20} aria-label='閱讀' />
+      開始閱讀
+    </div>
   );
 }
 
