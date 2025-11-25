@@ -94,6 +94,21 @@ function MinimizedButton({ className }: {
   );
 }
 
+function MobileGuide() {
+  return (
+    <>
+      <div className=''>
+        點這裡開始看<br />
+        <strong>事實</strong>時間軸
+      </div>
+      <div className='flex items-center gap-x-1'>
+        要返回時再按
+        <MinimizedButton className='animate-pulse' />
+      </div>
+    </>
+  );
+}
+
 function logError(error: Error, info: ErrorInfo) {
   console.error({ error: error, comp: 'PicksPanel' });
 }
@@ -290,14 +305,7 @@ export default function PicksPanel({ mode, children }: {
           <button data-layout={'min'} type='button' onClick={onSwitchLayout}
             className='md:hidden flex flex-col w-max items-center gap-y-2 translate-y-4 p-3 px-5 text-slate-900 bg-gradient-to-br from-stone-50 to-stone-200 ring-4 ring-stone-400 rounded-2xl shadow-2xl z-[902]'
           >
-            <div className=''>
-              點這裡開始看<br />
-              <strong>事實</strong>時間軸
-            </div>
-            <div className='flex items-center gap-x-1'>
-              要返回時再按
-              <MinimizedButton className='animate-pulse' />
-            </div>
+            <MobileGuide />
           </button>
         }
       </m.div>
