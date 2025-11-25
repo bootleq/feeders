@@ -34,7 +34,7 @@ export default function LinkPreview() {
     open: present(url),
     strategy: 'fixed',
     middleware: [
-      offset(30),
+      offset(5),
       shift({
         padding: 10,
       }),
