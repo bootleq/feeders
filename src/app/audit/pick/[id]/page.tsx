@@ -150,6 +150,14 @@ function Entry({ item }: {
 export const metadata: Metadata = {
   title: '選集修改記錄',
   description: '事實頁面中已公開的使用者選集，每次修改的變更歷史',
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
 };
 
 export default async function Page({ params }: {

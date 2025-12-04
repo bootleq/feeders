@@ -153,6 +153,14 @@ function Entry({ item }: {
 export const metadata: Metadata = {
   title: '地點跟進記錄',
   description: '世界地圖中每個地點的「跟進」項目，每次修改的變更歷史',
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
 };
 
 export default async function Page({ params }: {
