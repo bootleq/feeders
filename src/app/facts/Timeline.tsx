@@ -51,7 +51,8 @@ function Fact({ fact, isSubView, onZoom }: {
   const { id, date, title, desc, summary, origin, tags, weight } = fact;
   const anchor = `fact-${fact.date}_${fact.id}`;
   const zoomPath = `/facts/${anchor.replace('fact-', '')}/`;
-  const datePadEnd = date.length < 10 ? <span className=''>{'\u00A0'.repeat(10 - date.length)}</span> : '';
+  const dateDisplay = date.replace(/^0*/, '');
+  const datePadEnd = dateDisplay.length < 10 ? <span className=''>{'\u00A0'.repeat(10 - dateDisplay.length)}</span> : '';
   const allTagsHiddenAtom = useMemo(() => createTagsHiddenAtom(tags || ['']), [tags]);
   const hidden = useAtomValue(allTagsHiddenAtom);
 
@@ -67,7 +68,7 @@ function Fact({ fact, isSubView, onZoom }: {
         <div {...idProp} className='font-mono text-sm relative flex items-center whitespace-nowrap ml-px mr-1 px-1 rounded-md ring-1 text-red-950 bg-gradient-to-br from-amber-200 to-amber-200/80'>
           <a className='absolute flex items-center justify-center size-3 drop-shadow z-20 -left-[15px] bg-slate-100 border border-slate-400 rounded-full' href={`#${anchor}`}></a>
           <div data-role='fact-date'>
-            {date}{datePadEnd}
+            {dateDisplay}{datePadEnd}
           </div>
         </div>
         <div data-role='title' className='leading-tight text-balance text-center sm:text-start'>

@@ -38,7 +38,7 @@ export default function Mark({ id, anchor, title, onRemove, labelCls }: MarkProp
     }
   }, [interObserver]);
 
-  const date = R.match(/fact-(.+)_\d+/, anchor)[1];
+  const date = R.match(/fact-(.+)_\d+/, anchor)[1].replace(/^0*/, '');
   const datePadEnd = date?.length < 10 ? <span className=''>{'\u00A0'.repeat(10 - date.length)}</span> : '';
 
   return (
