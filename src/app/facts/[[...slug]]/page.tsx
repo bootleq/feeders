@@ -72,7 +72,7 @@ export async function generateMetadata(
       if (pickId > 0) {
         pick = (await getPicksById(pickId)).pop();
         if (pick) {
-          meta.title = `${pick.title} - ${pick.userName} | 選集 - ${meta.title}`;
+          meta.title = `${pick.title} | 選集 - ${meta.title}`;
           meta.description = ''; // will be removed
           meta.alternates.canonical = `/facts/picks/${pick.id}/`;
         }
