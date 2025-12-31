@@ -663,7 +663,10 @@ function MarkCtrlPanel({ facts }: {
         <div className='ml-auto flex items-center'>
           <Tooltip placement='top-start'>
             <TooltipTrigger className=''>
-              <button type='button' className='btn text-slate-600 px-1 py-px translate-x-1 hover:text-black hover:ring-1 hover:bg-white disabled:opacity-30' aria-label='儲存到瀏覽器空間' onClick={onToggleFilter}
+              <button type='button'
+                className={`btn text-slate-600 px-1 py-px translate-x-1 hover:text-black hover:ring-1 hover:bg-white disabled:opacity-30 ${filtered ? 'bg-rose-100 ring-1' : ''}`}
+                aria-label={`篩選狀態：${ filtered ? '已開啟' : '已關閉' }`}
+                onClick={onToggleFilter}
               >
                 {filtered ? <FunnelIcon className='' height={20} /> : <FunnelXIcon className='opacity-55' height={20} />
                 }
