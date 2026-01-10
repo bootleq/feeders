@@ -102,6 +102,7 @@
 
 .mce {
   --font-mono: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", monospace;
+  --table-border-color: silver;
   font-size: 0.9375rem;
   line-height: 1.35rem;
 
@@ -167,6 +168,65 @@
 
     &:hover {
       background-color: rgba(56, 189, 248, 0.19);
+    }
+  }
+
+  table {
+    border-collapse: collapse;
+    margin-block: 1rem;
+    background-color: #eee;
+  }
+
+  tbody, tr {
+    border-top: 1px;
+    border-color: var(--table-border-color);
+    border-style: solid;
+  }
+  tbody {
+    border-bottom: 1px solid var(--table-border-color);
+    border-left: 1px solid var(--table-border-color);
+    border-right: 1px solid var(--table-border-color);
+  }
+  thead {
+    background-color: #cbd5e1;
+  }
+  th, td {
+    border-right: 1px solid var(--table-border-color);
+  }
+  tbody tr:nth-child(even) {
+    background-color: #e2e8f0;
+  }
+  tbody tr:hover {
+    background-color: white;
+  }
+  th {
+    text-align: center;
+    font-weight: normal;
+  }
+  td {
+    // text-sm
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+
+    border-right: 1px solid silver;
+    padding: 0.25rem;
+    padding-inline: 0.5rem;
+
+    &:global(.text-xs) {
+      font-size: 0.825rem;
+      line-height: 1rem;
+    }
+  }
+
+  :global(table.feeders-mce-digit) {
+    td {
+      font-family: var(--font-mono);
+      text-align: right;
+
+      &:global(.feeders-mce-reset) {
+        text-align: revert;
+        font-family: var(--font-space), var(--font-digits), 'Microsoft JhengHei', 'Noto Sans TC', 'PingFang', 'LiHei Pro', 'Meiryo', 'MS Gothic', sans-serif;
+      }
     }
   }
 

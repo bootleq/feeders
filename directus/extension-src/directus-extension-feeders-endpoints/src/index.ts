@@ -67,6 +67,48 @@ const commonCSS = `
     margin-bottom: 0.5rem;
   }
 
+  /* 表格 */
+  .mce-content-body table {
+    border-collapse: collapse;
+    border-color: var(--table-border-color);
+    margin-inline: auto;
+    margin-block: 2em;
+    outline: var(--extension-ring);
+  }
+  .mce-content-body thead {
+    background-color: #cbd5e1;
+  }
+  .mce-content-body th {
+    text-align: center;
+    font-weight: bold;
+    border-width: 1px;
+    border-style: solid;
+  }
+  .mce-content-body tbody {
+    border-windth: 1px;
+  }
+  .mce-content-body tbody td {
+    border-width: 1px;
+    border-style: solid;
+  }
+  .mce-content-body tr:nth-child(even) {
+    background-color: #e2e8f0;
+  }
+
+  /* 數值表格 */
+  .feeders-mce-digit td {
+    font-family: var(--font-mono);
+    text-align: right;
+  }
+  .feeders-mce-digit td.text-xs) {
+    font-size: 0.825rem;
+    line-height: 1rem;
+  }
+  .feeders-mce-digit td.feeders-mce-reset {
+    text-align: revert;
+    font-family: var(--font-space), var(--font-digits), 'Microsoft JhengHei', 'Noto Sans TC', 'PingFang', 'LiHei Pro', 'Meiryo', 'MS Gothic', sans-serif;
+  }
+
 `;
 
 const articleCSS = `
@@ -124,40 +166,6 @@ const articleCSS = `
   }
   .feeders-mce-iframe .mce-object-iframe::before {
     display: none;
-  }
-
-  /* 表格 */
-  .mce-content-body table {
-    border-collapse: collapse;
-    border-color: var(--table-border-color);
-    margin-inline: auto;
-    margin-block: 2em;
-    outline: var(--extension-ring);
-  }
-  .mce-content-body thead {
-    background-color: #cbd5e1;
-  }
-  .mce-content-body th {
-    text-align: center;
-    font-weight: bold;
-    border-width: 1px;
-    border-style: solid;
-  }
-  .mce-content-body tbody {
-    border-windth: 1px;
-  }
-  .mce-content-body tbody td {
-    border-width: 1px;
-    border-style: solid;
-  }
-  .mce-content-body tr:nth-child(even) {
-    background-color: #e2e8f0;
-  }
-
-  /* 數值表格 */
-  .feeders-mce-digit td {
-    font-family: var(--font-mono);
-    text-align: right;
   }
 
 `;

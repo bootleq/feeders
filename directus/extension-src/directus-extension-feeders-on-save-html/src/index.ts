@@ -47,6 +47,7 @@ const allowedAttributes = {
 
 const allowedClasses = {
   'table': ['feeders-mce-digit'],
+  'td': ['feeders-mce-reset', 'text-xs'],
   'figure': ['feeders-mce-figure'],
   'ol': ['feeders-mce-lengthy'],
   'ul': ['feeders-mce-lengthy'],
