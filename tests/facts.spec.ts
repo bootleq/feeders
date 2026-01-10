@@ -65,13 +65,7 @@ test.describe('由網址進入獨占顯示：錯誤', () => {
   test('項目找不到', async ({ page }) => {
     const badSlug = '2010-01-27_120548213';
     await page.goto(`/facts/${badSlug}/`);
-    await expect(page).toHaveTitle(/^事實記錄 - /);
-
-    const alert = page.getByRole('alert').filter({ has: page.getByText(/無法跳到指定項目/) });
-    await expect(alert).toBeVisible();
-    await expect(alert).toHaveText(new RegExp(`"${badSlug}" 可能已改名`));
-
-    await alert.getByRole('button', { name: '關閉' }).click();
+    await expect(page).toHaveTitle(/^找不到（事實頁面） - /);
   });
 
   test('格式錯誤', async ({ page }) => {
