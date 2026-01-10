@@ -66,9 +66,10 @@ const tagsFigure = 'figure,figcaption'.split(',');
 const tagsTable = 'table,colgroup,col,thead,th,tbody,tr,td'.split(',');
 const tagsSimple = 'p,a,b,i,em,strong,blockquote,div,span,hr,ol,ul,li,br,code,kbd,details,summary'.split(',');
 const tagsAdvanced = tagsSimple.concat(tagsFigure).concat(tagsTable).concat('h2,h3,h4,img,iframe'.split(','));
+const tagsFacts = tagsSimple.concat(tagsTable);
 
 const modelTagsMapping: Record<string, string[]> = {
-  facts: tagsSimple,
+  facts: tagsFacts,
   insights: tagsAdvanced,
   laws: tagsSimple,
 };
