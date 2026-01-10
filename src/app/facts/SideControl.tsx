@@ -52,7 +52,8 @@ import { GlobeAltIcon, BookOpenIcon } from '@heroicons/react/24/outline';
 import {
   ArrowLeftEndOnRectangleIcon,
   ArrowUpTrayIcon,
-  ArrowDownTrayIcon
+  ArrowDownTrayIcon,
+  ExclamationCircleIcon,
 } from '@heroicons/react/24/outline';
 import UserPenIcon from '@/assets/user-pen.svg';
 import HighlighterIcon from '@/assets/highlighter.svg';
@@ -239,6 +240,7 @@ function ViewCtrlPanel() {
 function TagCtrlPanel() {
   const [panelOpen, setPanelOpen] = useState(true);
   const [tags, setTags] = useAtom(mergeTagsAtom);
+  const [dbcHint, setDbcHint] = useState<boolean | null>(null); // hint for dbclick
 
   const toggle = () => {
     setPanelOpen(R.not);
@@ -251,15 +253,45 @@ function TagCtrlPanel() {
     if (li) {
       const { tag, visible } = li.dataset;
       setTags({ [tag || '']: visible === 'false' })
+
+      if (R.isNil(dbcHint)) {
+        setDbcHint(true);
+      } else {
+        if (dbcHint) {
+          setDbcHint(false);
+        }
+      }
+    }
+  };
+  const onDbClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const el = e.target as HTMLElement;
+    const li = el.closest('li')
+    if (li) {
+      const { tag, visible } = li.dataset;
+      toggleAllTags(false);
+      setTags({ [tag || '']: true });
+      setDbcHint(false);
     }
   };
   const onToggleAll = (toggle: boolean) => () => toggleAllTags(toggle);
 
   return (
     <div className='py-3'>
-      <div className='font-bold cursor-pointer' onClick={toggle}>標籤篩選</div>
+      <div className='flex items-center'>
+        <div className='flex-grow font-bold cursor-pointer' onClick={toggle}>
+          標籤篩選
+        </div>
+        {dbcHint === true &&
+          <div className='ml-auto text-xs flex items-center p-px px-2 rounded-full bg-yellow-200 shadow-lg'>
+            <ExclamationCircleIcon className='stroke-slate-700 mr-0.5' height={18} />
+            點兩下標籤，只看它 1 個
+          </div>
+        }
+      </div>
+
       <div className={`flex flex-col items-start w-fit px-1 py-2 gap-y-2 ${panelOpen ? '' : 'hidden'}`}>
-        <ul className='text-xs flex flex-wrap items-center' onClick={onClick}>
+        <ul className='text-xs flex flex-wrap items-center' onClick={onClick} onDoubleClick={onDbClick}>
           {Object.entries(tags).map(([tag, visible]) => {
             return (
               <li key={tag} data-tag={tag} data-visible={visible} className={`py-0.5 relative cursor-pointer ${!visible && tlStyles.strikethrough}`}>
