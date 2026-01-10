@@ -253,13 +253,23 @@ function TagCtrlPanel() {
       setTags({ [tag || '']: visible === 'false' })
     }
   };
+  const onDbClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const el = e.target as HTMLElement;
+    const li = el.closest('li')
+    if (li) {
+      const { tag, visible } = li.dataset;
+      toggleAllTags(false);
+      setTags({ [tag || '']: true });
+    }
+  };
   const onToggleAll = (toggle: boolean) => () => toggleAllTags(toggle);
 
   return (
     <div className='py-3'>
       <div className='font-bold cursor-pointer' onClick={toggle}>標籤篩選</div>
       <div className={`flex flex-col items-start w-fit px-1 py-2 gap-y-2 ${panelOpen ? '' : 'hidden'}`}>
-        <ul className='text-xs flex flex-wrap items-center' onClick={onClick}>
+        <ul className='text-xs flex flex-wrap items-center' onClick={onClick} onDoubleClick={onDbClick}>
           {Object.entries(tags).map(([tag, visible]) => {
             return (
               <li key={tag} data-tag={tag} data-visible={visible} className={`py-0.5 relative cursor-pointer ${!visible && tlStyles.strikethrough}`}>
