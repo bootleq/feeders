@@ -105,9 +105,12 @@ export const metadata: Metadata = {
   description: '各地餵食點回報、追蹤、封鎖或監督管理',
 };
 
-export default async function Page({ params }: {
-  params: { path: string[] }
-}) {
+export default async function Page(
+  props: {
+    params: Promise<{ path: string[] }>
+  }
+) {
+  const params = await props.params;
   const path = params.path || [];
   const today = overwriteToday || new Date();
   const pathname = `/world/${path.map(s => decodeURIComponent(s)).join('/')}`

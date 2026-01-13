@@ -53,9 +53,12 @@ export const metadata: Metadata = {
   title: '使用者資料',
 };
 
-export default async function Page({ params }: {
-  params: { id: string }
-}) {
+export default async function Page(
+  props: {
+    params: Promise<{ id: string }>
+  }
+) {
+  const params = await props.params;
   const profile = await fetchProfile(params.id);
 
   if (!profile) {

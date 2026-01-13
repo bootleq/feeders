@@ -106,9 +106,12 @@ export async function generateMetadata(
   return meta;
 }
 
-export default async function Page({ params }: {
-  params: { slug: string[], }
-}) {
+export default async function Page(
+  props: {
+    params: Promise<{ slug: string[], }>
+  }
+) {
+  const params = await props.params;
   const facts = await getLatestFacts();
   const slug = decodeURI(params.slug?.[0] || '');
   const pickId = slug === 'picks' ? Number(params.slug?.[1]) : -1;
