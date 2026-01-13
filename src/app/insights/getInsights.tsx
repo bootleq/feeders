@@ -7,6 +7,7 @@ async function fromR2() {
   const url = cmsBuiltURL('insights.json');
 
   const items = await fetch(url, {
+    cache: 'force-cache',
     next: { revalidate: false }
   }).then(async (res) => {
     return await res.json();

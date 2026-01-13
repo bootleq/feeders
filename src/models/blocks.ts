@@ -15,6 +15,7 @@ async function fromR2(slug: string) {
   const url = cmsBuiltURL(`blocks/${slug}.json`);
 
   const item = await fetch(url, {
+    cache: 'force-cache',
     next: { revalidate: false }
   }).then(async (res) => {
     return await res.json();

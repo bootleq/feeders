@@ -55,6 +55,7 @@ async function fromR2(id?: number) {
   const url = cmsBuiltURL(path);
 
   const facts = await fetch(url, {
+    cache: 'force-cache',
     next: { revalidate: false }
   }).then(async (res) => {
     const parsed = await res.json();

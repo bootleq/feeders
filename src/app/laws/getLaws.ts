@@ -10,7 +10,7 @@ async function fromR2() {
   const { byAct, tagList } = await fetch(
     url,
     {
-      // cache: 'force-cache',  // can't, next-on-pages lack of support
+      cache: 'force-cache',
       next: { revalidate: false }
     }
   ).then(async (res) => {
