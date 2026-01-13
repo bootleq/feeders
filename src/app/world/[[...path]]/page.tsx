@@ -15,14 +15,10 @@ import { parsePath, GEOHASH_PRECISION } from './util';
 import { userAtom } from '@/components/store';
 import Sidebar from '@/components/Sidebar';
 import LinkPreview from '@/components/LinkPreview';
+import LazyMap from './LazyMap';
 import RecentFollowups from './RecentFollowups';
 import mapStyles from './map.module.scss';
 import { MapPinIcon } from '@heroicons/react/24/solid';
-
-const LazyMap = dynamic(() => import("./Map"), {
-  ssr: false,
-  loading: () => <p>Loading...</p>,
-});
 
 const TW_BOUNDS = [
   [21.7, 118.5], // bottom left
