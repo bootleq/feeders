@@ -42,7 +42,7 @@
     "@heroicons/react": "^2.1.5",
     "@internationalized/date": "^3.10.1",
     "@next/bundle-analyzer": "^14.2.5",
-    "@opennextjs/cloudflare": "^1.11.1",
+    "@opennextjs/cloudflare": "^1.14.8",
     "@react-leaflet/core": "^3.0.0",
     "chanfana": "^2.1.0",
     "change-case": "^5.4.4",
