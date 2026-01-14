@@ -17,9 +17,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function Page({ params }: {
-  params: { path: string[] }
-}) {
+export default async function Page() {
   const { byAct, tagList } = await getLaws();
   const tags = tagList.reduce((acc: Tags, tag: string) => {
     acc[tag] = true;
