@@ -28,7 +28,7 @@ export default async function Home() {
 
       <HomeNav />
 
-      <Link href='about' className='self-end mt-5 mb-12 text-slate-600 w-fit hover:text-black hover:underline decoration-yellow-300 decoration-4 underline-offset-3'>
+      <Link href='/about/' className='self-end mt-5 mb-12 text-slate-600 w-fit hover:text-black hover:underline decoration-yellow-300 decoration-4 underline-offset-3'>
         關於本站
       </Link>
 
