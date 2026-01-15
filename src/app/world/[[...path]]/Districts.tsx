@@ -18,7 +18,10 @@ const modes = {
 
 async function getLayer(mode: number) {
   const url = `${r2Path}/geojson/${mode === modes.village ? 'villages' : 'counties'}.geojson`;
-  const res = await fetch(url);
+  const res = await fetch(url, {
+    cache: 'force-cache',
+    next: { revalidate: false }
+  });
   const data = await res.json();
   return data;
 }

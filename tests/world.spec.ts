@@ -34,5 +34,5 @@ test('世界地圖', async ({ page }) => {
   await page.goBack();
   await expect(page).toHaveURL('/world/');
   await page.goBack();
-  await expect(page).toHaveTitle(SITE_NAME);
+  await expect(page).toHaveTitle(/^世界地圖 - /);
 });

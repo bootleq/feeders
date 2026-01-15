@@ -15,14 +15,10 @@ import { parsePath, GEOHASH_PRECISION } from './util';
 import { userAtom } from '@/components/store';
 import Sidebar from '@/components/Sidebar';
 import LinkPreview from '@/components/LinkPreview';
+import LazyMap from './LazyMap';
 import RecentFollowups from './RecentFollowups';
 import mapStyles from './map.module.scss';
 import { MapPinIcon } from '@heroicons/react/24/solid';
-
-const LazyMap = dynamic(() => import("./Map"), {
-  ssr: false,
-  loading: () => <p>Loading...</p>,
-});
 
 const TW_BOUNDS = [
   [21.7, 118.5], // bottom left
@@ -109,9 +105,12 @@ export const metadata: Metadata = {
   description: '各地餵食點回報、追蹤、封鎖或監督管理',
 };
 
-export default async function Page({ params }: {
-  params: { path: string[] }
-}) {
+export default async function Page(
+  props: {
+    params: Promise<{ path: string[] }>
+  }
+) {
+  const params = await props.params;
   const path = params.path || [];
   const today = overwriteToday || new Date();
   const pathname = `/world/${path.map(s => decodeURIComponent(s)).join('/')}`

@@ -29,6 +29,8 @@ import { present, jsonReviver, ACCESS_CTRL } from '@/lib/utils';
 import { format, formatDistance } from '@/lib/date-fp';
 import type { GeoSpotsResult, GeoSpotsResultFollowup } from '@/models/spots';
 import mapStyles from './map.module.scss';
+import 'react-leaflet-cluster/dist/assets/MarkerCluster.css';
+import 'react-leaflet-cluster/dist/assets/MarkerCluster.Default.css';
 
 const googleMapURL = (lat: number, lon: number) => {
   return `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;

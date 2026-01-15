@@ -144,6 +144,8 @@ export const PopoverTrigger = React.forwardRef<
   const childrenRef = (children as any).ref;
   const ref = useMergeRefs([context.refs.setReference, propRef, childrenRef]);
 
+  const childProps = (children as React.ReactElement).props as Record<string, any>;
+
   // `asChild` allows the user to pass any element as the anchor
   if (asChild && React.isValidElement(children)) {
     return React.cloneElement(
@@ -151,8 +153,8 @@ export const PopoverTrigger = React.forwardRef<
       context.getReferenceProps({
         ref,
         ...props,
-        ...children.props,
-        "data-state": context.open ? "open" : "closed"
+        ...childProps,
+        ...{ "data-state": context.open ? "open" : "closed" }
       })
     );
   }

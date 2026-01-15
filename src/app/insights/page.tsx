@@ -16,9 +16,7 @@ const wrapperCls = [
   'sm:peer-[[aria-expanded=true]]:ml-[40%] md:peer-[[aria-expanded=true]]:ml-[37%] lg:peer-[[aria-expanded=true]]:ml-[25%]',
 ].join(' ');
 
-export default async function Page({ params }: {
-  params: { path: string[] }
-}) {
+export default async function Page() {
   const insights = await getInsights();
 
   return (

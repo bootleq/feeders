@@ -18,7 +18,7 @@ import { errorsAtom, metaAtom } from '@/components/form/store';
 import type { FieldErrors } from '@/components/form/store';
 import { TextInput, Textarea, Select } from '@/components/form/Inputs';
 import { DateTimeField } from '@/components/form/DateTimeField';
-import { parseAbsoluteToLocal, parseZonedDateTime } from '@internationalized/date';
+import { parseAbsoluteToLocal } from '@internationalized/date';
 
 const fieldName = R.partial(t, ['spotFields']);
 

@@ -163,11 +163,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function Page({ params }: {
-  params: {
-    id: string
+export default async function Page(
+  props: {
+    params: Promise<{
+      id: string
+    }>
   }
-}) {
+) {
+  const params = await props.params;
   console.log({ '💀 cache thru': 'audit followup', args: [params.id] });
   const items = await getItems(params.id);
 
