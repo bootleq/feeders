@@ -1,6 +1,7 @@
 .spinner {
   animation: feeders-fade-in 1.2s ease-in-out 1;
   animation-fill-mode: forwards;
+  pointer-events: none;
 }
 
 @keyframes feeders-fade-in {
