@@ -17,6 +17,14 @@ export const ENABLE_ACTIVATE = process.env.NEXT_PUBLIC_ENABLE_ACTIVATE || 'off';
 export const present = R.both(R.isNotNil, R.isNotEmpty);
 export const blank = R.complement(present);
 
+export const preferR2Content = () => {
+  if (process.env.NEXT_PUBLIC_FORCE_R2_CONTENT === '1') {
+    return true;
+  }
+
+  return process.env.NODE_ENV !== 'development';
+}
+
 export const cmsBuiltURL = (path: string) => {
   const r2Path = process.env.NEXT_PUBLIC_R2_URL_PATH;
   const buildKey = process.env.NEXT_PUBLIC_CMS_BUILD_KEY;

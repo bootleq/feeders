@@ -1,6 +1,6 @@
 import directus from '@/lib/directus';
 import { readItems } from '@directus/sdk';
-import { cmsBuiltURL } from '@/lib/utils';
+import { preferR2Content, cmsBuiltURL } from '@/lib/utils';
 import { ACTS } from './store';
 import type { LawItem } from './store';
 
@@ -25,7 +25,7 @@ async function fromR2() {
 }
 
 export async function getLaws(build = false) {
-  if (!build && process.env.NODE_ENV !== 'development') {
+  if (!build && preferR2Content()) {
     return await fromR2();
   }
 

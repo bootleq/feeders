@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 import directus from '@/lib/directus';
 import { readItem, readItems } from '@directus/sdk';
-import { cmsBuiltURL, present, blank } from '@/lib/utils';
+import { preferR2Content, cmsBuiltURL, present, blank } from '@/lib/utils';
 import type { Fact, Tags } from '@/app/facts/store';
 
 const tagOrder = [
@@ -67,7 +67,7 @@ async function fromR2(id?: number) {
 }
 
 export async function getFacts(build = false) {
-  if (!build && process.env.NODE_ENV !== 'development') {
+  if (!build && preferR2Content()) {
     return await fromR2();
   }
 
@@ -86,7 +86,7 @@ export async function getFacts(build = false) {
 }
 
 export async function getLatestFacts() {
-  if (process.env.NODE_ENV !== 'development') {
+  if (preferR2Content()) {
     return await fromR2(-10);
   }
 
@@ -104,7 +104,7 @@ export async function getLatestFacts() {
 }
 
 export async function getFactById(id: number) {
-  if (process.env.NODE_ENV !== 'development') {
+  if (preferR2Content()) {
     const items = await fromR2(id);
     return items.length ? items.pop() : null;
   }

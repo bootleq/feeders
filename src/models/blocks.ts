@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 import directus from '@/lib/directus';
 import { readItems } from '@directus/sdk';
-import { cmsBuiltURL } from '@/lib/utils';
+import { preferR2Content, cmsBuiltURL } from '@/lib/utils';
 
 export async function getAllBlocks() {
   const items = await directus.request(readItems('blocks', {
@@ -25,7 +25,7 @@ async function fromR2(slug: string) {
 }
 
 export async function getBlock(slug: string, build = false) {
-  if (!build && process.env.NODE_ENV !== 'development') {
+  if (!build && preferR2Content()) {
     return await fromR2(slug);
   }
 

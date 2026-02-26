@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 import directus from '@/lib/directus';
 import { readItems } from '@directus/sdk';
-import { cmsBuiltURL } from '@/lib/utils';
+import { preferR2Content, cmsBuiltURL } from '@/lib/utils';
 
 async function fromR2() {
   const url = cmsBuiltURL('insights.json');
@@ -17,7 +17,7 @@ async function fromR2() {
 }
 
 export async function getInsights(build = false) {
-  if (!build && process.env.NODE_ENV !== 'development') {
+  if (!build && preferR2Content()) {
     return await fromR2();
   }
 

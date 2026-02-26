@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 import directus from '@/lib/directus';
 import { readItem, readFiles } from '@directus/sdk';
-import { cmsBuiltURL } from '@/lib/utils';
+import { preferR2Content, cmsBuiltURL } from '@/lib/utils';
 
 export type File = {
   [key: string]: any,
@@ -26,7 +26,7 @@ async function fromR2(id: number) {
 }
 
 export async function getInsightById(id: number, build = false) {
-  if (!build && process.env.NODE_ENV !== 'development') {
+  if (!build && preferR2Content()) {
     return await fromR2(id);
   }
 
