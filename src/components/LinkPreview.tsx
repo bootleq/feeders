@@ -1,7 +1,7 @@
 "use client"
 
 import * as R from 'ramda';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useFloating, FloatingPortal, shift, offset, autoPlacement } from '@floating-ui/react';
 import { useAtom } from 'jotai';
 import { useDebouncedCallback } from 'use-debounce';
@@ -11,6 +11,7 @@ import styles from '@/components/link-preview.module.scss';
 import Spinner from '@/assets/spinner.svg';
 
 const MAX_SCREEN_USAGE = 0.66;
+const PREVIEW_TOUCH_TIMEOUT = 600; // when touch hold more than this time (in ms), go default behavior instead of our logic
 
 const wrapperCls = [
   'z-[1422] w-fit h-fit p-3 bg-slate-100/50 rounded-lg shadow-lg',
@@ -29,6 +30,8 @@ export default function LinkPreview() {
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [dimension, setDimension] = useState({ width: 0, height: 0 });
+  const touchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const touchAborted = useRef(false);
 
   const { refs, floatingStyles, update, context } = useFloating({
     open: present(url),
@@ -98,8 +101,30 @@ export default function LinkPreview() {
     update();
   }, 50, { maxWait: 100 });
 
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    touchAborted.current = false;
+    touchTimer.current = setTimeout(() => {
+      touchAborted.current = true;
+    }, PREVIEW_TOUCH_TIMEOUT);
+  }, []);
+
+  const onTouchCancel = useCallback(() => {
+    if (touchTimer.current) {
+      clearTimeout(touchTimer.current);
+      touchTimer.current = null;
+    }
+    touchAborted.current = true;
+  }, []);
+
   const onTouchEnd = useCallback((e: React.TouchEvent) => {
-    setURL(null);
+    if (touchTimer.current) {
+      clearTimeout(touchTimer.current);
+      touchTimer.current = null;
+    }
+    if (!touchAborted.current) {
+      e.preventDefault();
+      setURL(null);
+    }
   }, [setURL]);
 
   useEffect(() => {
@@ -115,6 +140,8 @@ export default function LinkPreview() {
   const style = {
     ...floatingStyles,
   };
+
+  const touchHandlers = { onTouchStart, onTouchEnd, onTouchCancel };
 
   return (
     <FloatingPortal>
@@ -135,8 +162,8 @@ export default function LinkPreview() {
           height={dimension.height}
           onLoad={onLoad}
           onError={onError}
-          onTouchEnd={onTouchEnd}
           className='h-[revert-layer] pointer-events-auto'
+          {...touchHandlers}
         />
         }
       </div>
