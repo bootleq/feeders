@@ -10,7 +10,9 @@ import { linkPreviewUrlAtom, linkPreviewTriggerAtom } from '@/components/store';
 import styles from '@/components/link-preview.module.scss';
 import Spinner from '@/assets/spinner.svg';
 
-const MAX_SCREEN_USAGE = 0.66;
+const MAX_SCREEN_USAGE = { md: 0.66, sm: 0.88 };
+const SMALL_SCREEN = { w: 400, h: 860 };  // when screen is too small, allow larger MAX_SCREEN_USAGE
+const PADDING = 10;
 const PREVIEW_TOUCH_TIMEOUT = 600; // when touch hold more than this time (in ms), go default behavior instead of our logic
 
 const wrapperCls = [
@@ -52,20 +54,22 @@ export default function LinkPreview() {
     const { naturalWidth, naturalHeight } = e.currentTarget;
     const availWidth = window.innerWidth;
     const availHeight = window.innerHeight;
-    let width, height;
+    let width, height, maxScreenUsage;
 
     if (naturalWidth > naturalHeight) {
-      width = R.min(naturalWidth, availWidth * MAX_SCREEN_USAGE);
+      maxScreenUsage = MAX_SCREEN_USAGE[availWidth <= SMALL_SCREEN.w ? 'sm' : 'md'];
+      width = R.min(naturalWidth, availWidth * maxScreenUsage);
       height = width * naturalHeight/naturalWidth;
-      if (height > availHeight * MAX_SCREEN_USAGE) {
-        height = availHeight * MAX_SCREEN_USAGE;
+      if (height > availHeight * maxScreenUsage) {
+        height = availHeight * maxScreenUsage;
         width = height * naturalWidth/naturalHeight;
       }
     } else {
-      height = R.min(naturalHeight, availHeight * MAX_SCREEN_USAGE);
+      maxScreenUsage = MAX_SCREEN_USAGE[availHeight <= SMALL_SCREEN.h ? 'sm' : 'md'];
+      height = R.min(naturalHeight, availHeight * maxScreenUsage);
       width = height * naturalWidth/naturalHeight;
-      if (width > availWidth * MAX_SCREEN_USAGE) {
-        width = availWidth * MAX_SCREEN_USAGE;
+      if (width > availWidth * maxScreenUsage) {
+        width = availWidth * maxScreenUsage;
         height = width * naturalHeight/naturalWidth;
       }
     }
