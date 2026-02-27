@@ -3,10 +3,11 @@
 import Linkify from 'linkify-react';
 import type { Options, Opts, IntermediateRepresentation } from 'linkifyjs';
 import { useSetAtom } from 'jotai';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { linkPreviewUrlAtom } from '@/components/store';
 
 const MAX_URL_LENGTH = 75;
+const PREVIEW_TOUCH_TIMEOUT = 700; // when touch hold more than this time (in ms), go default behavior instead of our logic
 
 const canPreview = (href: string) => {
   const url = new URL(href);
@@ -42,12 +43,22 @@ function TruncateText({ value }: {
   return url;
 }
 
+// The Anchor (if is a image link):
+//
+// When mouse over, set the previewURL to bring LinkPreview alive.
+// When mouse out, hide the preview.
+//
+// For touch device, set previewURL when touch.
+// The "hide" should be handled by LinkPreview to response another touch on it.
+// If the touch hold by a long period (PREVIEW_TOUCH_TIMEOUT), give up preview, let the default behavior handle it.
 function Anchor({ href, content, ...props }: {
   href: string,
   content: string,
   [attr: string]: any,
 }) {
   const setPreviewURL = useSetAtom(linkPreviewUrlAtom);
+  const touchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const touchAborted = useRef(false);
 
   const onMouseOver = useCallback(() => {
     setPreviewURL(href);
@@ -57,15 +68,45 @@ function Anchor({ href, content, ...props }: {
     setPreviewURL(null);
   }, [setPreviewURL]);
 
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    touchAborted.current = false;
+    touchTimer.current = setTimeout(() => {
+      touchAborted.current = true;
+    }, PREVIEW_TOUCH_TIMEOUT);
+  }, []);
+
+  const onTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (touchTimer.current) {
+      clearTimeout(touchTimer.current);
+      touchTimer.current = null;
+    }
+    if (!touchAborted.current) {
+      e.preventDefault();
+      setPreviewURL(href);
+    }
+  }, [href, setPreviewURL]);
+
+  const onTouchCancel = useCallback(() => {
+    if (touchTimer.current) {
+      clearTimeout(touchTimer.current);
+      touchTimer.current = null;
+    }
+    touchAborted.current = true;
+  }, []);
+
   const previewEnabled = useMemo(() => {
     return canPreview(href);
   }, [href]);
+
+  const touchHandlers = previewEnabled ? { onTouchStart, onTouchEnd, onTouchCancel } : {};
+  const mouseHandlers = previewEnabled ? { onMouseOver, onMouseOut } : {};
 
   return (
     <a
       href={href}
       className={`underline underline-offset-[3px] decoration-slate-500 hover:bg-yellow-200/50 font-mono text-sm leading-6 align-bottom`}
-      {...(previewEnabled ? { onMouseOver, onMouseOut } : {}) }
+      {...mouseHandlers}
+      {...touchHandlers}
       {...props}
     >
       <TruncateText value={content} />

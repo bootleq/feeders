@@ -3,7 +3,7 @@
 import * as R from 'ramda';
 import { useEffect, useState, useCallback } from 'react';
 import { useFloating, FloatingPortal, shift, offset, autoPlacement } from '@floating-ui/react';
-import { useAtomValue } from 'jotai';
+import { useAtom } from 'jotai';
 import { useDebouncedCallback } from 'use-debounce';
 import { present } from '@/lib/utils';
 import { linkPreviewUrlAtom } from '@/components/store';
@@ -25,7 +25,7 @@ const wrapperLoadingCls = [
 ].join(' ');
 
 export default function LinkPreview() {
-  const url = useAtomValue(linkPreviewUrlAtom);
+  const [url, setURL] = useAtom(linkPreviewUrlAtom);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [dimension, setDimension] = useState({ width: 0, height: 0 });
@@ -98,6 +98,10 @@ export default function LinkPreview() {
     update();
   }, 50, { maxWait: 100 });
 
+  const onTouchEnd = useCallback((e: React.TouchEvent) => {
+    setURL(null);
+  }, [setURL]);
+
   useEffect(() => {
     if (url) window.addEventListener('mousemove', debouncedMoved);
 
@@ -131,7 +135,8 @@ export default function LinkPreview() {
           height={dimension.height}
           onLoad={onLoad}
           onError={onError}
-          className='h-[revert-layer]'
+          onTouchEnd={onTouchEnd}
+          className='h-[revert-layer] pointer-events-auto'
         />
         }
       </div>
