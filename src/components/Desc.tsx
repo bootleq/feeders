@@ -4,7 +4,7 @@ import Linkify from 'linkify-react';
 import type { Options, Opts, IntermediateRepresentation } from 'linkifyjs';
 import { useSetAtom } from 'jotai';
 import { useCallback, useMemo, useRef } from 'react';
-import { linkPreviewUrlAtom } from '@/components/store';
+import { linkPreviewUrlAtom, linkPreviewTriggerAtom } from '@/components/store';
 
 const MAX_URL_LENGTH = 75;
 const PREVIEW_TOUCH_TIMEOUT = 700; // when touch hold more than this time (in ms), go default behavior instead of our logic
@@ -57,12 +57,14 @@ function Anchor({ href, content, ...props }: {
   [attr: string]: any,
 }) {
   const setPreviewURL = useSetAtom(linkPreviewUrlAtom);
+  const setPreviewTrigger = useSetAtom(linkPreviewTriggerAtom);
   const touchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const touchAborted = useRef(false);
 
   const onMouseOver = useCallback(() => {
     setPreviewURL(href);
-  }, [href, setPreviewURL]);
+    setPreviewTrigger('mouse');
+  }, [href, setPreviewURL, setPreviewTrigger]);
 
   const onMouseOut = useCallback(() => {
     setPreviewURL(null);
@@ -83,8 +85,9 @@ function Anchor({ href, content, ...props }: {
     if (!touchAborted.current) {
       e.preventDefault();
       setPreviewURL(href);
+      setPreviewTrigger('touch')
     }
-  }, [href, setPreviewURL]);
+  }, [href, setPreviewURL, setPreviewTrigger]);
 
   const onTouchCancel = useCallback(() => {
     if (touchTimer.current) {

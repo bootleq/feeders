@@ -3,10 +3,10 @@
 import * as R from 'ramda';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useFloating, FloatingPortal, shift, offset, autoPlacement } from '@floating-ui/react';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { useDebouncedCallback } from 'use-debounce';
 import { present } from '@/lib/utils';
-import { linkPreviewUrlAtom } from '@/components/store';
+import { linkPreviewUrlAtom, linkPreviewTriggerAtom } from '@/components/store';
 import styles from '@/components/link-preview.module.scss';
 import Spinner from '@/assets/spinner.svg';
 
@@ -27,6 +27,7 @@ const wrapperLoadingCls = [
 
 export default function LinkPreview() {
   const [url, setURL] = useAtom(linkPreviewUrlAtom);
+  const trigger = useAtomValue(linkPreviewTriggerAtom);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [dimension, setDimension] = useState({ width: 0, height: 0 });
@@ -162,7 +163,7 @@ export default function LinkPreview() {
           height={dimension.height}
           onLoad={onLoad}
           onError={onError}
-          className='h-[revert-layer] pointer-events-auto'
+          className={`h-[revert-layer] ${trigger === 'touch' ? 'pointer-events-auto' : ''}`}
           {...touchHandlers}
         />
         }
