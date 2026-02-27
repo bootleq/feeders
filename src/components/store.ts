@@ -27,3 +27,4 @@ export const addAlertAtom = atom(
 export const dismissAlertAtom = atom(null, (get, set, key: string) => set(alertsAtom, rejectFirst(R.eqBy(R.head, [key]))));
 
 export const linkPreviewUrlAtom = atom<string | null>(null);
+export const linkPreviewTriggerAtom = atom<'mouse' | 'touch' | null>(null);
