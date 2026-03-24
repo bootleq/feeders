@@ -27,6 +27,7 @@
     "cms:build-local": "tsx --env-file=.env.development directus/scripts/build_to_r2.mjs",
     "cms:upload": "tsx --env-file=.env.development directus/scripts/sync_to_r2.mjs",
     "cms:snapshot": "cd ./directus && docker compose exec directus npx directus schema snapshot /directus/snapshots/$(date +'%Y%m%d').yml",
+    "cms:feeds": "tsx --env-file=.env.development directus/scripts/generate_feeds.mjs",
     "test:unit": "vitest",
     "test:e2e": "playwright test",
     "test:shots": "playwright test --update-snapshots",

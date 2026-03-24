@@ -44,6 +44,7 @@ Production deployment:
 
 ```bash
 pnpm cms:build-local
+pnpm cms:feeds
 pnpm worker:build
 pnpm run deploy
 ```
