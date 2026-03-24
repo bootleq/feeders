@@ -4,7 +4,15 @@ export const BASE_META = {
   title: '事實記錄',
   description: '台灣地區與遊蕩犬、流浪狗相關的歷史事件表列',
   alternates: {
-    canonical: `/facts`
+    canonical: `/facts`,
+    types: {
+      'application/atom+xml': [
+        {
+          url: '/feeds/facts.atom',
+          title: '事實記錄 - Feeders',
+        },
+      ],
+    },
   },
 };
 
