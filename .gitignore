@@ -17,6 +17,9 @@
 # sub repo
 /public/charts/
 
+# build
+/public/feeds/
+
 # production
 /build
 /dist

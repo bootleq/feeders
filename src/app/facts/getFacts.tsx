@@ -47,6 +47,15 @@ export const tags = tagOrder.reduce((acc, k) => {
   return acc;
 }, {} as Tags);
 
+function filterFields(result: Record<string, any>) {
+  return R.omit([
+    'user_created',
+    'user_updated',
+    'date_created',
+    'date_updated'
+  ], result);
+}
+
 async function fromR2(id?: number) {
   const getLatest = id === -10
   const byId = !getLatest && present(id);
@@ -82,7 +91,7 @@ export async function getFacts(build = false) {
     }
   });
 
-  return facts as Fact[];
+  return facts.map(filterFields) as Fact[];
 }
 
 export async function getLatestFacts() {
@@ -100,7 +109,7 @@ export async function getLatestFacts() {
       f['tags'] = null;
     }
   });
-  return R.reverse(facts) as Fact[];
+  return R.reverse(facts.map(filterFields)) as Fact[];
 }
 
 export async function getFactById(id: number) {
@@ -109,11 +118,12 @@ export async function getFactById(id: number) {
     return items.length ? items.pop() : null;
   }
 
-  const fact = await directus.request(readItem('facts', id));
+  let fact = await directus.request(readItem('facts', id));
 
   if (blank(fact.tags)) {
     fact['tags'] = null;
   }
+  fact = filterFields(fact);
 
   return fact as Fact;
 }
