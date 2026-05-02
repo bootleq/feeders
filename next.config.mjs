@@ -91,7 +91,17 @@ const nextConfig = {
           },
         },
       },
+      {
+        test: /exifreader\/dist\/exif-reader\.js$/,
+        resolve: {
+          fallback: {
+            fs: false,
+          },
+        },
+      },
     ];
+
+    config.resolve.alias['exifreader'] = require.resolve('exifreader/dist/exif-reader.js');
 
     config.plugins.push(
       optimizeLocales.webpack({
