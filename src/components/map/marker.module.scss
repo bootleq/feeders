@@ -1,0 +1,61 @@
+.temp-marker {
+  animation: feeders-flip-x 1.2s ease-in-out infinite, feeders-fall-in 400ms cubic-bezier(0.57, 0.4, 0.55, 1.17) 1;
+}
+
+.div-marker-svg-icon {
+  img {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@keyframes feeders-flip-x {
+  0% {
+    transform: scaleX(1);
+  }
+  60% {
+    transform: scaleX(1);
+  }
+  100% {
+    transform: scaleX(-1);
+  }
+}
+
+@keyframes feeders-fall-in {
+  0% {
+    transform: translateY(-90vh);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.cluster-marker {
+  color: white;
+
+  &:global(.marker-cluster-small) {
+    background-color: rgba(0,0,0, .6);
+
+    > div {
+      background-color: rgba(100,100,100, .6);
+    }
+  }
+
+  &:global(.marker-cluster-medium) {
+    color: black;
+    background-color: rgba(255,255,97, .7);
+
+    > div {
+      background-color: rgba(240,194,12, .6);
+    }
+  }
+
+  &:global(.marker-cluster-large) {
+    color: black;
+    background-color: rgba(190,0,0, .6);
+
+    > div {
+      background-color: rgba(241,128,23, .7);
+    }
+  }
+}

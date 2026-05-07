@@ -37,7 +37,7 @@ import { MapIcon } from '@heroicons/react/24/solid';
 import { StarIcon } from '@heroicons/react/24/outline';
 
 import SpotMarkers from './SpotMarkers';
-import TempMarker from './TempMarker';
+import TempMarker from '@/components/map/TempMarker';
 import Help from './Help';
 import Districts from './Districts';
 
