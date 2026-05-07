@@ -36,7 +36,7 @@ import Spinner from '@/assets/spinner.svg';
 import { MapIcon } from '@heroicons/react/24/solid';
 import { StarIcon } from '@heroicons/react/24/outline';
 
-import SpotMarkers from './SpotMarkers';
+import SpotMarkers from '@/components/map/SpotMarkers';
 import TempMarker from '@/components/map/TempMarker';
 import Help from './Help';
 import Districts from './Districts';

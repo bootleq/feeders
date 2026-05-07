@@ -17,18 +17,18 @@ import { Square3Stack3DIcon } from '@heroicons/react/24/outline';
 import { NoSymbolIcon } from '@heroicons/react/24/solid';
 
 import { useSession } from 'next-auth/react';
-import FoodLife from './FoodLife';
-import ActionLabel from './ActionLabel';
-import FollowupForm from './FollowupForm';
-import AmendSpotForm from './AmendSpotForm';
-import AmendFollowupForm from './AmendFollowupForm';
-import { editingFormAtom, spotFollowupsAtom, mergeSpotFollowupsAtom, loadingFollowupsAtom } from './store';
+import FoodLife from '@/app/world/[[...path]]/FoodLife';
+import ActionLabel from '@/app/world/[[...path]]/ActionLabel';
+import FollowupForm from '@/app/world/[[...path]]/FollowupForm';
+import AmendSpotForm from '@/app/world/[[...path]]/AmendSpotForm';
+import AmendFollowupForm from '@/app/world/[[...path]]/AmendFollowupForm';
+import { editingFormAtom, spotFollowupsAtom, mergeSpotFollowupsAtom, loadingFollowupsAtom } from '@/app/world/[[...path]]/store';
 import { nowAtom, addAlertAtom } from '@/components/store';
-import { openSpotMarkerById } from './util';
+import { openSpotMarkerById } from '@/app/world/[[...path]]/util';
 import { present, jsonReviver, ACCESS_CTRL } from '@/lib/utils';
 import { format, formatDistance } from '@/lib/date-fp';
 import type { GeoSpotsResult, GeoSpotsResultFollowup } from '@/models/spots';
-import mapStyles from './map.module.scss';
+import mapStyles from './marker.module.scss';
 import 'react-leaflet-cluster/dist/assets/MarkerCluster.css';
 import 'react-leaflet-cluster/dist/assets/MarkerCluster.Default.css';
 
