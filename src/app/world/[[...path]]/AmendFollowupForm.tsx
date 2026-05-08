@@ -11,7 +11,7 @@ import { ArrowsUpDownIcon } from '@heroicons/react/24/outline';
 import { SpotActionEnum } from '@/lib/schema';
 import { t } from '@/lib/i18n';
 import { ariaDatePickerValueFix } from '@/lib/utils';
-import { mergeTempMarkerAtom, editingFormAtom, mergeSpotsAtom } from '@/app/world/[[...path]]/store';
+import { editingFormAtom, mergeSpotsAtom } from '@/app/world/[[...path]]/store';
 import { amendFollowup } from '@/app/world/[[...path]]/amend-followup';
 import { errorsAtom, metaAtom } from '@/components/form/store';
 import type { GeoSpotsResultFollowup } from '@/models/spots';

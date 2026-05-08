@@ -4,6 +4,7 @@ import * as R from 'ramda';
 import Leaflet, { MarkerCluster } from 'leaflet';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import type { PrimitiveAtom } from 'jotai';
 import { MapContainer, TileLayer, useMapEvents, Marker, Popup } from "react-leaflet";
 import type { LeafletEvent } from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
@@ -17,18 +18,19 @@ import { Square3Stack3DIcon } from '@heroicons/react/24/outline';
 import { NoSymbolIcon } from '@heroicons/react/24/solid';
 
 import { useSession } from 'next-auth/react';
-import FoodLife from './FoodLife';
-import ActionLabel from './ActionLabel';
-import FollowupForm from './FollowupForm';
-import AmendSpotForm from './AmendSpotForm';
-import AmendFollowupForm from './AmendFollowupForm';
-import { editingFormAtom, spotFollowupsAtom, mergeSpotFollowupsAtom, loadingFollowupsAtom } from './store';
+import FoodLife from '@/app/world/[[...path]]/FoodLife';
+import ActionLabel from '@/app/world/[[...path]]/ActionLabel';
+import FollowupForm from '@/app/world/[[...path]]/FollowupForm';
+import AmendSpotForm from '@/app/world/[[...path]]/AmendSpotForm';
+import AmendFollowupForm from '@/app/world/[[...path]]/AmendFollowupForm';
+import type { TempMarkerProps, EditingFormType } from '@/components/map/store';
+import { spotFollowupsAtom, mergeSpotFollowupsAtom, loadingFollowupsAtom } from '@/components/map/store';
 import { nowAtom, addAlertAtom } from '@/components/store';
-import { openSpotMarkerById } from './util';
+import { openSpotMarkerById } from '@/app/world/[[...path]]/util';
 import { present, jsonReviver, ACCESS_CTRL } from '@/lib/utils';
 import { format, formatDistance } from '@/lib/date-fp';
 import type { GeoSpotsResult, GeoSpotsResultFollowup } from '@/models/spots';
-import mapStyles from './map.module.scss';
+import mapStyles from './marker.module.scss';
 import 'react-leaflet-cluster/dist/assets/MarkerCluster.css';
 import 'react-leaflet-cluster/dist/assets/MarkerCluster.Default.css';
 
@@ -109,13 +111,14 @@ function DroppedSpotMarker({ spot }: {
   );
 }
 
-function Followup({ fo, now, canEdit, startAmendFollowup, editingItemId, geohash }: {
+function Followup({ fo, now, canEdit, startAmendFollowup, editingItemId, geohash, editingFormAtom }: {
   fo: GeoSpotsResultFollowup,
   now: Date | null,
   canEdit: boolean,
   startAmendFollowup: any,
   editingItemId: number | null,
   geohash: string,
+  editingFormAtom: PrimitiveAtom<EditingFormType>,
 }) {
   const [editingForm, setEditingForm] = useAtom(editingFormAtom);
   if (!now) return;
@@ -193,9 +196,12 @@ function DroppedFollowup({ fo }: {
   );
 }
 
-export default function SpotMarkers({ spots }: {
-  spots: GeoSpotsResult[]
-}) {
+interface MarkerProps {
+  spots: GeoSpotsResult[],
+  editingFormAtom: PrimitiveAtom<EditingFormType>,
+}
+
+export default function SpotMarkers({ spots, editingFormAtom }: MarkerProps) {
   const { data: session, status } = useSession();
   const [editingForm, setEditingForm] = useAtom(editingFormAtom);
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
@@ -393,6 +399,7 @@ export default function SpotMarkers({ spots }: {
                         canEdit={canEdit && userId === fo.userId}
                         startAmendFollowup={startAmendFollowup}
                         editingItemId={editingItemId}
+                        editingFormAtom={editingFormAtom}
                         geohash={s.geohash}
                       />
                     );

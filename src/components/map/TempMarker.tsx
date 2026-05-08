@@ -7,24 +7,30 @@ import type { Marker as LeafletMarker } from 'leaflet';
 import type { LatLngExpression } from 'leaflet';
 import { useRef, useMemo } from 'react';
 import { useAtom } from 'jotai';
+import type { PrimitiveAtom, WritableAtom  } from 'jotai';
 import { ACCESS_CTRL } from '@/lib/utils';
-import { mergeTempMarkerAtom, editingFormAtom } from '@/app/world/[[...path]]/store';
 import Form from '@/app/world/[[...path]]/Form';
 
-import mapStyles from './map.module.scss';
+import type { TempMarkerProps, EditingFormType } from '@/components/map/store';
+import markerStyles from './marker.module.scss';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 const MarkerIcon = new DivIcon({
-  html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="red" class="${mapStyles['temp-marker']} size-9 -mt-6 -ml-3 opacity-90 drop-shadow-[0_0_2px_white]">
+  html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="red" class="${markerStyles['temp-marker']} size-9 -mt-6 -ml-3 opacity-90 drop-shadow-[0_0_2px_white]">
     <path fill-rule="evenodd" d="m11.54 22.351.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 0 0-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 0 0 2.682 2.282 16.975 16.975 0 0 0 1.145.742ZM12 13.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" clip-rule="evenodd" /></svg>`,
   className: 'leaflet-div-marker ring-2 ring',
   popupAnchor: [1, -27],
 })
 
-export default function TempMarker() {
+interface MarkerProps {
+  markerAtom: WritableAtom<TempMarkerProps, [TempMarkerProps], void>,
+  editingFormAtom: PrimitiveAtom<EditingFormType>,
+}
+
+export default function TempMarker({ markerAtom, editingFormAtom }: MarkerProps) {
   const { data: session, status } = useSession();
-  const [marker, setMarker] = useAtom(mergeTempMarkerAtom);
+  const [marker, setMarker] = useAtom(markerAtom);
   const [editingForm, setEditingForm] = useAtom(editingFormAtom);
   const { visible, lat, lon } = marker;
 
@@ -50,7 +56,7 @@ export default function TempMarker() {
 
   const canAdd = ACCESS_CTRL === 'open' && status === 'authenticated' && session.user.state === 'active';
 
-  if (!visible) {
+  if (!visible || !lat || !lon) {
     return;
   }
 
