@@ -12,6 +12,7 @@ import type { keyedAlert } from '@/components/store';
 import type { GeoSpotsResult, GeoSpotsByGeohash } from '@/models/spots';
 
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
+import { loadingFollowupsAtom } from '@/components/map/store';
 import {
   mapAtom,
   spotsAtom,
@@ -20,7 +21,7 @@ import {
   areaPickerAtom,
   statusAtom,
   mergeTempMarkerAtom,
-  loadingFollowupsAtom,
+  editingFormAtom,
   loadingDistrictAtom,
   toggleHelpAtom,
   advanceDistrictModeAtom,
@@ -321,9 +322,13 @@ export default function Map({ preloadedAreas, helpContent, children, className, 
           maxNativeZoom={18}
         >
         </TileLayer>
-        {filteredSpots && <SpotMarkers spots={filteredSpots} />}
 
-        <TempMarker />
+        {
+          filteredSpots &&
+            <SpotMarkers spots={filteredSpots} editingFormAtom={editingFormAtom} />
+        }
+
+        <TempMarker markerAtom={mergeTempMarkerAtom} editingFormAtom={editingFormAtom} />
 
         <LocateControl className={mapStyles['reset-view-ctrl']} />
         <ResetViewControl className={mapStyles['reset-view-ctrl']} title='整個台灣' position='bottomright' />

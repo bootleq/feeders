@@ -7,10 +7,11 @@ import type { Marker as LeafletMarker } from 'leaflet';
 import type { LatLngExpression } from 'leaflet';
 import { useRef, useMemo } from 'react';
 import { useAtom } from 'jotai';
+import type { PrimitiveAtom, WritableAtom  } from 'jotai';
 import { ACCESS_CTRL } from '@/lib/utils';
-import { mergeTempMarkerAtom, editingFormAtom } from '@/app/world/[[...path]]/store';
 import Form from '@/app/world/[[...path]]/Form';
 
+import type { TempMarkerProps, EditingFormType } from '@/components/map/store';
 import markerStyles from './marker.module.scss';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/outline';
@@ -22,9 +23,14 @@ const MarkerIcon = new DivIcon({
   popupAnchor: [1, -27],
 })
 
-export default function TempMarker() {
+interface MarkerProps {
+  markerAtom: WritableAtom<TempMarkerProps, [TempMarkerProps], void>,
+  editingFormAtom: PrimitiveAtom<EditingFormType>,
+}
+
+export default function TempMarker({ markerAtom, editingFormAtom }: MarkerProps) {
   const { data: session, status } = useSession();
-  const [marker, setMarker] = useAtom(mergeTempMarkerAtom);
+  const [marker, setMarker] = useAtom(markerAtom);
   const [editingForm, setEditingForm] = useAtom(editingFormAtom);
   const { visible, lat, lon } = marker;
 
@@ -50,7 +56,7 @@ export default function TempMarker() {
 
   const canAdd = ACCESS_CTRL === 'open' && status === 'authenticated' && session.user.state === 'active';
 
-  if (!visible) {
+  if (!visible || !lat || !lon) {
     return;
   }
 
