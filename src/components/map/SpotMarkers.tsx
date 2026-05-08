@@ -12,10 +12,12 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { Desc } from '@/components/Desc';
 import ClientDate from '@/components/ClientDate';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowDownIcon, UserCircleIcon } from '@heroicons/react/24/solid';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import { Square3Stack3DIcon } from '@heroicons/react/24/outline';
 import { NoSymbolIcon } from '@heroicons/react/24/solid';
+import siteIcon from '@/app/icon.svg'
 
 import { useSession } from 'next-auth/react';
 import FoodLife from '@/app/world/[[...path]]/FoodLife';
@@ -307,6 +309,8 @@ export default function SpotMarkers({ spots, editingFormAtom, readonly }: Marker
             return <DroppedSpotMarker key={s.id} spot={s} />;
           }
 
+          const spotLink = `/world/area/@${s.lat},${s.lon}#${s.id}`;
+
           return (
             <Marker spot-id={s.id} key={s.id} position={[s.lat, s.lon]} icon={icon} autoPan={false} eventHandlers={eventHandlers}>
               <Popup className={mapStyles.popup} autoPan={false}>
@@ -347,6 +351,20 @@ export default function SpotMarkers({ spots, editingFormAtom, readonly }: Marker
                       </TooltipTrigger>
                       <TooltipContent className={`${tooltipCls}`}>在 Google 地圖開啟座標</TooltipContent>
                     </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <a
+                          className='flex items-start font-sans whitespace-nowrap rounded-full hover:bg-yellow-300/50'
+                          aria-label='在 Feeders 地圖開啟'
+                          href={spotLink}
+                          target='_blank'
+                        >
+                          <Image src={siteIcon} alt='在 Feeders 地圖開啟' className='px-px py-0.5' width={17} height={17} />
+                        </a>
+                      </TooltipTrigger>
+                      <TooltipContent className={`${tooltipCls}`}>在 Feeders 地圖開啟</TooltipContent>
+                    </Tooltip>
                   </div>
                 </div>
 
@@ -360,7 +378,7 @@ export default function SpotMarkers({ spots, editingFormAtom, readonly }: Marker
 
                 <div className='flex items-center justify-end mt-2 px-2 text-xs text-slate-500/75'>
                   建立：<span data-id={s.id} className='font-mono mr-1'>
-                    <Link href={`/world/area/@${s.lat},${s.lon}#${s.id}`} data-id={s.id} data-disable-progress={true}>
+                    <Link href={spotLink} data-id={s.id} data-disable-progress={true}>
                       <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
                         {format({}, 'y/M/d', s.createdAt)}
                       </ClientDate>
