@@ -12,19 +12,14 @@ import { recentFollowups, geoSpots } from '@/models/spots';
 import type { RecentFollowupsResult } from '@/models/spots';
 import { formatISO } from '@/lib/date-fp';
 import { parsePath, GEOHASH_PRECISION } from './util';
+import { TW_BOUNDS, TW_CENTER } from '@/app/world/mapUtil';
 import { userAtom } from '@/components/store';
 import Sidebar from '@/components/Sidebar';
 import LinkPreview from '@/components/LinkPreview';
 import LazyMap from './LazyMap';
 import RecentFollowups from './RecentFollowups';
-import mapStyles from './map.module.scss';
 import { MapPinIcon } from '@heroicons/react/24/solid';
 
-const TW_BOUNDS = [
-  [21.7, 118.5], // bottom left
-  [25.4, 122.3]  // up right
-];
-const TW_CENTER = [23.9739, 120.9773];
 // const SAMPLE_CENTER = [24.987787927428965, 121.52125946066074];
 const SAMPLE_CENTER = [24.87493294850338,121.22191410433534];
 const fetchLimit = 200;

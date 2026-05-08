@@ -4,7 +4,7 @@ import type {
   RecentFollowupsItemProps,
   GeoSpotsByGeohash,
 } from '@/models/spots';
-import { spotFollowups, type LatLngBounds } from '@/lib/schema';
+import type { LatLngBounds } from '@/lib/schema';
 import type { TempMarkerProps, EditingFormType } from '@/components/map/store';
 import Leaflet from 'leaflet';
 

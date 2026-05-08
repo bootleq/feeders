@@ -4,6 +4,10 @@ import * as R from 'ramda';
 import Image from 'next/image';
 import { useState, useRef, useCallback } from 'react';
 import ExifReader from 'exifreader';
+import { TW_BOUNDS, TW_CENTER } from '@/app/world/mapUtil';
+import LazyMap from './LazyMap';
+
+import '@/components/leaflet/leaflet.css';  // import CSS here instead of inside SimpleMap for stability
 
 type Location = {
   lat: number | null;
@@ -71,6 +75,8 @@ const processFile = async (
       const lon = tags.gps?.Longitude;
       if (lat && lon) {
         location = { lat, lon };
+      } else {
+        return reject(new Error('檔案中沒有 GPS 資訊'));
       }
       time = tags['exif']?.['DateTime']?.value[0] || null;
     } catch (err) {
@@ -158,57 +164,83 @@ export default function Page() {
   const { lon, lat } = location;
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">從照片新增地點</h1>
+    <div className='flex'>
+      <div className="p-4 w-1/2 ring ring-yellow-100">
+        <h1 className="text-2xl font-bold mb-4">從照片新增地點</h1>
 
-      <input
-        type="file"
-        accept="image/*"
-        onChange={onFileChange}
-        className="mb-4 p-2 border rounded-md font-mono"
-        disabled={loading}
-      />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={onFileChange}
+          className="mb-4 p-2 border rounded-md font-mono"
+          disabled={loading}
+        />
 
-      {loading && <p>處理中...</p>}
+        {loading && <p>處理中...</p>}
 
-      {error && <p className="text-red-500">錯誤：{error}</p>}
+        {error && <p className="text-red-500">錯誤：{error}</p>}
 
-      <canvas ref={canvasRef} style={{ display: 'none' }} />
+        <canvas ref={canvasRef} style={{ display: 'none' }} />
 
-      <div className="mt-4">
-        {imageUrl ? (
-          <>
-            <h2 className="text-lg font-semibold mb-2">照片縮圖（低畫質）</h2>
-            <Image
-              ref={imageRef}
-              src={imageUrl}
-              alt="已上傳的照片"
-              width={640}
-              height={480}
-              className="border"
-            />
-          </>
-        ) :
-          <div>
-            無法顯示照片內容
+        <div className="mt-4">
+          {imageUrl ? (
+            <>
+              <h2 className="text-lg font-semibold mb-2">照片縮圖（低畫質）</h2>
+              <div className='max-h-[640px]'>
+                <Image
+                  ref={imageRef}
+                  src={imageUrl}
+                  alt="已上傳的照片"
+                  width={640}
+                  height={480}
+                  className="border max-h-full w-auto"
+                />
+              </div>
+            </>
+          ) :
+            <div>
+              無法顯示照片內容
+            </div>
+          }
+        </div>
+
+        {(lat && lon) && (
+          <div className="mt-4 p-3 bg-gray-100 rounded-md">
+            <div className="text-lg font-semibold mb-2">座標：</div>
+            <p>經度 (longitude): <span className='font-mono'>{lon.toFixed(6)}</span></p>
+            <p>緯度 (latitude): <span className='font-mono'>{lat.toFixed(6)}</span></p>
+
+            <div>
+              <button className='btn bg-slate-100 ring-1 flex items-center hover:bg-white'>
+                重新定位
+              </button>
+            </div>
           </div>
-        }
+        )}
+
+        {time && (
+          <div className="mt-4 p-3 bg-gray-100 rounded-md">
+            <div className="text-lg font-semibold mb-2">拍攝時間：</div>
+            <span className='font-mono'>{time}</span>
+          </div>
+        )}
       </div>
 
-      {(lat && lon) && (
-        <div className="mt-4 p-3 bg-gray-100 rounded-md">
-          <div className="text-lg font-semibold mb-2">座標：</div>
-          <p>經度 (longitude): <span className='font-mono'>{lon.toFixed(6)}</span></p>
-          <p>緯度 (latitude): <span className='font-mono'>{lat.toFixed(6)}</span></p>
-        </div>
-      )}
-
-      {time && (
-        <div className="mt-4 p-3 bg-gray-100 rounded-md">
-          <div className="text-lg font-semibold mb-2">拍攝時間：</div>
-          <span className='font-mono'>{time}</span>
-        </div>
-      )}
+      <div className='relative float-right w-full h-[100vh] border ring'>
+        {(lat && lon) &&
+          <LazyMap
+            preferCanvas={true}
+            center={[lat, lon]}
+            minZoom={15}
+            zoom={18}
+            maxZoom={20}
+            maxBounds={TW_BOUNDS}
+            maxBoundsViscosity={0.5}
+            zoomControl={false}
+          >
+          </LazyMap>
+        }
+      </div>
     </div>
   );
 }
