@@ -182,7 +182,7 @@ export default function SimpleMap({ center, preloadedAreas, helpContent, childre
           maxNativeZoom={18}
         >
         </TileLayer>
-        <SpotMarkers spots={filteredSpots} editingFormAtom={editingFormAtom} />
+        <SpotMarkers spots={filteredSpots} readonly editingFormAtom={editingFormAtom} />
 
         <TempMarker markerAtom={mergeTempMarkerAtom} editingFormAtom={editingFormAtom} />
       </MapContainer>
