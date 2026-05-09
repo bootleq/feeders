@@ -7,6 +7,7 @@ import { ScopeProvider } from 'jotai-scope'
 import { CheckIcon } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
+import PartyPopperIcon from '@/assets/party-popper.svg';
 
 import { SpotActionEnum } from '@/lib/schema';
 import { t } from '@/lib/i18n';
@@ -14,6 +15,7 @@ import { ariaDatePickerValueFix } from '@/lib/utils';
 import ActionLabel from '@/app/world/[[...path]]/ActionLabel';
 import { createSpot } from '@/app/world/[[...path]]/create-spot';
 import { errorsAtom, metaAtom } from '@/components/form/store';
+import { addAlertAtom } from '@/components/store';
 import type { MarkerProps } from '@/components/map/TempMarker';
 import type { FieldErrors } from '@/components/form/store';
 import { TextInput, Textarea, Select } from '@/components/form/Inputs';
@@ -77,6 +79,18 @@ export function FormErrors({ errors }: { errors: FieldErrors}) {
   );
 }
 
+function SuccessAlert() {
+  return (
+    <div className='flex flex-col text-center leading-8 gap-3'>
+      <div>新增地點<span className='text-green-900'>完成</span></div>
+      <div className='flex items-center'>
+        <PartyPopperIcon className='mr-2 stroke-rose-600 fill-white' width={25} height={25} aria-label='太棒了' />
+        感謝<span className='italic'>！</span>
+      </div>
+    </div>
+  )
+};
+
 type FormProps = {
   lat: number,
   lon: number,
@@ -98,6 +112,7 @@ function UnscopedForm({
   const [action, setAction] = useState('');
   const [now, setNow] = useState(() => new Date());
   const [confirming, setConfirming] = useState(false);
+  const addAlert = useSetAtom(addAlertAtom);
 
   useEffect(() => {
     setNow(new Date());
@@ -135,6 +150,7 @@ function UnscopedForm({
       reloadSpots(res.reloadSpots);
       setEditingForm('');
       setTempMarker({ visible: false });
+      addAlert('info', <SuccessAlert />);
       return;
     }
 
