@@ -2,6 +2,7 @@
 
 import * as R from 'ramda';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useState, useRef, useCallback } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import ExifReader from 'exifreader';
@@ -9,7 +10,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { googleMapURL } from '@/app/world/mapUtil';
 import { photoLocationAtom, mergeTempMarkerAtom } from './store';
 import type { Location } from './store';
-import { MapPinIcon, ArrowRightIcon } from '@heroicons/react/24/solid';
+import { MapPinIcon, ArrowRightIcon, InformationCircleIcon } from '@heroicons/react/24/solid';
 import siteIcon from '@/app/icon.svg'
 
 const tooltipCls = [
@@ -175,7 +176,7 @@ export default function PhotoReader() {
   const { lon, lat } = location;
 
   return (
-    <div className="flex flex-col px-3 py-4">
+    <div className="flex flex-col h-full px-3 py-4">
       <h1 className="text-2xl font-bold mb-4">從照片新增地點</h1>
 
       <input
@@ -283,8 +284,20 @@ export default function PhotoReader() {
         </div>
       )}
 
-      <div className='mt-5 my-3 text-gray-700'>
-        註：照片不會上傳到伺服器（暫無此功能），只是讀取檔案資訊而已
+      <div className='mt-auto mb-4 w-fit text-gray-700 flex-col gap-y-3'>
+        <div className='flex items-center my-2'>
+          <InformationCircleIcon className='shrink-0 mr-2' height={22} />
+          <div className='text-balance'>
+            照片不會上傳到伺服器（暫無此功能），只是讀取檔案資訊而已
+          </div>
+        </div>
+
+        <div className='flex items-center my-2'>
+          <InformationCircleIcon className='shrink-0 mr-2' height={22} />
+          <div className='text-balance'>
+            距離太近的點，請盡量不要新增記錄；前往<Link href='/world/' className='text-nowrap underline hover:bg-yellow-300/50 text-inherit'>世界地圖</Link>，在原本的點位新增「跟進」比較清楚
+          </div>
+        </div>
       </div>
     </div>
   );
