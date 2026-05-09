@@ -8,6 +8,13 @@ import type { TempMarkerProps, EditingFormType } from '@/components/map/store';
 import type { LatLngBounds } from '@/lib/schema';
 import type { Map } from 'leaflet';
 
+export type Location = {
+  lat: number | null;
+  lon: number | null;
+};
+
+export const photoLocationAtom = atom<Location>({lat: null, lon: null});
+
 export const mapAtom = atom<Map | null>(null);
 
 export const spotsAtom = atom<GeoSpotsByGeohash>({});

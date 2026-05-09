@@ -15,6 +15,7 @@ import type { GeoSpotsResult, GeoSpotsByGeohash } from '@/models/spots';
 import { nowAtom, alertsAtom, addAlertAtom, dismissAlertAtom } from '@/components/store';
 import Spinner from '@/assets/spinner.svg';
 import {
+  photoLocationAtom,
   mapAtom,
   spotsAtom,
   mergeSpotsAtom,
@@ -30,7 +31,6 @@ import TempMarker from '@/components/map/TempMarker';
 type MapProps = {
   children?: React.ReactNode;
   className?: string;
-  center?: [number, number];
   width?: string | number;
   height?: string | number;
   [key: string]: any;
@@ -152,9 +152,12 @@ function LoadingIndicator(params: any) {
   );
 }
 
-export default function SimpleMap({ center, preloadedAreas, helpContent, children, className, width, height, ...rest }: MapProps) {
+export default function SimpleMap({ preloadedAreas, helpContent, children, className, width, height, ...rest }: MapProps) {
   const map = useAtomValue(mapAtom);
+  const location = useAtomValue(photoLocationAtom);
   const setTempMarker = useSetAtom(mergeTempMarkerAtom);
+
+  const { lon, lat } = location;
 
   const spots = useAtomValue(spotsAtom);
   let filteredSpots = R.pipe(
@@ -165,8 +168,8 @@ export default function SimpleMap({ center, preloadedAreas, helpContent, childre
   )(spots) as GeoSpotsResult[];
 
   useEffect(() => {
-    if (center) {
-      setTempMarker({ visible: true, lat: center[0], lon: center[1] });
+    if (lat && lon) {
+      setTempMarker({ visible: true, lat, lon });
       if (map) {
         map.fire('moveend')
         map.eachLayer(layer => {
@@ -176,11 +179,19 @@ export default function SimpleMap({ center, preloadedAreas, helpContent, childre
         })
       }
     }
-  }, [center, map, setTempMarker]);
+  }, [lat, lon, map, setTempMarker]);
+
+  if (!lat || !lon) {
+    return (
+      <div className='p-3'>
+        輸入照片、取得地理資訊後才會載入地圖。
+      </div>
+    );
+  }
 
   return (
     <>
-      <MapContainer center={center} className={`w-full h-full relative ring ring-red-400 ${className || ''}`} {...rest}>
+      <MapContainer center={[lat, lon]} className={`w-full h-full relative ring ring-red-400 ${className || ''}`} {...rest}>
         <MapUser/>
         <TileLayer
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
