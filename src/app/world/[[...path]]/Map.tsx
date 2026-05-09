@@ -40,6 +40,7 @@ import { StarIcon } from '@heroicons/react/24/outline';
 
 import SpotMarkers from '@/components/map/SpotMarkers';
 import TempMarker from '@/components/map/TempMarker';
+import makeSpotFetcherAtoms from '@/components/map/makeSpotFetcherAtoms';
 import Help from './Help';
 import ShotInstruction from './ShotInstruction';
 import Districts from './Districts';
@@ -59,46 +60,9 @@ import '@/components/leaflet/leaflet.css';
 
 const D1_PARAM_LIMIT = 100;
 
-const loadingHashesAtom = atom<string[]>([]);
-const loadedHashesAtom = atom<string[]>([]);
-const loadingAtom = atom((get) => R.isNotEmpty(get(loadingHashesAtom)) || get(loadingFollowupsAtom) || get(loadingDistrictAtom));
+const { spotLoadingAtom, fetchSpotsAtom } = makeSpotFetcherAtoms(spotsAtom, mergeSpotsAtom);
 
-type ItemsGeoSpotsByGeohash = { items: GeoSpotsByGeohash }
-const fetchSpotsAtom = atom(
-  null,
-  async (get, set, geohash: string[]) => {
-    const loadingHashes = get(loadingHashesAtom);
-    const loadedHashes = R.union(get(loadedHashesAtom), Object.keys(get(spotsAtom)));
-
-    const staleHashes = R.difference(
-      R.difference(geohash, loadedHashes),
-      loadingHashes
-    );
-
-    if (R.isEmpty(staleHashes)) {
-      return; // already loading, do nothing
-    }
-    set(loadingHashesAtom, R.union(loadingHashes, staleHashes));
-
-    try {
-      const response = await fetch(`/api/spots/${staleHashes.sort()}/`);
-      const json = await response.text();
-      const fetched: ItemsGeoSpotsByGeohash = JSON.parse(json, jsonReviver);
-      if (response.ok) {
-        set(mergeSpotsAtom, { ...fetched.items });
-        set(loadedHashesAtom, R.union(get(loadedHashesAtom), staleHashes));
-      } else {
-        const errorNode = <><code className='font-mono mr-1'>{response.status}</code>無法取得資料</>;
-        set(addAlertAtom, 'error', errorNode);
-      }
-      set(loadingHashesAtom, R.difference(get(loadingHashesAtom), staleHashes));
-    } catch (e) {
-      const errorNode = <span>{String(e)}</span>;
-      set(addAlertAtom, 'error', errorNode);
-      set(loadingHashesAtom, R.difference(get(loadingHashesAtom), staleHashes));
-    }
-  }
-);
+const loadingAtom = atom((get) => get(spotLoadingAtom) || get(loadingFollowupsAtom) || get(loadingDistrictAtom));
 
 function MapUser(props: {
 }) {

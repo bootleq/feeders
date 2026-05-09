@@ -8,7 +8,6 @@ import type { LeafletMouseEvent } from 'leaflet';
 import { atom, useSetAtom, useAtomValue } from 'jotai';
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'motion/react';
 import Alerts from '@/components/Alerts';
-import { jsonReviver } from '@/lib/utils';
 import { GEOHASH_PRECISION } from '@/app/world/mapUtil';
 import { useDebouncedCallback } from 'use-debounce';
 import type { GeoSpotsResult, GeoSpotsByGeohash } from '@/models/spots';
@@ -27,6 +26,7 @@ import {
 
 import SpotMarkers from '@/components/map/SpotMarkers';
 import TempMarker from '@/components/map/TempMarker';
+import makeSpotFetcherAtoms from '@/components/map/makeSpotFetcherAtoms';
 
 type MapProps = {
   children?: React.ReactNode;
@@ -38,46 +38,8 @@ type MapProps = {
 
 const D1_PARAM_LIMIT = 100;
 
-const loadingHashesAtom = atom<string[]>([]);
-const loadedHashesAtom = atom<string[]>([]);
-const loadingAtom = atom((get) => R.isNotEmpty(get(loadingHashesAtom)) || get(loadingFollowupsAtom));
-
-type ItemsGeoSpotsByGeohash = { items: GeoSpotsByGeohash }
-export const fetchSpotsAtom = atom(
-  null,
-  async (get, set, geohash: string[]) => {
-    const loadingHashes = get(loadingHashesAtom);
-    const loadedHashes = R.union(get(loadedHashesAtom), Object.keys(get(spotsAtom)));
-
-    const staleHashes = R.difference(
-      R.difference(geohash, loadedHashes),
-      loadingHashes
-    );
-
-    if (R.isEmpty(staleHashes)) {
-      return; // already loading, do nothing
-    }
-    set(loadingHashesAtom, R.union(loadingHashes, staleHashes));
-
-    try {
-      const response = await fetch(`/api/spots/${staleHashes.sort()}/`);
-      const json = await response.text();
-      const fetched: ItemsGeoSpotsByGeohash = JSON.parse(json, jsonReviver);
-      if (response.ok) {
-        set(mergeSpotsAtom, { ...fetched.items });
-        set(loadedHashesAtom, R.union(get(loadedHashesAtom), staleHashes));
-      } else {
-        const errorNode = <><code className='font-mono mr-1'>{response.status}</code>無法取得資料</>;
-        set(addAlertAtom, 'error', errorNode);
-      }
-      set(loadingHashesAtom, R.difference(get(loadingHashesAtom), staleHashes));
-    } catch (e) {
-      const errorNode = <span>{String(e)}</span>;
-      set(addAlertAtom, 'error', errorNode);
-      set(loadingHashesAtom, R.difference(get(loadingHashesAtom), staleHashes));
-    }
-  }
-);
+const { spotLoadingAtom, fetchSpotsAtom } = makeSpotFetcherAtoms(spotsAtom, mergeSpotsAtom);
+const loadingAtom = atom((get) => get(spotLoadingAtom) || get(loadingFollowupsAtom));
 
 function MapUser(props: {}) {
   const setMap = useSetAtom(mapAtom);
