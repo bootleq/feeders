@@ -167,7 +167,14 @@ export default function SimpleMap({ center, preloadedAreas, helpContent, childre
   useEffect(() => {
     if (center) {
       setTempMarker({ visible: true, lat: center[0], lon: center[1] });
-      map?.fire('moveend')
+      if (map) {
+        map.fire('moveend')
+        map.eachLayer(layer => {
+          if ((layer.options as any)['marker-type'] === 'TempMarker') {
+            layer.openPopup();
+          }
+        })
+      }
     }
   }, [center, map, setTempMarker]);
 

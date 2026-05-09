@@ -6,6 +6,8 @@ import { useState, useRef, useCallback } from 'react';
 import ExifReader from 'exifreader';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { TW_BOUNDS, TW_CENTER, googleMapURL } from '@/app/world/mapUtil';
+import Sidebar from '@/components/Sidebar';
+import LinkPreview from '@/components/LinkPreview';
 import LazyMap from './LazyMap';
 import { MapPinIcon, ArrowRightIcon } from '@heroicons/react/24/solid';
 import siteIcon from '@/app/icon.svg'
@@ -172,121 +174,126 @@ export default function Page() {
   const { lon, lat } = location;
 
   return (
-    <div className='flex'>
-      <div className="p-4 w-1/2">
-        <h1 className="text-2xl font-bold mb-4">從照片新增地點</h1>
+    <main className="flex min-h-screen flex-row items-start justify-between">
+      <Sidebar defaultOpen fixed={false} className={`sm:w-fit lg:w-fit lg:max-w-[80%] max-h-screen scrollbar-thin flex flex-col pb-1 z-[810] bg-gradient-to-br from-stone-50 to-slate-200`}>
+        <div className='flex'>
+          <div className="p-4">
+            <h1 className="text-2xl font-bold mb-4">從照片新增地點</h1>
 
-        <input
-          type="file"
-          accept="image/*"
-          onChange={onFileChange}
-          className="mb-4 p-2 border rounded-md font-mono"
-          disabled={loading}
-        />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={onFileChange}
+              className="mb-4 p-2 border rounded-md font-mono cursor-pointer"
+              disabled={loading}
+            />
 
-        <div>
-          {loading && <p>處理中...</p>}
+            <div>
+              {loading && <p>處理中...</p>}
 
-          {error && <p className="text-red-500">錯誤：{error}</p>}
-        </div>
-
-        <canvas ref={canvasRef} style={{ display: 'none' }} />
-
-        {
-          selectedFile &&
-            <div className="mt-4">
-              {imageUrl ? (
-                <>
-                  <h2 className="text-lg font-semibold mb-2">畫面（低畫質）</h2>
-                  <div className='max-h-[640px]'>
-                    <Image
-                      ref={imageRef}
-                      src={imageUrl}
-                      alt="已上傳的照片"
-                      width={640}
-                      height={480}
-                      className="border max-h-full w-auto"
-                    />
-                  </div>
-                </>
-              ) :
-                <div>
-                  無法顯示照片內容
-                </div>
-              }
+              {error && <p className="text-red-500">錯誤：{error}</p>}
             </div>
-        }
+
+            <canvas ref={canvasRef} style={{ display: 'none' }} />
+
+            {
+              selectedFile &&
+                <div className="mt-4">
+                  {imageUrl ? (
+                    <>
+                      <h2 className="text-lg font-semibold mb-2">畫面（低畫質）</h2>
+                      <div className='max-h-[640px]'>
+                        <Image
+                          ref={imageRef}
+                          src={imageUrl}
+                          alt="已上傳的照片"
+                          width={640}
+                          height={480}
+                          className="border max-h-full w-auto"
+                        />
+                      </div>
+                    </>
+                  ) :
+                    <div>
+                      無法顯示照片內容
+                    </div>
+                  }
+                </div>
+            }
 
 
-        {(lat && lon) && (
-          <div className="mt-4 p-3 bg-gradient-to-br from-stone-50 to-slate-200 rounded-md ring">
-            <div className='grid grid-cols-[auto_1fr] items-center gap-4'>
-              <strong className='min-w-10'>座標</strong>
-              <div className='flex items-center'>
-                <Tooltip>
-                  <TooltipTrigger><code className='text-base max-w-20 truncate hover:bg-yellow-300/50'>{lat}</code></TooltipTrigger>
-                  <TooltipContent className={`${tooltipCls}`}>{lat}</TooltipContent>
-                </Tooltip>
-                <small className='text-base'>,</small>
-                <Tooltip>
-                  <TooltipTrigger><code className='text-base ml-1 max-w-20 truncate hover:bg-yellow-300/50'>{lon}</code></TooltipTrigger>
-                  <TooltipContent className={`${tooltipCls}`}>{lon}</TooltipContent>
-                </Tooltip>
+            {(lat && lon) && (
+              <div className="mt-4 p-3 bg-gradient-to-br from-stone-50 to-slate-200 rounded-md ring">
+                <div className='grid grid-cols-[auto_1fr] items-center gap-4'>
+                  <strong className='min-w-10'>座標</strong>
+                  <div className='flex items-center flex-wrap gap-y-1'>
+                    <Tooltip>
+                      <TooltipTrigger><code className='text-base max-w-20 truncate hover:bg-yellow-300/50'>{lat}</code></TooltipTrigger>
+                      <TooltipContent className={`${tooltipCls}`}>{lat}</TooltipContent>
+                    </Tooltip>
+                    <small className='text-base'>,</small>
+                    <Tooltip>
+                      <TooltipTrigger><code className='text-base ml-1 max-w-20 truncate hover:bg-yellow-300/50'>{lon}</code></TooltipTrigger>
+                      <TooltipContent className={`${tooltipCls}`}>{lon}</TooltipContent>
+                    </Tooltip>
 
-                <Tooltip>
-                  <TooltipTrigger>
-                    <a
-                      className='flex items-start mx-2 font-sans whitespace-nowrap rounded-full hover:bg-yellow-300/50'
-                      aria-label='在 Google 地圖開啟座標'
-                      href={googleMapURL(lat, lon)}
-                      target='_blank'
-                    >
-                      <span className='text-base text-slate-700 px-1 font-bold'>G</span>
-                    </a>
-                  </TooltipTrigger>
-                  <TooltipContent className={`${tooltipCls}`}>在 Google 地圖開啟座標</TooltipContent>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <a
+                          className='flex items-start mx-2 font-sans whitespace-nowrap rounded-full hover:bg-yellow-300/50'
+                          aria-label='在 Google 地圖開啟座標'
+                          href={googleMapURL(lat, lon)}
+                          target='_blank'
+                        >
+                          <span className='text-base text-slate-700 px-1 font-bold'>G</span>
+                        </a>
+                      </TooltipTrigger>
+                      <TooltipContent className={`${tooltipCls}`}>在 Google 地圖開啟座標</TooltipContent>
 
-                </Tooltip>
+                    </Tooltip>
 
-                <Tooltip>
-                  <TooltipTrigger>
-                    <a
-                      className='flex items-start font-sans whitespace-nowrap rounded-full hover:bg-yellow-300/50'
-                      aria-label='在 Feeders 地圖開啟'
-                      href={ `/world/area/@${lat},${lon}`}
-                      target='_blank'
-                    >
-                      <Image src={siteIcon} alt='在 Feeders 地圖開啟' className='px-px py-0.5' width={17} height={17} />
-                    </a>
-                  </TooltipTrigger>
-                  <TooltipContent className={`${tooltipCls}`}>在 Feeders 地圖開啟</TooltipContent>
-                </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <a
+                          className='flex items-start shrink-0 font-sans whitespace-nowrap rounded-full hover:bg-yellow-300/50'
+                          aria-label='在 Feeders 地圖開啟'
+                          href={ `/world/area/@${lat},${lon}`}
+                          target='_blank'
+                        >
+                          <Image src={siteIcon} alt='在 Feeders 地圖開啟' className='px-px py-0.5' width={17} height={17} />
+                        </a>
+                      </TooltipTrigger>
+                      <TooltipContent className={`${tooltipCls}`}>在 Feeders 地圖開啟</TooltipContent>
+                    </Tooltip>
 
-                <button className='ml-auto btn bg-slate-100 ring-1 flex items-center hover:bg-white'>
-                  重新定位
-                  <MapPinIcon className='fill-red-600 ml-px' height={18} />
-                  <ArrowRightIcon className='' height={18} />
-                </button>
-              </div>
-
-              {time && (
-                <>
-                  <strong className='min-w-10'>拍攝時間</strong>
-                  <div className='flex items-center'>
-                    <div className='font-mono'>{time}</div>
+                    <button className='ml-auto btn bg-slate-100 ring-1 flex items-center hover:bg-white'>
+                      重新定位
+                      <MapPinIcon className='fill-red-600 ml-px shrink-0' height={18} />
+                      <ArrowRightIcon className='shrink-0 hidden md:block' height={18} />
+                    </button>
                   </div>
-                </>
-              )}
+
+                  {time && (
+                    <>
+                      <strong className='min-w-10'>拍攝時間</strong>
+                      <div className='flex items-center'>
+                        <div className='font-mono'>{time}</div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className='mt-5 my-3 text-gray-700'>
+              註：照片不會上傳到伺服器（暫時無此功能），只是讀取檔案資訊而已
             </div>
           </div>
-        )}
 
-        <div className='mt-5 my-3 text-gray-700'>
-          註：照片不會上傳到伺服器（暫時無此功能），只是讀取檔案資訊而已
         </div>
-      </div>
+      </Sidebar>
 
-      <div className='relative float-right w-full h-[100vh] border ring'>
+      <div className='relative w-full h-[100vh] ml-auto'>
         {(lat && lon) &&
           <LazyMap
             preferCanvas={true}
@@ -301,6 +308,8 @@ export default function Page() {
           </LazyMap>
         }
       </div>
-    </div>
+
+      <LinkPreview />
+    </main>
   );
 }

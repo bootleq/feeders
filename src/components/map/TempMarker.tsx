@@ -68,6 +68,7 @@ export default function TempMarker({
 
   return (
     <Marker
+      marker-type='TempMarker'
       draggable={true}
       icon={MarkerIcon}
       eventHandlers={eventHandlers}
