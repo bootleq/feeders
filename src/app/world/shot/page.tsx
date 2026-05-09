@@ -3,12 +3,14 @@
 import * as R from 'ramda';
 import Image from 'next/image';
 import { useState, useRef, useCallback } from 'react';
+import { useSetAtom } from 'jotai';
 import ExifReader from 'exifreader';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { TW_BOUNDS, TW_CENTER, googleMapURL } from '@/app/world/mapUtil';
 import Sidebar from '@/components/Sidebar';
 import LinkPreview from '@/components/LinkPreview';
 import LazyMap from './LazyMap';
+import { mergeTempMarkerAtom } from './store';
 import { MapPinIcon, ArrowRightIcon } from '@heroicons/react/24/solid';
 import siteIcon from '@/app/icon.svg'
 
@@ -134,6 +136,7 @@ export default function Page() {
   const [time, setTime] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const setTempMarker = useSetAtom(mergeTempMarkerAtom);
 
   const imageRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -170,6 +173,13 @@ export default function Page() {
       setLoading(false);
     }
   }, [canvasRef]);
+
+  const onReLocate = useCallback(() => {
+    const { lon, lat } = location;
+    if (lon && lat) {
+      setTempMarker({ visible: true, lat: lat, lon: lon });
+    }
+  }, [location, setTempMarker]);
 
   const { lon, lat } = location;
 
@@ -266,7 +276,7 @@ export default function Page() {
                       <TooltipContent className={`${tooltipCls}`}>在 Feeders 地圖開啟</TooltipContent>
                     </Tooltip>
 
-                    <button className='ml-auto btn bg-slate-100 ring-1 flex items-center hover:bg-white'>
+                    <button className='ml-auto btn bg-slate-100 ring-1 flex items-center hover:bg-white' onClick={onReLocate}>
                       重新定位
                       <MapPinIcon className='fill-red-600 ml-px shrink-0' height={18} />
                       <ArrowRightIcon className='shrink-0 hidden md:block' height={18} />
