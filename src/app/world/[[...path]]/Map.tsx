@@ -328,7 +328,7 @@ export default function Map({ preloadedAreas, helpContent, children, className, 
             <SpotMarkers spots={filteredSpots} editingFormAtom={editingFormAtom} />
         }
 
-        <TempMarker markerAtom={mergeTempMarkerAtom} editingFormAtom={editingFormAtom} />
+        <TempMarker markerAtom={mergeTempMarkerAtom} editingFormAtom={editingFormAtom} mergeSpotsAtom={mergeSpotsAtom} />
 
         <LocateControl className={mapStyles['reset-view-ctrl']} />
         <ResetViewControl className={mapStyles['reset-view-ctrl']} title='整個台灣' position='bottomright' />

@@ -11,10 +11,10 @@ import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { SpotActionEnum } from '@/lib/schema';
 import { t } from '@/lib/i18n';
 import { ariaDatePickerValueFix } from '@/lib/utils';
-import { mergeTempMarkerAtom, editingFormAtom, mergeSpotsAtom } from '@/app/world/[[...path]]/store';
 import ActionLabel from '@/app/world/[[...path]]/ActionLabel';
 import { createSpot } from '@/app/world/[[...path]]/create-spot';
 import { errorsAtom, metaAtom } from '@/components/form/store';
+import type { MarkerProps } from '@/components/map/TempMarker';
 import type { FieldErrors } from '@/components/form/store';
 import { TextInput, Textarea, Select } from '@/components/form/Inputs';
 import { DateTimeField } from '@/components/form/DateTimeField';
@@ -77,12 +77,20 @@ export function FormErrors({ errors }: { errors: FieldErrors}) {
   );
 }
 
-function UnscopedForm({ lat, lon }: {
+type FormProps = {
   lat: number,
   lon: number,
-}) {
+} & MarkerProps;
+
+function UnscopedForm({
+  lat,
+  lon,
+  markerAtom,
+  editingFormAtom,
+  mergeSpotsAtom,
+}: FormProps) {
   const setEditingForm = useSetAtom(editingFormAtom);
-  const setTempMarker = useSetAtom(mergeTempMarkerAtom);
+  const setTempMarker = useSetAtom(markerAtom);
   const reloadSpots = useSetAtom(mergeSpotsAtom);
   const setMeta = useSetAtom(metaAtom);
   const [errors, setErrors] = useAtom(errorsAtom);
@@ -203,13 +211,10 @@ function UnscopedForm({ lat, lon }: {
   );
 }
 
-export default function Form({ lat, lon }: {
-  lat: number,
-  lon: number,
-}) {
+export default function Form(props: FormProps) {
   return (
     <ScopeProvider atoms={[errorsAtom, metaAtom]}>
-      <UnscopedForm lat={lat} lon={lon} />
+      <UnscopedForm {...props} />
     </ScopeProvider>
   );
 }

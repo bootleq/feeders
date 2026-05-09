@@ -184,7 +184,7 @@ export default function SimpleMap({ center, preloadedAreas, helpContent, childre
         </TileLayer>
         <SpotMarkers spots={filteredSpots} readonly editingFormAtom={editingFormAtom} />
 
-        <TempMarker markerAtom={mergeTempMarkerAtom} editingFormAtom={editingFormAtom} />
+        <TempMarker markerAtom={mergeTempMarkerAtom} editingFormAtom={editingFormAtom} mergeSpotsAtom={mergeSpotsAtom} />
       </MapContainer>
 
       <Alerts itemsAtom={alertsAtom} dismissAtom={dismissAlertAtom} />

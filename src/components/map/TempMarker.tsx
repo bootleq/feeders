@@ -12,6 +12,7 @@ import { ACCESS_CTRL } from '@/lib/utils';
 import Form from '@/app/world/[[...path]]/Form';
 
 import type { TempMarkerProps, EditingFormType } from '@/components/map/store';
+import type { GeoSpotsByGeohash } from '@/models/spots';
 import markerStyles from './marker.module.scss';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/outline';
@@ -23,12 +24,17 @@ const MarkerIcon = new DivIcon({
   popupAnchor: [1, -27],
 })
 
-interface MarkerProps {
+export interface MarkerProps {
   markerAtom: WritableAtom<TempMarkerProps, [TempMarkerProps], void>,
   editingFormAtom: PrimitiveAtom<EditingFormType>,
+  mergeSpotsAtom: WritableAtom<null, [GeoSpotsByGeohash], void>,
 }
 
-export default function TempMarker({ markerAtom, editingFormAtom }: MarkerProps) {
+export default function TempMarker({
+  markerAtom,
+  editingFormAtom,
+  mergeSpotsAtom,
+}: MarkerProps) {
   const { data: session, status } = useSession();
   const [marker, setMarker] = useAtom(markerAtom);
   const [editingForm, setEditingForm] = useAtom(editingFormAtom);
@@ -70,7 +76,7 @@ export default function TempMarker({ markerAtom, editingFormAtom }: MarkerProps)
       <Popup minWidth={90}>
         <div className='flex flex-col items-center text-base'>
           {canAdd ?
-            <Form lat={lat} lon={lon} />
+            <Form lat={lat} lon={lon} {...{ markerAtom, editingFormAtom, mergeSpotsAtom }} />
             :
             <div className='text-center'>
               {
