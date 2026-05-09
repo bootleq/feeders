@@ -123,6 +123,7 @@ const processFile = async (
 
 export default function PhotoReader() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [location, setLocation] = useAtom(photoLocationAtom);
   const [time, setTime] = useState<string | null>(null);
@@ -133,20 +134,20 @@ export default function PhotoReader() {
   const imageRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const onFileChange = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFiles = useCallback(async (files: FileList | File[] | null) => {
     setError(null);
     setLoading(true);
     setImageUrl(null);
     setLocation({ lat: null, lon: null });
     setTime(null);
 
-    const file = event.target.files?.[0];
-    if (!file) {
+    if (!files || files.length === 0) {
       setSelectedFile(null);
       setLoading(false);
       return;
     }
 
+    const file = files[0];
     setSelectedFile(file);
 
     try {
@@ -164,7 +165,37 @@ export default function PhotoReader() {
     } finally {
       setLoading(false);
     }
-  }, [canvasRef]);
+  }, [canvasRef, setLocation]);
+
+  const onFileChange = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    await handleFiles(files);
+  }, [handleFiles]);
+
+  const handleDragEnter = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  }, []);
+
+  const handleDrop = useCallback(async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    await handleFiles(e.dataTransfer.files);
+  }, [handleFiles]);
 
   const onReLocate = useCallback(() => {
     const { lon, lat } = location;
@@ -174,23 +205,44 @@ export default function PhotoReader() {
   }, [location, setTempMarker]);
 
   const { lon, lat } = location;
+  const filename = selectedFile?.name;
 
   return (
     <div className="flex flex-col h-full px-3 py-4">
       <h1 className="text-2xl font-bold mb-4">從照片新增地點</h1>
-
-      <input
-        type="file"
-        accept="image/*"
-        onChange={onFileChange}
-        className="mb-4 p-2 border rounded-md font-mono cursor-pointer"
-        disabled={loading}
-      />
-
-      <div>
-        {loading && <p>處理中...</p>}
-
-        {error && <p className="text-red-500">錯誤：{error}</p>}
+      <div
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        className={`
+          relative mb-4 px-2 py-3 border-3 rounded-md cursor-pointer
+          flex flex-col items-center justify-center
+          transition-colors duration-200 ease-in-out
+          ring ring-slate-300
+          ${isDragging ? 'border-rose-300 bg-pink-200' : 'border-gray-500 bg-white'}
+          ${loading ? 'opacity-50 cursor-not-allowed' : ''}
+        `}
+      >
+        <input
+          type="file"
+          accept="image/*"
+          onChange={onFileChange}
+          disabled={loading}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+        />
+        {isDragging ? (
+          <p className="text-blue-600">放下吧</p>
+        ) : (
+          <p className="text-gray-600">
+            拖曳照片到此處，或點擊選擇檔案
+          </p>
+        )}
+        { filename &&
+          <div className='font-mono truncate'>
+            {filename}
+          </div>
+        }
       </div>
 
       <canvas ref={canvasRef} style={{ display: 'none' }} />
