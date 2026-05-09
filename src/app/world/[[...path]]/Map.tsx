@@ -24,6 +24,7 @@ import {
   editingFormAtom,
   loadingDistrictAtom,
   toggleHelpAtom,
+  toggleShotIntroAtom,
   advanceDistrictModeAtom,
 } from './store';
 import { jsonReviver } from '@/lib/utils';
@@ -40,9 +41,11 @@ import { StarIcon } from '@heroicons/react/24/outline';
 import SpotMarkers from '@/components/map/SpotMarkers';
 import TempMarker from '@/components/map/TempMarker';
 import Help from './Help';
+import ShotInstruction from './ShotInstruction';
 import Districts from './Districts';
 
 import HelpControl from './map-controls/HelpControl';
+import ShotControl from './map-controls/ShotControl';
 import DistrictControl from './map-controls/DistrictControl';
 import ResetViewControl from './map-controls/ResetViewControl';
 import LocateControl from './map-controls/LocateControl';
@@ -299,6 +302,7 @@ export default function Map({ preloadedAreas, helpContent, children, className, 
   ]);
 
   const toggleHelp = useSetAtom(toggleHelpAtom);
+  const toggleShotIntro = useSetAtom(toggleShotIntroAtom);
   const advanceMode = useSetAtom(advanceDistrictModeAtom);
 
   const areaSpots = useAtomValue(spotsAtom);
@@ -333,6 +337,7 @@ export default function Map({ preloadedAreas, helpContent, children, className, 
         <LocateControl className={mapStyles['reset-view-ctrl']} />
         <ResetViewControl className={mapStyles['reset-view-ctrl']} title='整個台灣' position='bottomright' />
         <DistrictControl className={mapStyles['reset-view-ctrl']} title='行政區界線' position='bottomright' onClick={advanceMode} />
+        <ShotControl className={mapStyles['reset-view-ctrl']} title='從照片新增地點' position='bottomright' onClick={toggleShotIntro} />
         <HelpControl className={mapStyles['reset-view-ctrl']} title='說明' position='bottomright' onClick={toggleHelp} />
       </MapContainer>
 
@@ -340,6 +345,7 @@ export default function Map({ preloadedAreas, helpContent, children, className, 
       <MapStatus />
       <Alerts itemsAtom={alertsAtom} dismissAtom={dismissAlertAtom} />
       <Help content={helpContent} />
+      <ShotInstruction />
       <Districts />
       <LoadingIndicator />
     </>

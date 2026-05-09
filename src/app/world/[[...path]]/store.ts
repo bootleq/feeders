@@ -52,6 +52,14 @@ export const toggleHelpAtom = atom(
   }
 );
 
+export const showShotIntroAtom = atom(false);
+export const toggleShotIntroAtom = atom(
+  get => get(showShotIntroAtom),
+  (get, set) => {
+    set(showShotIntroAtom, R.not);
+  }
+);
+
 export const loadingDistrictAtom = atom(false);
 export const advanceDistrictModeAtom = atom(
   get => get(districtsModeAtom),
