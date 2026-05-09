@@ -4,10 +4,18 @@ import * as R from 'ramda';
 import Image from 'next/image';
 import { useState, useRef, useCallback } from 'react';
 import ExifReader from 'exifreader';
-import { TW_BOUNDS, TW_CENTER } from '@/app/world/mapUtil';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
+import { TW_BOUNDS, TW_CENTER, googleMapURL } from '@/app/world/mapUtil';
 import LazyMap from './LazyMap';
+import { MapPinIcon, ArrowRightIcon } from '@heroicons/react/24/solid';
+import siteIcon from '@/app/icon.svg'
 
 import '@/components/leaflet/leaflet.css';  // import CSS here instead of inside SimpleMap for stability
+
+const tooltipCls = [
+  'text-xs p-1 px-2 rounded box-border w-max max-w-[calc(100vw_-_10px)] z-[1002]',
+  'bg-gradient-to-br from-stone-50 to-slate-100 ring-2 ring-offset-1 ring-slate-300',
+].join(' ')
 
 type Location = {
   lat: number | null;
@@ -165,7 +173,7 @@ export default function Page() {
 
   return (
     <div className='flex'>
-      <div className="p-4 w-1/2 ring ring-yellow-100">
+      <div className="p-4 w-1/2">
         <h1 className="text-2xl font-bold mb-4">從照片新增地點</h1>
 
         <input
@@ -176,54 +184,106 @@ export default function Page() {
           disabled={loading}
         />
 
-        {loading && <p>處理中...</p>}
+        <div>
+          {loading && <p>處理中...</p>}
 
-        {error && <p className="text-red-500">錯誤：{error}</p>}
+          {error && <p className="text-red-500">錯誤：{error}</p>}
+        </div>
 
         <canvas ref={canvasRef} style={{ display: 'none' }} />
 
-        <div className="mt-4">
-          {imageUrl ? (
-            <>
-              <h2 className="text-lg font-semibold mb-2">照片縮圖（低畫質）</h2>
-              <div className='max-h-[640px]'>
-                <Image
-                  ref={imageRef}
-                  src={imageUrl}
-                  alt="已上傳的照片"
-                  width={640}
-                  height={480}
-                  className="border max-h-full w-auto"
-                />
-              </div>
-            </>
-          ) :
-            <div>
-              無法顯示照片內容
+        {
+          selectedFile &&
+            <div className="mt-4">
+              {imageUrl ? (
+                <>
+                  <h2 className="text-lg font-semibold mb-2">畫面（低畫質）</h2>
+                  <div className='max-h-[640px]'>
+                    <Image
+                      ref={imageRef}
+                      src={imageUrl}
+                      alt="已上傳的照片"
+                      width={640}
+                      height={480}
+                      className="border max-h-full w-auto"
+                    />
+                  </div>
+                </>
+              ) :
+                <div>
+                  無法顯示照片內容
+                </div>
+              }
             </div>
-          }
-        </div>
+        }
+
 
         {(lat && lon) && (
-          <div className="mt-4 p-3 bg-gray-100 rounded-md">
-            <div className="text-lg font-semibold mb-2">座標：</div>
-            <p>經度 (longitude): <span className='font-mono'>{lon.toFixed(6)}</span></p>
-            <p>緯度 (latitude): <span className='font-mono'>{lat.toFixed(6)}</span></p>
+          <div className="mt-4 p-3 bg-gradient-to-br from-stone-50 to-slate-200 rounded-md ring">
+            <div className='grid grid-cols-[auto_1fr] items-center gap-4'>
+              <strong className='min-w-10'>座標</strong>
+              <div className='flex items-center'>
+                <Tooltip>
+                  <TooltipTrigger><code className='text-base max-w-20 truncate hover:bg-yellow-300/50'>{lat}</code></TooltipTrigger>
+                  <TooltipContent className={`${tooltipCls}`}>{lat}</TooltipContent>
+                </Tooltip>
+                <small className='text-base'>,</small>
+                <Tooltip>
+                  <TooltipTrigger><code className='text-base ml-1 max-w-20 truncate hover:bg-yellow-300/50'>{lon}</code></TooltipTrigger>
+                  <TooltipContent className={`${tooltipCls}`}>{lon}</TooltipContent>
+                </Tooltip>
 
-            <div>
-              <button className='btn bg-slate-100 ring-1 flex items-center hover:bg-white'>
-                重新定位
-              </button>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <a
+                      className='flex items-start mx-2 font-sans whitespace-nowrap rounded-full hover:bg-yellow-300/50'
+                      aria-label='在 Google 地圖開啟座標'
+                      href={googleMapURL(lat, lon)}
+                      target='_blank'
+                    >
+                      <span className='text-base text-slate-700 px-1 font-bold'>G</span>
+                    </a>
+                  </TooltipTrigger>
+                  <TooltipContent className={`${tooltipCls}`}>在 Google 地圖開啟座標</TooltipContent>
+
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger>
+                    <a
+                      className='flex items-start font-sans whitespace-nowrap rounded-full hover:bg-yellow-300/50'
+                      aria-label='在 Feeders 地圖開啟'
+                      href={ `/world/area/@${lat},${lon}`}
+                      target='_blank'
+                    >
+                      <Image src={siteIcon} alt='在 Feeders 地圖開啟' className='px-px py-0.5' width={17} height={17} />
+                    </a>
+                  </TooltipTrigger>
+                  <TooltipContent className={`${tooltipCls}`}>在 Feeders 地圖開啟</TooltipContent>
+                </Tooltip>
+
+                <button className='ml-auto btn bg-slate-100 ring-1 flex items-center hover:bg-white'>
+                  重新定位
+                  <MapPinIcon className='fill-red-600 ml-px' height={18} />
+                  <ArrowRightIcon className='' height={18} />
+                </button>
+              </div>
+
+              {time && (
+                <>
+                  <strong className='min-w-10'>拍攝時間</strong>
+                  <div className='flex items-center'>
+                    <div className='font-mono'>{time}</div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
 
-        {time && (
-          <div className="mt-4 p-3 bg-gray-100 rounded-md">
-            <div className="text-lg font-semibold mb-2">拍攝時間：</div>
-            <span className='font-mono'>{time}</span>
-          </div>
-        )}
+        <div className='mt-5 my-3 text-gray-700'>
+          註：照片不會上傳到伺服器（暫時無此功能），只是讀取檔案資訊而已
+        </div>
       </div>
 
       <div className='relative float-right w-full h-[100vh] border ring'>

@@ -29,16 +29,13 @@ import type { TempMarkerProps, EditingFormType } from '@/components/map/store';
 import { spotFollowupsAtom, mergeSpotFollowupsAtom, loadingFollowupsAtom } from '@/components/map/store';
 import { nowAtom, addAlertAtom } from '@/components/store';
 import { openSpotMarkerById } from '@/app/world/[[...path]]/util';
+import { googleMapURL  } from '@/app/world/mapUtil';
 import { present, jsonReviver, ACCESS_CTRL } from '@/lib/utils';
 import { format, formatDistance } from '@/lib/date-fp';
 import type { GeoSpotsResult, GeoSpotsResultFollowup } from '@/models/spots';
 import mapStyles from './marker.module.scss';
 import 'react-leaflet-cluster/dist/assets/MarkerCluster.css';
 import 'react-leaflet-cluster/dist/assets/MarkerCluster.Default.css';
-
-const googleMapURL = (lat: number, lon: number) => {
-  return `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
-}
 
 const tooltipCls = [
   'text-xs p-1 px-2 rounded box-border w-max max-w-[calc(100vw_-_10px)] z-[1002]',

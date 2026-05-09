@@ -6,3 +6,7 @@ export const TW_BOUNDS = [
 export const TW_CENTER = [23.9739, 120.9773];
 
 export const GEOHASH_PRECISION = 4;
+
+export const googleMapURL = (lat: number, lon: number) => {
+  return `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+}
