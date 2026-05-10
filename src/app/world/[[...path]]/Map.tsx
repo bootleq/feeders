@@ -40,8 +40,8 @@ import { StarIcon } from '@heroicons/react/24/outline';
 
 import SpotMarkers from '@/components/map/SpotMarkers';
 import TempMarker from '@/components/map/TempMarker';
+import Help from '@/components/map/Help';
 import makeSpotFetcherAtoms from '@/components/map/makeSpotFetcherAtoms';
-import Help from './Help';
 import ShotInstruction from './ShotInstruction';
 import Districts from './Districts';
 
@@ -318,7 +318,7 @@ export default function Map({ allGeoHashes, preloadedAreas, helpContent, childre
       <Status />
       <MapStatus />
       <Alerts itemsAtom={alertsAtom} dismissAtom={dismissAlertAtom} />
-      <Help content={helpContent} />
+      <Help content={helpContent} toggleAtom={toggleHelpAtom} />
       <ShotInstruction />
       <Districts />
       <LoadingIndicator />
