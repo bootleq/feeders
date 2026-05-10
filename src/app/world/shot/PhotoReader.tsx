@@ -3,7 +3,7 @@
 import * as R from 'ramda';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import ExifReader from 'exifreader';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
@@ -138,7 +138,6 @@ export default function PhotoReader() {
     setError(null);
     setLoading(true);
     setImageUrl(null);
-    setLocation({ lat: null, lon: null });
     setTime(null);
 
     if (!files || files.length === 0) {
@@ -203,6 +202,10 @@ export default function PhotoReader() {
       setTempMarker({ visible: true, lat: lat, lon: lon });
     }
   }, [location, setTempMarker]);
+
+  useEffect(() => {
+    setLocation({ lat: null, lon: null });
+  }, [setLocation]);
 
   const { lon, lat } = location;
   const filename = selectedFile?.name;
