@@ -2,6 +2,7 @@ import { Feed } from 'feed';
 import { APP_URL } from '@/lib/utils';
 import { recentFollowups } from '@/models/spots';
 import type { RecentFollowupsItemProps } from '@/models/spots';
+import { PubStateEnum } from '@/lib/schema';
 import { unstable_cache } from '@/lib/cache';
 
 const FEED_SIZE = 35;
@@ -13,7 +14,8 @@ const getSpots = unstable_cache(
   async () => {
     const query = recentFollowups(FEED_SIZE);
     const items = await query;
-    return items;
+
+    return items.filter(i => i.spotPubState === i.pubState && i.pubState === PubStateEnum.enum.published);
   },
   ['world', 'spots'],
   {
