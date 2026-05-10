@@ -29,7 +29,7 @@ function buildFeed(facts) {
       atom: feedUrl,
     },
     updated: facts.length > 0 ? new Date(facts[0].date_updated) : new Date(),
-    generator: null,
+    generator: undefined,
   });
 
   for (const fact of facts) {
