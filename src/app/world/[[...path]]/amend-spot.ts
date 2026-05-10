@@ -126,7 +126,7 @@ export async function amendSpot(formData: FormData) {
     try {
       await revalidateByAPI({
         paths: ['/audit/spots/${data.id}/'],
-        tags: ['spots'],
+        tags: ['spots', 'geohash'],
       });
     } catch (e) {
       console.error({

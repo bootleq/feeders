@@ -64,7 +64,10 @@ const { spotLoadingAtom, fetchSpotsAtom } = makeSpotFetcherAtoms(spotsAtom, merg
 
 const loadingAtom = atom((get) => get(spotLoadingAtom) || get(loadingFollowupsAtom) || get(loadingDistrictAtom));
 
-function MapUser(props: {
+function MapUser({
+  allGeoHashes,
+}: {
+  allGeoHashes: Set<string>
 }) {
   const setMap = useSetAtom(mapAtom);
   const setNow = useSetAtom(nowAtom);
@@ -96,15 +99,21 @@ function MapUser(props: {
 
     if (mode === 'area' && zoom >= AREA_ZOOM_MAX) {
       const bounds = map.getBounds();
-      const hashes = geohash.bboxes(
-        bounds.getSouth(),
-        bounds.getWest(),
-        bounds.getNorth(),
-        bounds.getEast(),
-        GEOHASH_PRECISION
+      const hashes = new Set(
+        geohash.bboxes(
+          bounds.getSouth(),
+          bounds.getWest(),
+          bounds.getNorth(),
+          bounds.getEast(),
+          GEOHASH_PRECISION
+        )
       );
 
-      const newHash = new Set(hashes).difference(geoSet);
+      if (hashes.isDisjointFrom(allGeoHashes)) {
+        return;
+      }
+
+      const newHash = hashes.difference(geoSet);
       if (newHash.size > 0) {
         fetchSpots(
           R.take(D1_PARAM_LIMIT, Array.from(newHash))
@@ -253,6 +262,7 @@ function LoadingIndicator(params: any) {
 }
 
 type MapProps = {
+  allGeoHashes: Set<string>;
   children?: React.ReactNode;
   className?: string;
   width?: string | number;
@@ -260,7 +270,7 @@ type MapProps = {
   [key: string]: any;
 };
 
-export default function Map({ preloadedAreas, helpContent, children, className, width, height, ...rest }: MapProps) {
+export default function Map({ allGeoHashes, preloadedAreas, helpContent, children, className, width, height, ...rest }: MapProps) {
   useHydrateAtoms([
     [spotsAtom, preloadedAreas],
   ]);
@@ -282,7 +292,7 @@ export default function Map({ preloadedAreas, helpContent, children, className, 
   return (
     <>
       <MapContainer className={`w-full h-[100vh] ${mapStyles.map} ${className || ''}`} {...rest}>
-        <MapUser />
+        <MapUser allGeoHashes={allGeoHashes} />
         <TileLayer
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
           attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"

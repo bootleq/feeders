@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { TW_BOUNDS } from '@/app/world/mapUtil';
 import Sidebar from '@/components/Sidebar';
 import LinkPreview from '@/components/LinkPreview';
+import getGeoHashes from '@/components/map/getGeoHashes';
 import PhotoReader from './PhotoReader';
 import LazyMap from './LazyMap';
 
@@ -13,7 +14,9 @@ export const metadata: Metadata = {
   description: '從照片取得地理資訊，新增餵食點，登陸到 Feeders 世界地圖',
 };
 
-export default function Page() {
+export default async function Page() {
+  const geohashes = await getGeoHashes();
+
   return (
     <main className="flex min-h-screen flex-row items-start justify-between">
       <Sidebar defaultOpen fixed={false} className={`sm:w-fit lg:w-fit lg:max-w-[80%] max-h-screen scrollbar-thin flex flex-col pb-1 z-[810] bg-gradient-to-br from-stone-50 to-slate-200`}>
@@ -22,6 +25,7 @@ export default function Page() {
 
       <div className='relative w-full h-[100vh] ml-auto'>
         <LazyMap
+          allGeoHashes={geohashes}
           preferCanvas={true}
           minZoom={15}
           zoom={18}

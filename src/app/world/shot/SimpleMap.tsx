@@ -29,6 +29,7 @@ import TempMarker from '@/components/map/TempMarker';
 import makeSpotFetcherAtoms from '@/components/map/makeSpotFetcherAtoms';
 
 type MapProps = {
+  allGeoHashes: Set<string>;
   children?: React.ReactNode;
   className?: string;
   width?: string | number;
@@ -41,7 +42,11 @@ const D1_PARAM_LIMIT = 100;
 const { spotLoadingAtom, fetchSpotsAtom } = makeSpotFetcherAtoms(spotsAtom, mergeSpotsAtom);
 const loadingAtom = atom((get) => get(spotLoadingAtom) || get(loadingFollowupsAtom));
 
-function MapUser(props: {}) {
+function MapUser({
+  allGeoHashes,
+}: {
+  allGeoHashes: Set<string>
+}) {
   const setMap = useSetAtom(mapAtom);
   const setNow = useSetAtom(nowAtom);
   const geoSet = useAtomValue(geohashesAtom);
@@ -51,15 +56,21 @@ function MapUser(props: {}) {
 
   const debouncedMoveEnd = useDebouncedCallback(() => {
     const bounds = map.getBounds();
-    const hashes = geohash.bboxes(
-      bounds.getSouth(),
-      bounds.getWest(),
-      bounds.getNorth(),
-      bounds.getEast(),
-      GEOHASH_PRECISION
+    const hashes = new Set(
+      geohash.bboxes(
+        bounds.getSouth(),
+        bounds.getWest(),
+        bounds.getNorth(),
+        bounds.getEast(),
+        GEOHASH_PRECISION
+      )
     );
 
-    const newHash = new Set(hashes).difference(geoSet);
+    if (hashes.isDisjointFrom(allGeoHashes)) {
+      return;
+    }
+
+    const newHash = hashes.difference(geoSet);
     if (newHash.size > 0) {
       fetchSpots(
         R.take(D1_PARAM_LIMIT, Array.from(newHash))
@@ -114,7 +125,7 @@ function LoadingIndicator(params: any) {
   );
 }
 
-export default function SimpleMap({ preloadedAreas, helpContent, children, className, width, height, ...rest }: MapProps) {
+export default function SimpleMap({ allGeoHashes, preloadedAreas, helpContent, children, className, width, height, ...rest }: MapProps) {
   const map = useAtomValue(mapAtom);
   const location = useAtomValue(photoLocationAtom);
   const setTempMarker = useSetAtom(mergeTempMarkerAtom);
@@ -154,7 +165,7 @@ export default function SimpleMap({ preloadedAreas, helpContent, children, class
   return (
     <>
       <MapContainer center={[lat, lon]} className={`w-full h-full relative ring ring-red-400 ${className || ''}`} {...rest}>
-        <MapUser/>
+        <MapUser allGeoHashes={allGeoHashes} />
         <TileLayer
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
           attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"

@@ -15,6 +15,7 @@ import { parsePath, GEOHASH_PRECISION } from './util';
 import { TW_BOUNDS, TW_CENTER } from '@/app/world/mapUtil';
 import { userAtom } from '@/components/store';
 import Sidebar from '@/components/Sidebar';
+import getGeoHashes from '@/components/map/getGeoHashes';
 import LinkPreview from '@/components/LinkPreview';
 import LazyMap from './LazyMap';
 import RecentFollowups from './RecentFollowups';
@@ -115,6 +116,8 @@ export default async function Page(
   const user = await getUser(session?.userId);
   const items = await getSpots();
 
+  const geohashes = await getGeoHashes();
+
   const dates = R.uniq(
     items.map(({ createdAt }) => formatISO({ representation: 'date' }, createdAt))
   );
@@ -140,6 +143,7 @@ export default async function Page(
       </Sidebar>
 
       <LazyMap
+        allGeoHashes={geohashes}
         preloadedAreas={preloadedAreas}
         helpContent={helpContent}
         preferCanvas={true}
