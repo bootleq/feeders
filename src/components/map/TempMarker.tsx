@@ -1,5 +1,6 @@
 "use client"
 
+import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { DivIcon } from 'leaflet';
 import { Marker, Popup } from 'react-leaflet';
@@ -82,13 +83,22 @@ export default function TempMarker({
             <div className='text-center'>
               {
                 ACCESS_CTRL === 'open' ?
-                  <>
-                    您目前沒有權限新增地點<br />
-                    （未登入或權限有問題）
-                  </> :
+                  <div className='flex flex-col gap-y-3'>
+                    <div>
+                      您目前沒有權限新增地點<br />
+                      （未登入或權限有問題）
+                    </div>
+                    {
+                      status !== 'authenticated' &&
+                        <Link href='/user/login'
+                          className='mx-auto mb-3 p-1 px-3 w-fit bg-gradient-to-br from-yellow-200 to-yellow-300 border border-yellow-400 rounded-md drop-shadow-sm hover:from-yellow-100'>
+                          註冊或登入
+                      </Link>
+                    }
+                  </div> :
                 '新增地點功能目前未開放'
               }
-              <button className='btn text-sm mx-auto mt-2 bg-slate-100 ring-1 flex items-center hover:bg-white' onClick={() => setMarker({ visible: false })}>
+              <button className='btn text-sm mx-auto mt-2 mb-2 bg-slate-100 ring-1 flex items-center hover:bg-white' onClick={() => setMarker({ visible: false })}>
                 <XMarkIcon className='stroke-red-700' height={20} />
                 取消
               </button>
