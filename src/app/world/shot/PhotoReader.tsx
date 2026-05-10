@@ -350,6 +350,13 @@ export default function PhotoReader() {
             距離太近的點，請盡量不要新增記錄；前往<Link href='/world/' className='text-nowrap underline hover:bg-yellow-300/50 text-inherit'>世界地圖</Link>，在原本的點位新增「跟進」比較清楚
           </div>
         </div>
+
+        <div className='flex items-center my-2'>
+          <InformationCircleIcon className='shrink-0 mr-2' height={22} />
+          <div className='text-balance'>
+            本頁是照片專用，完整地圖功能（行政區等）請使用<Link href='/world/' className='text-nowrap underline hover:bg-yellow-300/50 text-inherit'>世界地圖</Link>
+          </div>
+        </div>
       </div>
     </div>
   );
