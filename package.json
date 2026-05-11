@@ -43,7 +43,6 @@
     "@heroicons/react": "^2.1.5",
     "@internationalized/date": "^3.10.1",
     "@next/bundle-analyzer": "^14.2.5",
-    "@opennextjs/cloudflare": "^1.16.5",
     "@react-leaflet/core": "^3.0.0",
     "chanfana": "^2.1.0",
     "change-case": "^5.4.4",
@@ -63,7 +62,7 @@
     "linkifyjs": "^4.3.2",
     "motion": "^12.23.24",
     "nanoid": "^5.0.7",
-    "next": "15.5.12",
+    "next": "15.5.18",
     "next-auth": "5.0.0-beta.25",
     "ngeohash": "^0.6.3",
     "ramda": "^0.30.1",
@@ -83,6 +82,7 @@
     "@aws-sdk/client-s3": "^3.666.0",
     "@faker-js/faker": "^8.4.1",
     "@inquirer/confirm": "^5.1.9",
+    "@opennextjs/cloudflare": "^1.19.9",
     "@playwright/test": "^1.57.0",
     "@react-aria/optimize-locales-plugin": "^1.1.5",
     "@svgr/webpack": "^8.1.0",
@@ -114,11 +114,11 @@
     "sass": "^1.77.8",
     "tailwind-scrollbar": "^3.1.0",
     "tailwindcss": "^3.4.9",
-    "tsx": "^4.19.1",
+    "tsx": "^4.20.2",
     "typescript": "^5.5.4",
     "vercel": "48.2.0",
     "vitest": "^2.0.5",
-    "wrangler": "^4.65.0"
+    "wrangler": "^4.90.0"
   },
   "exifreader": {
     "include": {
