@@ -17,6 +17,17 @@ import '@/components/leaflet/leaflet.css';  // import CSS here instead of inside
 export const metadata: Metadata = {
   title: '從照片新增地點',
   description: '從照片取得地理資訊，新增餵食點，登陸到 Feeders 世界地圖',
+  alternates: {
+    canonical: `/facts/shot/`,
+    types: {
+      'application/atom+xml': [
+        {
+          url: '/feeds/world.atom',
+          title: '世界地圖 - Feeders',
+        },
+      ],
+    },
+  },
 };
 
 async function getHelpContent() {

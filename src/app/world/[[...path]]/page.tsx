@@ -69,6 +69,16 @@ async function getHelpContent() {
 export const metadata: Metadata = {
   title: '世界地圖',
   description: '各地餵食點回報、追蹤、封鎖或監督管理',
+  alternates: {
+    types: {
+      'application/atom+xml': [
+        {
+          url: '/feeds/world.atom',
+          title: '世界地圖 - Feeders',
+        },
+      ],
+    },
+  },
 };
 
 export default async function Page(

@@ -11,6 +11,10 @@ export const BASE_META = {
           url: '/feeds/facts.atom',
           title: '事實記錄 - Feeders',
         },
+        {
+          url: '/feeds/picks.atom',
+          title: '事實選集 - Feeders',
+        },
       ],
     },
   },
