@@ -47,3 +47,11 @@ export const mergeTempMarkerAtom = atom(
     set(tempMarkerAtom, { ...get(tempMarkerAtom), ...update });
   }
 );
+
+export const showHelpAtom = atom(false);
+export const toggleHelpAtom = atom(
+  get => get(showHelpAtom),
+  (get, set) => {
+    set(showHelpAtom, R.not);
+  }
+);

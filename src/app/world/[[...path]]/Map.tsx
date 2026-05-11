@@ -42,6 +42,7 @@ import SpotMarkers from '@/components/map/SpotMarkers';
 import TempMarker from '@/components/map/TempMarker';
 import Help from '@/components/map/Help';
 import makeSpotFetcherAtoms from '@/components/map/makeSpotFetcherAtoms';
+import mapStyles from '@/components/map/map.module.scss';
 import ShotInstruction from './ShotInstruction';
 import Districts from './Districts';
 
@@ -50,8 +51,6 @@ import ShotControl from './map-controls/ShotControl';
 import DistrictControl from './map-controls/DistrictControl';
 import ResetViewControl from './map-controls/ResetViewControl';
 import LocateControl from './map-controls/LocateControl';
-
-import mapStyles from './map.module.scss';
 
 import Leaflet from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";

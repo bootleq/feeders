@@ -22,11 +22,15 @@ import {
   mergeTempMarkerAtom,
   editingFormAtom,
   loadingFollowupsAtom,
+  toggleHelpAtom,
 } from './store';
 
 import SpotMarkers from '@/components/map/SpotMarkers';
 import TempMarker from '@/components/map/TempMarker';
+import Help from '@/components/map/Help';
 import makeSpotFetcherAtoms from '@/components/map/makeSpotFetcherAtoms';
+import mapStyles from '@/components/map/map.module.scss';
+import HelpControl from '@/app/world/[[...path]]/map-controls/HelpControl';
 
 type MapProps = {
   allGeoHashes: Set<string>;
@@ -129,6 +133,7 @@ export default function SimpleMap({ allGeoHashes, preloadedAreas, helpContent, c
   const map = useAtomValue(mapAtom);
   const location = useAtomValue(photoLocationAtom);
   const setTempMarker = useSetAtom(mergeTempMarkerAtom);
+  const toggleHelp = useSetAtom(toggleHelpAtom);
 
   const { lon, lat } = location;
 
@@ -176,9 +181,12 @@ export default function SimpleMap({ allGeoHashes, preloadedAreas, helpContent, c
         <SpotMarkers spots={filteredSpots} readonly editingFormAtom={editingFormAtom} />
 
         <TempMarker markerAtom={mergeTempMarkerAtom} editingFormAtom={editingFormAtom} mergeSpotsAtom={mergeSpotsAtom} />
+
+        <HelpControl className={mapStyles['reset-view-ctrl']} title='說明' position='bottomright' onClick={toggleHelp} />
       </MapContainer>
 
       <Alerts itemsAtom={alertsAtom} dismissAtom={dismissAlertAtom} />
+      <Help content={helpContent} toggleAtom={toggleHelpAtom} />
       <LoadingIndicator />
     </>
   );
