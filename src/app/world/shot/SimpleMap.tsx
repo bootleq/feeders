@@ -31,6 +31,7 @@ import Help from '@/components/map/Help';
 import makeSpotFetcherAtoms from '@/components/map/makeSpotFetcherAtoms';
 import mapStyles from '@/components/map/map.module.scss';
 import HelpControl from '@/app/world/[[...path]]/map-controls/HelpControl';
+import LocateControl from '@/app/world/[[...path]]/map-controls/LocateControl';
 
 type MapProps = {
   allGeoHashes: Set<string>;
@@ -89,6 +90,10 @@ function MapUser({
         const point = e.latlng;
         setTempMarker({ visible: true, lat: point.lat, lon: point.lng });
       }
+    },
+    locationfound: (location) => {
+      map.setView(location.latlng, 16);
+      map.fire('moveend');
     },
     moveend: debouncedMoveEnd,
   });
@@ -182,6 +187,7 @@ export default function SimpleMap({ allGeoHashes, preloadedAreas, helpContent, c
 
         <TempMarker markerAtom={mergeTempMarkerAtom} editingFormAtom={editingFormAtom} mergeSpotsAtom={mergeSpotsAtom} />
 
+        <LocateControl className={mapStyles['reset-view-ctrl']} />
         <HelpControl className={mapStyles['reset-view-ctrl']} title='說明' position='bottomright' onClick={toggleHelp} />
       </MapContainer>
 
