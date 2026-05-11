@@ -7,7 +7,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import ExifReader from 'exifreader';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
-import { googleMapURL } from '@/app/world/mapUtil';
+import { googleMapURL, TW_BOUNDS } from '@/app/world/mapUtil';
 import { photoLocationAtom, mergeTempMarkerAtom } from './store';
 import type { Location } from './store';
 import { MapPinIcon, ArrowRightIcon, InformationCircleIcon } from '@heroicons/react/24/solid';
@@ -35,6 +35,13 @@ function formatEXIFDate(str: string) {
   } else {
     return str;
   }
+}
+
+function isWithinBounds(lat: number, lon: number, bounds: number[][]) {
+  const [sw, ne] = bounds; // South West / North East
+  const isLatInRange = lat >= sw[0] && lat <= ne[0];
+  const isLonInRange = lon >= sw[1] && lon <= ne[1];
+  return isLatInRange && isLonInRange;
 }
 
 async function stepScaleDown(img: HTMLImageElement, canvas: HTMLCanvasElement) {
@@ -88,7 +95,11 @@ const processFile = async (
       const lat = tags.gps?.Latitude;
       const lon = tags.gps?.Longitude;
       if (lat && lon) {
-        location = { lat, lon };
+        if (isWithinBounds(lat, lon, TW_BOUNDS)) {
+          location = { lat, lon };
+        } else {
+          return reject(new Error('離台灣太遠，暫不支援'));
+        }
       } else {
         return reject(new Error('檔案中沒有 GPS 資訊'));
       }
@@ -152,7 +163,8 @@ export default function PhotoReader() {
     setImageUrl(null);
     setSelectedFile(null);
     setLocation({ lat: null, lon: null });
-  }, [setImageUrl, setSelectedFile, setLocation]);
+    setError(null);
+  }, [setLocation]);
 
   const handleFiles = useCallback(async (files: FileList | File[] | null) => {
     setError(null);
