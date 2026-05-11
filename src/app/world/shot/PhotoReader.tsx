@@ -11,6 +11,7 @@ import { googleMapURL } from '@/app/world/mapUtil';
 import { photoLocationAtom, mergeTempMarkerAtom } from './store';
 import type { Location } from './store';
 import { MapPinIcon, ArrowRightIcon, InformationCircleIcon } from '@heroicons/react/24/solid';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 import siteIcon from '@/app/icon.svg'
 
 const tooltipCls = [
@@ -131,8 +132,18 @@ export default function PhotoReader() {
   const [error, setError] = useState<string | null>(null);
   const setTempMarker = useSetAtom(mergeTempMarkerAtom);
 
+  const inputRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const onClearPhoto = useCallback(() => {
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
+    setImageUrl(null);
+    setSelectedFile(null);
+    setLocation({ lat: null, lon: null });
+  }, [setImageUrl, setSelectedFile, setLocation]);
 
   const handleFiles = useCallback(async (files: FileList | File[] | null) => {
     setError(null);
@@ -228,6 +239,7 @@ export default function PhotoReader() {
         `}
       >
         <input
+          ref={inputRef}
           type="file"
           accept="image/*"
           onChange={onFileChange}
@@ -242,8 +254,13 @@ export default function PhotoReader() {
           </p>
         )}
         { filename &&
-          <div className='font-mono truncate'>
-            {filename}
+          <div className='flex items-center mt-2'>
+            <div className='font-mono truncate'>
+              {filename}
+            </div>
+            <button className='btn z-30 text-xs ml-3 my-px p-0.5 flex items-center hover:ring-1 hover:bg-slate-100' onClick={onClearPhoto}>
+              <XMarkIcon className='opacity-50 hover:opacity-100 hover:stroke-black' height={18} />
+            </button>
           </div>
         }
       </div>
@@ -256,7 +273,7 @@ export default function PhotoReader() {
             {imageUrl ? (
               <>
                 <h2 className="text-lg font-semibold mb-2">畫面（低畫質）</h2>
-                <div className='max-h-[640px]'>
+                <div className='max-h-[640px] resize overflow-auto'>
                   <Image
                     ref={imageRef}
                     src={imageUrl}
@@ -339,7 +356,7 @@ export default function PhotoReader() {
         </div>
       )}
 
-      <div className='mt-auto mb-4 w-fit text-gray-700 flex-col gap-y-3'>
+      <div className='mt-auto mb-4 py-3 w-fit text-gray-700 flex-col gap-y-3'>
         <div className='flex items-center my-2'>
           <InformationCircleIcon className='shrink-0 mr-2' height={22} />
           <div className='text-balance'>
