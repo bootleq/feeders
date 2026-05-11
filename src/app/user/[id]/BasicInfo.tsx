@@ -256,9 +256,7 @@ export default function UserInfo({ user, profile }: {
           {editDesc ?
             <form onSubmit={updateDesc} className='flex flex-col items-center gap-x-1'>
               <div>
-                <textarea name='desc' autoFocus cols={36} rows={8} className={`${inputCls} resize`}>
-                  {profile.desc}
-                </textarea>
+                <textarea name='desc' autoFocus cols={36} rows={8} className={`${inputCls} resize`} defaultValue={profile.desc || ''} />
                 <input type='hidden' name='field' value='desc' />
               </div>
 
