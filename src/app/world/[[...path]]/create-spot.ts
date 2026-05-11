@@ -101,7 +101,7 @@ export async function createSpot(formData: FormData) {
 
     try {
       await revalidateByAPI({
-        tags: ['spots'],
+        tags: ['spots', 'geohash'],
       });
     } catch (e) {
       console.error({

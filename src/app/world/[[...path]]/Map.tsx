@@ -12,6 +12,7 @@ import type { keyedAlert } from '@/components/store';
 import type { GeoSpotsResult, GeoSpotsByGeohash } from '@/models/spots';
 
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
+import { loadingFollowupsAtom } from '@/components/map/store';
 import {
   mapAtom,
   spotsAtom,
@@ -20,9 +21,10 @@ import {
   areaPickerAtom,
   statusAtom,
   mergeTempMarkerAtom,
-  loadingFollowupsAtom,
+  editingFormAtom,
   loadingDistrictAtom,
   toggleHelpAtom,
+  toggleShotIntroAtom,
   advanceDistrictModeAtom,
 } from './store';
 import { jsonReviver } from '@/lib/utils';
@@ -36,17 +38,19 @@ import Spinner from '@/assets/spinner.svg';
 import { MapIcon } from '@heroicons/react/24/solid';
 import { StarIcon } from '@heroicons/react/24/outline';
 
-import SpotMarkers from './SpotMarkers';
-import TempMarker from './TempMarker';
-import Help from './Help';
+import SpotMarkers from '@/components/map/SpotMarkers';
+import TempMarker from '@/components/map/TempMarker';
+import Help from '@/components/map/Help';
+import makeSpotFetcherAtoms from '@/components/map/makeSpotFetcherAtoms';
+import mapStyles from '@/components/map/map.module.scss';
+import ShotInstruction from './ShotInstruction';
 import Districts from './Districts';
 
 import HelpControl from './map-controls/HelpControl';
+import ShotControl from './map-controls/ShotControl';
 import DistrictControl from './map-controls/DistrictControl';
 import ResetViewControl from './map-controls/ResetViewControl';
 import LocateControl from './map-controls/LocateControl';
-
-import mapStyles from './map.module.scss';
 
 import Leaflet from 'leaflet';
 import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
@@ -55,48 +59,14 @@ import '@/components/leaflet/leaflet.css';
 
 const D1_PARAM_LIMIT = 100;
 
-const loadingHashesAtom = atom<string[]>([]);
-const loadedHashesAtom = atom<string[]>([]);
-const loadingAtom = atom((get) => R.isNotEmpty(get(loadingHashesAtom)) || get(loadingFollowupsAtom) || get(loadingDistrictAtom));
+const { spotLoadingAtom, fetchSpotsAtom } = makeSpotFetcherAtoms(spotsAtom, mergeSpotsAtom);
 
-type ItemsGeoSpotsByGeohash = { items: GeoSpotsByGeohash }
-const fetchSpotsAtom = atom(
-  null,
-  async (get, set, geohash: string[]) => {
-    const loadingHashes = get(loadingHashesAtom);
-    const loadedHashes = R.union(get(loadedHashesAtom), Object.keys(get(spotsAtom)));
+const loadingAtom = atom((get) => get(spotLoadingAtom) || get(loadingFollowupsAtom) || get(loadingDistrictAtom));
 
-    const staleHashes = R.difference(
-      R.difference(geohash, loadedHashes),
-      loadingHashes
-    );
-
-    if (R.isEmpty(staleHashes)) {
-      return; // already loading, do nothing
-    }
-    set(loadingHashesAtom, R.union(loadingHashes, staleHashes));
-
-    try {
-      const response = await fetch(`/api/spots/${staleHashes.sort()}/`);
-      const json = await response.text();
-      const fetched: ItemsGeoSpotsByGeohash = JSON.parse(json, jsonReviver);
-      if (response.ok) {
-        set(mergeSpotsAtom, { ...fetched.items });
-        set(loadedHashesAtom, R.union(get(loadedHashesAtom), staleHashes));
-      } else {
-        const errorNode = <><code className='font-mono mr-1'>{response.status}</code>無法取得資料</>;
-        set(addAlertAtom, 'error', errorNode);
-      }
-      set(loadingHashesAtom, R.difference(get(loadingHashesAtom), staleHashes));
-    } catch (e) {
-      const errorNode = <span>{String(e)}</span>;
-      set(addAlertAtom, 'error', errorNode);
-      set(loadingHashesAtom, R.difference(get(loadingHashesAtom), staleHashes));
-    }
-  }
-);
-
-function MapUser(props: {
+function MapUser({
+  allGeoHashes,
+}: {
+  allGeoHashes: Set<string>
 }) {
   const setMap = useSetAtom(mapAtom);
   const setNow = useSetAtom(nowAtom);
@@ -128,15 +98,21 @@ function MapUser(props: {
 
     if (mode === 'area' && zoom >= AREA_ZOOM_MAX) {
       const bounds = map.getBounds();
-      const hashes = geohash.bboxes(
-        bounds.getSouth(),
-        bounds.getWest(),
-        bounds.getNorth(),
-        bounds.getEast(),
-        GEOHASH_PRECISION
+      const hashes = new Set(
+        geohash.bboxes(
+          bounds.getSouth(),
+          bounds.getWest(),
+          bounds.getNorth(),
+          bounds.getEast(),
+          GEOHASH_PRECISION
+        )
       );
 
-      const newHash = new Set(hashes).difference(geoSet);
+      if (hashes.isDisjointFrom(allGeoHashes)) {
+        return;
+      }
+
+      const newHash = hashes.difference(geoSet);
       if (newHash.size > 0) {
         fetchSpots(
           R.take(D1_PARAM_LIMIT, Array.from(newHash))
@@ -285,6 +261,7 @@ function LoadingIndicator(params: any) {
 }
 
 type MapProps = {
+  allGeoHashes: Set<string>;
   children?: React.ReactNode;
   className?: string;
   width?: string | number;
@@ -292,12 +269,13 @@ type MapProps = {
   [key: string]: any;
 };
 
-export default function Map({ preloadedAreas, helpContent, children, className, width, height, ...rest }: MapProps) {
+export default function Map({ allGeoHashes, preloadedAreas, helpContent, children, className, width, height, ...rest }: MapProps) {
   useHydrateAtoms([
     [spotsAtom, preloadedAreas],
   ]);
 
   const toggleHelp = useSetAtom(toggleHelpAtom);
+  const toggleShotIntro = useSetAtom(toggleShotIntroAtom);
   const advanceMode = useSetAtom(advanceDistrictModeAtom);
 
   const areaSpots = useAtomValue(spotsAtom);
@@ -313,7 +291,7 @@ export default function Map({ preloadedAreas, helpContent, children, className, 
   return (
     <>
       <MapContainer className={`w-full h-[100vh] ${mapStyles.map} ${className || ''}`} {...rest}>
-        <MapUser />
+        <MapUser allGeoHashes={allGeoHashes} />
         <TileLayer
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
           attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
@@ -321,20 +299,26 @@ export default function Map({ preloadedAreas, helpContent, children, className, 
           maxNativeZoom={18}
         >
         </TileLayer>
-        {filteredSpots && <SpotMarkers spots={filteredSpots} />}
 
-        <TempMarker />
+        {
+          filteredSpots &&
+            <SpotMarkers spots={filteredSpots} editingFormAtom={editingFormAtom} />
+        }
+
+        <TempMarker markerAtom={mergeTempMarkerAtom} editingFormAtom={editingFormAtom} mergeSpotsAtom={mergeSpotsAtom} />
 
         <LocateControl className={mapStyles['reset-view-ctrl']} />
         <ResetViewControl className={mapStyles['reset-view-ctrl']} title='整個台灣' position='bottomright' />
         <DistrictControl className={mapStyles['reset-view-ctrl']} title='行政區界線' position='bottomright' onClick={advanceMode} />
+        <ShotControl className={mapStyles['reset-view-ctrl']} title='從照片新增地點' position='bottomright' onClick={toggleShotIntro} />
         <HelpControl className={mapStyles['reset-view-ctrl']} title='說明' position='bottomright' onClick={toggleHelp} />
       </MapContainer>
 
       <Status />
       <MapStatus />
       <Alerts itemsAtom={alertsAtom} dismissAtom={dismissAlertAtom} />
-      <Help content={helpContent} />
+      <Help content={helpContent} toggleAtom={toggleHelpAtom} />
+      <ShotInstruction />
       <Districts />
       <LoadingIndicator />
     </>

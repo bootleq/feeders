@@ -8,6 +8,7 @@ import {
   or,
   and,
   inArray,
+  count,
   asc,
   desc,
   sql,
@@ -330,6 +331,21 @@ export const geoSpots = async (geohashes: string[]) => {
 
   return R.reject(R.isNil, byGeohash);
 };
+
+export async function allGeoHashes(fetchLimit: number) {
+  const db = getDb();
+  const query = db.select({
+    hash: spots.geohash,
+    qty: count(spots.id),
+  }).from(spots)
+    .groupBy(spots.geohash)
+    .where(inArray(spots.state, [PubStateEnum.enum.published, PubStateEnum.enum.dropped])
+  ).orderBy(
+    asc(spots.geohash),
+  ).limit(fetchLimit);
+
+  return query;
+}
 
 export async function createSpot(data: CreateSpotSchema) {
   let result: {

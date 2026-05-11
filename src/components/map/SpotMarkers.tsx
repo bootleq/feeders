@@ -2,8 +2,9 @@
 
 import * as R from 'ramda';
 import Leaflet, { MarkerCluster } from 'leaflet';
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import type { PrimitiveAtom } from 'jotai';
 import { MapContainer, TileLayer, useMapEvents, Marker, Popup } from "react-leaflet";
 import type { LeafletEvent } from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
@@ -11,30 +12,30 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { Desc } from '@/components/Desc';
 import ClientDate from '@/components/ClientDate';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowDownIcon, UserCircleIcon } from '@heroicons/react/24/solid';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import { Square3Stack3DIcon } from '@heroicons/react/24/outline';
 import { NoSymbolIcon } from '@heroicons/react/24/solid';
+import siteIcon from '@/app/icon.svg'
 
 import { useSession } from 'next-auth/react';
-import FoodLife from './FoodLife';
-import ActionLabel from './ActionLabel';
-import FollowupForm from './FollowupForm';
-import AmendSpotForm from './AmendSpotForm';
-import AmendFollowupForm from './AmendFollowupForm';
-import { editingFormAtom, spotFollowupsAtom, mergeSpotFollowupsAtom, loadingFollowupsAtom } from './store';
+import FoodLife from '@/app/world/[[...path]]/FoodLife';
+import ActionLabel from '@/app/world/[[...path]]/ActionLabel';
+import FollowupForm from '@/app/world/[[...path]]/FollowupForm';
+import AmendSpotForm from '@/app/world/[[...path]]/AmendSpotForm';
+import AmendFollowupForm from '@/app/world/[[...path]]/AmendFollowupForm';
+import type { TempMarkerProps, EditingFormType } from '@/components/map/store';
+import { spotFollowupsAtom, mergeSpotFollowupsAtom, loadingFollowupsAtom } from '@/components/map/store';
 import { nowAtom, addAlertAtom } from '@/components/store';
-import { openSpotMarkerById } from './util';
+import { openSpotMarkerById } from '@/app/world/[[...path]]/util';
+import { googleMapURL  } from '@/app/world/mapUtil';
 import { present, jsonReviver, ACCESS_CTRL } from '@/lib/utils';
 import { format, formatDistance } from '@/lib/date-fp';
 import type { GeoSpotsResult, GeoSpotsResultFollowup } from '@/models/spots';
-import mapStyles from './map.module.scss';
+import mapStyles from './marker.module.scss';
 import 'react-leaflet-cluster/dist/assets/MarkerCluster.css';
 import 'react-leaflet-cluster/dist/assets/MarkerCluster.Default.css';
-
-const googleMapURL = (lat: number, lon: number) => {
-  return `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
-}
 
 const tooltipCls = [
   'text-xs p-1 px-2 rounded box-border w-max max-w-[calc(100vw_-_10px)] z-[1002]',
@@ -109,13 +110,14 @@ function DroppedSpotMarker({ spot }: {
   );
 }
 
-function Followup({ fo, now, canEdit, startAmendFollowup, editingItemId, geohash }: {
+function Followup({ fo, now, canEdit, startAmendFollowup, editingItemId, geohash, editingFormAtom }: {
   fo: GeoSpotsResultFollowup,
   now: Date | null,
   canEdit: boolean,
   startAmendFollowup: any,
   editingItemId: number | null,
   geohash: string,
+  editingFormAtom: PrimitiveAtom<EditingFormType>,
 }) {
   const [editingForm, setEditingForm] = useAtom(editingFormAtom);
   if (!now) return;
@@ -193,9 +195,23 @@ function DroppedFollowup({ fo }: {
   );
 }
 
-export default function SpotMarkers({ spots }: {
-  spots: GeoSpotsResult[]
-}) {
+interface MarkerProps {
+  spots: GeoSpotsResult[],
+  editingFormAtom: PrimitiveAtom<EditingFormType>,
+  readonly?: boolean,
+}
+
+const followInitialHash = (group: Leaflet.MarkerClusterGroup) => {
+  if (typeof group.eachLayer === 'function' && typeof group.zoomToShowLayer === 'function') { // is MarkerClusterGroup
+    const hashMatch = window.location.hash.match(/^#(\d+)$/)?.[1];
+    const hashId = hashMatch && Number(hashMatch);
+    if (hashId) {
+      openSpotMarkerById(hashId, group, 800);
+    }
+  }
+};
+
+export default function SpotMarkers({ spots, editingFormAtom, readonly }: MarkerProps) {
   const { data: session, status } = useSession();
   const [editingForm, setEditingForm] = useAtom(editingFormAtom);
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
@@ -203,6 +219,7 @@ export default function SpotMarkers({ spots }: {
   const fetchFollowups = useSetAtom(fetchFollowupsAtom);
   const postloadFollowups = useAtomValue(spotFollowupsAtom);
   const loading = useAtomValue(loadingFollowupsAtom);
+  const clusterRef = useRef<Leaflet.MarkerClusterGroup>(null);
 
   const loadFollowups = useCallback((spotId: number) => {
     fetchFollowups(spotId);
@@ -222,7 +239,8 @@ export default function SpotMarkers({ spots }: {
         // Open the Marker with id matches URL hash.
         // This cover the missing part of followHash: when the Marker is first
         // time added thus can't be found during hashchange.
-        // FIXME: cover MarkerClusterGroup, spiderfied markers not opened
+        // NOTE: for another uncovered case: MarkerClusterGroup + overlaps
+        // markers grouped (not opened) --> let `followInitialHash` handle it
         const hashId = window.location.hash.match(/^#(\d+)$/)?.[1];
         if (hashId) {
           openSpotMarkerById(Number(hashId), e.target, 800);
@@ -259,14 +277,19 @@ export default function SpotMarkers({ spots }: {
     setEditingItemId(null);
   }, [setEditingForm]);
 
+  useEffect(() => {
+    const group = clusterRef.current;
+    if (group) followInitialHash(group);
+  }, []);
+
   const statLiCls = 'hover:bg-yellow-300/50 pr-1';
   const statNumCls = 'font-mono px-1 align-baseline';
 
-  const canEdit = ACCESS_CTRL === 'open' && status === 'authenticated' && session.user.state === 'active';
+  const canEdit = !readonly && ACCESS_CTRL === 'open' && status === 'authenticated' && session.user.state === 'active';
   const userId = session?.user.id;
 
   return (
-    <MarkerClusterGroup chunkedLoading removeOutsideVisibleBounds={false} iconCreateFunction={clusterIconFn} disableClusteringAtZoom={18}>
+    <MarkerClusterGroup chunkedLoading removeOutsideVisibleBounds={false} iconCreateFunction={clusterIconFn} disableClusteringAtZoom={18} ref={clusterRef}>
       {
         spots.map(({ spot: s, followups: foFromProps }) => {
           const followups = postloadFollowups[s.id] || foFromProps;
@@ -282,6 +305,8 @@ export default function SpotMarkers({ spots }: {
           if (s.state === 'dropped') {
             return <DroppedSpotMarker key={s.id} spot={s} />;
           }
+
+          const spotLink = `/world/area/@${s.lat},${s.lon}#${s.id}`;
 
           return (
             <Marker spot-id={s.id} key={s.id} position={[s.lat, s.lon]} icon={icon} autoPan={false} eventHandlers={eventHandlers}>
@@ -323,6 +348,20 @@ export default function SpotMarkers({ spots }: {
                       </TooltipTrigger>
                       <TooltipContent className={`${tooltipCls}`}>在 Google 地圖開啟座標</TooltipContent>
                     </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <a
+                          className='flex items-start font-sans whitespace-nowrap rounded-full hover:bg-yellow-300/50'
+                          aria-label='在 Feeders 地圖開啟'
+                          href={spotLink}
+                          target='_blank'
+                        >
+                          <Image src={siteIcon} alt='在 Feeders 地圖開啟' className='px-px py-0.5' width={17} height={17} />
+                        </a>
+                      </TooltipTrigger>
+                      <TooltipContent className={`${tooltipCls}`}>在 Feeders 地圖開啟</TooltipContent>
+                    </Tooltip>
                   </div>
                 </div>
 
@@ -336,11 +375,11 @@ export default function SpotMarkers({ spots }: {
 
                 <div className='flex items-center justify-end mt-2 px-2 text-xs text-slate-500/75'>
                   建立：<span data-id={s.id} className='font-mono mr-1'>
-                    <a href={`#${s.id}`} data-id={s.id}>
+                    <Link href={spotLink} data-id={s.id} data-disable-progress={true}>
                       <ClientDate fallback={<span className='opacity-50'>----/-/-</span>}>
                         {format({}, 'y/M/d', s.createdAt)}
                       </ClientDate>
-                    </a>
+                    </Link>
                   </span> by
                   <Link href={`/user/${s.userId}`} data-user-id={s.userId} className='ml-1 hover:bg-yellow-300/50 hover:text-slate-950'>
                     {s.userName}
@@ -373,11 +412,13 @@ export default function SpotMarkers({ spots }: {
 
                 <hr className='w-11/12 h-px mx-auto my-9 bg-gray-200 border-0 dark:bg-gray-700' />
 
-                <span className='flex items-center gap-x-2 mx-auto -mt-[2.9rem] mb-8 px-3 w-min whitespace-nowrap bg-white text-sm text-center text-slate-500'>
-                  <ArrowDownIcon className='stroke-slate-200' height={18} />
-                  跟進
-                  <ArrowDownIcon className='stroke-slate-200' height={18} />
-                </span>
+                {!readonly &&
+                  <span className='flex items-center gap-x-2 mx-auto -mt-[2.9rem] mb-8 px-3 w-min whitespace-nowrap bg-white text-sm text-center text-slate-500'>
+                    <ArrowDownIcon className='stroke-slate-200' height={18} />
+                    跟進
+                    <ArrowDownIcon className='stroke-slate-200' height={18} />
+                  </span>
+                }
 
                 <div className='max-h-[65vh] overflow-auto scrollbar-thin'>
                   {followups.map(fo => {
@@ -393,6 +434,7 @@ export default function SpotMarkers({ spots }: {
                         canEdit={canEdit && userId === fo.userId}
                         startAmendFollowup={startAmendFollowup}
                         editingItemId={editingItemId}
+                        editingFormAtom={editingFormAtom}
                         geohash={s.geohash}
                       />
                     );
@@ -409,7 +451,7 @@ export default function SpotMarkers({ spots }: {
                   </>
                 }
 
-                {canEdit && editingForm !== 'followup' &&
+                {!readonly && canEdit && editingForm !== 'followup' &&
                   <div className='w-full flex items-center mt-2'>
                     <button className='flex items-center justify-center py-1' onClick={startEdit}>
                       ➕ 跟進

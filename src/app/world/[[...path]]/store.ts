@@ -3,9 +3,9 @@ import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
 import type {
   RecentFollowupsItemProps,
   GeoSpotsByGeohash,
-  GeoSpotsResultFollowup
 } from '@/models/spots';
-import { spotFollowups, type LatLngBounds } from '@/lib/schema';
+import type { LatLngBounds } from '@/lib/schema';
+import type { TempMarkerProps, EditingFormType } from '@/components/map/store';
 import Leaflet from 'leaflet';
 
 export const mapAtom = atom<Leaflet.Map | null>(null);
@@ -18,22 +18,6 @@ export const mergeSpotsAtom = atom(
   }
 );
 
-export const spotFollowupsAtom = atom<Record<number, GeoSpotsResultFollowup[]>>({});
-export const mergeSpotFollowupsAtom = atom(
-  null,
-  (get, set, update: [spotId: number, items: GeoSpotsResultFollowup[]]) => {
-    const [spotId, items] = update;
-    if (R.isEmpty(items)) return;
-
-    const o = get(spotFollowupsAtom);
-
-    if (!o) return set(spotFollowupsAtom, { [spotId]: items });
-
-    set(spotFollowupsAtom, { ...o, [spotId]: items });
-  }
-);
-export const loadingFollowupsAtom = atom(false);
-
 export const geohashesAtom = atom((get) => {
   return new Set(R.keys(get(spotsAtom)));
 });
@@ -44,7 +28,7 @@ export type AreaPickerAtom = {
 } | null;
 export const areaPickerAtom = atom<AreaPickerAtom>(null);
 
-export const editingFormAtom = atom<'spot' | 'followup' | 'amendSpot' | 'amendFollowup' | ''>('');
+export const editingFormAtom = atom<EditingFormType>('');
 
 export const statusAtom = atom<string | null>(get => {
   if (get(areaPickerAtom)) {
@@ -68,6 +52,14 @@ export const toggleHelpAtom = atom(
   }
 );
 
+export const showShotIntroAtom = atom(false);
+export const toggleShotIntroAtom = atom(
+  get => get(showShotIntroAtom),
+  (get, set) => {
+    set(showShotIntroAtom, R.not);
+  }
+);
+
 export const loadingDistrictAtom = atom(false);
 export const advanceDistrictModeAtom = atom(
   get => get(districtsModeAtom),
@@ -78,7 +70,7 @@ export const advanceDistrictModeAtom = atom(
 
 export const viewItemAtom = atom<RecentFollowupsItemProps | null>(null);
 
-export const tempMarkerAtom = atom({
+export const tempMarkerAtom = atom<TempMarkerProps>({
   visible: false,
   lat: 23.97565,
   lon: 120.9738819,
@@ -86,7 +78,7 @@ export const tempMarkerAtom = atom({
 
 export const mergeTempMarkerAtom = atom(
   (get) => get(tempMarkerAtom),
-  (get, set, update: { visible?: boolean, lat?: number, lon?: number }) => {
+  (get, set, update: TempMarkerProps) => {
     set(tempMarkerAtom, { ...get(tempMarkerAtom), ...update });
   }
 );
