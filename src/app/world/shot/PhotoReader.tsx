@@ -274,6 +274,16 @@ export default function PhotoReader() {
         }
       </div>
 
+      {
+        error &&
+        <div className='flex items-center bg-red-200 text-slate-700 p-2 rounded-sm'>
+          錯誤：
+          <div className='text-red-800'>
+            {error}
+          </div>
+        </div>
+      }
+
       <canvas ref={canvasRef} style={{ display: 'none' }} />
 
       {
