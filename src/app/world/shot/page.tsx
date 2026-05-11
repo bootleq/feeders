@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import * as R from 'ramda';
 import type { Metadata } from "next";
 import { TW_BOUNDS } from '@/app/world/mapUtil';
