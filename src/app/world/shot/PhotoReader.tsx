@@ -28,6 +28,15 @@ interface ProcessedImage {
 const SCALE_DOWN_STEP = 0.8;
 const MAX_DIMENSION = 640;
 
+function formatEXIFDate(str: string) {
+  if (/^\d{4}:\d{2}:\d{2} /.test(str)) {
+    const [date, tail] = str.split(' ', 2);
+    return [date.replaceAll(':', '-'), tail].join(' ');
+  } else {
+    return str;
+  }
+}
+
 async function stepScaleDown(img: HTMLImageElement, canvas: HTMLCanvasElement) {
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error("Could not get 2D context for temp canvas");
@@ -348,7 +357,7 @@ export default function PhotoReader() {
               <>
                 <strong className='min-w-10'>拍攝時間</strong>
                 <div className='flex items-center'>
-                  <div className='font-mono'>{time}</div>
+                  <div className='font-mono'>{formatEXIFDate(time)}</div>
                 </div>
               </>
             )}
