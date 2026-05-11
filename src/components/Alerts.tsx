@@ -13,7 +13,7 @@ const itemWrapperCls = [
   'flex flex-wrap items-center justify-center',
   '[white-space-collapse:preserve-spaces]',
   'w-max max-w-[90vw] h-max px-6 py-4 shadow-[10px_20px_20px_14px_rgba(0,0,0,0.5)]',
-  'text-lg bg-pink-300/20 backdrop-blur-sm ring ring-3 ring-offset-1 rounded',
+  'text-lg bg-pink-300/20 backdrop-blur-md ring ring-3 ring-offset-1 rounded',
 ].join(' ');
 
 const motionProps = {

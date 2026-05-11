@@ -166,8 +166,8 @@ export default function SimpleMap({ allGeoHashes, preloadedAreas, helpContent, c
 
   if (!lat || !lon) {
     return (
-      <div className='p-3 text-slate-700'>
-        輸入照片、取得地理資訊後才會載入地圖。
+      <div className='p-3 text-slate-500'>
+        Ready.
       </div>
     );
   }
