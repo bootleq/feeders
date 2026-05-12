@@ -12,6 +12,8 @@ const iconUrl = `${APP_URL}icon.svg`;
 
 const getSpots = unstable_cache(
   async () => {
+    console.log({ '💀 cache thru': 'Feed world.atom' });
+
     const query = recentFollowups(FEED_SIZE);
     const items = await query;
 

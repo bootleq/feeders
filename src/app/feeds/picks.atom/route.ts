@@ -15,6 +15,8 @@ const iconUrl = `${APP_URL}icon.svg`;
 
 const getPicks = unstable_cache(
   async () => {
+    console.log({ '💀 cache thru': 'Feed picks.atom' });
+
     const query = recentPicks(FEED_SIZE);
     const items = await query;
     return items.filter(i => {
