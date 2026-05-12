@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import { SITE_NAME, SITE_CONTACT_EMAIL } from '@/lib/utils';
+import { SITE_CONTACT_EMAIL } from '@/lib/utils';
+import Link from 'next/link';
 import Sidebar from '@/components/Sidebar';
 import RepoLink from './RepoLink';
+import { TERM_DATE } from './term/util';
 
 export const metadata: Metadata = {
   title: '關於本站',
@@ -39,6 +41,14 @@ export default async function Page() {
           <p>
             網站目前是測試階段。
             使用者和上傳的資料，日後可能會清空重來。
+          </p>
+
+          <Hr />
+
+          <h2 className='text-2xl'>使用條款</h2>
+          <p className="flex items-center">
+            請閱讀《<Link className='underline px-1 rounded-md w-fit hover:bg-amber-300/50' href='/about/term/'>網站使用條款</Link>》
+            <span className='font-mono text-slate-600 text-center'>{TERM_DATE}</span>。
           </p>
 
           <Hr />
