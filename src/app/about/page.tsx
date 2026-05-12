@@ -39,14 +39,6 @@ export default async function Page() {
 
           <Hr />
 
-          <h2 className='text-2xl'>關於測試</h2>
-          <p>
-            網站目前是測試階段。
-            使用者和上傳的資料，日後可能會清空重來。
-          </p>
-
-          <Hr />
-
           <h2 className='text-2xl'>使用條款</h2>
           <p className="flex items-center">
             請閱讀《<Link className='underline px-1 rounded-md w-fit hover:bg-amber-300/50' href='/about/term/'>網站使用條款</Link>》
@@ -68,6 +60,10 @@ export default async function Page() {
             <li>
               <time className='font-mono mr-2'>2025-10-04</time>
               啟用網址 <code>feeders.fyi</code>
+            </li>
+            <li>
+              <time className='font-mono mr-2'>2026-05-12</time>
+              移除關於頁有關測試期的聲明
             </li>
           </ol>
 
