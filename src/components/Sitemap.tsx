@@ -67,7 +67,7 @@ export default function Sitemap({ className, userDisplay, userLink }: {
                   世界地圖
                 </TooltipTrigger>
                 <TooltipContentMenu>
-                  <Link href='/world/shot/' className='flex items-center p-2 px-3 rounded-md text-slate-600 w-fit hover:text-black hover:bg-white hover:drop-shadow-md'>
+                  <Link href='/world/shot/' className='hidden md:flex items-center p-2 px-3 rounded-md text-slate-600 w-fit hover:text-black hover:bg-white hover:drop-shadow-md'>
                     <ArrowTurnDownRightIcon className='inline' width={11} height={11} />
                     <span className='ml-1 hover:underline decoration-yellow-300 decoration-4 underline-offset-3'>從照片</span>
                   </Link>
@@ -75,7 +75,6 @@ export default function Sitemap({ className, userDisplay, userLink }: {
               </Tooltip>
             </Link>
           </div>
-
 
         </div>
       </div>

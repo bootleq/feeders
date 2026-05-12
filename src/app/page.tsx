@@ -51,13 +51,13 @@ export default async function Home() {
 
       <HomeNav />
 
-      <Tooltip placement='bottom-start' >
+      <Tooltip placement='bottom-start'>
         <TooltipTrigger>
           <Link href='/about/' className='self-end mt-5 mb-12 text-slate-600 w-fit hover:text-black hover:underline decoration-yellow-300 decoration-4 underline-offset-3'>
             關於本站
           </Link>
         </TooltipTrigger>
-        <TooltipContent className=''>
+        <TooltipContent>
           <Link href='/about/term/' className='self-end mt-5 pl-3 text-slate-600 w-fit hover:text-black hover:underline decoration-yellow-300 decoration-4 underline-offset-3'>
             <ArrowTurnDownRightIcon className='inline mr-1' width={11} height={11} />
             網站使用條款
