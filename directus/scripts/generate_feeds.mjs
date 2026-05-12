@@ -36,7 +36,8 @@ function buildFeed(facts) {
     const anchor = `fact-${fact.date}_${fact.id}`;
     const zoomPath = `facts/${anchor.replace('fact-', '')}/`;
     const link = `${APP_URL}${zoomPath}`;
-    const categories = fact.tags.map(tag => ({
+
+    const categories = fact.tags?.map(tag => ({
       term: tag,
       scheme: `${APP_URL}facts/tags`,
       label: tag,
