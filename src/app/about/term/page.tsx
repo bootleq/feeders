@@ -58,7 +58,7 @@ export default async function Page() {
 
           <h2 className='text-2xl'>註冊時顯示的使用者須知</h2>
 
-          <div className="w-max -translate-y-2 p-4 pb-6 ml-1 rounded-lg md:shadow-lg bg-gradient-to-br from-stone-50 to-slate-200 backdrop:bg-black/50">
+          <div className="w-max max-w-[85vw] -translate-y-2 p-4 pb-6 ml-1 rounded-lg md:shadow-lg bg-gradient-to-br from-stone-50 to-slate-200 backdrop:bg-black/50">
             <UserAgreement />
           </div>
 
