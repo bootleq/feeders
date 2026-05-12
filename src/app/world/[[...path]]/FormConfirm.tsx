@@ -9,7 +9,7 @@ export default function Confirm() {
         <ExclamationCircleIcon className='stroke-yellow-700 animate-pulse size-14 stroke-2 shrink-0' height={20} />
         <div className='flex flex-col items-center'>
           <div>
-            資料即將公開，修改也會留下記錄，請避免洩漏私人資訊
+            資料即將公開，修改也會留下記錄，請謹慎保護私人資訊
           </div>
 
           <hr className='w-11/12 h-[2px] my-2 bg-slate-400/75 border-0' />
