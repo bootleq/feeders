@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SITE_CONTACT_EMAIL } from '@/lib/utils';
 import Link from 'next/link';
 import Sidebar from '@/components/Sidebar';
+import SideNav from '@/app/about/SideNav';
 import RepoLink from './RepoLink';
 import { TERM_DATE } from './term/util';
 
@@ -17,6 +18,7 @@ export default async function Page() {
   return (
     <main className="flex min-h-screen flex-row items-start justify-start">
       <Sidebar navTitle='關於' fixed={false} className={`peer max-h-screen scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
+        <SideNav />
       </Sidebar>
 
       <div className='p-2 px-4 w-full h-screen overflow-auto peer-[[aria-expanded="false"]]:pt-8'>
