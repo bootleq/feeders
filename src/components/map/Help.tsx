@@ -29,7 +29,7 @@ export default function Help(params: {
 
   return (
     <LazyMotion features={domAnimation}>
-      <div className='fixed z-[900] inset-x-1/2 top-1 md:top-[20vh] -translate-x-1/2 w-max h-max max-w-[98vw] max-h-[80vh] flex flex-col-reverse items-center gap-y-1'>
+      <div className='fixed z-[1200] inset-x-1/2 top-1 md:top-[20vh] -translate-x-1/2 w-max h-max max-w-[98vw] max-h-[80vh] flex flex-col-reverse items-center gap-y-1'>
         <AnimatePresence>
           { showHelp &&
             <m.section className={sectionCls} {...motionProps}>
