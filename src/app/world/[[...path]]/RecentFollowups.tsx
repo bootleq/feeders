@@ -233,7 +233,7 @@ function Followups({ items, today, dates }: {
   });
 
   return (
-    <ul className='mb-1'>
+    <ul className='mb-14 md:mb-4'>
       {list}
     </ul>
   )

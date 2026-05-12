@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default async function SideNav() {
   return (
-    <ul className="flex flex-col mt-4 ml-5 p-3 list-disc list-outside">
+    <ul className="flex flex-col mt-4 ml-5 p-3 min-h-[20vh] list-disc list-outside">
       <li>
         <Link href='/about/' className="p-1 rounded-md hover:bg-amber-200">關於本站</Link>
       </li>

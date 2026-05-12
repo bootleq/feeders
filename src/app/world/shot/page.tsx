@@ -45,7 +45,7 @@ export default async function Page() {
 
   return (
     <main className="flex min-h-screen flex-row items-start justify-between">
-      <Sidebar defaultOpen fixed={false} className={`sm:w-fit lg:w-fit lg:max-w-[80%] max-h-screen scrollbar-thin flex flex-col pb-1 z-[810] bg-gradient-to-br from-stone-50 to-slate-200`}>
+      <Sidebar defaultOpen fixed={false} className={`sm:w-fit lg:w-fit lg:max-w-[80%] h-full max-h-screen scrollbar-thin flex flex-col pb-1 z-[1001] bg-gradient-to-br from-stone-50 to-slate-200`}>
         <PhotoReader />
       </Sidebar>
 

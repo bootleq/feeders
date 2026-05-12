@@ -17,7 +17,7 @@ function Hr() {
 export default async function Page() {
   return (
     <main className="flex min-h-screen flex-row items-start justify-start">
-      <Sidebar navTitle='關於' fixed={false} className={`peer max-h-screen scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
+      <Sidebar navTitle='關於' fixed={false} className={`peer min-h-max max-h-screen scrollbar-thin flex flex-col pb-1 z-[410] bg-gradient-to-br from-stone-50 to-slate-200`}>
         <SideNav />
       </Sidebar>
 
