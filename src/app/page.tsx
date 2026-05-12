@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { Noto_Serif_TC } from "next/font/google";
 import Image from 'next/image';
 import Link from 'next/link';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { SITE_NAME } from '@/lib/utils';
 import HomeNav from './HomeNav';
+import { ArrowTurnDownRightIcon } from '@heroicons/react/24/solid';
 import siteIcon from './icon.svg'
 
 const notoSerif = Noto_Serif_TC({
@@ -28,9 +30,19 @@ export default async function Home() {
 
       <HomeNav />
 
-      <Link href='/about/' className='self-end mt-5 mb-12 text-slate-600 w-fit hover:text-black hover:underline decoration-yellow-300 decoration-4 underline-offset-3'>
-        關於本站
-      </Link>
+      <Tooltip placement='bottom-start' >
+        <TooltipTrigger>
+          <Link href='/about/' className='self-end mt-5 mb-12 text-slate-600 w-fit hover:text-black hover:underline decoration-yellow-300 decoration-4 underline-offset-3'>
+            關於本站
+          </Link>
+        </TooltipTrigger>
+        <TooltipContent className=''>
+          <Link href='/about/term/' className='self-end mt-5 pl-3 text-slate-600 w-fit hover:text-black hover:underline decoration-yellow-300 decoration-4 underline-offset-3'>
+            <ArrowTurnDownRightIcon className='inline mr-1' width={11} height={11} />
+            網站使用條款
+          </Link>
+        </TooltipContent>
+      </Tooltip>
 
       <div className="flex flex-col items-center mt-auto">
         <div className='text-2xl md:text-3xl text-center tracking-[16px] -mb-20 text-stone-400 animate-[pulse_6444ms_ease-in_infinite]'>
