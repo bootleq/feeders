@@ -8,7 +8,7 @@ import { useHydrateAtoms } from 'jotai/utils';
 import striptags from 'striptags';
 import type { PickProps } from '@/models/facts';
 import { present, blank, scrollAnywhereFix } from '@/lib/utils';
-import { factsAtom, filterByMarksAtom, pickAtom, currentMarksAtom } from '@/app/facts/store';
+import { factsAtom, factsLoadedAtom, filterByMarksAtom, pickAtom, currentMarksAtom } from '@/app/facts/store';
 import {
   slugAtom,
   ZOOM_SLUG_PATTERN,
@@ -44,6 +44,7 @@ export default function TimelineContainer({ facts: initialFacts, initialSlug, in
     [filterByMarksAtom, present(initialPick)],
   ]);
   const facts = useAtomValue(factsAtom);
+  const factsLoaded = useAtomValue(factsLoadedAtom);
   const setSlug = useSetAtom(slugAtom);
   const [isInitialZoom, setIsInitialZoom] = useState(present(initialSlug));
   const textFilter = useAtomValue(textFilterAtom);
@@ -171,6 +172,14 @@ export default function TimelineContainer({ facts: initialFacts, initialSlug, in
     setSlug(decodedSlug);
     setZoomBySlug(decodedSlug);
   }, [pathname, initialSlug, setIsInitialZoom, setSlug, setZoomBySlug]);
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (!hash && !initialSlug && factsLoaded) {
+      const target = document.querySelector('[data-role="timeline"] [data-role="fact"]:nth-last-child(1 of [data-role="fact"])')
+      target && target.scrollIntoView({ behavior: 'instant' });
+    }
+  }, [initialSlug, factsLoaded]);
 
   return (
     <div className={`w-full mx-auto px-0 grid gap-2 ${colsClass}`} onMouseEnter={onMouseEnter} data-nosnippet={isInitialZoom ? '' : undefined}>
