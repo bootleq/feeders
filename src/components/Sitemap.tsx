@@ -3,13 +3,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import styles from './sitemap.module.scss';
+import { Tooltip, TooltipTrigger, TooltipContentMenu, menuHoverProps } from '@/components/Tooltip';
 
 import TaiwanIcon from '@/assets/main-island.svg';
 import JudgeIcon from '/public/assets/gavel.svg';
 import ThinkIcon from '@/assets/brain-and-head.svg';
 import HumanIcon from '@/assets/man-walk.svg';
 import BarChartIcon from '@/assets/bar-chart.svg';
-import { ListBulletIcon } from '@heroicons/react/24/solid';
+import { ListBulletIcon, ArrowTurnDownRightIcon } from '@heroicons/react/24/solid';
 
 const iconSize = 32;
 
@@ -61,9 +62,21 @@ export default function Sitemap({ className, userDisplay, userLink }: {
           <div className={styles.world}>
             <Link href='/world' className=''>
               <TaiwanIcon className='fill-lime-700 -mr-1.5' width={iconSize} height={iconSize} />
-              <span className=''>世界地圖</span>
+              <Tooltip placement='right' hoverProps={menuHoverProps} role='menu'  offset={{ crossAxis: 20 }}>
+                <TooltipTrigger>
+                  世界地圖
+                </TooltipTrigger>
+                <TooltipContentMenu>
+                  <Link href='/world/shot/' className='flex items-center p-2 px-3 rounded-md text-slate-600 w-fit hover:text-black hover:bg-white hover:drop-shadow-md'>
+                    <ArrowTurnDownRightIcon className='inline' width={11} height={11} />
+                    <span className='ml-1 hover:underline decoration-yellow-300 decoration-4 underline-offset-3'>從照片</span>
+                  </Link>
+                </TooltipContentMenu>
+              </Tooltip>
             </Link>
           </div>
+
+
         </div>
       </div>
     </div>

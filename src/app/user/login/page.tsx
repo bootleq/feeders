@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { auth, signIn } from '@/lib/auth';
 import SubmitButton from '@/components/form/SubmitButton';
 import UserAgreement from '@/app/user/UserAgreement';
+import { TERM_DATE } from '@/app/about/term/util';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -45,6 +46,11 @@ export default async function Page() {
         </div>
 
         <hr className='w-11/12 h-px mx-auto my-6 bg-slate-400/75 border-0' />
+
+        <div className="my-2 text-center">
+          請閱讀完整《<Link className='px-1 font-bold rounded-md w-fit hover:bg-amber-300/50' href='/about/term/' target='_blank'>網站使用條款</Link>》
+          <span className='font-mono text-slate-600 text-center'>{TERM_DATE}</span>。
+        </div>
 
         <form action={onSubmit} className='p-3'>
           <SubmitButton className='block btn mx-auto ring-1 ring-offset-2 bg-gradient-to-br from-slate-100 to-pink-100 rounded-lg shadow-lg hover:ring-2 hover:scale-110'>

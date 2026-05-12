@@ -13,6 +13,7 @@ import { SpotActionEnum } from '@/lib/schema';
 import { t } from '@/lib/i18n';
 import { ariaDatePickerValueFix } from '@/lib/utils';
 import ActionLabel from '@/app/world/[[...path]]/ActionLabel';
+import FormConfirm from '@/app/world/[[...path]]/FormConfirm';
 import { createSpot } from '@/app/world/[[...path]]/create-spot';
 import { errorsAtom, metaAtom } from '@/components/form/store';
 import { addAlertAtom } from '@/components/store';
@@ -204,12 +205,7 @@ function UnscopedForm({
 
       {R.isNotEmpty(errors) && <FormErrors errors={errors} />}
 
-      {confirming &&
-        <div className='p-2 m-1 rounded ring-4 ring-yellow-400 bg-gradient-to-br from-amber-200 to-yellow-300 text-center text-balance flex items-center'>
-          <ExclamationCircleIcon className='stroke-yellow-700 animate-pulse size-16 stroke-2' height={24} />
-          資料即將公開，修改也會留下記錄，請避免洩漏私人資訊
-        </div>
-      }
+      {confirming && <FormConfirm />}
 
       <div className='flex items-center justify-center w-full gap-x-2 mt-2 mb-1 text-sm'>
         <button className='btn bg-slate-100 ring-1 flex items-center hover:bg-white' disabled={!canSave}>
