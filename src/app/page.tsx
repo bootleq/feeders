@@ -8,6 +8,27 @@ import HomeNav from './HomeNav';
 import { ArrowTurnDownRightIcon } from '@heroicons/react/24/solid';
 import siteIcon from './icon.svg'
 
+export const metadata: Metadata = {
+  alternates: {
+    types: {
+      'application/atom+xml': [
+        {
+          url: '/feeds/facts.atom',
+          title: '事實記錄 - Feeders',
+        },
+        {
+          url: '/feeds/picks.atom',
+          title: '事實選集 - Feeders',
+        },
+        {
+          url: '/feeds/world.atom',
+          title: '世界地圖 - Feeders',
+        },
+      ],
+    },
+  },
+};
+
 const notoSerif = Noto_Serif_TC({
   weight: '400',
   subsets: ['latin'],
