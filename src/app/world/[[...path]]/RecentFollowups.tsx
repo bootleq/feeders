@@ -8,7 +8,7 @@ import { ACCESS_CTRL } from '@/lib/utils';
 import { subDays, formatISO } from '@/lib/date-fp';
 import useClientOnly from '@/lib/useClientOnly';
 
-import { userAtom } from '@/components/store';
+import { userAtom, sidebarOpenedAtom } from '@/components/store';
 import { mapAtom, areaPickerAtom, viewItemAtom } from './store';
 import type { AreaPickerAtom } from './store';
 import type { WorldUserResult } from '@/models/users';
@@ -239,6 +239,26 @@ function Followups({ items, today, dates }: {
   )
 }
 
+function SidebarHideHint() {
+  const [sidebarOpen, setSidebarOpen] = useAtom(sidebarOpenedAtom);
+
+  const onCloseSidebar = useCallback(() => {
+    setSidebarOpen(false);
+  }, [setSidebarOpen]);
+
+  if (!sidebarOpen) return;
+
+  return (
+    <button type='button' onClick={onCloseSidebar} className='md:hidden block w-max mx-auto mb-14 p-1 px-5 leading-6 text-slate-600 bg-gradient-to-br from-stone-50 to-stone-200 ring-4 ring-pink-400 rounded-2xl shadow-2xl z-[1002] opacity-90 hover:opacity-100'
+    >
+      點這裡
+      <span className='text-slate-900'>關閉側邊欄</span>
+      <br />
+      （因為<strong>地圖</strong>在後面）
+    </button>
+  );
+}
+
 
 export default function RecentFollowups({ user, items, preloadedAreas, today, dates }: {
   user: WorldUserResult | null,
@@ -264,6 +284,7 @@ export default function RecentFollowups({ user, items, preloadedAreas, today, da
       <Areas areas={preloadedAreas} />
       <div className='mt-3 px-1'>最近更新</div>
       <Followups items={items} today={today} dates={dates} />
+      <SidebarHideHint />
     </div>
   );
 };

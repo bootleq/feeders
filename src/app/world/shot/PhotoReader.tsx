@@ -8,6 +8,7 @@ import { useAtom, useSetAtom } from 'jotai';
 import ExifReader from 'exifreader';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { googleMapURL, TW_BOUNDS } from '@/app/world/mapUtil';
+import { sidebarOpenedAtom } from '@/components/store';
 import { photoLocationAtom, mergeTempMarkerAtom } from './store';
 import type { Location } from './store';
 import { MapPinIcon, ArrowRightIcon, InformationCircleIcon } from '@heroicons/react/24/solid';
@@ -151,6 +152,7 @@ export default function PhotoReader() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const setTempMarker = useSetAtom(mergeTempMarkerAtom);
+  const [sidebarOpen, setSidebarOpen] = useAtom(sidebarOpenedAtom);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -234,6 +236,10 @@ export default function PhotoReader() {
       setTempMarker({ visible: true, lat: lat, lon: lon });
     }
   }, [location, setTempMarker]);
+
+  const onCloseSidebar = useCallback(() => {
+    setSidebarOpen(false);
+  }, [setSidebarOpen]);
 
   useEffect(() => {
     setLocation({ lat: null, lon: null });
@@ -386,6 +392,18 @@ export default function PhotoReader() {
           </div>
         </div>
       )}
+
+      {
+        (lat && lon) && sidebarOpen &&
+          <button type='button' onClick={onCloseSidebar}
+            className='md:hidden block w-max mx-auto mt-5 p-1 px-5 leading-6 text-slate-600 bg-gradient-to-br from-stone-50 to-stone-200 ring-4 ring-pink-400 rounded-2xl shadow-2xl z-[1002] opacity-90 hover:opacity-100'
+          >
+            點這裡
+            <span className='text-slate-900'>關閉側邊欄</span>
+            <br />
+            （因為<strong>地圖</strong>在後面）
+          </button>
+      }
 
       <div className='mt-auto mb-4 py-3 w-fit text-gray-700 flex-col gap-y-3'>
         <div className='flex items-center my-2'>
