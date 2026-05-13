@@ -249,7 +249,7 @@ export default function PhotoReader() {
   const filename = selectedFile?.name;
 
   return (
-    <div className="flex flex-col h-full overflow-auto px-3 py-4">
+    <div className="flex flex-col h-full overflow-auto scrollbar-thin px-3 py-4">
       <h1 className="text-2xl font-bold mb-4">從照片新增地點</h1>
       <div
         onDrop={handleDrop}

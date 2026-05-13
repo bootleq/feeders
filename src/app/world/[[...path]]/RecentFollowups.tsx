@@ -279,7 +279,7 @@ export default function RecentFollowups({ user, items, preloadedAreas, today, da
   }, [items, setDefaultViewItem])
 
   return (
-    <div className='overflow-y-auto'>
+    <div className='overflow-y-auto scrollbar-thin'>
       <SpotInfoPreview />
       <Areas areas={preloadedAreas} />
       <div className='mt-3 px-1'>最近更新</div>
