@@ -8,6 +8,7 @@ export type TempMarkerProps = {
   visible?: boolean,
   lat?: number,
   lon?: number,
+  defaultDate?: Date,
 };
 
 export type EditingFormType = 'spot' | 'followup' | 'amendSpot' | 'amendFollowup' | '';

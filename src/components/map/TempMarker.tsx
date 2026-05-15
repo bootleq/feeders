@@ -39,7 +39,7 @@ export default function TempMarker({
   const { data: session, status } = useSession();
   const [marker, setMarker] = useAtom(markerAtom);
   const [editingForm, setEditingForm] = useAtom(editingFormAtom);
-  const { visible, lat, lon } = marker;
+  const { visible, lat, lon, defaultDate } = marker;
 
   const markerRef = useRef<LeafletMarker | any>(null);
   const eventHandlers = useMemo(
@@ -78,7 +78,7 @@ export default function TempMarker({
       <Popup minWidth={90}>
         <div className='flex flex-col items-center text-base'>
           {canAdd ?
-            <Form lat={lat} lon={lon} {...{ markerAtom, editingFormAtom, mergeSpotsAtom }} />
+            <Form lat={lat} lon={lon} {...{ markerAtom, editingFormAtom, mergeSpotsAtom, defaultDate }} />
             :
             <div className='text-center'>
               {

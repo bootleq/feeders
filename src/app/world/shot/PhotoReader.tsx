@@ -6,10 +6,12 @@ import Link from 'next/link';
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import ExifReader from 'exifreader';
+import { format } from '@/lib/date-fp';
+import { parse, isValid } from 'date-fns';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/Tooltip';
 import { googleMapURL, TW_BOUNDS } from '@/app/world/mapUtil';
 import { sidebarOpenedAtom } from '@/components/store';
-import { photoLocationAtom, mergeTempMarkerAtom } from './store';
+import { photoLocationAtom, photoDateAtom, mergeTempMarkerAtom } from './store';
 import type { Location } from './store';
 import { MapPinIcon, ArrowRightIcon, InformationCircleIcon } from '@heroicons/react/24/solid';
 import { XMarkIcon } from '@heroicons/react/24/outline';
@@ -23,20 +25,11 @@ const tooltipCls = [
 interface ProcessedImage {
   imageUrl: string | null;
   location: Location;
-  time: string | null;
+  time: Date | null;
 }
 
 const SCALE_DOWN_STEP = 0.8;
 const MAX_DIMENSION = 640;
-
-function formatEXIFDate(str: string) {
-  if (/^\d{4}:\d{2}:\d{2} /.test(str)) {
-    const [date, tail] = str.split(' ', 2);
-    return [date.replaceAll(':', '-'), tail].join(' ');
-  } else {
-    return str;
-  }
-}
 
 function isWithinBounds(lat: number, lon: number, bounds: number[][]) {
   const [sw, ne] = bounds; // South West / North East
@@ -104,7 +97,17 @@ const processFile = async (
       } else {
         return reject(new Error('檔案中沒有 GPS 資訊'));
       }
-      time = tags['exif']?.['DateTime']?.value[0] || null;
+      const date = tags['exif']?.['DateTime']?.value[0];
+      if (date) {
+        let parsedDate;
+        try {
+          parsedDate = parse(date, 'yyyy:MM:dd HH:mm:ss', new Date());
+        } catch {
+        }
+        if (parsedDate && isValid(parsedDate)) {
+          time = parsedDate;
+        }
+      }
     } catch (err) {
       return reject(new Error('無法取得檔案中的 GPS 資訊', { cause: err }));
     }
@@ -148,7 +151,7 @@ export default function PhotoReader() {
   const [isDragging, setIsDragging] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [location, setLocation] = useAtom(photoLocationAtom);
-  const [time, setTime] = useState<string | null>(null);
+  const [time, setTime] = useAtom(photoDateAtom);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const setTempMarker = useSetAtom(mergeTempMarkerAtom);
@@ -233,9 +236,10 @@ export default function PhotoReader() {
   const onReLocate = useCallback(() => {
     const { lon, lat } = location;
     if (lon && lat) {
-      setTempMarker({ visible: true, lat: lat, lon: lon });
+      const defaultDate = time;
+      setTempMarker({ visible: true, lat: lat, lon: lon, ...defaultDate });
     }
-  }, [location, setTempMarker]);
+  }, [location, time, setTempMarker]);
 
   const onCloseSidebar = useCallback(() => {
     setSidebarOpen(false);
@@ -385,7 +389,7 @@ export default function PhotoReader() {
               <>
                 <strong className='min-w-10'>拍攝時間</strong>
                 <div className='flex items-center'>
-                  <div className='font-mono'>{formatEXIFDate(time)}</div>
+                  <div className='font-mono'>{format({}, 'yyyy-MM-dd HH:mm:SS', time)}</div>
                 </div>
               </>
             )}

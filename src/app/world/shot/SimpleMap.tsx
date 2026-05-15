@@ -15,6 +15,7 @@ import { nowAtom, alertsAtom, addAlertAtom, dismissAlertAtom } from '@/component
 import Spinner from '@/assets/spinner.svg';
 import {
   photoLocationAtom,
+  photoDateAtom,
   mapAtom,
   spotsAtom,
   mergeSpotsAtom,
@@ -137,6 +138,7 @@ function LoadingIndicator(params: any) {
 export default function SimpleMap({ allGeoHashes, preloadedAreas, helpContent, children, className, width, height, ...rest }: MapProps) {
   const map = useAtomValue(mapAtom);
   const location = useAtomValue(photoLocationAtom);
+  const photoDate = useAtomValue(photoDateAtom);
   const setTempMarker = useSetAtom(mergeTempMarkerAtom);
   const toggleHelp = useSetAtom(toggleHelpAtom);
 
@@ -152,7 +154,12 @@ export default function SimpleMap({ allGeoHashes, preloadedAreas, helpContent, c
 
   useEffect(() => {
     if (lat && lon) {
-      setTempMarker({ visible: true, lat, lon });
+      setTempMarker({
+        visible: true,
+        lat,
+        lon,
+        ...(photoDate ? { defaultDate: photoDate } : {}),
+      });
       if (map) {
         map.fire('moveend')
         map.eachLayer(layer => {
@@ -162,7 +169,7 @@ export default function SimpleMap({ allGeoHashes, preloadedAreas, helpContent, c
         })
       }
     }
-  }, [lat, lon, map, setTempMarker]);
+  }, [lat, lon, photoDate, map, setTempMarker]);
 
   if (!lat || !lon) {
     return (
