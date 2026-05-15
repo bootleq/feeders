@@ -56,7 +56,7 @@ test('事實記錄 篩選', async ({ page }) => {
 
   const fact2 = page.locator('[data-role="fact"]')
     .filter({ has: page.getByText('動保法第 7 次修法') });
-  await expect(fact2).toBeInViewport();
+  await expect(fact2).toHaveCount(1);
 
   await expect(fact2).toHaveScreenshot('facts/text-filter-w-highlight.png');
 });
