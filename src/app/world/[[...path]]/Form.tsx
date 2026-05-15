@@ -198,7 +198,7 @@ function UnscopedForm({
         </Select>
         {
           action === 'remove' &&
-            <DateTimeField name='removedAt' key={pickerKey} defaultValue={defaultDateValue} maxValue={nowValue} />
+            <DateTimeField name='removedAt' key={`${pickerKey}_r`} defaultValue={defaultDateValue} maxValue={nowValue} />
         }
 
         <Textarea name='desc' />
