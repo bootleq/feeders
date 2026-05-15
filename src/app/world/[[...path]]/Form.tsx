@@ -95,6 +95,7 @@ function SuccessAlert() {
 type FormProps = {
   lat: number,
   lon: number,
+  defaultDate?: Date,
 } & MarkerProps;
 
 function UnscopedForm({
@@ -103,6 +104,7 @@ function UnscopedForm({
   markerAtom,
   editingFormAtom,
   mergeSpotsAtom,
+  defaultDate,
 }: FormProps) {
   const setEditingForm = useSetAtom(editingFormAtom);
   const setTempMarker = useSetAtom(markerAtom);
@@ -112,6 +114,7 @@ function UnscopedForm({
   const [sending, setSending] = useState(false);
   const [action, setAction] = useState('');
   const [now, setNow] = useState(() => new Date());
+  const [pickerKey, setPickerKey] = useState(0);
   const [confirming, setConfirming] = useState(false);
   const addAlert = useSetAtom(addAlertAtom);
 
@@ -119,6 +122,10 @@ function UnscopedForm({
     setNow(new Date());
     setMeta({ fieldNameScope: 'spotFields' });
   }, [setMeta]);
+
+  useEffect(() => {
+    setPickerKey(R.inc);  // ensure DatePicker value reset
+  }, [defaultDate]);
 
   const onActionChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     setAction(e.currentTarget.value);
@@ -167,6 +174,7 @@ function UnscopedForm({
 
   const canSave = !sending;
   const nowValue = parseAbsoluteToLocal(now.toISOString());
+  const defaultDateValue = defaultDate ? parseAbsoluteToLocal(defaultDate.toISOString()) : nowValue;
 
   return (
     <form onSubmit={onSubmit} className='flex flex-col items-center gap-y-1 mt-3'>
@@ -190,14 +198,14 @@ function UnscopedForm({
         </Select>
         {
           action === 'remove' &&
-            <DateTimeField name='removedAt' defaultValue={nowValue} maxValue={nowValue} />
+            <DateTimeField name='removedAt' key={`${pickerKey}_r`} defaultValue={defaultDateValue} maxValue={nowValue} />
         }
 
         <Textarea name='desc' />
         <TextInput name='material' inputProps={{ placeholder: '例：狗罐頭' }} />
         <TextInput name='feedeeCount' type='number' tooltip={<SimpleTooltip text='同時出現的狗群隻數' />} inputProps={{ min: 0, max: 99, defaultValue: 0 }} />
 
-        <DateTimeField name='spawnedAt' maxValue={nowValue} tooltip={spawnedAtTooltip} />
+        <DateTimeField name='spawnedAt' key={pickerKey} defaultValue={defaultDateValue} maxValue={nowValue} tooltip={spawnedAtTooltip} />
 
         <input type='hidden' name='lat' value={lat} />
         <input type='hidden' name='lon' value={lon} />

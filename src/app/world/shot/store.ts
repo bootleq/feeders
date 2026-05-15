@@ -2,10 +2,8 @@ import * as R from 'ramda';
 import { atom } from 'jotai';
 import type {
   GeoSpotsByGeohash,
-  GeoSpotsResultFollowup
 } from '@/models/spots';
 import type { TempMarkerProps, EditingFormType } from '@/components/map/store';
-import type { LatLngBounds } from '@/lib/schema';
 import type { Map } from 'leaflet';
 
 export type Location = {
@@ -14,6 +12,7 @@ export type Location = {
 };
 
 export const photoLocationAtom = atom<Location>({lat: null, lon: null});
+export const photoDateAtom = atom<Date | null>(null);
 
 export const mapAtom = atom<Map | null>(null);
 
