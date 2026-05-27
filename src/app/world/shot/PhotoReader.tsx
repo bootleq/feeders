@@ -201,7 +201,7 @@ export default function PhotoReader() {
     } finally {
       setLoading(false);
     }
-  }, [canvasRef, setLocation]);
+  }, [setLocation, setTime]);
 
   const onFileChange = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
