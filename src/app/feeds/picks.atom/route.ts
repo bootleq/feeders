@@ -10,7 +10,7 @@ const masker = buildMasker({ isPublic: true });
 
 const FEED_SIZE = 35;
 const headerCacheTime = 30 * 60;  // GET response cache: 30 minutes
-const feedUrl = `${APP_URL}feeds/fact-picks.atom`;
+const feedUrl = `${APP_URL}feeds/picks.atom`;
 const iconUrl = `${APP_URL}icon.svg`;
 
 const getPicks = unstable_cache(
