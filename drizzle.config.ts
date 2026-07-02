@@ -14,7 +14,7 @@ const config: Config = {
 }
 
 if (REMOTE_D1) {
-  Object.assign({
+  Object.assign(config, {
     driver: 'd1-http',
     dbCredentials: {
       accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
@@ -22,7 +22,7 @@ if (REMOTE_D1) {
       token: process.env.CLOUDFLARE_D1_TOKEN
     },
     strict: true,
-  }, config);
+  });
 } else {
   const localDbDir = '.wrangler/state/v3/d1/miniflare-D1DatabaseObject';
   const files = readdirSync(localDbDir);
