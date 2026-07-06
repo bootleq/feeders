@@ -27,7 +27,7 @@ import {
   latestAddMarkAtom,
   timelineInterObserverAtom,
   factsLoadedAtom,
-  factsVirtuaAtom,
+  virtualListAtom,
 } from './store';
 import type { Tags } from './store';
 import FactTagList from './FactTagList';
@@ -155,7 +155,7 @@ export default function Timeline({ facts, isSubView = false, col, isOnly = false
   const setInterObserver = useSetAtom(timelineInterObserverAtom);
   const [markOffscreen, setMarkOffscreen] = useState<null | 'up' | 'down'>(null);
   const factLoaded = useAtomValue(factsLoadedAtom);
-  const factVirtua = useAtomValue(factsVirtuaAtom);
+  const virtualList = useAtomValue(virtualListAtom);
 
   const rangesAtom = useMemo(() => {
     return highlightRangesAtomFamily(col);
@@ -290,7 +290,7 @@ export default function Timeline({ facts, isSubView = false, col, isOnly = false
       {!isSubView && <a href='#head' className='absolute -top-2'></a>}
       {!isSubView && <MarkOffscreenIndicators direct='up' />}
       {!factLoaded && <LoadingInitialFacts />}
-      {factVirtua ?
+      {virtualList ?
         <VList ref={vListRef} shift={true}>
           {Facts}
         </VList>

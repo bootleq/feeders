@@ -19,7 +19,7 @@ import {
   filterRejectedCountAtom,
   columnsAtom,
   zoomedFactAtom,
-  factsVirtuaAtom,
+  virtualListAtom,
 } from './store';
 import { addAlertAtom } from '@/components/store';
 
@@ -59,7 +59,7 @@ export default function TimelineContainer({ facts: initialFacts, initialSlug, in
   const dateRangeKey = dateRange.join(',');
   const pathname = usePathname();
   const setZoomedFact = useSetAtom(zoomedFactAtom);
-  const setFactVirtua = useSetAtom(factsVirtuaAtom);
+  const setVirtualList = useSetAtom(virtualListAtom);
   const lastAlertSlug = useRef('');
   const addAlert = useSetAtom(addAlertAtom);
 
@@ -183,7 +183,7 @@ export default function TimelineContainer({ facts: initialFacts, initialSlug, in
 
   const throttledResize = useThrottledCallback(() => {
     const isMobile = window.innerWidth <= 768;
-    setFactVirtua(isMobile);
+    setVirtualList(isMobile);
   }, 200, { trailing: true });
 
   useEffect(() => {

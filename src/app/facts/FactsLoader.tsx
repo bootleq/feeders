@@ -8,7 +8,7 @@ import {
   factsAtom,
   factsLoadedAtom,
   mergeFactsAtom,
-  factsVirtuaAtom,
+  virtualListAtom,
 } from './store';
 import { addAlertAtom } from '@/components/store';
 
@@ -54,16 +54,16 @@ const fetchFactsAtom = atom(
 export default function FactsLoader() {
   const fetchFacts = useSetAtom(fetchFactsAtom);
   const loaded = useAtomValue(factsLoadedAtom);
-  const setVirtua = useSetAtom(factsVirtuaAtom);
+  const setVirtual = useSetAtom(virtualListAtom);
 
   useEffect(() => {
     if (!loaded) {
       if (window.innerWidth <= 768) {
-        setVirtua(true);
+        setVirtual(true);
       }
       fetchFacts();
     }
-  }, [loaded, fetchFacts, setVirtua]);
+  }, [loaded, fetchFacts, setVirtual]);
 
   return null;
 }
