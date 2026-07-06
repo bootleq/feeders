@@ -73,6 +73,7 @@ export const mergeFactsAtom = atom(
     set(factsAtom, mergedItems);
   }
 );
+export const factsVirtuaAtom = atom(false);
 
 export type Tags = Record<string, boolean>;
 export const tagsAtom = atom<Tags>({});

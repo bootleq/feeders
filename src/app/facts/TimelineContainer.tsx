@@ -5,6 +5,7 @@ import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { useSetAtom, useAtomValue } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
+import { useThrottledCallback } from 'use-debounce';
 import striptags from 'striptags';
 import type { PickProps } from '@/models/facts';
 import { present, blank, scrollAnywhereFix } from '@/lib/utils';
@@ -17,6 +18,7 @@ import {
   filterRejectedCountAtom,
   columnsAtom,
   zoomedFactAtom,
+  factsVirtuaAtom,
 } from './store';
 import { addAlertAtom } from '@/components/store';
 
@@ -55,6 +57,7 @@ export default function TimelineContainer({ facts: initialFacts, initialSlug, in
   const dateRangeKey = dateRange.join(',');
   const pathname = usePathname();
   const setZoomedFact = useSetAtom(zoomedFactAtom);
+  const setFactVirtua = useSetAtom(factsVirtuaAtom);
   const lastAlertSlug = useRef('');
   const addAlert = useSetAtom(addAlertAtom);
 
@@ -150,6 +153,11 @@ export default function TimelineContainer({ facts: initialFacts, initialSlug, in
     }
   }, [addAlert]);
 
+  const throttledResize = useThrottledCallback(() => {
+    const isMobile = window.innerWidth <= 768;
+    setFactVirtua(isMobile);
+  }, 200, { trailing: true });
+
   useEffect(() => {
     window.addEventListener('hashchange', followHash);
     return () => {
@@ -180,6 +188,14 @@ export default function TimelineContainer({ facts: initialFacts, initialSlug, in
       target && target.scrollIntoView({ behavior: 'instant' });
     }
   }, [initialSlug, factsLoaded]);
+
+  useEffect(() => {
+    window.addEventListener('resize', throttledResize);
+
+    return () => {
+      window.removeEventListener('resize', throttledResize);
+    };
+  }, [throttledResize]);
 
   return (
     <div className={`w-full mx-auto px-0 grid gap-2 ${colsClass}`} onMouseEnter={onMouseEnter} data-nosnippet={isInitialZoom ? '' : undefined}>

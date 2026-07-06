@@ -3,6 +3,7 @@
 import * as R from 'ramda';
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { VList } from "virtua";
 import { AnyFunction, present } from '@/lib/utils';
 import { addAlertAtom } from '@/components/store';
 import Html from '@/components/Html';
@@ -24,6 +25,7 @@ import {
   latestAddMarkAtom,
   timelineInterObserverAtom,
   factsLoadedAtom,
+  factsVirtuaAtom,
 } from './store';
 import type { Tags } from './store';
 import FactTagList from './FactTagList';
@@ -150,6 +152,7 @@ export default function Timeline({ facts, isSubView = false, col, isOnly = false
   const setInterObserver = useSetAtom(timelineInterObserverAtom);
   const [markOffscreen, setMarkOffscreen] = useState<null | 'up' | 'down'>(null);
   const factLoaded = useAtomValue(factsLoadedAtom);
+  const factVirtua = useAtomValue(factsVirtuaAtom);
 
   const rangesAtom = useMemo(() => {
     return highlightRangesAtomFamily(col);
@@ -284,7 +287,13 @@ export default function Timeline({ facts, isSubView = false, col, isOnly = false
       {!isSubView && <a href='#head' className='absolute -top-2'></a>}
       {!isSubView && <MarkOffscreenIndicators direct='up' />}
       {!factLoaded && <LoadingInitialFacts />}
-      {Facts}
+      {factVirtua ?
+        <VList shift={true}>
+          {Facts}
+        </VList>
+        :
+        Facts
+      }
       {!isSubView && <MarkOffscreenIndicators direct='down' />}
 
       <KeywordRangeCollector
