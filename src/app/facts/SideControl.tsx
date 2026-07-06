@@ -33,7 +33,7 @@ import type { Tags, Fact, DateRange } from './store';
 import type { AnyFunction } from '@/lib/utils';
 import { tooltipClass, tooltipMenuCls } from '@/lib/utils';
 import useClientOnly from '@/lib/useClientOnly';
-import { findFactElement, clearMarkIndicators } from './utils';
+import { clearMarkIndicators } from './utils';
 import tlStyles from './timeline.module.scss';
 import { getTagColor } from './colors';
 import MarkList from './MarkList';
