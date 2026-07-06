@@ -5,7 +5,9 @@ import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { useSetAtom, useAtomValue } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
+import { useThrottledCallback } from 'use-debounce';
 import striptags from 'striptags';
+import type { VListHandle } from "virtua";
 import type { PickProps } from '@/models/facts';
 import { present, blank, scrollAnywhereFix } from '@/lib/utils';
 import { factsAtom, factsLoadedAtom, filterByMarksAtom, pickAtom, currentMarksAtom } from '@/app/facts/store';
@@ -17,6 +19,7 @@ import {
   filterRejectedCountAtom,
   columnsAtom,
   zoomedFactAtom,
+  virtualListAtom,
 } from './store';
 import { addAlertAtom } from '@/components/store';
 
@@ -47,6 +50,7 @@ export default function TimelineContainer({ facts: initialFacts, initialSlug, in
   const factsLoaded = useAtomValue(factsLoadedAtom);
   const setSlug = useSetAtom(slugAtom);
   const [isInitialZoom, setIsInitialZoom] = useState(present(initialSlug));
+  const vListRef = useRef<VListHandle>(null);
   const textFilter = useAtomValue(textFilterAtom);
   const dateRange = useAtomValue(dateRangeAtom);
   const setRejectCount = useSetAtom(filterRejectedCountAtom);
@@ -55,6 +59,7 @@ export default function TimelineContainer({ facts: initialFacts, initialSlug, in
   const dateRangeKey = dateRange.join(',');
   const pathname = usePathname();
   const setZoomedFact = useSetAtom(zoomedFactAtom);
+  const setVirtualList = useSetAtom(virtualListAtom);
   const lastAlertSlug = useRef('');
   const addAlert = useSetAtom(addAlertAtom);
 
@@ -94,6 +99,14 @@ export default function TimelineContainer({ facts: initialFacts, initialSlug, in
     }, 500);
   }, []);
 
+  const findVirtualFact = useCallback((anchor?: string) => {
+    const factId = anchor?.toString().match(/^fact.*_(\d+)$/)?.pop();
+    if (factId) {
+      return validFacts.findIndex(R.propEq(Number(factId), 'id'));
+    }
+    return -1;
+  }, [validFacts]);
+
   const setZoomBySlug = useCallback((newSlug?: string) => {
     const zoom = newSlug?.match(ZOOM_SLUG_PATTERN);
     if (zoom) {
@@ -104,8 +117,16 @@ export default function TimelineContainer({ facts: initialFacts, initialSlug, in
           if (!isInitialZoom) {
             setZoomedFact(fact);
           }
-          const target = findFactElement(`fact-${newSlug}`);
-          target && target.scrollIntoView({ behavior: 'instant' });
+
+          const anchor = `fact-${newSlug}`;
+
+          if (vListRef.current) {
+            const vItemIdx = findVirtualFact(anchor);
+            vListRef.current.scrollToIndex(vItemIdx);
+          } else {
+            const target = findFactElement(anchor);
+            target && target.scrollIntoView({ behavior: 'instant' });
+          }
         } else {
           setZoomedFact(null);
           const slugString = JSON.stringify(newSlug);
@@ -129,26 +150,41 @@ export default function TimelineContainer({ facts: initialFacts, initialSlug, in
       }
       setZoomedFact(null);
     }
-  }, [facts, setZoomedFact, addAlert, isInitialZoom, lastAlertSlug]);
+  }, [facts, setZoomedFact, addAlert, isInitialZoom, lastAlertSlug, findVirtualFact]);
+
+  const highlightScrolledFact = useCallback((target: Element) => {
+    target.classList.remove(tlStyles['animate-flash']);
+    window.setTimeout(() => {
+      target.classList.add(tlStyles['animate-flash']);
+      clearMarkIndicators();
+    });
+  }, []);
 
   const followHash = useCallback((e: HashChangeEvent) => {
     const hash = decodeURI(new URL(e.newURL).hash);
 
     if (hash.startsWith('#fact-')) {
+      if (vListRef.current) {
+        const vItemIdx = findVirtualFact(hash.slice(1));
+        vListRef.current.scrollToIndex(vItemIdx);
+        return;
+      }
+
       const target = findFactElement(hash.slice(1));
       if (target) {
-        target.classList.remove(tlStyles['animate-flash']);
-        window.setTimeout(() => {
-          target.classList.add(tlStyles['animate-flash']);
-          clearMarkIndicators();
-        });
+        highlightScrolledFact(target);
         scrollAnywhereFix();
         target.scrollIntoView();
       } else {
         addAlert('error', <>無法跳到選定日期（可能已被隱藏）</>);
       }
     }
-  }, [addAlert]);
+  }, [addAlert, findVirtualFact, highlightScrolledFact]);
+
+  const throttledResize = useThrottledCallback(() => {
+    const isMobile = window.innerWidth <= 768;
+    setVirtualList(isMobile);
+  }, 200, { trailing: true });
 
   useEffect(() => {
     window.addEventListener('hashchange', followHash);
@@ -176,14 +212,26 @@ export default function TimelineContainer({ facts: initialFacts, initialSlug, in
   useEffect(() => {
     const hash = window.location.hash;
     if (!hash && !initialSlug && factsLoaded) {
-      const target = document.querySelector('[data-role="timeline"] [data-role="fact"]:nth-last-child(1 of [data-role="fact"])')
-      target && target.scrollIntoView({ behavior: 'instant' });
+      if (vListRef.current) {
+        vListRef.current.scrollToIndex(99999);
+      } else {
+        const target = document.querySelector('[data-role="timeline"] [data-role="fact"]:nth-last-child(1 of [data-role="fact"])')
+        target && target.scrollIntoView({ behavior: 'instant' });
+      }
     }
   }, [initialSlug, factsLoaded]);
 
+  useEffect(() => {
+    window.addEventListener('resize', throttledResize);
+
+    return () => {
+      window.removeEventListener('resize', throttledResize);
+    };
+  }, [throttledResize]);
+
   return (
     <div className={`w-full mx-auto px-0 grid gap-2 ${colsClass}`} onMouseEnter={onMouseEnter} data-nosnippet={isInitialZoom ? '' : undefined}>
-      <Timeline col={1} facts={validFacts} isOnly={columns.length === 1} />
+      <Timeline col={1} facts={validFacts} vListRef={vListRef} isOnly={columns.length === 1} />
 
       {
         columns.slice(1).map((visible, idx) => (

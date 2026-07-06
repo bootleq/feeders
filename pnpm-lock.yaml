@@ -131,6 +131,9 @@ importers:
       use-debounce:
         specifier: ^10.0.2
         version: 10.0.2(react@19.2.3)
+      virtua:
+        specifier: ^0.49.2
+        version: 0.49.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       zod:
         specifier: ^3.23.8
         version: 3.23.8
@@ -7207,6 +7210,7 @@ packages:
 
   stream-to-promise@2.2.0:
     resolution: {integrity: sha512-HAGUASw8NT0k8JvIVutB2Y/9iBk7gpgEyAudXwNJmZERdMITGdajOa4VJfD/kNiA3TppQpTP4J+CtcHwdzKBAw==}
+    deprecated: Deprecated. Use node:stream/promises and node:stream/consumers instead.
 
   string-width@4.2.3:
     resolution: {integrity: sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==}
@@ -7641,6 +7645,26 @@ packages:
     resolution: {integrity: sha512-TwzIEm5pYB9J2ZwfZbiET3BTaV5eaW8zxvEmWyua6dTPo42TVz7IfQjume8wo6CrzZ2ru0W/ti/Ydsmf7g4jeA==}
     engines: {node: '>= 18'}
     hasBin: true
+
+  virtua@0.49.2:
+    resolution: {integrity: sha512-aEp3+6cmIRjHUlQnWdgGXYMYtrIG26QnN9jJDZEE5LRhvo1Z9HzoJwLDgyVULUPWcSdCnZAroQm7raXJyTG0AA==}
+    peerDependencies:
+      react: '>=16.14.0'
+      react-dom: '>=16.14.0'
+      solid-js: '>=1.0'
+      svelte: '>=5.0'
+      vue: '>=3.2'
+    peerDependenciesMeta:
+      react:
+        optional: true
+      react-dom:
+        optional: true
+      solid-js:
+        optional: true
+      svelte:
+        optional: true
+      vue:
+        optional: true
 
   vite-node@2.0.5:
     resolution: {integrity: sha512-LdsW4pxj0Ot69FAoXZ1yTnA9bjGohr2yNBU7QKRxpz8ITSkhuDl6h3zS/tvgz4qrNjeRnvrWeXQ8ZF7Um4W00Q==}
@@ -17060,6 +17084,11 @@ snapshots:
       - encoding
       - rollup
       - supports-color
+
+  virtua@0.49.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
+    optionalDependencies:
+      react: 19.2.3
+      react-dom: 19.2.3(react@19.2.3)
 
   vite-node@2.0.5(@types/node@20.14.14)(sass@1.77.8)(terser@5.16.9):
     dependencies:

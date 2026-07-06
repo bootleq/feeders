@@ -75,6 +75,7 @@
     "striptags": "4.0.0-alpha.4",
     "superjson": "^2.2.3",
     "use-debounce": "^10.0.2",
+    "virtua": "^0.49.2",
     "zod": "^3.23.8"
   },
   "devDependencies": {
