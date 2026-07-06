@@ -99,6 +99,14 @@ export default function TimelineContainer({ facts: initialFacts, initialSlug, in
     }, 500);
   }, []);
 
+  const findVirtualFact = useCallback((anchor?: string) => {
+    const factId = anchor?.toString().match(/^fact.*_(\d+)$/)?.pop();
+    if (factId) {
+      return validFacts.findIndex(R.propEq(Number(factId), 'id'));
+    }
+    return -1;
+  }, [validFacts]);
+
   const setZoomBySlug = useCallback((newSlug?: string) => {
     const zoom = newSlug?.match(ZOOM_SLUG_PATTERN);
     if (zoom) {
@@ -142,15 +150,7 @@ export default function TimelineContainer({ facts: initialFacts, initialSlug, in
       }
       setZoomedFact(null);
     }
-  }, [facts, setZoomedFact, addAlert, isInitialZoom, lastAlertSlug]);
-
-  const findVirtualFact = useCallback((anchor?: string) => {
-    const factId = anchor?.toString().match(/^fact.*_(\d+)$/)?.pop();
-    if (factId) {
-      return validFacts.findIndex(R.propEq(Number(factId), 'id'));
-    }
-    return -1;
-  }, [validFacts]);
+  }, [facts, setZoomedFact, addAlert, isInitialZoom, lastAlertSlug, findVirtualFact]);
 
   const highlightScrolledFact = useCallback((target: Element) => {
     target.classList.remove(tlStyles['animate-flash']);
@@ -179,7 +179,7 @@ export default function TimelineContainer({ facts: initialFacts, initialSlug, in
         addAlert('error', <>無法跳到選定日期（可能已被隱藏）</>);
       }
     }
-  }, [addAlert, findVirtualFact]);
+  }, [addAlert, findVirtualFact, highlightScrolledFact]);
 
   const throttledResize = useThrottledCallback(() => {
     const isMobile = window.innerWidth <= 768;
