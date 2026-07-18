@@ -138,6 +138,13 @@
     &:global(.feeders-mce-lengthy) {
       > li {
         margin-bottom: 0.5rem;
+
+        ul, ol {
+          margin-block: 0.5rem;
+          > li {
+            margin-bottom: 0.25rem;
+          }
+        }
       }
     }
   }

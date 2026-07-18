@@ -62,9 +62,16 @@ const commonCSS = `
   ul.feeders-mce-lengthy {
     border-left: 2px solid var(--extension-ring-color);
   }
-  ol.feeders-mce-lengthy li,
-  ul.feeders-mce-lengthy li {
+  .feeders-mce-lengthy > li {
     margin-bottom: 0.5rem;
+  }
+  .feeders-mce-lengthy > li ul,
+  .feeders-mce-lengthy > li ol {
+    margin-block: 0.5rem;
+  }
+  .feeders-mce-lengthy > li ul > li,
+  .feeders-mce-lengthy > li ol > li {
+    margin-bottom: 0.25rem;
   }
 
   /* 表格 */
