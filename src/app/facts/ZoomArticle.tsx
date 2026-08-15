@@ -9,6 +9,7 @@ import { useHydrateAtoms } from 'jotai/utils';
 import { BASE_META } from '@/app/facts/utils';
 import tlStyles from './timeline.module.scss';
 import FactTagList from './FactTagList';
+import DateTag from './DateTag';
 import Html from '@/components/Html';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
@@ -77,19 +78,17 @@ export default function ZoomArticle({ initialFact }: {
   const { id, date, title, desc, summary, origin, tags, weight } = fact;
 
   return (
-    <dialog ref={ref} className={dialogCls} onClose={onClose} onClick={onClick}>
-      <div className='sticky top-0 flex items-center flex-wrap p-3 px-2 sm:px-5 gap-y-2 bg-gradient-to-br from-stone-50/80 to-slate-100/80'>
-        <div className={`leading-tight text-center text-lg sm:text-start sm:text-balance ${titleCollapsed ? 'truncate sm:whitespace-normal' : 'text-balance'}`}>
+    <dialog ref={ref} className={dialogCls} onClose={onClose} onClick={onClick} itemScope itemType='https://schema.org/Article'>
+      <header className='sticky top-0 flex items-center flex-wrap p-3 px-2 sm:px-5 gap-y-2 bg-gradient-to-br from-stone-50/80 to-slate-100/80'>
+        <h1 itemProp='headline' className={`leading-tight text-center text-lg sm:text-start sm:text-balance ${titleCollapsed ? 'truncate sm:whitespace-normal' : 'text-balance'}`}>
           {title}
-        </div>
+        </h1>
 
         <div className='text-sm ml-auto flex items-center'>
           <button className='sm:hidden flex items-center btn px-1 py-0 mx-1 text-slate-400 text-xs focus:ring-0 focus-visible:ring' onClick={onResizeTitle}>
             <span className='text-base mr-1'>{titleCollapsed ? ' ⇳' : '↸'}</span> title
           </button>
-          <div className='font-mono mx-1 px-1 whitespace-nowrap rounded-md ring-1 text-red-950 bg-gradient-to-br from-amber-200 to-amber-200/80'>
-            {date}
-          </div>
+          <DateTag date={date} className='font-mono mx-1 px-1 whitespace-nowrap rounded-md ring-1 text-red-950 bg-gradient-to-br from-amber-200 to-amber-200/80' />
         </div>
 
         <FactTagList tags={tags} className={`mx-2 ${titleCollapsed ? 'hidden sm:flex' : ''}`} />
@@ -97,10 +96,10 @@ export default function ZoomArticle({ initialFact }: {
         <button className='btn p-px ml-auto hover:bg-white rounded-full hover:scale-125 hover:drop-shadow' aria-label='刪除' onClick={onClose}>
           <XMarkIcon className='stroke-slate-700 stroke-2' height={24} />
         </button>
-      </div>
+      </header>
 
       <div ref={bodyRef} tabIndex={0} className='px-2 sm:px-5 pb-2.5 mt-auto max-h-[80vh] overflow-auto focus-visible:outline-none'>
-        <div className={`text-opacity-90 -mt-2 break-words ${tlStyles.mce}`}>
+        <div itemProp='articleBody' className={`text-opacity-90 -mt-2 break-words ${tlStyles.mce}`}>
           <Html html={desc} />
         </div>
 

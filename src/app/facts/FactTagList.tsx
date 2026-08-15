@@ -13,7 +13,7 @@ export default function FactTagList({ tags, className }: {
   return (
     <ul data-role='tags' className={`flex flex-wrap items-center justify-end gap-y-1 text-xs ${className || ''}`}>
       {tags.map(tag => (
-        <li key={tag} className={`${getTagColor(tag).join(' ')} rounded-full px-1 p-px mx-px border text-nowrap`}>
+        <li key={tag} itemProp='keywords' className={`${getTagColor(tag).join(' ')} rounded-full px-1 p-px mx-px border text-nowrap`}>
           {tag}
         </li>
       ))}

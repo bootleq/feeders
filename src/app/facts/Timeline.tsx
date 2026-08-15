@@ -9,6 +9,7 @@ import type { VListHandle } from "virtua";
 import { AnyFunction, present } from '@/lib/utils';
 import { addAlertAtom } from '@/components/store';
 import Html from '@/components/Html';
+import DateTag from './DateTag';
 import { KeywordRangeCollector } from '@/components/KeywordRangeCollector';
 import {
   slugAtom,
@@ -55,8 +56,6 @@ function Fact({ fact, isSubView, onZoom }: {
   const { id, date, title, desc, summary, origin, tags, weight } = fact;
   const anchor = `fact-${fact.date}_${fact.id}`;
   const zoomPath = `/facts/${anchor.replace('fact-', '')}/`;
-  const dateDisplay = date.replace(/^0*/, '');
-  const datePadEnd = dateDisplay.length < 10 ? <span className=''>{'\u00A0'.repeat(10 - dateDisplay.length)}</span> : '';
   const allTagsHiddenAtom = useMemo(() => createTagsHiddenAtom(tags || ['']), [tags]);
   const hidden = useAtomValue(allTagsHiddenAtom);
 
@@ -67,15 +66,13 @@ function Fact({ fact, isSubView, onZoom }: {
   const idProp = isSubView ? {} : { id: anchor };
 
   return (
-    <div data-role='fact' data-id={id} data-anchor={anchor} className='px-1 pl-3 py-1 relative group rounded ring-slate-700/20'>
+    <div data-role='fact' data-id={id} data-anchor={anchor} itemScope itemType='https://schema.org/Article' className='px-1 pl-3 py-1 relative group rounded ring-slate-700/20'>
       <div className='flex items-center py-1 group/header group-hover:bg-slate-100 group-hover:ring ring-slate-200'>
         <div {...idProp} className='font-mono text-sm relative flex items-center whitespace-nowrap ml-px mr-1 px-1 rounded-md ring-1 text-red-950 bg-gradient-to-br from-amber-200 to-amber-200/80'>
           <a className='absolute flex items-center justify-center size-3 drop-shadow z-20 -left-[15px] bg-slate-100 border border-slate-400 rounded-full' href={`#${anchor}`}></a>
-          <div data-role='fact-date'>
-            {dateDisplay}{datePadEnd}
-          </div>
+          <DateTag date={date} />
         </div>
-        <div data-role='title' className='leading-tight text-balance text-center sm:text-start'>
+        <div data-role='title' itemProp='headline' className='leading-tight text-balance text-center sm:text-start'>
           {title}
         </div>
         <a href={zoomPath} className={`ml-auto ${factHeaderIconCls}`} data-disable-progress={true} onClick={onZoom} title='獨占顯示'>
@@ -89,7 +86,7 @@ function Fact({ fact, isSubView, onZoom }: {
         <FactTagList tags={tags} />
       </div>
 
-      <div data-role='desc' className={`text-opacity-90 pl-2 break-words ${tlStyles.mce}`}>
+      <div data-role='desc' itemProp='articleBody' className={`text-opacity-90 pl-2 break-words ${tlStyles.mce}`}>
         <Html html={desc} />
       </div>
 
