@@ -112,6 +112,15 @@ pnpm cms-restart
 See [directus/README.md](directus/README.md) for more details.
 
 
+## Build markdown files from CMS content
+
+```
+pnpm cms:mds`
+```
+
+Transform content HTML to markdown, prepare to be used by external tools.
+
+
 ## Build with Bundle Analyzer
 
     ANALYZE=true pnpm build
