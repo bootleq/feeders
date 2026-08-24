@@ -115,7 +115,8 @@ See [directus/README.md](directus/README.md) for more details.
 ## Build markdown files from CMS content
 
 ```
-pnpm cms:mds`
+pnpm cms:mds
+pnpm cms:mds:upload
 ```
 
 Transform content HTML to markdown, prepare to be used by external tools.

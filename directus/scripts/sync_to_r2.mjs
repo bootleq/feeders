@@ -3,7 +3,7 @@ import { spawnSync } from 'child_process';
 
 const STORAGE_S3_BUCKET = 'feeders';
 
-const rcloneRemote = process.env.RCLONE_REMOTE;
+const rcloneRemote = process.env.RCLONE_REMOTE_R2;
 const srcDir = 'directus/build/cms';
 const r2Dir = 'cms';
 
@@ -15,7 +15,7 @@ const fullSync = false;
 // files. If certain operation is needed, enable fullSync and bear the cost.
 
 if (!rcloneRemote) {
-  console.error('Variable "RCLONE_REMOTE" is not set, aborted.');
+  console.error('Variable "RCLONE_REMOTE_R2" is not set, aborted.');
   process.exit(1);
 }
 
